@@ -108,42 +108,6 @@ public class DIVFeatureManager extends FeatureManager {
 				throw new RuntimeException("parent is general span, but have "+children_k.length+" children?");
 
 			
-			if(!pa_type.equals(OE) && !pa_type.equals(ONE) && !child_1_type.equals(OE) && !child_1_type.equals(ONE)
-					&& (leftIndex==rightIndex || (leftIndex!=rightIndex && completeness==0))){
-				for(int i=leftIndex;i<=rightIndex;i++){
-					String word = sent.get(i).getName();
-					String tag = sent.get(i).getTag();
-					String prevWord = i>0?sent.get(i-1).getName():"STR";
-					String prevTag = i>0?sent.get(i-1).getTag():"STR";
-					String nextWord = i<sent.length()-1? sent.get(i+1).getName():"END";
-					String nextTag = i<sent.length()-1? sent.get(i+1).getTag():"END";
-					String child_type = child_1_type;
-					for(int d=0;d<dirs.length;d++){
-						if(completeness==1 && direction==1 && i==leftIndex && d==0) continue;
-						if(completeness==1 && direction==0 && i==rightIndex && d==1) continue;
-						if(completeness==0 && ((i==leftIndex && d==0) || (i==rightIndex && d==1)) ) continue;
-						
-						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-UN-WORD", child_type+":"+word+",DIRECTION:"+dirs[d]));
-						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-UN-TAG", child_type+":"+tag+",DIRECTION:"+dirs[d]));
-						
-						featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevTag-currTag", 
-								child_type+":"+prevTag+","+tag+",DIRECTION:"+dirs[d]));
-						
-						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-UN-SHAPE", 
-								child_type+":"+wordShape(word)+",DIRECTION:"+dirs[d]));
-						
-					}
-					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevWord", child_type+":"+prevWord));
-					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevTag", child_type+":"+prevTag));
-					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevShape", child_type+":"+wordShape(prevWord)));
-					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-nextWord", child_type+":"+nextWord));
-					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-nextTag", child_type+":"+nextTag));
-					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-nextShape", child_type+":"+wordShape(nextWord)));
-					
-				}
-			}
-			
-			
 			if((pa_type.equals(OE)||pa_type.equals("null")) && !child_1_type.equals(OE) && !child_1_type.equals(ONE)
 					&& (leftIndex==rightIndex || (leftIndex!=rightIndex && completeness==0))){
 				
@@ -186,27 +150,32 @@ public class DIVFeatureManager extends FeatureManager {
 					String nextWord = i<sent.length()-1? sent.get(i+1).getName():"END";
 					String nextTag = i<sent.length()-1? sent.get(i+1).getTag():"END";
 					String child_type = leftIndex==rightIndex||i==leftIndex? E_B_PREFIX+child_1_type:E_I_PREFIX+child_1_type;
-					for(int d=0;d<dirs.length;d++){
-						if(completeness==1 && direction==1 && i==leftIndex && d==0) continue;
-						if(completeness==1 && direction==0 && i==rightIndex && d==1) continue;
-						if(completeness==0 && ((i==leftIndex && d==0) || (i==rightIndex && d==1)) ) continue;
-						
-						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-UN-WORD", child_type+":"+word+",DIRECTION:"+dirs[d]));
-						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-UN-TAG", child_type+":"+tag+",DIRECTION:"+dirs[d]));
-						
-						featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevTag-currTag", 
-								child_type+":"+prevTag+","+tag+",DIRECTION:"+dirs[d]));
-						
-						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-UN-SHAPE", 
-								child_type+":"+wordShape(word)+",DIRECTION:"+dirs[d]));
-						
+					if(i==leftIndex || i==rightIndex){
+						for(int d=0;d<dirs.length;d++){
+							if(completeness==1 && direction==1 && i==leftIndex && d==0) continue;
+							if(completeness==1 && direction==0 && i==rightIndex && d==1) continue;
+							if(completeness==0 && ((i==leftIndex && d==0) || (i==rightIndex && d==1)) ) continue;
+							featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-UN-WORD", child_type+":"+word+",DIRECTION:"+dirs[d]));
+							featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-UN-TAG", child_type+":"+tag+",DIRECTION:"+dirs[d]));
+							featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevTag-currTag", 
+									child_type+":"+prevTag+","+tag+",DIRECTION:"+dirs[d]));
+							featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-UN-SHAPE", 
+									child_type+":"+wordShape(word)+",DIRECTION:"+dirs[d]));
+						}
+					}else{
+						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-UN-WORD", child_type+":"+word));
+						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-UN-TAG", child_type+":"+tag));
+						featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevTag-currTag", child_type+":"+prevTag+","+tag));
+						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-UN-SHAPE", child_type+":"+wordShape(word)));
 					}
+					
 					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevWord", child_type+":"+prevWord));
 					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevTag", child_type+":"+prevTag));
 					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevShape", child_type+":"+wordShape(prevWord)));
 					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-nextWord", child_type+":"+nextWord));
 					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-nextTag", child_type+":"+nextTag));
 					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-nextShape", child_type+":"+wordShape(nextWord)));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-type", child_1_type));
 					
 				}
 				
@@ -254,16 +223,21 @@ public class DIVFeatureManager extends FeatureManager {
 				
 				StringBuilder sb = new StringBuilder("");
 				StringBuilder sbShapes = new StringBuilder("");
-				for(int i=leftIndex;i<=rightIndex;i++){	
-					for(int d=0;d<dirs.length;d++){
-						if(completeness==1 && direction==1 && i==leftIndex && d==0) continue;
-						if(completeness==1 && direction==0 && i==rightIndex && d==1) continue;
-						if(completeness==0 && ((i==leftIndex && d==0) || (i==rightIndex && d==1)) ) continue;
-						String word = sent.get(i).getName();
-						String tag = sent.get(i).getTag();
-						sb.append("<sep>"+word+":"+dirs[d]);
-						sbShapes.append("<sep>"+wordShape(word)+":"+dirs[d]);
+				for(int i=leftIndex;i<=rightIndex;i++){
+					String word = sent.get(i).getName();
+					if(i==leftIndex || i==rightIndex){
+						for(int d=0;d<dirs.length;d++){
+							if(completeness==1 && direction==1 && i==leftIndex && d==0) continue;
+							if(completeness==1 && direction==0 && i==rightIndex && d==1) continue;
+							if(completeness==0 && ((i==leftIndex && d==0) || (i==rightIndex && d==1)) ) continue;
+							sb.append("<sep>"+word+":"+dirs[d]);
+							sbShapes.append("<sep>"+wordShape(word)+":"+dirs[d]);
+						}
+					}else{
+						sb.append("<sep>"+word);
+						sbShapes.append("<sep>"+wordShape(word));
 					}
+					
 				}
 				//span entity words && tags feature
 				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-whole-words",child_1_type+":"+sb.toString()) );
@@ -293,6 +267,11 @@ public class DIVFeatureManager extends FeatureManager {
 				String rw = sent.get(rightIndex).getName();
 				String lt = sent.get(leftIndex).getTag();
 				String rt =sent.get(rightIndex).getTag();
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-LBW-RBW",child_1_type+":"+lb+":"+rb));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-LBT-RBT",child_1_type+":"+lbt+":"+rbt));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-LBWT-RBWT",child_1_type+":"+lb+":"+lbt+"-"+rb+":"+rbt));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-LBW-RBT",child_1_type+":"+lb+":"+rbt));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-LBT-RBW",child_1_type+":"+lbt+":"+rb));
 				
 				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LW-RW",child_1_type+":"+lw+":"+rw));
 				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LT-RT",child_1_type+":"+lt+":"+rt));
