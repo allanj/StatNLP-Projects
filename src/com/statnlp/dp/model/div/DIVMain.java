@@ -60,7 +60,7 @@ public class DIVMain {
 //		testNumber = -1;
 //		numIteration = 80;
 //		numThreads = 5;
-		testingPath = trainingPath;
+//		testingPath = trainingPath;
 		/************/
 		
 		
