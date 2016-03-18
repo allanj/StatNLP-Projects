@@ -308,8 +308,8 @@ public class DIVFeatureManager extends FeatureManager {
 				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword", "JOINT:"+child_1_type+":"+headWord+",DIR:"+dirs[direction]+"-"+modifierWord+",DIR:"+dirs[1-direction]));
 				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag", "JOINT:"+child_1_type+":"+headTag+",DIR:"+dirs[direction]+"-"+modifierTag+",DIR:"+dirs[1-direction]));
 				
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword-dist", "JOINT:"+child_1_type+":"+headWord+",DIR:"+dirs[direction]+"-"+modifierWord+",DIR:"+dirs[1-direction]+attDist));
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag-dist", "JOINT:"+child_1_type+":"+headTag+",DIR:"+dirs[direction]+"-"+modifierTag+",DIR:"+dirs[1-direction]+attDist));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword-dist", "JOINT:"+child_1_type+":"+headWord+",DIR:"+dirs[direction]+"-"+modifierWord+",DIR:"+dirs[1-direction]+attDist));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag-dist", "JOINT:"+child_1_type+":"+headTag+",DIR:"+dirs[direction]+"-"+modifierTag+",DIR:"+dirs[1-direction]+attDist));
 //				
 				
 				//add more dependency features here.
