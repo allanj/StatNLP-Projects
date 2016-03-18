@@ -109,7 +109,7 @@ public class DIVFeatureManager extends FeatureManager {
 
 			
 			if((pa_type.equals(OE)||pa_type.equals("null")) && !child_1_type.equals(OE) && !child_1_type.equals(ONE)
-					&& ((leftIndex==rightIndex && direction==1) || (leftIndex!=rightIndex && completeness==0))){
+					&& (leftIndex==rightIndex || (leftIndex!=rightIndex && completeness==0))){
 				
 				
 				//when comes in must be incomplete
@@ -291,27 +291,7 @@ public class DIVFeatureManager extends FeatureManager {
 				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBW-RW", rightPrefix+child_1_type+":"+rb+","+rw));
 				
 			}
-			
-			if((pa_type.equals(OE)||pa_type.equals("null")) && child_1_type.equals(ONE)){
-				
-				for(int i=leftIndex;i<=rightIndex;i++){
-					String word = sent.get(i).getName();
-					String tag = sent.get(i).getTag();
-					if(i==leftIndex || i==rightIndex){
-						for(int d=0;d<dirs.length;d++){
-							if(completeness==1 && direction==1 && i==leftIndex && d==0) continue;
-							if(completeness==1 && direction==0 && i==rightIndex && d==1) continue;
-							if(completeness==0 && ((i==leftIndex && d==0) || (i==rightIndex && d==1)) ) continue;
-							featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "ONE-UN-WORD", child_1_type+":"+word+",DIRECTION:"+dirs[d]));
-							featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "ONE-UN-TAG", child_1_type+":"+tag+",DIRECTION:"+dirs[d]));
-						}
-					}else{
-						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "ONE-UN-WORD", child_1_type+":"+word));
-						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "ONE-UN-TAG", child_1_type+":"+tag));
-					}
-				}
-			}
-			
+						
 			
 			if(!child_1_type.equals("OE") && !child_1_type.equals("ONE") && completeness==0 && (pa_type.equals(OE)||pa_type.equals("null"))){
 				
