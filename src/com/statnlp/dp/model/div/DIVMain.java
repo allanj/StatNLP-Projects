@@ -80,7 +80,9 @@ public class DIVMain {
 			testingInsts = DependencyReader.readInstance(decodePath, false,testNumber,selectedEntities,tran, false);
 		}
 		
-//		Formatter.semevalToNER(trainingInsts, "data/testRandom.txt");
+//		Formatter.semevalToText(trainingInsts, "data/cnn/proj/en.train.txt");
+//		Formatter.semevalToText(testingInsts, "data/cnn/proj/en.devel.txt");
+//		System.exit(0);
 //		System.err.println(testingInsts[0].getInput().toString());
 //		DataChecker.checkJoint(trainingInsts, entities);
 //		DataChecker.checkJoint(testingInsts, entities);

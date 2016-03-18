@@ -192,34 +192,6 @@ public class DIVFeatureManager extends FeatureManager {
 					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-BI-WORD", 
 							leftType+":"+blw+","+dirs[1]+"-"+rightType+":"+brw+","+dirs[0]));
 				}
-				//trigram
-				for(int i=leftIndex;i<=rightIndex-2;i++){
-					String tlw = sent.get(i).getName();
-					String tlt = sent.get(i).getTag();
-					String tmw = sent.get(i+1).getName();
-					String tmt =sent.get(i+1).getTag();
-					String trw = sent.get(i+2).getName();
-					String trt =sent.get(i+2).getTag();
-					String leftType = i==leftIndex?E_B_PREFIX+child_1_type:E_I_PREFIX+child_1_type;
-					String rightType = E_I_PREFIX+child_1_type;
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-TRI-WORD", 
-							leftType+":"+tlw+","+dirs[1]+"-"+rightType+"-"+tmw+","+trw+","+dirs[0]));
-				}
-				//4-gram
-				for(int i=leftIndex;i<=rightIndex-3;i++){
-					String flw = sent.get(i).getName();
-					String flt = sent.get(i).getTag();
-					String fm1w = sent.get(i+1).getName();
-					String fm1t =sent.get(i+1).getTag();
-					String fm2w = sent.get(i+2).getName();
-					String fm2t =sent.get(i+2).getTag();
-					String frw = sent.get(i+3).getName();
-					String frt =sent.get(i+3).getTag();
-					String leftType = i==leftIndex?E_B_PREFIX+child_1_type:E_I_PREFIX+child_1_type;
-					String rightType = E_I_PREFIX+child_1_type;
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-FG-WORD", 
-							leftType+":"+flw+","+dirs[1]+"-"+rightType+"-"+fm1w+","+fm2w+","+frw+","+dirs[0]));
-				}
 				
 				StringBuilder sb = new StringBuilder("");
 				StringBuilder sbShapes = new StringBuilder("");
