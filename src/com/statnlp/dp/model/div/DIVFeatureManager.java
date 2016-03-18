@@ -296,7 +296,7 @@ public class DIVFeatureManager extends FeatureManager {
 			}
 						
 			
-			if(!child_1_type.equals("OE") && !child_1_type.equals("ONE") && completeness==0 && (pa_type.equals(OE)||pa_type.equals("null"))){
+			if(!child_1_type.equals("OE") && !child_1_type.equals("ONE") && completeness==0 ){
 				
 				/**Unigram feature without dist info**/
 				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headword", "JOINT:"+child_1_type+":"+headWord+",DIR:"+dirs[direction]));
