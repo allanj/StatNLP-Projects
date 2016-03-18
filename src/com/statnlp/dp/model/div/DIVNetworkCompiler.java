@@ -136,7 +136,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 		long root = this.toNode_generalRoot(inst.getInput().length());
 		int rootIdx = Arrays.binarySearch(this._nodes, root);
 		DependencyNetwork network = new DependencyNetwork(networkId,inst,this._nodes,this._children, param,rootIdx+1 );
-		viewer.visualizeNetwork(network, null, "UnLabeled Network");
+		//viewer.visualizeNetwork(network, null, "UnLabeled Network");
 		//System.err.println("[Info] Compile Unlabeled instance, length: "+inst.getInput().length());
 		//System.err.println("My root:"+Arrays.toString(NetworkIDMapper.toHybridNodeArray(root)));
 		//System.err.println("root index:"+rootIdx);
