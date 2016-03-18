@@ -24,7 +24,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 	private static final long serialVersionUID = -5080640847287255079L;
 
 	private long[] _nodes;
-	private final int maxSentLen = 100;
+	private final int maxSentLen = 3;
 	private int[][][] _children;
 	private HashMap<String, Integer> typeMap;
 	private String[] types;
@@ -136,7 +136,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 		long root = this.toNode_generalRoot(inst.getInput().length());
 		int rootIdx = Arrays.binarySearch(this._nodes, root);
 		DependencyNetwork network = new DependencyNetwork(networkId,inst,this._nodes,this._children, param,rootIdx+1 );
-		//viewer.visualizeNetwork(network, null, "UnLabeled Network");
+		viewer.visualizeNetwork(network, null, "UnLabeled Network");
 		//System.err.println("[Info] Compile Unlabeled instance, length: "+inst.getInput().length());
 		//System.err.println("My root:"+Arrays.toString(NetworkIDMapper.toHybridNodeArray(root)));
 		//System.err.println("root index:"+rootIdx);
@@ -174,12 +174,15 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 				for(String pae:types){
 					if(!e.equals(ONE) && pae.equals(ONE)) continue;
 					if(!pae.equals(ONE) && !pae.equals(OE) && !e.equals(pae)) continue;
-					long wordLeftNode = this.toNode(rightIndex, rightIndex, 0, 1,PARENT_IS+pae);
+					
 					long wordRightNode = this.toNode(rightIndex, rightIndex, 1, 1,PARENT_IS+pae);
-					network.addNode(wordLeftNode);
 					network.addNode(wordRightNode);
-					network.addEdge(wordLeftNode, new long[]{wordLeftNodeE});
 					network.addEdge(wordRightNode, new long[]{wordRightNodeE});
+					if(pae.equals(OE) && !e.equals(ONE)) continue;
+					long wordLeftNode = this.toNode(rightIndex, rightIndex, 0, 1,PARENT_IS+pae);
+					network.addNode(wordLeftNode);
+					network.addEdge(wordLeftNode, new long[]{wordLeftNodeE});
+					
 					
 				}
 			}
