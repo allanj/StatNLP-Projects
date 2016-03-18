@@ -31,9 +31,9 @@ public class DIVMain {
 	public static int testNumber = -1;
 	public static int numIteration = 100;
 	public static int numThreads = 2;
-	public static String trainingPath = DPConfig.trainingPath;
-	public static String testingPath = DPConfig.testingPath;
-	public static String devPath = DPConfig.devPath;
+	public static String trainingPath;
+	public static String testingPath;
+	public static String devPath;
 	public static boolean isDev = true;
 	public static String[] selectedEntities = {"person","organization","gpe","MISC"};
 	
@@ -48,6 +48,9 @@ public class DIVMain {
 		String dpRes = DPConfig.data_prefix+modelType+middle+DPConfig.dp_res_suffix; 
 		String nerEval = DPConfig.data_prefix+modelType+middle+DPConfig.ner_eval_suffix;
 		String jointRes = DPConfig.data_prefix+modelType+middle+DPConfig.joint_res_suffix;
+		trainingPath = DPConfig.trainingPath;
+		testingPath = DPConfig.testingPath;
+		devPath = DPConfig.devPath;
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
@@ -57,7 +60,7 @@ public class DIVMain {
 //		testNumber = -1;
 //		numIteration = 80;
 //		numThreads = 5;
-//		testingPath = trainingPath;
+		testingPath = trainingPath;
 		/************/
 		
 		
@@ -67,9 +70,16 @@ public class DIVMain {
 		System.err.println("[Info] dpRes: "+dpRes);
 		System.err.println("[Info] ner eval: "+nerEval);
 		System.err.println("[Info] joint Res: "+jointRes);
+		DependInstance[] trainingInsts = null;
+		DependInstance[] testingInsts = null;
+		if(DPConfig.dataType.equals("cnn")){
+			trainingInsts = DependencyReader.readCNN(trainingPath, true,trainNumber,tran);
+			testingInsts = DependencyReader.readCNN(decodePath, false,testNumber,tran);
+		}else{
+			trainingInsts = DependencyReader.readInstance(trainingPath, true,trainNumber,selectedEntities,tran, false);
+			testingInsts = DependencyReader.readInstance(decodePath, false,testNumber,selectedEntities,tran, false);
+		}
 		
-		DependInstance[] trainingInsts = DependencyReader.readInstance(trainingPath, true,trainNumber,selectedEntities,tran, false);
-		DependInstance[] testingInsts = DependencyReader.readInstance(decodePath, false,testNumber,selectedEntities,tran, false);
 //		Formatter.semevalToNER(trainingInsts, "data/testRandom.txt");
 //		System.err.println(testingInsts[0].getInput().toString());
 //		DataChecker.checkJoint(trainingInsts, entities);
@@ -120,6 +130,7 @@ public class DIVMain {
 					case "-reg": DPConfig.L2 = Double.valueOf(args[i+1]); break;
 					case "-dev": isDev = args[i+1].equals("true")? true:false; break;
 					case "-windows": DPConfig.windows = true; break;
+					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
 					default: System.err.println("Invalid arguments, please check usage."); System.err.println(usage);System.exit(0);
 				}
 			}
