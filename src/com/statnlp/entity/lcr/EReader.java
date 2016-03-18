@@ -90,6 +90,41 @@ public class EReader {
 		System.err.println("[Pipeline] Testing instance, total:"+ myInsts.size()+" Instance. ");
 		return myInsts;
 	}
+	
+	public static List<ECRFInstance> readCNN(String path, boolean setLabel, int number,HashMap<String, Integer> entityMap) throws IOException{
+		BufferedReader br = RAWF.reader(path);
+		String line = null;
+		List<ECRFInstance> insts = new ArrayList<ECRFInstance>();
+		int index =1;
+		ArrayList<WordToken> words = new ArrayList<WordToken>();
+		ArrayList<String> es = new ArrayList<String>();
+		while((line = br.readLine())!=null){
+			if(line.startsWith("#")) continue;
+			if(line.equals("")){
+				WordToken[] wordsArr = new WordToken[words.size()];
+				words.toArray(wordsArr);
+				Sentence sent = new Sentence(wordsArr);
+				ECRFInstance inst = new ECRFInstance(index++,1.0,sent);
+				inst.entities = es;
+				if(setLabel) inst.setLabeled(); else inst.setUnlabeled();
+				insts.add(inst);
+				words = new ArrayList<WordToken>();
+				es = new ArrayList<String>();
+				if(number!=-1 && insts.size()==number) break;
+				continue;
+			}
+			String[] values = line.split(" ");
+			String entity = values[3];
+			if(!entityMap.containsKey(entity)) entity = "O";
+			words.add(new WordToken(values[1],values[2],Integer.valueOf(values[4])-1,entity));
+			es.add(entity);
+		}
+		br.close();
+		List<ECRFInstance> myInsts = insts;
+		String type = setLabel? "Training":"Testing";
+		System.err.println(type+" instance, total:"+ myInsts.size()+" Instance. ");
+		return myInsts;
+	}
 
 	
 }

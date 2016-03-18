@@ -76,9 +76,17 @@ public class EMain {
 		System.err.println("[Info] nerOut: "+nerOut);
 		System.err.println("[Info] nerRes: "+nerRes);
 		
-		List<ECRFInstance> trainInstances = EReader.readData(DPConfig.ecrftrain,true,trainNumber, NetworkConfig.entityMap);
-		List<ECRFInstance> testInstances = isPipe?EReader.readDP2NERPipe(testFile, testNumber,NetworkConfig.entityMap)
-				:EReader.readData(testFile,false,testNumber,NetworkConfig.entityMap);
+		List<ECRFInstance> trainInstances = null;
+		List<ECRFInstance> testInstances = null;
+		if(DPConfig.dataType.equals("cnn")){
+			trainInstances = EReader.readCNN(DPConfig.ecrftrain, true, trainNumber, NetworkConfig.entityMap);
+			testInstances = EReader.readCNN(testFile, false, testNumber, NetworkConfig.entityMap);
+		}else{
+			trainInstances = EReader.readData(DPConfig.ecrftrain,true,trainNumber, NetworkConfig.entityMap);
+			testInstances = isPipe?EReader.readDP2NERPipe(testFile, testNumber,NetworkConfig.entityMap)
+					:EReader.readData(testFile,false,testNumber,NetworkConfig.entityMap);
+		}
+		
 //		Formatter.ner2Text(trainInstances, "data/testRandom2.txt");
 //		System.exit(0);
 		
@@ -119,6 +127,7 @@ public class EMain {
 					case "-reg": DPConfig.L2 = Double.valueOf(args[i+1]); break;
 					case "-dev":isDev = args[i+1].equals("true")?true:false; break;
 					case "-windows":DPConfig.windows = true; break;
+					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
 					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 				}
 			}
@@ -129,6 +138,7 @@ public class EMain {
 			System.err.println("[Info] is Pipeline: "+isPipe);
 			System.err.println("[Info] Using development set??: "+isDev);
 			System.err.println("[Info] Selected Entities: "+Arrays.toString(selectedEntities));
+			System.err.println("[Info] Data type: "+DPConfig.dataType);
 			if(isPipe){
 				System.err.println("[Info] *********PipeLine: from DP result to NER****");
 			}
