@@ -1,0 +1,20 @@
+Right RB O O
+now RB O O
+let VB O O
+'s PRP O O
+get VB O O
+an DT O O
+update NN O O
+on IN O O
+the DT O O
+latest JJS O O
+world NN O O
+news NN O O
+from IN O O
+VOA NNP O O
+'s POS O O
+Dave NNP B-person B-person
+Deforest NNP I-person I-person
+. . O O
+
+

@@ -1,0 +1,591 @@
+nohup: ignoring input
+Picked up _JAVA_OPTIONS: -Xmx160000m
+[Info] trainNum: 500
+[Info] testNum: 100
+[Info] numIter: 300
+[Info] numThreads: 40
+[Info] train path: data/semeval10t1/en.all.txt
+[Info] test path: data/semeval10t1/en.test.txt
+[Info] Selected Entities: [person]
+[Info] Regularization Parameter: 0.7
+[Info] Current Model:DIVIDED
+Training instance, total:500 Instance. 
+Training Maxlen is:80
+Training Max span length is:74
+Testing instance, total:100 Instance. 
+Testing Maxlen is:53
+Testing Max span length is:42
+Capacity successfully set to: [1000, 1000, 2, 3, 15, 2]
+#instances=500
+Thread 0 has 26 instances.
+Thread 1 has 26 instances.
+Thread 2 has 26 instances.
+Thread 3 has 26 instances.
+Thread 4 has 26 instances.
+Thread 5 has 26 instances.
+Thread 6 has 26 instances.
+Thread 7 has 26 instances.
+Thread 8 has 26 instances.
+Thread 9 has 26 instances.
+Thread 10 has 26 instances.
+Thread 11 has 26 instances.
+Thread 12 has 26 instances.
+Thread 13 has 26 instances.
+Thread 14 has 26 instances.
+Thread 15 has 26 instances.
+Thread 16 has 26 instances.
+Thread 17 has 26 instances.
+Thread 18 has 26 instances.
+Thread 19 has 26 instances.
+Thread 20 has 24 instances.
+Thread 21 has 24 instances.
+Thread 22 has 24 instances.
+Thread 23 has 24 instances.
+Thread 24 has 24 instances.
+Thread 25 has 24 instances.
+Thread 26 has 24 instances.
+Thread 27 has 24 instances.
+Thread 28 has 24 instances.
+Thread 29 has 24 instances.
+Thread 30 has 24 instances.
+Thread 31 has 24 instances.
+Thread 32 has 24 instances.
+Thread 33 has 24 instances.
+Thread 34 has 24 instances.
+Thread 35 has 24 instances.
+Thread 36 has 24 instances.
+Thread 37 has 24 instances.
+Thread 38 has 24 instances.
+Thread 39 has 24 instances.
+........................................118308 nodes..
+
+Thread 1 touch time: 27.537 secs.
+
+Thread 11 touch time: 32.22 secs.
+
+Thread 32 touch time: 35.46 secs.
+
+Thread 34 touch time: 39.84 secs.
+
+Thread 24 touch time: 41.409 secs.
+
+Thread 9 touch time: 41.858 secs.
+
+Thread 23 touch time: 43.225 secs.
+
+Thread 19 touch time: 44.121 secs.
+
+Thread 17 touch time: 45.17 secs.
+
+Thread 36 touch time: 46.888 secs.
+
+Thread 0 touch time: 47.679 secs.
+
+Thread 35 touch time: 47.887 secs.
+
+Thread 31 touch time: 49.683 secs.
+
+Thread 4 touch time: 52.687 secs.
+
+Thread 38 touch time: 54.396 secs.
+
+Thread 2 touch time: 55.241 secs.
+
+Thread 28 touch time: 55.472 secs.
+
+Thread 8 touch time: 57.786 secs.
+
+Thread 21 touch time: 60.52 secs.
+
+Thread 27 touch time: 61.56 secs.
+
+Thread 13 touch time: 62.262 secs.
+
+Thread 16 touch time: 63.908 secs.
+
+Thread 29 touch time: 65.002 secs.
+
+Thread 6 touch time: 66.396 secs.
+
+Thread 14 touch time: 69.195 secs.
+
+Thread 18 touch time: 69.911 secs.
+
+Thread 12 touch time: 71.287 secs.
+
+Thread 7 touch time: 71.424 secs.
+
+Thread 39 touch time: 77.839 secs.
+
+Thread 20 touch time: 80.087 secs.
+
+Thread 26 touch time: 80.896 secs.
+
+Thread 37 touch time: 81.421 secs.
+
+Thread 25 touch time: 81.937 secs.
+
+Thread 15 touch time: 82.194 secs.
+
+Thread 3 touch time: 82.363 secs.
+
+Thread 33 touch time: 82.745 secs.
+
+Thread 10 touch time: 83.804 secs.
+
+Thread 22 touch time: 84.439 secs.
+
+Thread 5 touch time: 87.569 secs.
+
+Thread 30 touch time: 90.619 secs.
+Finalized local param. size:206449
+Finalized local param. size:164304
+Finalized local param. size:257659
+Finalized local param. size:357328
+Finalized local param. size:235815
+Finalized local param. size:336230
+Finalized local param. size:303200
+Finalized local param. size:288493
+Finalized local param. size:279248
+Finalized local param. size:210205
+Finalized local param. size:356075
+Finalized local param. size:179918
+Finalized local param. size:308477
+Finalized local param. size:277938
+Finalized local param. size:300011
+Finalized local param. size:365351
+Finalized local param. size:272899
+Finalized local param. size:246619
+Finalized local param. size:318076
+Finalized local param. size:239125
+Finalized local param. size:350651
+Finalized local param. size:269930
+Finalized local param. size:358711
+Finalized local param. size:229746
+Finalized local param. size:220226
+Finalized local param. size:390127
+Finalized local param. size:330396
+Finalized local param. size:272827
+Finalized local param. size:252149
+Finalized local param. size:307782
+Finalized local param. size:349218
+Finalized local param. size:220645
+Finalized local param. size:193626
+Finalized local param. size:341762
+Finalized local param. size:192817
+Finalized local param. size:226081
+Finalized local param. size:210358
+Finalized local param. size:333661
+Finalized local param. size:215271
+Finalized local param. size:355365
+5320155 features.
+*************************************************
+  n = 5320155   number of corrections = 4
+       initial values
+ f =  36147.13992749088   gnorm =  8449.870607235174
+*************************************************
+	i	nfn	func			gnorm			steplength
+Iteration 0	Objective=-36147.13992749088	Time=2.021 seconds.	0.0
+	1	2	29500.676133779656	5632.931765706079	1.183450074541678E-4
+Iteration 1	Objective=-29500.676133779656	Time=2.005 seconds.	0.8161275329931038
+Iteration 2	Objective=-20742.046224493934	Time=1.891 seconds.	0.7031040960021699
+Iteration 3	Objective=-16772.072235541353	Time=1.878 seconds.	0.808602586939349
+Iteration 4	Objective=-14336.905560932602	Time=1.883 seconds.	0.8548082407224291
+Iteration 5	Objective=-11482.702143996241	Time=1.91 seconds.	0.8009191450131378
+Iteration 6	Objective=-9683.585814506485	Time=1.901 seconds.	0.8433194289176587
+Iteration 7	Objective=-8575.68702874696	Time=1.912 seconds.	0.8855900276011558
+Iteration 8	Objective=-7633.871331057541	Time=2.023 seconds.	0.8901760646660363
+Iteration 9	Objective=-6790.774588003301	Time=2.053 seconds.	0.8895584289423117
+Iteration 10	Objective=-6227.102008030983	Time=1.956 seconds.	0.9169943615904861
+Iteration 11	Objective=-5789.138518397087	Time=2.011 seconds.	0.9296681684242426
+Iteration 12	Objective=-5460.589997114857	Time=1.94 seconds.	0.943247424424524
+Iteration 13	Objective=-5181.5823251829715	Time=1.879 seconds.	0.9489052149897169
+Iteration 14	Objective=-5051.428007967578	Time=1.865 seconds.	0.974881356881501
+Iteration 15	Objective=-4762.404508977056	Time=1.926 seconds.	0.9427838032068065
+Iteration 16	Objective=-4570.814286138606	Time=1.95 seconds.	0.9597702751882362
+Iteration 17	Objective=-4377.600829531182	Time=2.006 seconds.	0.9577288761887875
+Iteration 18	Objective=-4253.570299776596	Time=2.033 seconds.	0.971667007892113
+Iteration 19	Objective=-4050.168898972691	Time=1.922 seconds.	0.952181018187336
+Iteration 20	Objective=-3833.7304149346696	Time=1.978 seconds.	0.9465606276091548
+Iteration 21	Objective=-3679.1729428876483	Time=1.897 seconds.	0.9596848355729637
+Iteration 22	Objective=-3494.685095929375	Time=2.024 seconds.	0.9498561633763605
+Iteration 23	Objective=-3228.253298105277	Time=1.92 seconds.	0.9237608566979499
+Iteration 24	Objective=-3507.1735636393228	Time=1.523 seconds.	1.086399746171637
+Iteration 25	Objective=-3106.322238301549	Time=1.984 seconds.	0.8857053071186421
+Iteration 26	Objective=-2962.6176654806723	Time=2.114 seconds.	0.9537380343066241
+Iteration 27	Objective=-2796.448580750931	Time=1.945 seconds.	0.9439113974557425
+Iteration 28	Objective=-2691.197908151271	Time=1.907 seconds.	0.9623627363205809
+Iteration 29	Objective=-2607.433569295661	Time=1.989 seconds.	0.9688747012615092
+Iteration 30	Objective=-2551.5553962773324	Time=1.941 seconds.	0.9785696657140827
+Iteration 31	Objective=-2471.772137143236	Time=1.97 seconds.	0.968731519899392
+Iteration 32	Objective=-2422.0654566234193	Time=1.976 seconds.	0.9798902658651759
+Iteration 33	Objective=-2333.516148390221	Time=1.946 seconds.	0.9634405800260064
+Iteration 34	Objective=-2297.3137012736065	Time=1.94 seconds.	0.984485881041968
+Iteration 35	Objective=-2276.71911709452	Time=1.904 seconds.	0.9910353626639369
+Iteration 36	Objective=-2265.245074580484	Time=1.887 seconds.	0.9949602731281676
+Iteration 37	Objective=-2243.2115563351017	Time=1.641 seconds.	0.990273229818428
+Iteration 38	Objective=-2225.038437521235	Time=2.012 seconds.	0.9918986157312968
+Iteration 39	Objective=-2199.2653147296755	Time=1.943 seconds.	0.9884167741298565
+Iteration 40	Objective=-2160.312783089156	Time=2.081 seconds.	0.9822883890453628
+Iteration 41	Objective=-2146.3324417221293	Time=1.903 seconds.	0.9935285568476638
+Iteration 42	Objective=-2105.4530570073202	Time=2.051 seconds.	0.9809538429741065
+Iteration 43	Objective=-2094.2733865466435	Time=2.098 seconds.	0.9946901354919936
+Iteration 44	Objective=-2080.448868800899	Time=1.958 seconds.	0.9933988953712771
+Iteration 45	Objective=-2073.2296429100697	Time=2.059 seconds.	0.9965299671628122
+Iteration 46	Objective=-2063.2590811215746	Time=2.024 seconds.	0.9951908068541312
+Iteration 47	Objective=-2055.250605604552	Time=1.884 seconds.	0.9961185313127671
+Iteration 48	Objective=-2050.7882265529206	Time=1.971 seconds.	0.9978287907861635
+Iteration 49	Objective=-2044.549900015796	Time=1.846 seconds.	0.9969580835035267
+Iteration 50	Objective=-2038.615209435564	Time=1.973 seconds.	0.9970973119412805
+Iteration 51	Objective=-2033.3884747553393	Time=1.911 seconds.	0.9974361347565577
+Iteration 52	Objective=-2028.6283285755048	Time=1.898 seconds.	0.9976590079864561
+Iteration 53	Objective=-2026.0283943679772	Time=1.944 seconds.	0.9987183782406542
+Iteration 54	Objective=-2023.7505095691906	Time=1.918 seconds.	0.998875689597876
+Iteration 55	Objective=-2021.589538480231	Time=2.057 seconds.	0.9989321949129888
+Iteration 56	Objective=-2020.15420162823	Time=2.058 seconds.	0.9992899959043714
+Iteration 57	Objective=-2018.0806549620725	Time=1.903 seconds.	0.9989735701044572
+Iteration 58	Objective=-2016.5129774762045	Time=2.062 seconds.	0.9992231839287427
+Iteration 59	Objective=-2015.8794646912809	Time=1.976 seconds.	0.9996858374867904
+Iteration 60	Objective=-2014.7703235671456	Time=2.081 seconds.	0.999449797895379
+Iteration 61	Objective=-2014.3214936584689	Time=1.88 seconds.	0.9997772302364062
+Iteration 62	Objective=-2013.7323423153005	Time=1.981 seconds.	0.9997075187128652
+Iteration 63	Objective=-2013.323334246414	Time=1.994 seconds.	0.9997968905498056
+Iteration 64	Objective=-2013.0320172800305	Time=1.999 seconds.	0.9998553054239087
+Iteration 65	Objective=-2012.711736481025	Time=1.98 seconds.	0.9998408963214414
+Iteration 66	Objective=-2012.499916497493	Time=2.041 seconds.	0.9998947589067562
+Iteration 67	Objective=-2012.1900010185266	Time=2.054 seconds.	0.9998460047245589
+Iteration 68	Objective=-2012.1317150535037	Time=2.065 seconds.	0.999971033567907
+Iteration 69	Objective=-2011.9404890108176	Time=2.077 seconds.	0.9999049634567879
+Iteration 70	Objective=-2011.895764948561	Time=2.081 seconds.	0.9999777706833274
+Iteration 71	Objective=-2011.81536239895	Time=1.958 seconds.	0.9999600364238487
+Iteration 72	Objective=-2011.7225599784883	Time=2.015 seconds.	0.9999538713034029
+Iteration 73	Objective=-2011.6782223821683	Time=2.088 seconds.	0.9999779603822108
+Iteration 74	Objective=-2011.6316773919125	Time=1.99 seconds.	0.9999768626066843
+Iteration 75	Objective=-2011.6112748787	Time=1.934 seconds.	0.9999898577292047
+Iteration 76	Objective=-2011.5948351224345	Time=2.037 seconds.	0.9999918275680442
+Iteration 77	Objective=-2011.5764260292203	Time=1.987 seconds.	0.999990848508411
+Iteration 78	Objective=-2011.5516852660112	Time=1.989 seconds.	0.9999877008087343
+Iteration 79	Objective=-2011.5451024338402	Time=2.069 seconds.	0.9999967274854435
+Iteration 80	Objective=-2011.5298887177337	Time=2.082 seconds.	0.9999924368009009
+Iteration 81	Objective=-2011.5259054904434	Time=1.93 seconds.	0.9999980198020857
+Iteration 82	Objective=-2011.5213317041002	Time=1.983 seconds.	0.9999977262105695
+Iteration 83	Objective=-2011.515371331272	Time=2.113 seconds.	0.9999970368831121
+Iteration 84	Objective=-2011.5099586895685	Time=1.894 seconds.	0.9999973091720895
+Iteration 85	Objective=-2011.5085435304097	Time=1.93 seconds.	0.9999992964692257
+Iteration 86	Objective=-2011.5056015518592	Time=2.009 seconds.	0.9999985374267686
+Iteration 87	Objective=-2011.5047821223523	Time=2.023 seconds.	0.999999592628772
+Iteration 88	Objective=-2011.5036034145535	Time=2.091 seconds.	0.9999994140169045
+Iteration 89	Objective=-2011.5024687857006	Time=1.964 seconds.	0.9999994359299924
+Iteration 90	Objective=-2011.5018317033414	Time=1.957 seconds.	0.9999996832803494
+Iteration 91	Objective=-2011.500931058291	Time=2.094 seconds.	0.9999995522524333
+Iteration 92	Objective=-2011.5006707854286	Time=1.972 seconds.	0.9999998706076352
+Iteration 93	Objective=-2011.500216104262	Time=2.001 seconds.	0.999999773959227
+Iteration 94	Objective=-2011.4998456152625	Time=1.953 seconds.	0.9999998158145862
+Iteration 95	Objective=-2011.4995959240287	Time=1.955 seconds.	0.9999998758681318
+Iteration 96	Objective=-2011.4996345807035	Time=1.563 seconds.	1.0000000192178387
+Iteration 97	Objective=-2011.4994376266836	Time=1.942 seconds.	0.9999999020859778
+Iteration 98	Objective=-2011.499198213452	Time=2.017 seconds.	0.9999998809777287
+Iteration 99	Objective=-2011.499069633339	Time=1.994 seconds.	0.9999999360774724
+Iteration 100	Objective=-2011.498948829962	Time=1.96 seconds.	0.9999999399436078
+Iteration 101	Objective=-2011.4988295781807	Time=1.936 seconds.	0.9999999407149671
+Iteration 102	Objective=-2011.4987496143754	Time=1.935 seconds.	0.9999999602466558
+Iteration 103	Objective=-2011.4987007751338	Time=1.994 seconds.	0.9999999757199742
+Iteration 104	Objective=-2011.4986739511994	Time=1.944 seconds.	0.9999999866647021
+Iteration 105	Objective=-2011.49862775421	Time=2.023 seconds.	0.9999999770335471
+Iteration 106	Objective=-2011.4985971973174	Time=1.988 seconds.	0.9999999848088922
+Iteration 107	Objective=-2011.4985746290781	Time=2.097 seconds.	0.9999999887803853
+Iteration 108	Objective=-2011.498556624907	Time=2.095 seconds.	0.9999999910493742
+Iteration 109	Objective=-2011.49853782032	Time=2.03 seconds.	0.999999990651454
+Iteration 110	Objective=-2011.4985357344246	Time=2.011 seconds.	0.9999999989630142
+Iteration 111	Objective=-2011.4985270773545	Time=1.903 seconds.	0.9999999956962086
+Iteration 112	Objective=-2011.4985229518916	Time=2.029 seconds.	0.9999999979490599
+Iteration 113	Objective=-2011.49851722629	Time=2.0 seconds.	0.9999999971535641
+Iteration 114	Objective=-2011.4985098591887	Time=1.985 seconds.	0.999999996337506
+Iteration 115	Objective=-2011.4985158101902	Time=1.549 seconds.	1.0000000029584917
+Iteration 116	Objective=-2011.4985067741736	Time=2.029 seconds.	0.9999999955078185
+Iteration 117	Objective=-2011.4985029252541	Time=1.985 seconds.	0.9999999980865412
+Iteration 118	Objective=-2011.4985000565484	Time=2.075 seconds.	0.9999999985738465
+Iteration 119	Objective=-2011.4984981591076	Time=2.035 seconds.	0.9999999990567029
+Iteration 120	Objective=-2011.4984962893195	Time=2.014 seconds.	0.9999999990704501
+Iteration 121	Objective=-2011.4984954903093	Time=1.983 seconds.	0.9999999996027786
+Iteration 122	Objective=-2011.4984939171813	Time=1.974 seconds.	0.9999999992179324
+Iteration 123	Objective=-2011.4984940403178	Time=1.55 seconds.	1.0000000000612164
+Iteration 124	Objective=-2011.4984930732587	Time=1.947 seconds.	0.9999999995192345
+Iteration 125	Objective=-2011.4984920688082	Time=1.95 seconds.	0.9999999995006457
+Iteration 126	Objective=-2011.498491490962	Time=2.028 seconds.	0.9999999997127285
+Iteration 127	Objective=-2011.498491204018	Time=1.929 seconds.	0.9999999998573481
+Iteration 128	Objective=-2011.498490752121	Time=1.99 seconds.	0.9999999997753432
+Iteration 129	Objective=-2011.498490617973	Time=1.937 seconds.	0.9999999999333095
+Iteration 130	Objective=-2011.4984903728782	Time=1.966 seconds.	0.9999999998781531
+Iteration 131	Objective=-2011.498490047753	Time=1.974 seconds.	0.9999999998383666
+Iteration 132	Objective=-2011.4984897975014	Time=2.028 seconds.	0.9999999998755895
+Iteration 133	Objective=-2011.4984896849926	Time=1.986 seconds.	0.9999999999440672
+Iteration 134	Objective=-2011.4984895492712	Time=1.946 seconds.	0.9999999999325272
+Iteration 135	Objective=-2011.4984894681052	Time=1.979 seconds.	0.9999999999596489
+Iteration 136	Objective=-2011.4984894165927	Time=1.935 seconds.	0.999999999974391
+Iteration 137	Objective=-2011.4984893728345	Time=2.057 seconds.	0.999999999978246
+Iteration 138	Objective=-2011.4984893406051	Time=1.887 seconds.	0.9999999999839775
+Iteration 139	Objective=-2011.4984892945185	Time=1.94 seconds.	0.9999999999770884
+Iteration 140	Objective=-2011.4984892942207	Time=1.506 seconds.	0.9999999999998519
+Iteration 141	Objective=-2011.4984892675716	Time=1.962 seconds.	0.9999999999867516
+Iteration 142	Objective=-2011.4984892405669	Time=2.034 seconds.	0.9999999999865749
+Iteration 143	Objective=-2011.4984892225557	Time=2.028 seconds.	0.9999999999910459
+Iteration 144	Objective=-2011.498489203458	Time=1.915 seconds.	0.9999999999905057
+Iteration 145	Objective=-2011.4984891954412	Time=2.098 seconds.	0.9999999999960145
+Iteration 146	Objective=-2011.4984891750246	Time=1.951 seconds.	0.9999999999898501
+Iteration 147	Objective=-2011.498489170869	Time=1.92 seconds.	0.9999999999979341
+Iteration 148	Objective=-2011.4984891660497	Time=2.022 seconds.	0.999999999997604
+Iteration 149	Objective=-2011.4984891628924	Time=2.034 seconds.	0.9999999999984304
+Iteration 150	Objective=-2011.4984891573445	Time=1.949 seconds.	0.9999999999972419
+Iteration 151	Objective=-2011.4984891530505	Time=1.965 seconds.	0.9999999999978653
+Iteration 152	Objective=-2011.4984891510135	Time=1.958 seconds.	0.9999999999989873
+Iteration 153	Objective=-2011.4984891470804	Time=1.957 seconds.	0.9999999999980447
+Iteration 154	Objective=-2011.4984891462373	Time=2.076 seconds.	0.9999999999995809
+Iteration 155	Objective=-2011.498489143945	Time=1.999 seconds.	0.9999999999988605
+Iteration 156	Objective=-2011.4984891433246	Time=1.927 seconds.	0.9999999999996915
+Iteration 157	Objective=-2011.4984891420431	Time=1.99 seconds.	0.999999999999363
+Iteration 158	Objective=-2011.4984891412073	Time=1.985 seconds.	0.9999999999995844
+Iteration 159	Objective=-2011.498489140265	Time=2.041 seconds.	0.9999999999995316
+Iteration 160	Objective=-2011.4984891396614	Time=1.989 seconds.	0.9999999999996999
+Iteration 161	Objective=-2011.4984891389913	Time=2.113 seconds.	0.9999999999996669
+Iteration 162	Objective=-2011.4984891383197	Time=1.942 seconds.	0.999999999999666
+Iteration 163	Objective=-2011.4984891380225	Time=2.055 seconds.	0.9999999999998522
+Iteration 164	Objective=-2011.498489137509	Time=1.945 seconds.	0.9999999999997448
+Iteration 165	Objective=-2011.498489137445	Time=1.942 seconds.	0.9999999999999681
+Iteration 166	Objective=-2011.4984891373301	Time=1.992 seconds.	0.9999999999999429
+Iteration 167	Objective=-2011.498489136904	Time=1.978 seconds.	0.9999999999997882
+Iteration 168	Objective=-2011.4984891368247	Time=1.877 seconds.	0.9999999999999606
+Iteration 169	Objective=-2011.4984891367765	Time=1.933 seconds.	0.999999999999976
+Iteration 170	Objective=-2011.4984891366717	Time=2.017 seconds.	0.9999999999999479
+Iteration 171	Objective=-2011.4984891366353	Time=1.945 seconds.	0.9999999999999819
+Iteration 172	Objective=-2011.4984891365552	Time=2.103 seconds.	0.9999999999999603
+Iteration 173	Objective=-2011.4984891365034	Time=1.931 seconds.	0.9999999999999742
+Iteration 174	Objective=-2011.4984891365575	Time=1.522 seconds.	1.0000000000000269
+Iteration 175	Objective=-2011.498489136516	Time=1.578 seconds.	0.9999999999999793
+Iteration 176	Objective=-2011.4984891365152	Time=1.558 seconds.	0.9999999999999997
+Iteration 177	Objective=-2011.4984891365034	Time=1.48 seconds.	0.9999999999999941
+Iteration 178	Objective=-2011.4984891365018	Time=1.518 seconds.	0.9999999999999992
+Iteration 179	Objective=-2011.4984891365125	Time=1.571 seconds.	1.0000000000000053
+Iteration 180	Objective=-2011.498489136502	Time=1.58 seconds.	0.9999999999999948
+Iteration 181	Objective=-2011.4984891365018	Time=1.553 seconds.	0.9999999999999999
+Iteration 182	Objective=-2011.4984891365018	Time=1.486 seconds.	1.0
+Iteration 183	Objective=-2011.4984891365023	Time=1.529 seconds.	1.0000000000000002
+Iteration 184	Objective=-2011.4984891365018	Time=1.566 seconds.	0.9999999999999998
+Iteration 185	Objective=-2011.4984891365018	Time=1.578 seconds.	1.0
+Iteration 186	Objective=-2011.498489136502	Time=1.703 seconds.	1.0000000000000002
+Iteration 187	Objective=-2011.4984891365018	Time=1.538 seconds.	0.9999999999999999
+Iteration 188	Objective=-2011.4984891365018	Time=1.475 seconds.	1.0
+Iteration 189	Objective=-2011.4984891365018	Time=1.56 seconds.	1.0
+Iteration 190	Objective=-2011.4984891365018	Time=1.552 seconds.	1.0
+Iteration 191	Objective=-2011.4984891365018	Time=1.587 seconds.	1.0
+Iteration 192	Objective=-2011.4984891365018	Time=1.566 seconds.	1.0
+Iteration 193	Objective=-2011.498489136502	Time=1.508 seconds.	1.0000000000000002
+Iteration 194	Objective=-2011.4984891365018	Time=1.587 seconds.	0.9999999999999999
+Iteration 195	Objective=-2011.4984891365018	Time=1.54 seconds.	1.0
+Iteration 196	Objective=-2011.4984891365016	Time=1.519 seconds.	0.9999999999999999
+Iteration 197	Objective=-2011.4984891365016	Time=1.535 seconds.	1.0
+Iteration 198	Objective=-2011.4984891365016	Time=1.507 seconds.	1.0
+Iteration 199	Objective=-2011.498489136502	Time=1.576 seconds.	1.0000000000000002
+Iteration 200	Objective=-2011.4984891365016	Time=1.687 seconds.	0.9999999999999998
+Iteration 201	Objective=-2011.4984891365016	Time=1.599 seconds.	1.0
+Iteration 202	Objective=-2011.498489136502	Time=1.499 seconds.	1.0000000000000002
+Iteration 203	Objective=-2011.4984891365016	Time=1.562 seconds.	0.9999999999999998
+Iteration 204	Objective=-2011.4984891365016	Time=1.627 seconds.	1.0
+Iteration 205	Objective=-2011.4984891365016	Time=1.55 seconds.	1.0
+Iteration 206	Objective=-2011.4984891365016	Time=1.665 seconds.	1.0
+Iteration 207	Objective=-2011.4984891365016	Time=1.618 seconds.	1.0
+Iteration 208	Objective=-2011.498489136502	Time=1.579 seconds.	1.0000000000000002
+Iteration 209	Objective=-2011.4984891365016	Time=1.574 seconds.	0.9999999999999998
+Iteration 210	Objective=-2011.4984891365016	Time=1.575 seconds.	1.0
+Iteration 211	Objective=-2011.498489136502	Time=1.493 seconds.	1.0000000000000002
+Iteration 212	Objective=-2011.4984891365016	Time=1.5 seconds.	0.9999999999999998
+Iteration 213	Objective=-2011.4984891365016	Time=1.617 seconds.	1.0
+Iteration 214	Objective=-2011.4984891365016	Time=1.703 seconds.	1.0
+Iteration 215	Objective=-2011.498489136502	Time=1.644 seconds.	1.0000000000000002
+Iteration 216	Objective=-2011.4984891365016	Time=1.627 seconds.	0.9999999999999998
+Iteration 217	Objective=-2011.4984891365016	Time=1.634 seconds.	1.0
+Iteration 218	Objective=-2011.4984891365016	Time=1.645 seconds.	1.0
+Iteration 219	Objective=-2011.498489136502	Time=1.594 seconds.	1.0000000000000002
+Iteration 220	Objective=-2011.4984891365016	Time=1.927 seconds.	0.9999999999999998
+Iteration 221	Objective=-2011.4984891365016	Time=2.101 seconds.	1.0
+Iteration 222	Objective=-2011.4984891406043	Time=1.565 seconds.	1.0000000000020397
+Iteration 223	Objective=-2011.4984891365455	Time=1.588 seconds.	0.9999999999979822
+Iteration 224	Objective=-2011.4984891365502	Time=1.55 seconds.	1.0000000000000024
+Iteration 225	Objective=-2011.498489136533	Time=1.504 seconds.	0.9999999999999915
+Iteration 226	Objective=-2011.498489136502	Time=1.578 seconds.	0.9999999999999847
+Iteration 227	Objective=-2011.4984891365016	Time=1.51 seconds.	0.9999999999999998
+Iteration 228	Objective=-2011.4984891365016	Time=1.567 seconds.	1.0
+Iteration 229	Objective=-2011.4984891365013	Time=1.551 seconds.	0.9999999999999999
+Iteration 230	Objective=-2011.4984891365013	Time=1.549 seconds.	1.0
+Iteration 231	Objective=-2011.4984891365013	Time=1.608 seconds.	1.0
+Iteration 232	Objective=-2011.4984891365011	Time=1.516 seconds.	0.9999999999999999
+Iteration 233	Objective=-2011.4984891365011	Time=1.497 seconds.	1.0
+Iteration 234	Objective=-2011.4984891365011	Time=1.571 seconds.	1.0
+Iteration 235	Objective=-2011.4984891365016	Time=1.522 seconds.	1.0000000000000002
+Iteration 236	Objective=-2011.4984891365011	Time=1.503 seconds.	0.9999999999999998
+Iteration 237	Objective=-2011.4984891365011	Time=1.544 seconds.	1.0
+Iteration 238	Objective=-2011.498489136502	Time=1.622 seconds.	1.0000000000000004
+Iteration 239	Objective=-2011.4984891365011	Time=1.52 seconds.	0.9999999999999996
+Iteration 240	Objective=-2011.4984891365011	Time=1.564 seconds.	1.0
+Iteration 241	Objective=-2011.4984891365023	Time=1.561 seconds.	1.0000000000000007
+Iteration 242	Objective=-2011.4984891365011	Time=1.636 seconds.	0.9999999999999994
+Iteration 243	Objective=-2011.4984891365011	Time=1.493 seconds.	1.0
+Iteration 244	Objective=-2011.4984891365016	Time=1.723 seconds.	1.0000000000000002
+Iteration 245	Objective=-2011.4984891365011	Time=1.575 seconds.	0.9999999999999998
+Iteration 246	Objective=-2011.4984891365011	Time=1.503 seconds.	1.0
+Iteration 247	Objective=-2011.498489136502	Time=1.618 seconds.	1.0000000000000004
+Iteration 248	Objective=-2011.4984891365011	Time=1.623 seconds.	0.9999999999999996
+Iteration 249	Objective=-2011.4984891365011	Time=1.611 seconds.	1.0
+Iteration 250	Objective=-2011.4984891365011	Time=1.549 seconds.	1.0
+Iteration 251	Objective=-2011.4984891365011	Time=1.567 seconds.	1.0
+Iteration 252	Objective=-2011.4984891365011	Time=1.554 seconds.	1.0
+Iteration 253	Objective=-2011.4984891365016	Time=1.568 seconds.	1.0000000000000002
+Iteration 254	Objective=-2011.4984891365011	Time=1.577 seconds.	0.9999999999999998
+Iteration 255	Objective=-2011.4984891365011	Time=1.498 seconds.	1.0
+Iteration 256	Objective=-2011.4984891365016	Time=1.646 seconds.	1.0000000000000002
+Iteration 257	Objective=-2011.4984891365011	Time=1.546 seconds.	0.9999999999999998
+Iteration 258	Objective=-2011.4984891365011	Time=1.536 seconds.	1.0
+Iteration 259	Objective=-2011.4984891365011	Time=1.559 seconds.	1.0
+Iteration 260	Objective=-2011.4984891365011	Time=1.502 seconds.	1.0
+Iteration 261	Objective=-2011.4984891365016	Time=1.537 seconds.	1.0000000000000002
+Iteration 262	Objective=-2011.4984891365011	Time=1.604 seconds.	0.9999999999999998
+Iteration 263	Objective=-2011.4984891365011	Time=1.572 seconds.	1.0
+Iteration 264	Objective=-2011.4984891365011	Time=1.6 seconds.	1.0
+Iteration 265	Objective=-2011.4984891365011	Time=1.557 seconds.	1.0
+Iteration 266	Objective=-2011.4984891365011	Time=1.647 seconds.	1.0
+Iteration 267	Objective=-2011.4984891365016	Time=1.553 seconds.	1.0000000000000002
+Iteration 268	Objective=-2011.4984891365011	Time=1.99 seconds.	0.9999999999999998
+Iteration 269	Objective=-2011.4984891365498	Time=1.644 seconds.	1.0000000000000242
+Iteration 270	Objective=-2011.4984891365727	Time=1.526 seconds.	1.0000000000000113
+Iteration 271	Objective=-2011.4984891365261	Time=1.631 seconds.	0.9999999999999768
+Iteration 272	Objective=-2011.498489136506	Time=1.684 seconds.	0.9999999999999899
+Iteration 273	Objective=-2011.4984891365011	Time=1.52 seconds.	0.9999999999999977
+Iteration 274	Objective=-2011.4984891365034	Time=1.608 seconds.	1.000000000000001
+Iteration 275	Objective=-2011.4984891365011	Time=1.546 seconds.	0.9999999999999989
+Iteration 276	Objective=-2011.4984891365075	Time=1.686 seconds.	1.000000000000003
+Iteration 277	Objective=-2011.4984891365011	Time=1.491 seconds.	0.9999999999999968
+Iteration 278	Objective=-2011.4984891365011	Time=1.557 seconds.	1.0
+Iteration 279	Objective=-2011.498489136506	Time=1.493 seconds.	1.0000000000000024
+Iteration 280	Objective=-2011.4984891365011	Time=1.613 seconds.	0.9999999999999977
+Iteration 281	Objective=-2011.4984891365043	Time=1.539 seconds.	1.0000000000000016
+Iteration 282	Objective=-2011.4984891365011	Time=1.541 seconds.	0.9999999999999984
+Iteration 283	Objective=-2011.4984891365023	Time=1.565 seconds.	1.0000000000000007
+Iteration 284	Objective=-2011.4984891365011	Time=1.67 seconds.	0.9999999999999994
+Iteration 285	Objective=-2011.4984891365025	Time=1.547 seconds.	1.0000000000000007
+Iteration 286	Objective=-2011.4984891365011	Time=1.607 seconds.	0.9999999999999993
+Iteration 287	Objective=-2011.4984891365011	Time=1.56 seconds.	1.0
+Iteration 288	Objective=-2011.4984891365052	Time=1.576 seconds.	1.000000000000002
+Iteration 289	Objective=-2011.4984891365011	Time=1.613 seconds.	0.999999999999998
+Iteration 290	Objective=-2011.498489136505	Time=1.591 seconds.	1.000000000000002
+Iteration 291	Objective=-2011.4984891365011	Time=1.585 seconds.	0.9999999999999981
+Iteration 292	Objective=-2011.4984891365027	Time=1.645 seconds.	1.0000000000000009
+Iteration 293	Objective=-2011.4984891365011	Time=1.567 seconds.	0.9999999999999992
+Iteration 294	Objective=-2011.4984891365027	Time=1.671 seconds.	1.0000000000000009
+Iteration 295	Objective=-2011.4984891365011	Time=1.65 seconds.	0.9999999999999992
+Iteration 296	Objective=-2011.4984891365011	Time=1.477 seconds.	1.0
+Iteration 297	Objective=-2011.498489136504	Time=1.557 seconds.	1.0000000000000016
+Iteration 298	Objective=-2011.4984891365011	Time=1.62 seconds.	0.9999999999999986
+Iteration 299	Objective=-2011.4984891365011	Time=1.52 seconds.	1.0
+*****Evaluation*****
+#threads:40
+#instances=100
+Thread 0 has 3 instances.
+Thread 1 has 3 instances.
+Thread 2 has 3 instances.
+Thread 3 has 3 instances.
+Thread 4 has 3 instances.
+Thread 5 has 3 instances.
+Thread 6 has 3 instances.
+Thread 7 has 3 instances.
+Thread 8 has 3 instances.
+Thread 9 has 3 instances.
+Thread 10 has 3 instances.
+Thread 11 has 3 instances.
+Thread 12 has 3 instances.
+Thread 13 has 3 instances.
+Thread 14 has 3 instances.
+Thread 15 has 3 instances.
+Thread 16 has 3 instances.
+Thread 17 has 3 instances.
+Thread 18 has 3 instances.
+Thread 19 has 3 instances.
+Thread 20 has 2 instances.
+Thread 21 has 2 instances.
+Thread 22 has 2 instances.
+Thread 23 has 2 instances.
+Thread 24 has 2 instances.
+Thread 25 has 2 instances.
+Thread 26 has 2 instances.
+Thread 27 has 2 instances.
+Thread 28 has 2 instances.
+Thread 29 has 2 instances.
+Thread 30 has 2 instances.
+Thread 31 has 2 instances.
+Thread 32 has 2 instances.
+Thread 33 has 2 instances.
+Thread 34 has 2 instances.
+Thread 35 has 2 instances.
+Thread 36 has 2 instances.
+Thread 37 has 2 instances.
+Thread 38 has 2 instances.
+Thread 39 has 2 instances.
+Okay. Decoding started.
+Decoding time for thread 34 = 0.916 secs.
+Decoding time for thread 28 = 1.618 secs.
+Decoding time for thread 37 = 2.252 secs.
+Decoding time for thread 6 = 2.344 secs.
+Decoding time for thread 20 = 2.479 secs.
+Decoding time for thread 24 = 2.72 secs.
+Decoding time for thread 39 = 2.934 secs.
+Decoding time for thread 23 = 2.961 secs.
+Decoding time for thread 15 = 3.481 secs.
+Decoding time for thread 5 = 3.733 secs.
+Decoding time for thread 33 = 3.748 secs.
+Decoding time for thread 14 = 3.877 secs.
+Decoding time for thread 35 = 4.263 secs.
+Decoding time for thread 21 = 4.788 secs.
+Decoding time for thread 30 = 5.653 secs.
+Decoding time for thread 36 = 5.716 secs.
+Decoding time for thread 12 = 6.136 secs.
+Decoding time for thread 19 = 6.337 secs.
+Decoding time for thread 27 = 6.47 secs.
+Decoding time for thread 2 = 6.996 secs.
+Decoding time for thread 16 = 6.983 secs.
+Decoding time for thread 38 = 7.004 secs.
+Decoding time for thread 0 = 7.209 secs.
+Decoding time for thread 7 = 7.316 secs.
+Decoding time for thread 1 = 7.449 secs.
+Decoding time for thread 13 = 7.932 secs.
+Decoding time for thread 8 = 8.991 secs.
+Decoding time for thread 18 = 9.119 secs.
+Decoding time for thread 3 = 9.202 secs.
+Decoding time for thread 31 = 9.397 secs.
+Decoding time for thread 9 = 9.422 secs.
+Decoding time for thread 11 = 9.969 secs.
+Decoding time for thread 25 = 10.049 secs.
+Decoding time for thread 10 = 10.605 secs.
+Decoding time for thread 26 = 10.635 secs.
+Decoding time for thread 32 = 10.784 secs.
+Decoding time for thread 17 = 10.867 secs.
+Decoding time for thread 22 = 16.605 secs.
+Decoding time for thread 29 = 16.801 secs.
+Decoding time for thread 4 = 17.986 secs.
+Okay. Decoding done.
+Overall decoding time = 17.989 secs.
+****
+[Dependency] Correct: 1647
+[Dependency] total: 1966
+[Dependency] UAS: 0.8377416073245167
+****
+perl data/semeval10t1/conlleval.pl < data/semeval10t1/output/DIVIDED.ner.eval.txt
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LANGUAGE = (unset),
+	LC_ALL = (unset),
+	LC_CTYPE = "UTF-8",
+	LANG = "en_US.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
+processed 1966 tokens with 40 phrases; found: 10 phrases; correct: 7.
+accuracy:  97.05%; precision:  70.00%; recall:  17.50%; FB1:  28.00
+           person: precision:  70.00%; recall:  17.50%; FB1:  28.00  10
