@@ -75,14 +75,7 @@ public class DIVFeatureManager extends FeatureManager {
 		if(dist > 10) distBool = "10";
 			
 		String attDist = "&"+att+"&"+distBool;
-		String myDistBool = "0";
-		if(dist >= 1)  distBool = "1";
-		if(dist >= 2)  distBool = "2";
-		if(dist >= 3)  distBool = "3";
-		if(dist >= 4)  distBool = "4";
-		if(dist >= 5)  distBool = "5";
-		if(dist >= 10) distBool = "10";
-		String myAttDist = "&"+att+"&"+myDistBool;
+		
 		
 		
 		int headIndex = direction==1? leftIndex:rightIndex;
@@ -259,12 +252,6 @@ public class DIVFeatureManager extends FeatureManager {
 				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBT-1",rightPrefix+child_1_type+":"+rbt+":RIGHT_1_BD"));
 				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBWT-1",rightPrefix+child_1_type+":"+rb+","+rbt+":RIGHT_1_BD"));
 				
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBW-2",E_B_PREFIX+child_1_type+":"+llb+":LEFT_2_BD"));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBT-2",E_B_PREFIX+child_1_type+":"+llbt+":LEFT_2_BD"));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBWT-2",E_B_PREFIX+child_1_type+":"+llb+","+llbt+":LEFT_2_BD"));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBW-2",rightPrefix+child_1_type+":"+rrb+":RIGHT_2_BD"));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBT-2",rightPrefix+child_1_type+":"+rrbt+":RIGHT_2_BD"));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBWT-2",rightPrefix+child_1_type+":"+rrb+","+rrbt+":RIGHT_2_BD"));
 				
 				String lw = sent.get(leftIndex).getName();
 				String rw = sent.get(rightIndex).getName();
@@ -299,21 +286,21 @@ public class DIVFeatureManager extends FeatureManager {
 			if(!child_1_type.equals("OE") && !child_1_type.equals("ONE") && completeness==0 && (pa_type.equals(OE)||pa_type.equals("null"))){
 				
 				/**Unigram feature without dist info**/
-				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headword", "JOINT:"+child_1_type+":"+headWord+",DIR:"+dirs[direction]));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headtag", "JOINT:"+child_1_type+":"+headTag+",DIR:"+dirs[direction]));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-modifierword", "JOINT:"+child_1_type+":"+modifierWord+",DIR:"+dirs[1-direction]));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-modifiertag", "JOINT:"+child_1_type+":"+modifierTag+",DIR:"+dirs[1-direction]));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headwordtag", "JOINT:"+child_1_type+":"+headWord+","+headTag+",DIR:"+dirs[direction]));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-modifierwordtag", "JOINT:"+child_1_type+":"+modifierWord+","+modifierTag+",DIR:"+dirs[1-direction]));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headword", "JOINT:"+child_1_type+":"+headWord+",DIR:"+dirs[direction]));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headtag", "JOINT:"+child_1_type+":"+headTag+",DIR:"+dirs[direction]));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-modifierword", "JOINT:"+child_1_type+":"+modifierWord+",DIR:"+dirs[1-direction]));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-modifiertag", "JOINT:"+child_1_type+":"+modifierTag+",DIR:"+dirs[1-direction]));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headwordtag", "JOINT:"+child_1_type+":"+headWord+","+headTag+",DIR:"+dirs[direction]));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-modifierwordtag", "JOINT:"+child_1_type+":"+modifierWord+","+modifierTag+",DIR:"+dirs[1-direction]));
 				
 				
 				/****Bigram features without dist info******/
 				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword", "JOINT:"+child_1_type+":"+headWord+",DIR:"+dirs[direction]+"-"+modifierWord+",DIR:"+dirs[1-direction]));
 				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag", "JOINT:"+child_1_type+":"+headTag+",DIR:"+dirs[direction]+"-"+modifierTag+",DIR:"+dirs[1-direction]));
 				
-				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword-dist", "JOINT:"+child_1_type+":"+headWord+",DIR:"+dirs[direction]+"-"+modifierWord+",DIR:"+dirs[1-direction]+attDist));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag-dist", "JOINT:"+child_1_type+":"+headTag+",DIR:"+dirs[direction]+"-"+modifierTag+",DIR:"+dirs[1-direction]+attDist));
-				
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword-dist", "JOINT:"+child_1_type+":"+headWord+",DIR:"+dirs[direction]+"-"+modifierWord+",DIR:"+dirs[1-direction]+attDist));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag-dist", "JOINT:"+child_1_type+":"+headTag+",DIR:"+dirs[direction]+"-"+modifierTag+",DIR:"+dirs[1-direction]+attDist));
+//				
 				
 				//add more dependency features here.
 				for(int i=leftIndex+1;i<rightIndex;i++){
