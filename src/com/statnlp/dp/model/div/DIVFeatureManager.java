@@ -270,6 +270,8 @@ public class DIVFeatureManager extends FeatureManager {
 				
 				
 				String myDist = "&"+dist;
+				if(dist>=5)
+					myDist = "&long";
 				if(leftIndex!=rightIndex){
 					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LW-RW",child_1_type+":"+lw+":"+rw+myDist));
 					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LT-RT",child_1_type+":"+lt+":"+rt+myDist));
