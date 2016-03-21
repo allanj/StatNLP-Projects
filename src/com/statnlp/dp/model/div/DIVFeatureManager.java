@@ -161,27 +161,20 @@ public class DIVFeatureManager extends FeatureManager {
 									child_type+":"+prevTag+","+tag+",DIRECTION:"+dirs[d]));
 							featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-UN-SHAPE", 
 									child_type+":"+wordShape(word)+",DIRECTION:"+dirs[d]));
-							
-							featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevWord", child_type+":"+prevWord+",DIRECTION:"+dirs[d]));
-							featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevTag", child_type+":"+prevTag+",DIRECTION:"+dirs[d]));
-							featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevShape", child_type+":"+wordShape(prevWord)+",DIRECTION:"+dirs[d]));
-							featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-nextWord", child_type+":"+nextWord+",DIRECTION:"+dirs[d]));
-							featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-nextTag", child_type+":"+nextTag+",DIRECTION:"+dirs[d]));
-							featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-nextShape", child_type+":"+wordShape(nextWord)+",DIRECTION:"+dirs[d]));
 						}
 					}else{
 						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-UN-WORD", child_type+":"+word));
 						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-UN-TAG", child_type+":"+tag));
 						featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevTag-currTag", child_type+":"+prevTag+","+tag));
 						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-UN-SHAPE", child_type+":"+wordShape(word)));
-						featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevWord", child_type+":"+prevWord));
-						featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevTag", child_type+":"+prevTag));
-						featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevShape", child_type+":"+wordShape(prevWord)));
-						featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-nextWord", child_type+":"+nextWord));
-						featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-nextTag", child_type+":"+nextTag));
-						featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-nextShape", child_type+":"+wordShape(nextWord)));
 					}
 					
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevWord", child_type+":"+prevWord));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevTag", child_type+":"+prevTag));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-prevShape", child_type+":"+wordShape(prevWord)));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-nextWord", child_type+":"+nextWord));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-nextTag", child_type+":"+nextTag));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-nextShape", child_type+":"+wordShape(nextWord)));
 					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-UN-type", child_1_type));
 					
 				}
@@ -260,54 +253,42 @@ public class DIVFeatureManager extends FeatureManager {
 				String rbt = rightIndex<sent.length()-1? sent.get(rightIndex+1).getTag():"END";
 				String rrbt = rightIndex+1<sent.length()-1? sent.get(rightIndex+2).getTag():rightIndex==sent.length()-1?"END":"afterEND";
 				
-				
+				//boundary
+				String rightPrefix = leftIndex==rightIndex?E_B_PREFIX:E_I_PREFIX;
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBW-1",E_B_PREFIX+child_1_type+":"+lb+":LEFT_1_BD"));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBT-1",E_B_PREFIX+child_1_type+":"+lbt+":LEFT_1_BD"));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBWT-1",E_B_PREFIX+child_1_type+":"+lb+","+lbt+":LEFT_1_BD"));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBW-1",rightPrefix+child_1_type+":"+rb+":RIGHT_1_BD"));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBT-1",rightPrefix+child_1_type+":"+rbt+":RIGHT_1_BD"));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBWT-1",rightPrefix+child_1_type+":"+rb+","+rbt+":RIGHT_1_BD"));
 				
 				
 				String lw = sent.get(leftIndex).getName();
 				String rw = sent.get(rightIndex).getName();
 				String lt = sent.get(leftIndex).getTag();
 				String rt =sent.get(rightIndex).getTag();
-				
-				
-				String myDist = "&"+dist;
-				if(dist>=5)
-					myDist = "&long";
-				if(leftIndex!=rightIndex){
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LW-RW",child_1_type+":"+lw+":"+rw+myDist));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LT-RT",child_1_type+":"+lt+":"+rt+myDist));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LWT-RWT",child_1_type+":"+lw+":"+lt+"-"+rw+":"+rt+myDist));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LW-RT",child_1_type+":"+lw+":"+rt+myDist));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LT-RW",child_1_type+":"+lt+":"+rw+myDist));
-				}
-				
-				String rightPrefix = leftIndex==rightIndex?E_B_PREFIX:E_I_PREFIX;
-				
 //				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-LBW-RBW",child_1_type+":"+lb+":"+rb));
 //				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-LBT-RBT",child_1_type+":"+lbt+":"+rbt));
 //				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-LBWT-RBWT",child_1_type+":"+lb+":"+lbt+"-"+rb+":"+rbt));
 //				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-LBW-RBT",child_1_type+":"+lb+":"+rbt));
 //				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-LBT-RBW",child_1_type+":"+lbt+":"+rb));
 				
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBW-1",child_1_type+":"+lb+":LEFT_1_BD"+myDist));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBT-1",child_1_type+":"+lbt+":LEFT_1_BD"+myDist));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBWT-1",child_1_type+":"+lb+","+lbt+":LEFT_1_BD"+myDist));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBW-1",child_1_type+":"+rb+":RIGHT_1_BD"+myDist));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBT-1",child_1_type+":"+rbt+":RIGHT_1_BD"+myDist));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBWT-1",child_1_type+":"+rb+","+rbt+":RIGHT_1_BD"+myDist));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LW-RW",child_1_type+":"+lw+":"+rw));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LT-RT",child_1_type+":"+lt+":"+rt));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LWT-RWT",child_1_type+":"+lw+":"+lt+"-"+rw+":"+rt));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LW-RT",child_1_type+":"+lw+":"+rt));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LT-RW",child_1_type+":"+lt+":"+rw));
 				
 				
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBT-LT", E_B_PREFIX+child_1_type+":"+lbt+","+lt));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBT-LW", E_B_PREFIX+child_1_type+":"+lbt+","+lw));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBW-LT", E_B_PREFIX+child_1_type+":"+lb+","+lt));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBW-LW", E_B_PREFIX+child_1_type+":"+lb+","+lw));
 				
-				
-				
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBT-LT", E_B_PREFIX+child_1_type+":"+lbt+","+lt+myDist));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBT-LW", E_B_PREFIX+child_1_type+":"+lbt+","+lw+myDist));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBW-LT", E_B_PREFIX+child_1_type+":"+lb+","+lt+myDist));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBW-LW", E_B_PREFIX+child_1_type+":"+lb+","+lw+myDist));
-				
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBT-RT", rightPrefix+child_1_type+":"+rbt+","+rt+myDist));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBT-RW", rightPrefix+child_1_type+":"+rbt+","+rw+myDist));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBW-RT", rightPrefix+child_1_type+":"+rb+","+rt+myDist));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBW-RW", rightPrefix+child_1_type+":"+rb+","+rw+myDist));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBT-RT", rightPrefix+child_1_type+":"+rbt+","+rt));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBT-RW", rightPrefix+child_1_type+":"+rbt+","+rw));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBW-RT", rightPrefix+child_1_type+":"+rb+","+rt));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBW-RW", rightPrefix+child_1_type+":"+rb+","+rw));
 				
 			}
 						
