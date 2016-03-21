@@ -322,7 +322,7 @@ public class DIVFeatureManager extends FeatureManager {
 		}
 		
 		/****End of Entity features*******/
-		if(completeness==0 && type.startsWith(PARENT_IS) && !(!child_1_type.equals(ONE) && !child_1_type.equals(OE) &&  !pa_type.equals(ONE) && !pa_type.equals(OE))){
+		if(completeness==0 && type.startsWith(PARENT_IS) && !(!child_1_type.equals(ONE) && !child_1_type.equals(OE) && child_1_type.equals(pa_type))){
 			
 			if(headWord.length()>5 || modifierWord.length()>5){
 				int hL = headWord.length();
