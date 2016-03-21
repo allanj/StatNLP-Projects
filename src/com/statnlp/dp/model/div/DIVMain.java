@@ -2,6 +2,7 @@ package com.statnlp.dp.model.div;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.dp.DependInstance;
@@ -11,8 +12,6 @@ import com.statnlp.dp.Transformer;
 import com.statnlp.dp.model.ModelViewer;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DPConfig.MODEL;
-import com.statnlp.dp.utils.DataChecker;
-import com.statnlp.dp.utils.Formatter;
 import com.statnlp.dp.utils.Init;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -36,12 +35,13 @@ public class DIVMain {
 	public static String devPath;
 	public static boolean isDev = true;
 	public static String[] selectedEntities = {"person","organization","gpe","MISC"};
-	
+	public static HashSet<String> dataTypeSet;
 	
 	public static void main(String[] args) throws InterruptedException, IOException {
 		
 		
 		processArgs(args);
+		dataTypeSet = Init.iniOntoNotesData();
 		entities = Init.initializeUniqueModelTypeMap(selectedEntities);
 		String modelType = MODEL.DIVIDED.name();
 		String middle = isDev? ".dev":".test";
@@ -72,7 +72,7 @@ public class DIVMain {
 		System.err.println("[Info] joint Res: "+jointRes);
 		DependInstance[] trainingInsts = null;
 		DependInstance[] testingInsts = null;
-		if(DPConfig.dataType.equals("cnn")){
+		if(dataTypeSet.contains(DPConfig.dataType)){
 			trainingInsts = DependencyReader.readCNN(trainingPath, true,trainNumber,tran);
 			testingInsts = DependencyReader.readCNN(decodePath, false,testNumber,tran);
 		}else{
