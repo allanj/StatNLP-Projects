@@ -27,9 +27,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 
-import com.statnlp.commons.ml.opt.LBFGSOptimizer;
-import com.statnlp.commons.ml.opt.MathsVector;
+import com.statnlp.commons.ml.opt.L1ProximalGradientDescentOptimizer;
 import com.statnlp.commons.ml.opt.LBFGS.ExceptionWithIflag;
+import com.statnlp.commons.ml.opt.MathsVector;
 
 //TODO: other optimization and regularization methods. Such as the L1 regularization.
 
@@ -39,7 +39,7 @@ public class GlobalNetworkParam implements Serializable{
 	
 	//these parameters are used for discriminative training using LBFGS.
 	protected transient double _kappa;
-	protected transient LBFGSOptimizer _opt;
+	protected transient L1ProximalGradientDescentOptimizer _opt;
 	protected transient double[] _counts;
 	protected transient double _obj_old;
 	protected transient double _obj;
@@ -69,8 +69,8 @@ public class GlobalNetworkParam implements Serializable{
 		this._obj = Double.NEGATIVE_INFINITY;
 		this._isDiscriminative = !NetworkConfig.TRAIN_MODE_IS_GENERATIVE;
 		if(this.isDiscriminative()){
-			this._opt = new LBFGSOptimizer();
-			this._kappa = NetworkConfig.L2_REGULARIZATION_CONSTANT;
+			this._opt = new L1ProximalGradientDescentOptimizer(NetworkConfig.L1_REGULARIZATION_CONSTANT);
+			this._kappa = NetworkConfig.L1_REGULARIZATION_CONSTANT;
 		}
 		this._featureIntMap = new HashMap<String, HashMap<String, HashMap<String, Integer>>>();
 		this._type2inputMap = new HashMap<String, ArrayList<String>>();
@@ -245,7 +245,7 @@ public class GlobalNetworkParam implements Serializable{
 			}
 		}
 		this._version = 0;
-		this._opt = new LBFGSOptimizer();
+		this._opt = new L1ProximalGradientDescentOptimizer(NetworkConfig.L1_REGULARIZATION_CONSTANT);
 		this._locked = true;
 		
 		System.err.println(this._size+" features.");
@@ -292,7 +292,7 @@ public class GlobalNetworkParam implements Serializable{
 			}
 		}
 		this._version = 0;
-		this._opt = new LBFGSOptimizer();
+		this._opt = new L1ProximalGradientDescentOptimizer(NetworkConfig.L1_REGULARIZATION_CONSTANT);
 		this._locked = true;
 		
 		System.err.println(this._size+" features.");
@@ -497,7 +497,7 @@ public class GlobalNetworkParam implements Serializable{
 	protected boolean updateDiscriminative(){
 		
     	this._opt.setVariables(this._weights);
-    	this._opt.setObjective(-this._obj);
+    	//this._opt.setObjective(-this._obj);
     	this._opt.setGradients(this._counts);
     	
 //    	int fid = 10;
@@ -506,11 +506,11 @@ public class GlobalNetworkParam implements Serializable{
     	
     	boolean done = false;
     	
-    	try{
+    	//try{
         	done = this._opt.optimize();
-    	} catch(ExceptionWithIflag e){
-    		throw new NetworkException("Exception with Iflag:"+e.getMessage());
-    	}
+    	//} catch(ExceptionWithIflag e){
+    	//	throw new NetworkException("Exception with Iflag:"+e.getMessage());
+    	//}
 		
     	if(Math.abs(this.getObj()-this.getObj_old())<NetworkConfig.objtol){
     		done = true;
@@ -530,13 +530,16 @@ public class GlobalNetworkParam implements Serializable{
 			this._counts[k] = 0.0;
 			//for regularization
 			if(this.isDiscriminative() && this._kappa > 0 && k>=this._fixedFeaturesSize){
-				this._counts[k] += 2 * this._kappa * this._weights[k];
+				//this._counts[k] += 2 * this._kappa * this._weights[k];
+				this._counts[k] += 0;
 			}
 		}
 		this._obj = 0.0;
 		//for regularization
 		if(this.isDiscriminative() && this._kappa > 0){
-			this._obj += - this._kappa * MathsVector.square(this._weights);
+			//this._obj += - this._kappa * MathsVector.square(this._weights);
+			MathsVector mv = new MathsVector(this._weights);
+			this._obj += - this._kappa * mv.L1_norm();
 		}
 		//NOTES:
 		//for additional terms such as regularization terms:
