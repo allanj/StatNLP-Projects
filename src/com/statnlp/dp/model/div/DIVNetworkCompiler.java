@@ -167,10 +167,13 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 			//eIndex: 1,2,3,4,5,..n
 			for(String e: types){
 				if(e.equals(OE)) continue;
-				long wordLeftNodeE = this.toNode(rightIndex, rightIndex, 0, 1, e);
 				long wordRightNodeE = this.toNode(rightIndex, rightIndex, 1, 1, e);
-				network.addNode(wordLeftNodeE);
 				network.addNode(wordRightNodeE);
+				long wordLeftNodeE = -1;
+				if(!(rightIndex==1 && !e.equals(ONE))){
+					wordLeftNodeE = this.toNode(rightIndex, rightIndex, 0, 1, e);
+					network.addNode(wordLeftNodeE);
+				}
 				for(String pae:types){
 					if(!e.equals(ONE) && pae.equals(ONE)) continue;
 					if(!pae.equals(ONE) && !pae.equals(OE) && !e.equals(pae)) continue;
@@ -178,10 +181,11 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 					long wordRightNode = this.toNode(rightIndex, rightIndex, 1, 1,PARENT_IS+pae);
 					network.addNode(wordRightNode);
 					network.addEdge(wordRightNode, new long[]{wordRightNodeE});
-					long wordLeftNode = this.toNode(rightIndex, rightIndex, 0, 1,PARENT_IS+pae);
-					network.addNode(wordLeftNode);
-					network.addEdge(wordLeftNode, new long[]{wordLeftNodeE});
-					
+					if(wordLeftNodeE!=-1){
+						long wordLeftNode = this.toNode(rightIndex, rightIndex, 0, 1,PARENT_IS+pae);
+						network.addNode(wordLeftNode);
+						network.addEdge(wordLeftNode, new long[]{wordLeftNodeE});
+					}
 					
 				}
 			}

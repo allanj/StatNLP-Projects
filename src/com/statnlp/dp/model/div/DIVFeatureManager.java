@@ -183,10 +183,6 @@ public class DIVFeatureManager extends FeatureManager {
 				for(int i=leftIndex;i<=rightIndex-1;i++){
 					String blw = sent.get(i).getName();
 					String brw = sent.get(i+1).getName();
-					String blt = sent.get(i).getTag();
-					String brt =sent.get(i+1).getTag();
-					String brpw = i+2<sent.length()?sent.get(i+2).getName():"END";
-					String brpt = i+2<sent.length()?sent.get(i+2).getTag():"END";
 					String leftType = i==leftIndex?E_B_PREFIX+child_1_type:E_I_PREFIX+child_1_type;
 					String rightType = E_I_PREFIX+child_1_type;
 					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-BI-WORD", 
@@ -195,11 +191,8 @@ public class DIVFeatureManager extends FeatureManager {
 				//trigram
 				for(int i=leftIndex;i<=rightIndex-2;i++){
 					String tlw = sent.get(i).getName();
-					String tlt = sent.get(i).getTag();
 					String tmw = sent.get(i+1).getName();
-					String tmt =sent.get(i+1).getTag();
 					String trw = sent.get(i+2).getName();
-					String trt =sent.get(i+2).getTag();
 					String leftType = i==leftIndex?E_B_PREFIX+child_1_type:E_I_PREFIX+child_1_type;
 					String rightType = E_I_PREFIX+child_1_type;
 					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-TRI-WORD", 
@@ -208,13 +201,9 @@ public class DIVFeatureManager extends FeatureManager {
 				//4-gram
 				for(int i=leftIndex;i<=rightIndex-3;i++){
 					String flw = sent.get(i).getName();
-					String flt = sent.get(i).getTag();
 					String fm1w = sent.get(i+1).getName();
-					String fm1t =sent.get(i+1).getTag();
 					String fm2w = sent.get(i+2).getName();
-					String fm2t =sent.get(i+2).getTag();
 					String frw = sent.get(i+3).getName();
-					String frt =sent.get(i+3).getTag();
 					String leftType = i==leftIndex?E_B_PREFIX+child_1_type:E_I_PREFIX+child_1_type;
 					String rightType = E_I_PREFIX+child_1_type;
 					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-FG-WORD", 
@@ -245,13 +234,9 @@ public class DIVFeatureManager extends FeatureManager {
 
 				//boundary features
 				String lb = leftIndex>0? sent.get(leftIndex-1).getName():"STR";
-				String llb = leftIndex-1>0? sent.get(leftIndex-2).getName():leftIndex==1?"STR":"prevSTR";
 				String lbt = leftIndex>0? sent.get(leftIndex-1).getTag():"STR";
-				String llbt = leftIndex-1>0? sent.get(leftIndex-2).getTag():leftIndex==1?"STR":"prevSTR";
 				String rb = rightIndex<sent.length()-1? sent.get(rightIndex+1).getName():"END";
-				String rrb = rightIndex+1<sent.length()-1? sent.get(rightIndex+2).getName():rightIndex==sent.length()-1?"END":"afterEND";
 				String rbt = rightIndex<sent.length()-1? sent.get(rightIndex+1).getTag():"END";
-				String rrbt = rightIndex+1<sent.length()-1? sent.get(rightIndex+2).getTag():rightIndex==sent.length()-1?"END":"afterEND";
 				
 				//boundary
 				String rightPrefix = leftIndex==rightIndex?E_B_PREFIX:E_I_PREFIX;
