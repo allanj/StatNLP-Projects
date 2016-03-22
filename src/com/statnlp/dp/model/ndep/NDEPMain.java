@@ -54,10 +54,10 @@ public class NDEPMain {
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
-		trainingPath = "data/semeval10t1/small.txt";
+//		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-		trainNumber = 1;
-//		testNumber = -1;
+//		trainNumber = 100;
+//		testNumber = 10;
 //		numIteration = 80;
 //		numThreads = 5;
 //		testingPath = trainingPath;

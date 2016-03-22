@@ -95,7 +95,6 @@ public class NDEPNetworkCompiler extends NetworkCompiler {
 		int pa_completeness = Integer.valueOf(info[3]);
 		String pa_type = info[4];
 		if(pa_leftIndex==pa_rightIndex && !pa_type.startsWith(PARENT_IS)) return; //means the span width now is 1, already enough
-		if(!pa_type.equals(ONE) && !pa_type.equals(OE)) return; //means this span is already entity, then return.
 		long parentNode = toNode(pa_leftIndex, pa_rightIndex, pa_direction, pa_completeness,pa_type);
 		Tree[] children = parent.children();
 		if(children.length!=2 && children.length!=1){
@@ -174,7 +173,7 @@ public class NDEPNetworkCompiler extends NetworkCompiler {
 				network.addNode(wordRightNodeE);
 				for(String pae:types){
 					if(!e.equals(ONE) && pae.equals(ONE)) continue;
-					if(!pae.equals(ONE) && !pae.equals(OE) && !e.equals(pae)) continue;
+					if(!pae.equals(ONE) && !pae.equals(OE) ) continue;
 					
 					long wordRightNode = this.toNode(rightIndex, rightIndex, 1, 1,PARENT_IS+pae);
 					network.addNode(wordRightNode);
@@ -207,17 +206,21 @@ public class NDEPNetworkCompiler extends NetworkCompiler {
 							for(int m=leftIndex;m<rightIndex;m++){
 								for(int t=0;t<types.length;t++){
 									long parentE = this.toNode(leftIndex, rightIndex, direction, complete, types[t]);
-									long child_1 = this.toNode(leftIndex, m, 1, 1, PARENT_IS+types[t]);
-									long child_2 = this.toNode(m+1, rightIndex, 0, 1, PARENT_IS+types[t]);
-									if(network.contains(child_1) && network.contains(child_2)){
+									if(!types[t].equals(ONE) && !types[t].equals(OE) && leftIndex!=0){
 										network.addNode(parentE);
-										network.addEdge(parentE, new long[]{child_1,child_2});
+									}else{
+										long child_1 = this.toNode(leftIndex, m, 1, 1, PARENT_IS+types[t]);
+										long child_2 = this.toNode(m+1, rightIndex, 0, 1, PARENT_IS+types[t]);
+										if(network.contains(child_1) && network.contains(child_2)){
+											network.addNode(parentE);
+											network.addEdge(parentE, new long[]{child_1,child_2});
+										}
 									}
 									if(!addedPaeLink){
 										for(String pae:types){
 											if(types[t].equals(OE) && !pae.equals(OE)) continue;
 											if(!types[t].equals(ONE) && !types[t].equals(OE) && pae.equals(ONE)) continue;
-											if(!pae.equals(ONE) && !pae.equals(OE) && !types[t].equals(pae)) continue;
+											if(!pae.equals(ONE) && !pae.equals(OE)) continue;
 											long parent = this.toNode(leftIndex, rightIndex, direction, complete, PARENT_IS+pae);
 											if(network.contains(parentE)){
 												network.addNode(parent);
@@ -245,7 +248,7 @@ public class NDEPNetworkCompiler extends NetworkCompiler {
 										for(String pae:types){
 											if(types[t].equals(OE) && !pae.equals(OE)) continue;
 											if(!types[t].equals(ONE) && !types[t].equals(OE) && pae.equals(ONE)) continue;
-											if(!pae.equals(ONE) && !pae.equals(OE) && !types[t].equals(pae)) continue;
+											if(!pae.equals(ONE) && !pae.equals(OE)) continue;
 											if(pae.equals(OE) && !types[t].equals(OE) && !types[t].equals(ONE)) continue;
 											long parent = this.toNode(leftIndex, rightIndex, direction, complete, PARENT_IS+pae);
 											if(network.contains(parentE)){
@@ -283,7 +286,7 @@ public class NDEPNetworkCompiler extends NetworkCompiler {
 										for(String pae:types){
 											if(types[t].equals(OE) && !pae.equals(OE)) continue;
 											if(!types[t].equals(ONE) && !types[t].equals(OE) && pae.equals(ONE)) continue;
-											if(!pae.equals(ONE) && !pae.equals(OE) && !types[t].equals(pae)) continue;
+											if(!pae.equals(ONE) && !pae.equals(OE)) continue;
 											if(pae.equals(OE) && !types[t].equals(OE) && !types[t].equals(ONE)) continue;
 											long parent = this.toNode(leftIndex, rightIndex, direction, complete, PARENT_IS+pae);
 											if(network.contains(parentE)){
