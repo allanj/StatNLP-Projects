@@ -61,8 +61,6 @@ public class DIVFeatureManager extends FeatureManager {
 		}
 		String leftTag = sent.get(leftIndex).getTag();
 		String rightTag = sent.get(rightIndex).getTag();
-		String leftA = leftTag.substring(0, 1);
-		String rightA = rightTag.substring(0, 1);
 		
 		int dist = Math.abs(rightIndex-leftIndex);
 		String att = direction==1? "RA":"LA";
@@ -75,8 +73,6 @@ public class DIVFeatureManager extends FeatureManager {
 		if(dist > 10) distBool = "10";
 			
 		String attDist = "&"+att+"&"+distBool;
-		
-		
 		
 		int headIndex = direction==1? leftIndex:rightIndex;
 		int modifierIndex = direction==1? rightIndex:leftIndex;
@@ -107,7 +103,6 @@ public class DIVFeatureManager extends FeatureManager {
 			if(children_k.length!=1)
 				throw new RuntimeException("parent is general span, but have "+children_k.length+" children?");
 
-			
 			if((pa_type.equals(OE)||pa_type.equals("null")) && !child_1_type.equals(OE) && !child_1_type.equals(ONE)
 					&& (leftIndex==rightIndex || (leftIndex!=rightIndex && completeness==0))){
 				
@@ -126,6 +121,7 @@ public class DIVFeatureManager extends FeatureManager {
 						if(completeness==1 && direction==0 && i==rightIndex && d==1) continue;
 						if(completeness==0 && ((i==leftIndex && d==0) || (i==rightIndex && d==1)) ) continue;
 						String child_type = leftIndex==rightIndex||i==leftIndex? E_B_PREFIX+child_1_type:E_I_PREFIX+child_1_type;
+						if(leftIndex==rightIndex && direction==0) child_type = E_I_PREFIX+child_1_type;
 						//suffix and prefix
 						for(int plen = 1;plen<=6;plen++){
 							if(word.length()>=plen){
@@ -150,6 +146,7 @@ public class DIVFeatureManager extends FeatureManager {
 					String nextWord = i<sent.length()-1? sent.get(i+1).getName():"END";
 					String nextTag = i<sent.length()-1? sent.get(i+1).getTag():"END";
 					String child_type = leftIndex==rightIndex||i==leftIndex? E_B_PREFIX+child_1_type:E_I_PREFIX+child_1_type;
+					if(leftIndex==rightIndex && direction==0) child_type = E_I_PREFIX+child_1_type;
 					if(i==leftIndex || i==rightIndex){
 						for(int d=0;d<dirs.length;d++){
 							if(completeness==1 && direction==1 && i==leftIndex && d==0) continue;
@@ -239,10 +236,12 @@ public class DIVFeatureManager extends FeatureManager {
 				String rbt = rightIndex<sent.length()-1? sent.get(rightIndex+1).getTag():"END";
 				
 				//boundary
+				String leftPrefix = E_B_PREFIX;
+				if(leftIndex==rightIndex && direction==0) leftPrefix = E_I_PREFIX;
 				String rightPrefix = leftIndex==rightIndex?E_B_PREFIX:E_I_PREFIX;
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBW-1",E_B_PREFIX+child_1_type+":"+lb+":LEFT_1_BD"));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBT-1",E_B_PREFIX+child_1_type+":"+lbt+":LEFT_1_BD"));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBWT-1",E_B_PREFIX+child_1_type+":"+lb+","+lbt+":LEFT_1_BD"));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBW-1",leftPrefix+child_1_type+":"+lb+":LEFT_1_BD"));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBT-1",leftPrefix+child_1_type+":"+lbt+":LEFT_1_BD"));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBWT-1",leftPrefix+child_1_type+":"+lb+","+lbt+":LEFT_1_BD"));
 				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBW-1",rightPrefix+child_1_type+":"+rb+":RIGHT_1_BD"));
 				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBT-1",rightPrefix+child_1_type+":"+rbt+":RIGHT_1_BD"));
 				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBWT-1",rightPrefix+child_1_type+":"+rb+","+rbt+":RIGHT_1_BD"));
@@ -265,10 +264,10 @@ public class DIVFeatureManager extends FeatureManager {
 				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LT-RW",child_1_type+":"+lt+":"+rw));
 				
 				
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBT-LT", E_B_PREFIX+child_1_type+":"+lbt+","+lt));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBT-LW", E_B_PREFIX+child_1_type+":"+lbt+","+lw));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBW-LT", E_B_PREFIX+child_1_type+":"+lb+","+lt));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBW-LW", E_B_PREFIX+child_1_type+":"+lb+","+lw));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBT-LT", leftPrefix+child_1_type+":"+lbt+","+lt));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBT-LW", leftPrefix+child_1_type+":"+lbt+","+lw));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBW-LT", leftPrefix+child_1_type+":"+lb+","+lt));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBW-LW", leftPrefix+child_1_type+":"+lb+","+lw));
 				
 				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBT-RT", rightPrefix+child_1_type+":"+rbt+","+rt));
 				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBT-RW", rightPrefix+child_1_type+":"+rbt+","+rw));
@@ -280,24 +279,12 @@ public class DIVFeatureManager extends FeatureManager {
 			
 			if(!child_1_type.equals("OE") && !child_1_type.equals("ONE") && completeness==0 && (pa_type.equals(OE)||pa_type.equals("null"))){
 				
-				/**Unigram feature without dist info**/
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headword", "JOINT:"+child_1_type+":"+headWord+",DIR:"+dirs[direction]));
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headtag", "JOINT:"+child_1_type+":"+headTag+",DIR:"+dirs[direction]));
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-modifierword", "JOINT:"+child_1_type+":"+modifierWord+",DIR:"+dirs[1-direction]));
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-modifiertag", "JOINT:"+child_1_type+":"+modifierTag+",DIR:"+dirs[1-direction]));
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headwordtag", "JOINT:"+child_1_type+":"+headWord+","+headTag+",DIR:"+dirs[direction]));
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-modifierwordtag", "JOINT:"+child_1_type+":"+modifierWord+","+modifierTag+",DIR:"+dirs[1-direction]));
-				
-				
-				/****Bigram features without dist info******/
 				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword", "JOINT:"+child_1_type+":"+headWord+",DIR:"+dirs[direction]+"-"+modifierWord+",DIR:"+dirs[1-direction]));
 				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag", "JOINT:"+child_1_type+":"+headTag+",DIR:"+dirs[direction]+"-"+modifierTag+",DIR:"+dirs[1-direction]));
 				
 				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword-dist", "JOINT:"+child_1_type+":"+headWord+",DIR:"+dirs[direction]+"-"+modifierWord+",DIR:"+dirs[1-direction]+attDist));
 				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag-dist", "JOINT:"+child_1_type+":"+headTag+",DIR:"+dirs[direction]+"-"+modifierTag+",DIR:"+dirs[1-direction]+attDist));
-//				
 				
-				//add more dependency features here.
 				for(int i=leftIndex+1;i<rightIndex;i++){
 					featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-inbetween-1", "JOINT:"+child_1_type+":"+leftTag+","+sent.get(i).getTag()+","+rightTag));
 					featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-inbetween-2", "JOINT:"+child_1_type+":"+leftTag+","+sent.get(i).getTag()+","+rightTag+attDist));
@@ -307,6 +294,67 @@ public class DIVFeatureManager extends FeatureManager {
 		}
 		
 		/****End of Entity features*******/
+		addDepFeatures(featureList,network,parentArr,children_k,sent);
+		
+		ArrayList<Integer> finalList = new ArrayList<Integer>();
+		for(int i=0;i<featureList.size();i++){
+			if(featureList.get(i)!=-1)
+				finalList.add(featureList.get(i) );
+		}
+		int[] features = new int[finalList.size()];
+		for(int i=0;i<finalList.size();i++) features[i] = finalList.get(i);
+		if(features.length==0) return FeatureArray.EMPTY;
+		fa = new FeatureArray(features);
+		return fa;
+	}
+	
+	
+	private String wordShape(String word){
+		return Extractor.wordShapeOf(word);
+	}
+	
+	private void addDepFeatures(ArrayList<Integer> featureList, Network network, int[] parentArr, int[] children_k, Sentence sent){
+		
+		
+		int leftIndex = parentArr[0] - parentArr[1];
+		int rightIndex = parentArr[0];
+		int direction = parentArr[3];
+		int completeness = parentArr[2];
+		String type = null;
+		if(parentArr[4]==2*types.length)
+			type = PARENT_IS+"null";
+		else if(parentArr[4]>types.length-1){
+			type = PARENT_IS+types[parentArr[4]-types.length];
+		}else{
+			type = types[parentArr[4]];
+		}
+		String leftTag = sent.get(leftIndex).getTag();
+		String rightTag = sent.get(rightIndex).getTag();
+		String leftA = leftTag.substring(0, 1);
+		String rightA = rightTag.substring(0, 1);
+		
+		int dist = Math.abs(rightIndex-leftIndex);
+		String att = direction==1? "RA":"LA";
+		String distBool = "0";
+		if(dist > 1)  distBool = "1";
+		if(dist > 2)  distBool = "2";
+		if(dist > 3)  distBool = "3";
+		if(dist > 4)  distBool = "4";
+		if(dist > 5)  distBool = "5";
+		if(dist > 10) distBool = "10";
+		String attDist = "&"+att+"&"+distBool;
+		
+		int headIndex = direction==1? leftIndex:rightIndex;
+		int modifierIndex = direction==1? rightIndex:leftIndex;
+		String headWord = sent.get(headIndex).getName();
+		String headTag = sent.get(headIndex).getTag();
+		String modifierWord = sent.get(modifierIndex).getName();
+		String modifierTag = sent.get(modifierIndex).getTag();
+		
+		
+		if(children_k.length==0) return;
+		
+		
 		if(completeness==0 && type.startsWith(PARENT_IS)){
 			
 			if(headWord.length()>5 || modifierWord.length()>5){
@@ -458,25 +506,7 @@ public class DIVFeatureManager extends FeatureManager {
 				featureList.add(this._param_g.toFeature(network,FEATYPE.inbetween.name(), "inbetween-4", leftA+","+sent.get(i).getATag()+","+rightA));
 			}
 		}
-		
-		
-		ArrayList<Integer> finalList = new ArrayList<Integer>();
-		for(int i=0;i<featureList.size();i++){
-			if(featureList.get(i)!=-1)
-				finalList.add(featureList.get(i) );
-		}
-		int[] features = new int[finalList.size()];
-		for(int i=0;i<finalList.size();i++) features[i] = finalList.get(i);
-		if(features.length==0) return FeatureArray.EMPTY;
-		fa = new FeatureArray(features);
-		return fa;
 	}
-	
-	
-	private String wordShape(String word){
-		return Extractor.wordShapeOf(word);
-	}
-	
 	
 	
 }
