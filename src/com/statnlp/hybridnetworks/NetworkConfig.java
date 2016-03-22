@@ -59,7 +59,7 @@ public class NetworkConfig {
 	
 	public static int _maxSpanLen = 2;//the upper-bound of the length of a span.
 	
-	
+	public static double L1_REGULARIZATION_CONSTANT = 0.01;
 	
 	public static HashMap<String, Integer> entityMap;
 	public static String EMPTY = "EMPTY";
