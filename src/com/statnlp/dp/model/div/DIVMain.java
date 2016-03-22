@@ -12,6 +12,7 @@ import com.statnlp.dp.Transformer;
 import com.statnlp.dp.model.ModelViewer;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DPConfig.MODEL;
+import com.statnlp.dp.utils.Formatter;
 import com.statnlp.dp.utils.Init;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -56,9 +57,9 @@ public class DIVMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 10;
-//		testNumber = 10;
-//		numIteration = 80;
+//		trainNumber = 45;
+//		testNumber = -1;
+//		numIteration = 100;
 //		numThreads = 5;
 //		testingPath = trainingPath;
 		/************/
@@ -79,20 +80,19 @@ public class DIVMain {
 			trainingInsts = DependencyReader.readInstance(trainingPath, true,trainNumber,selectedEntities,tran, false);
 			testingInsts = DependencyReader.readInstance(decodePath, false,testNumber,selectedEntities,tran, false);
 		}
-		
-//		Formatter.semevalToText(trainingInsts, "data/cnn/proj/en.train.txt");
-//		Formatter.semevalToText(testingInsts, "data/cnn/proj/en.devel.txt");
+//		Formatter.semevalToText(trinInsts, "data/"+DPConfig.dataType+"/proj/en.train.txt");
+//		Formatter.semevalToText(devInsts, "data/"+DPConfig.dataType+"/proj/en.devel.txt");
+//		Formatter.semevalToText(tInsts, "data/"+DPConfig.dataType+"/proj/en.test.txt");
 //		System.exit(0);
 //		System.err.println(testingInsts[0].getInput().toString());
 //		DataChecker.checkJoint(trainingInsts, entities);
 //		DataChecker.checkJoint(testingInsts, entities);
 //		System.exit(0);
 		
-		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
 		NetworkConfig._CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig._numThreads = numThreads;
-		NetworkConfig.L2_REGULARIZATION_CONSTANT = 0.7; //DPConfig.L2;
+		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //DPConfig.L2;
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
 		
 		
@@ -129,11 +129,11 @@ public class DIVMain {
 					case "-test":testingPath = args[i+1];break;
 					case "-ent": selectedEntities = args[i+1].split(","); break;
 					case "-debug": DPConfig.DEBUG = args[i+1].equals("true")? true:false; break;
-					case "-reg": DPConfig.L2 = Double.valueOf(args[i+1]); break;
+					case "-reg": DPConfig.L2 = Double.parseDouble(args[i+1]); break;
 					case "-dev": isDev = args[i+1].equals("true")? true:false; break;
 					case "-windows": DPConfig.windows = true; break;
 					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
-					default: System.err.println("Invalid arguments, please check usage."); System.err.println(usage);System.exit(0);
+					default: System.err.println("Invalid arguments: "+args[i]+", please check usage."); System.err.println(usage);System.exit(0);
 				}
 			}
 			System.err.println("[Info] trainNum: "+trainNumber);

@@ -178,7 +178,6 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 					long wordRightNode = this.toNode(rightIndex, rightIndex, 1, 1,PARENT_IS+pae);
 					network.addNode(wordRightNode);
 					network.addEdge(wordRightNode, new long[]{wordRightNodeE});
-					if(pae.equals(OE) && !e.equals(ONE)) continue;
 					long wordLeftNode = this.toNode(rightIndex, rightIndex, 0, 1,PARENT_IS+pae);
 					network.addNode(wordLeftNode);
 					network.addEdge(wordLeftNode, new long[]{wordLeftNodeE});
