@@ -67,6 +67,7 @@ public class DIVMain {
 		
 		Transformer tran = new DIVTransformer();
 		String decodePath = isDev?devPath:testingPath;
+		System.err.println("[Info] train path: "+trainingPath);
 		System.err.println("[Info] testFile: "+decodePath);
 		System.err.println("[Info] dpRes: "+dpRes);
 		System.err.println("[Info] ner eval: "+nerEval);
@@ -132,15 +133,20 @@ public class DIVMain {
 					case "-reg": DPConfig.L2 = Double.parseDouble(args[i+1]); break;
 					case "-dev": isDev = args[i+1].equals("true")? true:false; break;
 					case "-windows": DPConfig.windows = true; break;
+					case "-comb": DPConfig.comb = true; break;
 					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
 					default: System.err.println("Invalid arguments: "+args[i]+", please check usage."); System.err.println(usage);System.exit(0);
 				}
 			}
+			if(DPConfig.comb){
+				DPConfig.changeTrainingPath();
+			}
+			
 			System.err.println("[Info] trainNum: "+trainNumber);
 			System.err.println("[Info] testNum: "+testNumber);
 			System.err.println("[Info] numIter: "+numIteration);
 			System.err.println("[Info] numThreads: "+numThreads);
-			System.err.println("[Info] train path: "+trainingPath);
+			
 			System.err.println("[Info] Selected Entities: "+Arrays.toString(selectedEntities));
 			System.err.println("[Info] Regularization Parameter: "+DPConfig.L2);
 			System.err.println("[Info] Using development set??: "+isDev);
