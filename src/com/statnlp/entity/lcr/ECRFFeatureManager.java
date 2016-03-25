@@ -23,7 +23,7 @@ public class ECRFFeatureManager extends FeatureManager {
 		this.entities = entities;
 		this.isPipeLine = isPipeLine;
 	}
-
+	//
 	@Override
 	protected FeatureArray extract_helper(Network network, int parent_k, int[] children_k) {
 		// TODO Auto-generated method stub

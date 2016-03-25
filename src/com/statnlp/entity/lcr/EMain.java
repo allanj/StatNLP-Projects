@@ -3,12 +3,14 @@ package com.statnlp.entity.lcr;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.dp.Evaluator;
 import com.statnlp.dp.utils.DPConfig;
+import com.statnlp.dp.utils.Init;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
@@ -27,7 +29,7 @@ public class EMain {
 	public static String nerRes;
 	public static boolean isDev;
 	public static String[] selectedEntities = {"person","organization","gpe","MISC"};
-	
+	public static HashSet<String> dataTypeSet;
 	
 	public static void initializeEntityMap(){
 		NetworkConfig.entityMap = new HashMap<String, Integer>();
@@ -59,6 +61,7 @@ public class EMain {
 		numIteration = 200;
 		isPipe = false;
 		processArgs(args);
+		dataTypeSet = Init.iniOntoNotesData();
 		initializeEntityMap();
 		String modelType = "ecrf";
 		
@@ -72,13 +75,14 @@ public class EMain {
 			nerOut = DPConfig.data_prefix+middle+".pp.dp2ner.ner.eval.txt";
 			nerRes = DPConfig.data_prefix+middle+".pp.dp2ner.ner.res.txt";
 		}
+		System.err.println("[Info] trainingFile: "+DPConfig.ecrftrain);
 		System.err.println("[Info] testFile: "+testFile);
 		System.err.println("[Info] nerOut: "+nerOut);
 		System.err.println("[Info] nerRes: "+nerRes);
 		
 		List<ECRFInstance> trainInstances = null;
 		List<ECRFInstance> testInstances = null;
-		if(DPConfig.dataType.equals("cnn")){
+		if(dataTypeSet.contains(DPConfig.dataType)){
 			trainInstances = EReader.readCNN(DPConfig.ecrftrain, true, trainNumber, NetworkConfig.entityMap);
 			testInstances = EReader.readCNN(testFile, false, testNumber, NetworkConfig.entityMap);
 		}else{
@@ -127,9 +131,13 @@ public class EMain {
 					case "-reg": DPConfig.L2 = Double.valueOf(args[i+1]); break;
 					case "-dev":isDev = args[i+1].equals("true")?true:false; break;
 					case "-windows":DPConfig.windows = true; break;
+					case "-comb": DPConfig.comb = true; break;
 					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
 					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 				}
+			}
+			if(DPConfig.comb){
+				DPConfig.changeTrainingPath();
 			}
 			System.err.println("[Info] trainNum: "+trainNumber);
 			System.err.println("[Info] testNum: "+testNumber);
@@ -139,6 +147,7 @@ public class EMain {
 			System.err.println("[Info] Using development set??: "+isDev);
 			System.err.println("[Info] Selected Entities: "+Arrays.toString(selectedEntities));
 			System.err.println("[Info] Data type: "+DPConfig.dataType);
+			System.err.println("[Info] Regularization Parameter: "+DPConfig.L2);
 			if(isPipe){
 				System.err.println("[Info] *********PipeLine: from DP result to NER****");
 			}
