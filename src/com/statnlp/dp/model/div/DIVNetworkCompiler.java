@@ -9,6 +9,7 @@ import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.DependInstance;
 import com.statnlp.dp.DependencyNetwork;
 import com.statnlp.dp.utils.DPConfig;
+import com.statnlp.hybridnetworks.FeatureArray;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
@@ -34,7 +35,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 	public static String OE = DPConfig.OE;
 	public static String ONE = DPConfig.ONE;
 	
-	
+	public static HashMap<String, Integer> feaNum;
 	/**
 	 * Compiler constructor
 	 * @param typeMap: typeMap from DPConfig which also include those type with "pae"
@@ -319,6 +320,9 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 	
 	@Override
 	public Instance decompile(Network network) {
+		/****************DEBuG*******************/
+		feaNum = new HashMap<String, Integer>();
+		/******************************/
 		DependencyNetwork dependNetwork = (DependencyNetwork)network;
 		DependInstance inst = (DependInstance)(dependNetwork.getInstance());
 		inst = inst.duplicate();
@@ -343,6 +347,32 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 	
 	private void toTreeHelper(DependencyNetwork network, int node_k, Tree parentNode){
 		int[] children_k = network.getMaxPath(node_k);
+		/**************DEBUG *********************/
+		//System.err.println(node_k+" score:"+network.getMax(node_k));
+//		DependInstance inst = (DependInstance)network.getInstance();
+//		int[][] childrenList_k = network.getChildren(node_k);
+//		if(children_k.length==1){
+//			long parent = this.toNode(10, 10, 1, 1, "pae:OE");
+//			int paIdx = Arrays.binarySearch(this._nodes, parent);
+//			int[] pa_children_k = network.getMaxPath(paIdx);
+//			long c = network.getNode(pa_children_k[0]);
+//			int[] ids_child = NetworkIDMapper.toHybridNodeArray(c);
+//			int leftIndex = ids_child[0]-ids_child[1];
+//			int[][] childrenList_k_1 = network.getChildren(paIdx);
+//			if(leftIndex==ids_child[0] && leftIndex==10){
+//				
+//				for(int ck = 0; ck < childrenList_k_1.length;ck++){
+//					int[] candi_children_k = childrenList_k_1[ck];
+//					FeatureArray fa = network.getLocalParam().extract(network, paIdx, candi_children_k, ck);
+//					int[] cc = NetworkIDMapper.toHybridNodeArray(network.getNode(candi_children_k[0]));
+//					if(cc[4] == 4)
+//						System.err.println(inst.getInput().get(leftIndex)+" gpe word now:"+fa.toString());
+//					//break;
+//					
+//				}
+//			}
+//		}
+		/*****************************************/
 //		System.err.println("node_k:"+node_k);
 //		System.err.println("Parent Node:"+parentNode.toString());
 //		System.err.println("Children length:"+children_k.length);

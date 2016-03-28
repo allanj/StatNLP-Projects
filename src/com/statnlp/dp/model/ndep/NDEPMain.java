@@ -56,9 +56,9 @@ public class NDEPMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 100;
-//		testNumber = 10;
-//		numIteration = 80;
+		trainNumber = 100;
+		testNumber = 10;
+		numIteration = 80;
 //		numThreads = 5;
 //		testingPath = trainingPath;
 		/************/
@@ -94,6 +94,7 @@ public class NDEPMain {
 		NetworkConfig._CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig._numThreads = numThreads;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = 0.7; //DPConfig.L2;
+		NetworkConfig.L1_REGULARIZATION_CONSTANT = 0.1; //DPConfig.L2;
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
 		
 		

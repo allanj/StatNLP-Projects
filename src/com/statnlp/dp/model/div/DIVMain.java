@@ -57,11 +57,13 @@ public class DIVMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 1;
+//		trainNumber = 500;
 //		testNumber = -1;
-//		numIteration = 100;
-//		numThreads = 5;
+//		numIteration = 1;
+//		numThreads = 8;
 //		testingPath = trainingPath;
+		DPConfig.readWeight = true;
+		DPConfig.writeWeight = false;
 		/************/
 		
 		
