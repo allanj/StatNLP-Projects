@@ -205,13 +205,9 @@ public class DIVFeatureManager extends FeatureManager {
 				
 				//boundary features
 				String lb = leftIndex>0? sent.get(leftIndex-1).getName():"STR";
-				String llb = leftIndex-1>0? sent.get(leftIndex-2).getName():leftIndex==1?"STR":"prevSTR";
 				String lbt = leftIndex>0? sent.get(leftIndex-1).getTag():"STR";
-				String llbt = leftIndex-1>0? sent.get(leftIndex-2).getTag():leftIndex==1?"STR":"prevSTR";
 				String rb = rightIndex<sent.length()-1? sent.get(rightIndex+1).getName():"END";
-				String rrb = rightIndex+1<sent.length()-1? sent.get(rightIndex+2).getName():rightIndex==sent.length()-1?"END":"afterEND";
 				String rbt = rightIndex<sent.length()-1? sent.get(rightIndex+1).getTag():"END";
-				String rrbt = rightIndex+1<sent.length()-1? sent.get(rightIndex+2).getTag():rightIndex==sent.length()-1?"END":"afterEND";
 				
 				//boundary
 				String rightPrefix = leftIndex==rightIndex?E_B_PREFIX:E_I_PREFIX;
@@ -249,11 +245,11 @@ public class DIVFeatureManager extends FeatureManager {
 				
 				
 				/****Bigram features without dist info******/
-				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword", "JOINT:"+child_1_type+":"+headWord+",DIR:"+dirs[direction]+"-"+modifierWord+",DIR:"+dirs[1-direction]));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag", "JOINT:"+child_1_type+":"+headTag+",DIR:"+dirs[direction]+"-"+modifierTag+",DIR:"+dirs[1-direction]));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword", "JOINT:"+child_1_type+":"+headWord+"-"+modifierWord));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag", "JOINT:"+child_1_type+":"+headTag+"-"+modifierTag));
 				
-				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword-dist", "JOINT:"+child_1_type+":"+headWord+",DIR:"+dirs[direction]+"-"+modifierWord+",DIR:"+dirs[1-direction]+attDist));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag-dist", "JOINT:"+child_1_type+":"+headTag+",DIR:"+dirs[direction]+"-"+modifierTag+",DIR:"+dirs[1-direction]+attDist));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword-dist", "JOINT:"+child_1_type+":"+headWord+"-"+modifierWord+",DIR:"+attDist));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag-dist", "JOINT:"+child_1_type+":"+headTag+"-"+modifierTag+attDist));
 				
 				//add more dependency features here.
 				for(int i=leftIndex+1;i<rightIndex;i++){
