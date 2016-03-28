@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import com.statnlp.commons.types.Instance;
+import com.statnlp.hybridnetworks.FeatureArray;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
@@ -65,6 +66,19 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 		
 		for(int i=0;i<lcrfInstance.size();i++){
 			int child_k = lcrfNetwork.getMaxPath(rootIdx)[0];
+			/*****************debug allan 27/03/2016. 00.21am*******************/
+//			System.err.println(rootIdx+" score:"+network.getMax(rootIdx));
+//			int[][] childrenList_k = network.getChildren(rootIdx);
+//			for(int children_k_index = 0; children_k_index < childrenList_k.length; children_k_index++){
+//				int[] candi_children_k = childrenList_k[children_k_index];
+//				if(Arrays.equals(lcrfNetwork.getMaxPath(rootIdx), candi_children_k)){
+//					FeatureArray fa = network.getLocalParam().extract(network, rootIdx, candi_children_k, children_k_index);
+//					System.err.println(fa.toString() + " score:"+fa.getScore(network.getLocalParam()));
+//					
+//					break;
+//				}
+//			}
+			/**************************************/
 			long child = lcrfNetwork.getNode(child_k);
 			rootIdx = child_k;
 			int tagID = NetworkIDMapper.toHybridNodeArray(child)[1];
