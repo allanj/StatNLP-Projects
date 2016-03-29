@@ -249,5 +249,78 @@ public class DependencyReader {
 		return dataArr;
 	}
 
-
+	
+	public static DependInstance[] readCNN(String path, boolean isLabeled, int number, Transformer transformer){
+		ArrayList<DependInstance> data = new ArrayList<DependInstance>();
+		int maxLen = -1;
+		try {
+			BufferedReader br = RAWF.reader(path);
+			String line = null;
+			int index = 1;
+			ArrayList<WordToken> words = new ArrayList<WordToken>();
+			words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
+			ArrayList<UnnamedDependency> dependencies = new ArrayList<UnnamedDependency>();
+			
+			while((line = br.readLine())!=null){
+				if(line.startsWith("#")) continue;
+				if(line.equals("")){
+					WordToken[] wordsArr = new WordToken[words.size()];
+					words.toArray(wordsArr);
+					Sentence sent = new Sentence(wordsArr);
+					boolean projectiveness=  DataChecker.checkProjective(dependencies);
+					if(!projectiveness) {
+						dependencies = new ArrayList<UnnamedDependency>();
+						words = new ArrayList<WordToken>();
+						words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
+						continue;
+					}
+					Tree dependencyTree = transformer.toDependencyTree(dependencies, sent);
+					if(dependencyTree.size()==sent.length()){
+						DependInstance inst = new DependInstance(index++,1.0,sent,dependencies,dependencyTree,transformer);
+						maxLen = Math.max(maxLen, inst.getInput().length());
+						if(isLabeled) {
+							sent.setRecognized();
+							inst.setLabeled();
+							data.add(inst);
+						}
+						else {
+							inst.setUnlabeled();
+							data.add(inst);
+						}
+						
+					}
+//					System.err.println("Reading: "+inst.getDependencies().toString());
+					words = new ArrayList<WordToken>();
+					words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
+					if(number!= -1 && data.size()==number) break;
+					dependencies = new ArrayList<UnnamedDependency>();
+					continue;
+				}
+				String[] values = line.split(" ");
+				int headIndex = Integer.valueOf(values[4]);
+				String entity = values[3];
+				
+				
+				words.add(new WordToken(values[1],values[2],headIndex,entity));
+				CoreLabel headLabel = new CoreLabel();
+				CoreLabel modifierLabel = new CoreLabel();
+				
+				headLabel.setSentIndex(headIndex);
+				headLabel.setValue("index:"+headIndex);
+				modifierLabel.setSentIndex(words.size()-1);
+				modifierLabel.setValue("index:"+modifierLabel.sentIndex());
+				dependencies.add(new UnnamedDependency(headLabel, modifierLabel));
+				
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		List<DependInstance> myData = data;
+		DependInstance[] dataArr = new DependInstance[myData.size()];
+		String type = isLabeled? "Training":"Testing"; 
+		System.err.println("[Info] "+type+" instance, total:"+ dataArr.length+" Instance. ");
+		myData.toArray(dataArr);
+		return dataArr;
+	}
 }

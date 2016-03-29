@@ -1,6 +1,7 @@
 package com.statnlp.dp;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.dp.utils.DPConfig;
@@ -24,15 +25,21 @@ public class DependencyMain {
 	public static int testNumber = 20;
 	public static int numIteration = 300;
 	public static int numThreads = 5;
-	public static String testFile = DPConfig.testingPath;
+	public static String testFile;
 	public static boolean isPipe = true;
-	public static String trainingPath = DPConfig.trainingPath;
+	public static String trainingPath;
 	public static boolean isDev;
+	public static HashSet<String> dataTypeSet;
 	
 	public static void main(String[] args) throws InterruptedException, IOException {
 	
 		entities = Init.initializeTypeMap();
+		dataTypeSet = Init.iniOntoNotesData();
 		processArgs(args);
+		testFile = DPConfig.testingPath;
+		trainingPath = DPConfig.trainingPath;
+		
+		
 		
 		String middle = isDev? ".dev":".test";
 		String modelType = "only";
@@ -45,17 +52,27 @@ public class DependencyMain {
 		}
 		System.err.println("[Info] DEBUG MODE: "+DPConfig.DEBUG);
 		
+		System.err.println("[Info] train path: "+trainingPath);
 		System.err.println("[Info] testFile: "+testFile);
 		System.err.println("[Info] nerOut: "+dpOut);
 		
 		DependencyTransformer trans = new DependencyTransformer();
-		DependInstance[] trainingInsts = DependencyReader.readInstance(trainingPath, true,trainNumber,entities,trans);
+		DependInstance[] trainingInsts = null;
+		DependInstance[] testingInsts = null;
+		if(dataTypeSet.contains(DPConfig.dataType)){
+			trainingInsts = DependencyReader.readCNN(trainingPath, true, trainNumber, trans);
+			testingInsts = DependencyReader.readCNN(testFile, false,testNumber,trans);
+		}else{
+			trainingInsts = DependencyReader.readInstance(trainingPath, true,trainNumber,entities,trans);
+			testingInsts = isPipe? DependencyReader.readFromPipeline(testFile,testNumber,trans): DependencyReader.readInstance(testFile, false,testNumber,entities,trans);
+		}
 		
-		DependInstance[] testingInsts = isPipe? DependencyReader.readFromPipeline(testFile,testNumber,trans): DependencyReader.readInstance(testFile, false,testNumber,entities,trans);
+		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
 		NetworkConfig._CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig._numThreads = numThreads;
-		NetworkConfig.L2_REGULARIZATION_CONSTANT = 0.7;
+		//0.1 is the best after tunning the parameters
+		NetworkConfig.L2_REGULARIZATION_CONSTANT = 0.1;
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
 		DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(), isPipe);
 		DependencyNetworkCompiler dnc = new DependencyNetworkCompiler();
@@ -88,16 +105,22 @@ public class DependencyMain {
 					case "-debug": DPConfig.DEBUG = args[i+1].equals("true")? true:false; break;
 					case "-reg": DPConfig.L2 = Double.valueOf(args[i+1]); break;
 					case "-dev":isDev = args[i+1].equals("true")?true:false; break;
+					case "-windows":DPConfig.windows = true; break;
+					case "-comb": DPConfig.comb = true; break;
+					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
+					case "-wpath":DPConfig.weightPath=args[i+1]; DPConfig.writeWeight = true; break;
 					default: System.err.println("Invalid arguments, please check usage."); System.err.println(usage);System.exit(0);
 				}
 			}
 
+			if(DPConfig.comb){
+				DPConfig.changeTrainingPath();
+			}
 			System.err.println("[Info] trainNum: "+trainNumber);
 			System.err.println("[Info] testNum: "+testNumber);
 			System.err.println("[Info] numIter: "+numIteration);
 			System.err.println("[Info] numThreads: "+numThreads);
 			System.err.println("[Info] is Pipeline: "+isPipe);
-			System.err.println("[Info] train path: "+trainingPath);
 			System.err.println("[Info] Using development set??: "+isDev);
 			System.err.println("[Info] Regularization Parameter: "+DPConfig.L2);
 			if(isPipe){
