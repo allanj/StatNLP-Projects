@@ -9,7 +9,6 @@ import com.statnlp.dp.commons.Entity;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DataChecker;
 
-import cern.colt.Arrays;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.LabeledScoredTreeNode;
 import edu.stanford.nlp.trees.Tree;
@@ -25,7 +24,12 @@ public class DIVTransformer extends Transformer {
 	public static String E_B_PREFIX = DPConfig.E_B_PREFIX;
 	public static String E_I_PREFIX = DPConfig.E_I_PREFIX;
 	
-	
+	/**
+	 * process the entities which are not covered by incomplete span.
+	 * @param sent
+	 * @param incompletes
+	 * @param sentEntities
+	 */
 	private void processInvalid(Sentence sent, ArrayList<Entity> incompletes, String[][] sentEntities){
 		for(Entity e: incompletes){
 			int left = e.getLeft();
@@ -385,9 +389,6 @@ public class DIVTransformer extends Transformer {
 			}
 		}
 	}
-
-	
-	
 
 	
 

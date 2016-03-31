@@ -12,7 +12,7 @@ import com.statnlp.dp.Transformer;
 import com.statnlp.dp.model.ModelViewer;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DPConfig.MODEL;
-import com.statnlp.dp.utils.Formatter;
+import com.statnlp.dp.utils.DataChecker;
 import com.statnlp.dp.utils.Init;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -62,7 +62,7 @@ public class DIVMain {
 //		numIteration = 1;
 //		numThreads = 8;
 //		testingPath = trainingPath;
-		DPConfig.readWeight = true;
+		DPConfig.readWeight = false;
 		DPConfig.writeWeight = false;
 		/************/
 		
