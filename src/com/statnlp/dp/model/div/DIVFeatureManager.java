@@ -80,7 +80,7 @@ public class DIVFeatureManager extends FeatureManager {
 		}
 		
 		
-		/********************pairwise features********************/
+		/********************pairwise features********(this one achieve 794/1373)************/
 		if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE) && leftIndex!=rightIndex && completeness == 0){
 			int splitPoint = childArr_1[0]; // the rightIndex of the left child
 			String word = sent.get(splitPoint+1).getName();
