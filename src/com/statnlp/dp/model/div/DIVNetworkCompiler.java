@@ -213,8 +213,8 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 				
 				for(int complete=0;complete<=1;complete++){
 					for(int direction=0;direction<=1;direction++){
-						boolean addedPaeLink = false;
-						boolean haveAdded = false;
+						boolean[] addedPaeLink = new boolean[types.length];
+						for(int x=0;x<addedPaeLink.length;x++) addedPaeLink[x] = false;
 						if(leftIndex==0 && direction==0) continue;
 						if(complete==0){
 							//incomplete span decompose to two complete spans
@@ -228,7 +228,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 										network.addNode(parentE);
 										network.addEdge(parentE, new long[]{child_1,child_2});
 									}
-									if(!addedPaeLink){
+									if(!addedPaeLink[t]){
 										for(String pae:types){
 											if(types[t].equals(OE) && !pae.equals(OE)) continue;
 											if(!types[t].equals(ONE) && !types[t].equals(OE) && pae.equals(ONE)) continue;
@@ -237,12 +237,11 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 											if(network.contains(parentE)){
 												network.addNode(parent);
 												network.addEdge(parent, new long[]{parentE});
-												haveAdded = true;
+												addedPaeLink[t] = true;
 											}
 										}
 									}
 								}
-								if(haveAdded) addedPaeLink = true;
 							}
 						}
 						
@@ -256,7 +255,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 										network.addNode(parentE);
 										network.addEdge(parentE, new long[]{child_1,child_2});
 									}
-									if(!addedPaeLink){
+									if(!addedPaeLink[t]){
 										for(String pae:types){
 											if(types[t].equals(OE) && !pae.equals(OE)) continue;
 											if(!types[t].equals(ONE) && !types[t].equals(OE) && pae.equals(ONE)) continue;
@@ -266,12 +265,11 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 											if(network.contains(parentE)){
 												network.addNode(parent);
 												network.addEdge(parent, new long[]{parentE});
-												haveAdded = true;
+												addedPaeLink[t] = true;
 											}
 										}
 									}
 								}
-								if(haveAdded) addedPaeLink = true;
 							}
 						}
 						
@@ -286,7 +284,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 										network.addNode(parentE);
 										network.addEdge(parentE, new long[]{child_1,child_2});
 									}
-									if(!addedPaeLink){
+									if(!addedPaeLink[t]){
 										if(leftIndex==0 && rightIndex>leftIndex){
 											long subRoot = this.toNode(leftIndex, rightIndex, direction, complete, PARENT_IS+"null");
 											if(network.contains(parentE)){
@@ -304,12 +302,11 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 											if(network.contains(parentE)){
 												network.addNode(parent);
 												network.addEdge(parent, new long[]{parentE});
-												haveAdded = true;
+												addedPaeLink[t] = true;
 											}
 										}
 									}
 								}
-								if(haveAdded) addedPaeLink = true;
 							}
 						}
 						
