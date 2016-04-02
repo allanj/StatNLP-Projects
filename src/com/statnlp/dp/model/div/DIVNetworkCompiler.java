@@ -192,7 +192,9 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 					long wordRightNode = this.toNode(rightIndex, rightIndex, 1, 1,PARENT_IS+pae);
 					network.addNode(wordRightNode);
 					network.addEdge(wordRightNode, new long[]{wordRightNodeE});
+					//Should use the first one.
 					if(wordLeftNodeE!=-1 && !(pae.equals(OE) && isEntity(e)) ){
+					//if(wordLeftNodeE!=-1){
 						long wordLeftNode = this.toNode(rightIndex, rightIndex, 0, 1,PARENT_IS+pae);
 						network.addNode(wordLeftNode);
 						network.addEdge(wordLeftNode, new long[]{wordLeftNodeE});
@@ -378,6 +380,10 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 				type = types[ids_child[4]];
 			}
 			sb.append(type);
+//			if(leftIndex==ids_child[0] && !type.startsWith(PARENT_IS)){
+//				Sentence sentence = (Sentence)network.getInstance().getInput();
+//				System.err.println(sentence.get(leftIndex).getName()+" left:"+leftIndex+", right:"+ids_child[0]+", cmp:"+ids_child[3]+", dir:"+ids_child[2]+", "+type);
+//			}
 			childLabel.setValue(sb.toString());
 			childNode.setLabel(childLabel);
 			parentNode.addChild(childNode);
