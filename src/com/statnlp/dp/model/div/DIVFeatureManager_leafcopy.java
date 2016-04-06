@@ -100,87 +100,15 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 		}
 		
 		
-		/********************pairwise features********************/
-//		//split the incomplete the span to acquire pairwise features, exclude the O features
-//		if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE) && completeness == 0 && leftIndex==rightIndex-1){
-//			int splitPoint = childArr_1[0]; // the rightIndex of the left child
-//			String word = sent.get(splitPoint+1).getName();
-//			String tag = sent.get(splitPoint+1).getTag();
-//			String prevWord = splitPoint==0?"STR":sent.get(splitPoint).getName();
-//			String prevTag = splitPoint==0?"STR":sent.get(splitPoint).getTag();
-//			String nextWord = splitPoint+2<sent.length()?sent.get(splitPoint+2).getName():"END";
-//			String nextTag = splitPoint+2<sent.length()?sent.get(splitPoint+2).getTag():"END";
-//			String prevEntity = type;
-//			String currEn = type;
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E",prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE",word+","+LD+":"+prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevW-prevE-currE",prevWord+","+RD+":"+prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextW-prevE-currE",nextWord+":"+prevEntity+separator+currEn));
-//			
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE",tag+","+LD+":"+prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-prevE-currE",prevTag+","+RD+":"+prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextT-prevE-currE",nextTag+":"+prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-currT-prevE-currE",prevTag+separator+tag+":"+prevEntity+separator+currEn));
-//		}
-//		
-//		if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE) && leftIndex!=rightIndex && completeness==1){
-//			int splitPoint = childArr_1[0];
-//			String currEn = type;
-//			String word = sent.get(splitPoint).getName();
-//			String tag = sent.get(splitPoint).getTag();
-//			currEn = E_I_PREFIX+currEn;
-//			
-//			featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-2D-W", LD+","+currEn+":"+RD+","+currEn+":"+word));
-//			featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-2D-T", LD+","+currEn+":"+RD+","+currEn+":"+tag));
-//		}
-		/****************************End of pairwise features********************************************/
 		
 		
 		if(type.startsWith(PARENT_IS)){
 			if(children_k.length!=1)
 				throw new RuntimeException("parent is general span, but have "+children_k.length+" children?");
 
-			//leaf nodes.. local features: include the O features
-			if(!child_1_type.equals(OE) && leftIndex==rightIndex && !sent.get(leftIndex).getName().equals("ROOT")){
-				int i = leftIndex;
-				String word = sent.get(i).getName();
-				String tag = sent.get(i).getTag();
-				String prevWord = i>1?sent.get(i-1).getName():"STR";
-				String prevTag = i>1?sent.get(i-1).getTag():"STR";
-				String nextWord = i<sent.length()-1? sent.get(i+1).getName():"END";
-				String nextTag = i<sent.length()-1? sent.get(i+1).getTag():"END";
-				String child_type = child_1_type;
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "EW", child_type+":"+word));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ET", child_type+":"+tag));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELW", child_type+":"+prevWord));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELT", child_type+":"+prevTag));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ERW", child_type+":"+nextWord));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ERT", child_type+":"+nextTag));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELT-T",child_type+":"+prevTag+","+tag));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "EW-dir", child_type+":"+word+":"+att));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ET-dir", child_type+":"+tag+":"+att));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELW-dir", child_type+":"+prevWord+":"+att));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELT-dir", child_type+":"+prevTag+":"+att));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ERW-dir", child_type+":"+nextWord+":"+att));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ERT-dir", child_type+":"+nextTag+":"+att));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELT-T-dir",child_type+":"+prevTag+","+tag+":"+att));
-				
-	
-				/****Add some prefix features******/
-				for(int plen = 1;plen<=6;plen++){
-					if(word.length()>=plen){
-						String suff = word.substring(word.length()-plen, word.length());
-						String pref = word.substring(0,plen);
-						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-PATTERN-SUFF-"+plen, child_type+":"+suff));
-						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-PATTERN-SUFF-"+plen+"-dir", child_type+":"+suff+":"+att));
-						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-PATTERN-PREF-"+plen, child_type+":"+pref));
-						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-PATTERN-PREF-"+plen+"-dir", child_type+":"+pref+":"+att));
-					}
-				}
-			}
 			
 			//the outmost entity
-			if((pa_type.equals(OE)||pa_type.equals("null")) && !child_1_type.equals(OE) && !child_1_type.equals(ONE)){
+			if((pa_type.equals(OE)||pa_type.equals("null")) && isEntity(child_1_type)){
 				
 				//when comes in must be incomplete
 				if(leftIndex!=rightIndex && completeness!=0){
@@ -190,32 +118,35 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 				}
 				if(leftIndex==rightIndex && direction==0){throw new RuntimeException("single outside entity shouldn't be in left direction");}
 				
-				/******************The begin of that entity*********************/
-				if( (leftIndex==rightIndex && direction==1) || completeness==0){
-					String word = sent.get(leftIndex).getName();
-					String tag = sent.get(leftIndex).getTag();
-					String prevWord = leftIndex>1?sent.get(leftIndex-1).getName():"STR";
-					String prevTag = leftIndex>1?sent.get(leftIndex-1).getTag():"STR";
-					String nextWord = leftIndex<sent.length()-1? sent.get(leftIndex+1).getName():"END";
-					String nextTag = leftIndex<sent.length()-1? sent.get(leftIndex+1).getTag():"END";
-					String child_type = E_B_PREFIX+child_1_type;
-					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "B-EW", child_type+":"+word));
-					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "B-ET", child_type+":"+tag));
-					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "B-ELW", child_type+":"+prevWord));
-					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "B-ELT", child_type+":"+prevTag));
-					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "B-ERW", child_type+":"+nextWord));
-					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "B-ERT", child_type+":"+nextTag));
-					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "B-ELT-T",child_type+":"+prevTag+","+tag));
+				
+				for(int i=leftIndex;i<=rightIndex;i++){
+					String word = sent.get(i).getName();
+					String tag = sent.get(i).getTag();
+					String prevWord = i>1?sent.get(i-1).getName():"STR";
+					String prevTag = i>1?sent.get(i-1).getTag():"STR";
+					String nextWord = i<sent.length()-1? sent.get(i+1).getName():"END";
+					String nextTag = i<sent.length()-1? sent.get(i+1).getTag():"END";
+					String child_type = child_1_type;
+					if(i==leftIndex) child_type = E_B_PREFIX+child_type;
+					else child_type = E_I_PREFIX+child_type;
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "EW", child_type+":"+word));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ET", child_type+":"+tag));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELW", child_type+":"+prevWord));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELT", child_type+":"+prevTag));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ERW", child_type+":"+nextWord));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ERT", child_type+":"+nextTag));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELT-T",child_type+":"+prevTag+","+tag));
+					
+		
 					/****Add some prefix features******/
 					for(int plen = 1;plen<=6;plen++){
 						if(word.length()>=plen){
 							String suff = word.substring(word.length()-plen, word.length());
 							String pref = word.substring(0,plen);
-							featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "B-E-PATTERN-SUFF-"+plen, child_type+":"+suff));
-							featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "B-E-PATTERN-PREF-"+plen, child_type+":"+pref));
+							featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-PATTERN-SUFF-"+plen, child_type+":"+suff));
+							featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-PATTERN-PREF-"+plen, child_type+":"+pref));
 						}
 					}
-					
 				}
 				
 				/************whole entity feature*************/
@@ -496,4 +427,8 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 	}
 	
 
+	private boolean isEntity(String type){
+		return !type.equals(OE) &&!type.equals(ONE);
+	}
+	
 }
