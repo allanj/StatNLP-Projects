@@ -36,7 +36,7 @@ public class DCNetworkCompiler extends NetworkCompiler {
 	public static String OE = DPConfig.OE;
 	public static String ONE = DPConfig.ONE;
 	
-	private static boolean DEBUG = true;
+	private static boolean DEBUG = false;
 	
 	/**
 	 * Compiler constructor
