@@ -1,11 +1,9 @@
 package com.statnlp.dp.model.divcopy;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.DependInstance;
 import com.statnlp.dp.utils.DPConfig;
@@ -90,35 +88,6 @@ public class DCFeatureManager extends FeatureManager {
 		}
 		
 		
-		/********************pairwise features********(this one achieve 794/1373)************/
-		if(!type.startsWith(PARENT_IS) && !type.equals(OE) && leftIndex!=rightIndex && completeness == 0){
-			int splitPoint = childArr_1[0]; // the rightIndex of the left child
-			String word = sent.get(splitPoint+1).getName();
-			String tag = sent.get(splitPoint+1).getTag();
-			String prevWord = splitPoint==0?"STR":sent.get(splitPoint).getName();
-			String prevTag = splitPoint==0?"STR":sent.get(splitPoint).getTag();
-			String nextWord = splitPoint+2<sent.length()?sent.get(splitPoint+2).getName():"END";
-			String nextTag = splitPoint+2<sent.length()?sent.get(splitPoint+2).getTag():"END";
-			String prevEntity = type;
-			String currEn = type;
-			if(type.equals(ONE)) { currEn = "O"; prevEntity="O";}
-			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E",prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE",word+":"+prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevW-prevE-currE",prevWord+":"+prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextW-prevE-currE",nextWord+":"+prevEntity+":"+currEn));
-			
-			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE",tag+":"+prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-prevE-currE",prevTag+":"+prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextT-prevE-currE",nextTag+":"+prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-currT-prevE-currE",prevTag+":"+tag+":"+prevEntity+":"+currEn));
-			if(di.getInstanceId()>0 && di.isLabeled()){
-				
-				//pw.write("currW-prevE-currE,"+word+":"+prevEntity+":"+currEn+"\n");
-//				System.err.println("currW-prevE-currE,"+word+":"+prevEntity+":"+currEn);
-//				System.err.println("prevW-prevE-currE,"+prevWord+":"+prevEntity+":"+currEn);
-//				System.err.println("nextW-prevE-currE,"+nextWord+":"+prevEntity+":"+currEn);
-			}
-		}
 		
 		
 		if(type.startsWith(PARENT_IS)){
@@ -126,7 +95,7 @@ public class DCFeatureManager extends FeatureManager {
 				throw new RuntimeException("parent is general span, but have "+children_k.length+" children?");
 
 			//leaf nodes
-			if(!child_1_type.equals(OE)  && leftIndex==rightIndex && !sent.get(leftIndex).getName().equals("ROOT")){
+			if(!child_1_type.equals(OE) && leftIndex==rightIndex && !sent.get(leftIndex).getName().equals("ROOT")){
 				int i = leftIndex;
 				String word = sent.get(i).getName();
 				String tag = sent.get(i).getTag();
@@ -134,28 +103,37 @@ public class DCFeatureManager extends FeatureManager {
 				String prevTag = i>1?sent.get(i-1).getTag():"STR";
 				String nextWord = i<sent.length()-1? sent.get(i+1).getName():"END";
 				String nextTag = i<sent.length()-1? sent.get(i+1).getTag():"END";
-				String child_type = child_1_type.equals(ONE)?"O":child_1_type;
-				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "EW", child_type+":"+word));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ET", child_type+":"+tag));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ELW", child_type+":"+prevWord));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ELT", child_type+":"+prevTag));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ERW", child_type+":"+nextWord));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ERT", child_type+":"+nextTag));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ELT-T",child_type+":"+prevTag+","+tag));
+				String child_type = child_1_type;
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "EW", child_type+":"+word));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ET", child_type+":"+tag));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELW", child_type+":"+prevWord));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELT", child_type+":"+prevTag));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ERW", child_type+":"+nextWord));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ERT", child_type+":"+nextTag));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELT-T",child_type+":"+prevTag+","+tag));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "EW-dir", child_type+":"+word+":"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ET-dir", child_type+":"+tag+":"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELW-dir", child_type+":"+prevWord+":"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELT-dir", child_type+":"+prevTag+":"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ERW-dir", child_type+":"+nextWord+":"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ERT-dir", child_type+":"+nextTag+":"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELT-T-dir",child_type+":"+prevTag+","+tag+":"+att));
 				
+	
 				/****Add some prefix features******/
 				for(int plen = 1;plen<=6;plen++){
 					if(word.length()>=plen){
 						String suff = word.substring(word.length()-plen, word.length());
-						featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-SUFF-"+plen, child_type+":"+suff));
 						String pref = word.substring(0,plen);
-						featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-PREF-"+plen, child_type+":"+pref));
+						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-PATTERN-SUFF-"+plen, child_type+":"+suff));
+						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-PATTERN-SUFF-"+plen+"-dir", child_type+":"+suff+":"+att));
+						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-PATTERN-PREF-"+plen, child_type+":"+pref));
+						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-PATTERN-PREF-"+plen+"-dir", child_type+":"+pref+":"+att));
 					}
 				}
 			}
 			
-			
-//			addDepFeatures(featureList,network,parentArr,children_k,sent);
+			addDepFeatures(featureList,network,parentArr,children_k,sent);
 		}
 		
 		/****End of Entity features*******/

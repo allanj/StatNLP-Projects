@@ -36,7 +36,7 @@ public class DCNetworkCompiler extends NetworkCompiler {
 	public static String OE = DPConfig.OE;
 	public static String ONE = DPConfig.ONE;
 	
-	private static boolean DEBUG = false;
+	private static boolean DEBUG = true;
 	
 	/**
 	 * Compiler constructor
@@ -180,29 +180,17 @@ public class DCNetworkCompiler extends NetworkCompiler {
 				if(e.equals(OE)) continue;
 				long wordRightNodeE = this.toNode(rightIndex, rightIndex, 1, 1, e); //the leaf node entity, right direction.
 				network.addNode(wordRightNodeE);
-				long wordLeftNodeE = -1;
-				if(!(rightIndex==1 && !e.equals(ONE))){
-					wordLeftNodeE = this.toNode(rightIndex, rightIndex, 0, 1, e);
-					network.addNode(wordLeftNodeE);
-				}
+				long wordLeftNodeE = this.toNode(rightIndex, rightIndex, 0, 1, e);
+				network.addNode(wordLeftNodeE);
 				for(String pae:types){
 					if(!e.equals(ONE) && pae.equals(ONE)) continue;
 					if(!pae.equals(ONE) && !pae.equals(OE) && !e.equals(pae)) continue;
-					
 					long wordRightNode = this.toNode(rightIndex, rightIndex, 1, 1,PARENT_IS+pae);
 					network.addNode(wordRightNode);
 					network.addEdge(wordRightNode, new long[]{wordRightNodeE});
-					//Should use the first one. can yield the best result
-					//if(wordLeftNodeE!=-1 && !(pae.equals(OE) && isEntity(e)) ){
-					boolean exp;
-					if(DPConfig.readWeight) exp = wordLeftNodeE!=-1;
-					else exp = wordLeftNodeE!=-1 && !(pae.equals(OE) && isEntity(e));
-					if(exp){
-						long wordLeftNode = this.toNode(rightIndex, rightIndex, 0, 1,PARENT_IS+pae);
-						network.addNode(wordLeftNode);
-						network.addEdge(wordLeftNode, new long[]{wordLeftNodeE});
-					}
-					
+					long wordLeftNode = this.toNode(rightIndex, rightIndex, 0, 1,PARENT_IS+pae);
+					network.addNode(wordLeftNode);
+					network.addEdge(wordLeftNode, new long[]{wordLeftNodeE});
 				}
 			}
 
@@ -234,8 +222,8 @@ public class DCNetworkCompiler extends NetworkCompiler {
 									if(!addedPaeLink[t]){
 										for(String pae:types){
 											if(types[t].equals(OE) && !pae.equals(OE)) continue;
-											if(!types[t].equals(ONE) && !types[t].equals(OE) && pae.equals(ONE)) continue;
-											if(!pae.equals(ONE) && !pae.equals(OE) && !types[t].equals(pae)) continue;
+											if(isEntity(types[t]) && pae.equals(ONE)) continue;
+											if(isEntity(pae) && !types[t].equals(pae)) continue;
 											long parent = this.toNode(leftIndex, rightIndex, direction, complete, PARENT_IS+pae);
 											if(network.contains(parentE)){
 												network.addNode(parent);
@@ -261,9 +249,8 @@ public class DCNetworkCompiler extends NetworkCompiler {
 									if(!addedPaeLink[t]){
 										for(String pae:types){
 											if(types[t].equals(OE) && !pae.equals(OE)) continue;
-											if(!types[t].equals(ONE) && !types[t].equals(OE) && pae.equals(ONE)) continue;
-											if(!pae.equals(ONE) && !pae.equals(OE) && !types[t].equals(pae)) continue;
-											if(pae.equals(OE) && !types[t].equals(OE) && !types[t].equals(ONE)) continue;
+											if(isEntity(types[t]) && pae.equals(ONE)) continue;
+											if(isEntity(pae) && !types[t].equals(pae)) continue;
 											long parent = this.toNode(leftIndex, rightIndex, direction, complete, PARENT_IS+pae);
 											if(network.contains(parentE)){
 												network.addNode(parent);
@@ -298,9 +285,8 @@ public class DCNetworkCompiler extends NetworkCompiler {
 										//since complete span from span>=2, it should always same as the parent.
 										for(String pae:types){
 											if(types[t].equals(OE) && !pae.equals(OE)) continue;
-											if(!types[t].equals(ONE) && !types[t].equals(OE) && pae.equals(ONE)) continue;
-											if(!pae.equals(ONE) && !pae.equals(OE) && !types[t].equals(pae)) continue;
-											if(pae.equals(OE) && !types[t].equals(OE) && !types[t].equals(ONE)) continue;
+											if(isEntity(types[t]) && pae.equals(ONE)) continue;
+											if(isEntity(pae) && !types[t].equals(pae)) continue;
 											long parent = this.toNode(leftIndex, rightIndex, direction, complete, PARENT_IS+pae);
 											if(network.contains(parentE)){
 												network.addNode(parent);

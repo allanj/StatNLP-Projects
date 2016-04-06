@@ -1,9 +1,13 @@
 package com.statnlp.dp.model.divcopy;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.security.spec.ECPrivateKeySpec;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.dp.DependInstance;
 import com.statnlp.dp.DependencyReader;
@@ -37,6 +41,30 @@ public class DCMain {
 	public static boolean isDev = true;
 	public static String[] selectedEntities = {"person","organization","gpe","MISC"};
 	public static HashSet<String> dataTypeSet;
+	public static String E="E";
+	
+	
+	public static String[] readRules(String file) throws IOException{
+		BufferedReader reader = RAWF.reader(file);
+		ArrayList<String> rules = new ArrayList<String>();
+		String line = null;
+		while((line = reader.readLine())!=null){
+			String[] vals = line.split(",");
+			if(Arrays.equals(vals, new String[]{E,E})){
+				for(String entity: selectedEntities)
+					rules.add(entity+","+entity);
+			}else if(Arrays.equals(vals, new String[]{E,DPConfig.ONE})){
+				for(String entity: selectedEntities)
+					rules.add(entity+","+DPConfig.ONE);
+			}else if(Arrays.equals(vals, new String[]{DPConfig.ONE,E})){
+				for(String entity: selectedEntities)
+					rules.add(DPConfig.ONE+","+entity);
+			}
+		}
+		String[] rulesArr = new String[rules.size()];
+		rules.toArray(rulesArr);
+		return rulesArr;
+	}
 	
 	public static void main(String[] args) throws InterruptedException, IOException {
 		
