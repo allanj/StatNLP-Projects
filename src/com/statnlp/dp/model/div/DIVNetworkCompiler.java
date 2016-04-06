@@ -36,7 +36,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 	public static String OE = DPConfig.OE;
 	public static String ONE = DPConfig.ONE;
 	
-	private static boolean DEBUG = true;
+	private static boolean DEBUG = false;
 	
 	/**
 	 * Compiler constructor
@@ -192,9 +192,12 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 					long wordRightNode = this.toNode(rightIndex, rightIndex, 1, 1,PARENT_IS+pae);
 					network.addNode(wordRightNode);
 					network.addEdge(wordRightNode, new long[]{wordRightNodeE});
-					//Should use the first one.
-					if(wordLeftNodeE!=-1 && !(pae.equals(OE) && isEntity(e)) ){
-					//if(wordLeftNodeE!=-1){
+					//Should use the first one. can yield the best result
+					//if(wordLeftNodeE!=-1 && !(pae.equals(OE) && isEntity(e)) ){
+					boolean exp;
+					if(DPConfig.readWeight) exp = wordLeftNodeE!=-1;
+					else exp = wordLeftNodeE!=-1 && !(pae.equals(OE) && isEntity(e));
+					if(exp){
 						long wordLeftNode = this.toNode(rightIndex, rightIndex, 0, 1,PARENT_IS+pae);
 						network.addNode(wordLeftNode);
 						network.addEdge(wordLeftNode, new long[]{wordLeftNodeE});
@@ -336,7 +339,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 		//viewer.visualizeNetwork(dependNetwork, null, "Testing Labeled Model:"+network.getInstance().getInstanceId());
 		Tree forest = this.toTree(dependNetwork,inst);
 //		printNetwork(dependNetwork, (Sentence)dependNetwork.getInstance().getInput());
-//		System.err.println("[Result] "+forest.pennString());
+		if(DEBUG) System.err.println("[Result] "+forest.pennString());
 		inst.setPrediction(forest);
 		return inst;
 	}
@@ -347,13 +350,38 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 		CoreLabel rootLabel = new CoreLabel();
 		rootLabel.setValue("0,"+(inst.getInput().length()-1)+",1,1,"+PARENT_IS+"null");
 		root.setLabel(rootLabel);
+		/***************************Debug information 9.23pm Allan*******************************/
+//		long mynode = this.toNode(6, 6, 1, 1, "pae:"+OE);
+//		int node_k = Arrays.binarySearch(network.getAllNodes(), mynode);
+//		long pa = network.getNode(node_k);
+//		int[] paArr = NetworkIDMapper.toHybridNodeArray(pa);
+//		int paLeft = paArr[0]-paArr[1]; int paRight= paArr[0];
+//		String patype = null;
+//		if(paArr[4]==2*types.length)
+//			patype = PARENT_IS+"null";
+//		else if(paArr[4]>types.length-1){
+//			patype = PARENT_IS+types[paArr[4]-types.length];
+//		}else{
+//			patype = types[paArr[4]];
+//		}
+//		System.err.println("max score for this node:"+network.getMax(node_k));
+//		int[][] children = network.getChildren(node_k);
+//		for(int c=0;c<children.length;c++){
+//			int[] children_k_list = children[c];
+//			FeatureArray fa = network.getLocalParam().extract(network, node_k, children_k_list, c);
+//			long c1 = network.getNode(children_k_list[0]);
+//			int splitPoint = NetworkIDMapper.toHybridNodeArray(c1)[0];
+//			System.err.println("current split point:"+splitPoint);
+//			System.err.println(fa.toString() + " score:"+fa.getScore(network.getLocalParam()));
+//		}
+		/********************************************************/
 		this.toTreeHelper(network, network.countNodes()-1, root);
 		return root;
 	}
 	
 	private void toTreeHelper(DependencyNetwork network, int node_k, Tree parentNode){
 		int[] children_k = network.getMaxPath(node_k);
-//		System.err.println("node_k:"+node_k);
+//		System.err.println("node_k:"+node_k+" score:"+network.getMax(node_k));
 //		System.err.println("Parent Node:"+parentNode.toString());
 //		System.err.println("Children length:"+children_k.length);
 		for(int k=0;k<children_k.length;k++){
@@ -377,10 +405,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 				type = types[ids_child[4]];
 			}
 			sb.append(type);
-//			if(leftIndex==ids_child[0] && !type.startsWith(PARENT_IS)){
-//				Sentence sentence = (Sentence)network.getInstance().getInput();
-//				System.err.println(sentence.get(leftIndex).getName()+" left:"+leftIndex+", right:"+ids_child[0]+", cmp:"+ids_child[3]+", dir:"+ids_child[2]+", "+type);
-//			}
+			
 			childLabel.setValue(sb.toString());
 			childNode.setLabel(childLabel);
 			parentNode.addChild(childNode);

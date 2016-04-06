@@ -12,9 +12,9 @@ import com.statnlp.dp.Transformer;
 import com.statnlp.dp.model.ModelViewer;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DPConfig.MODEL;
-import com.statnlp.dp.utils.DataChecker;
 import com.statnlp.dp.utils.Init;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
+import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkModel;
@@ -57,9 +57,9 @@ public class DIVMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 500;
+//		trainNumber = 2;
 //		testNumber = -1;
-//		numIteration = 1;
+//		numIteration = 20;
 //		numThreads = 8;
 //		testingPath = trainingPath;
 		DPConfig.readWeight = false;
@@ -100,11 +100,15 @@ public class DIVMain {
 		
 		
 		ModelViewer viewer = new ModelViewer(4,entities);
-		DIVFeatureManager dfm = new DIVFeatureManager(new GlobalNetworkParam(),entities);
+		FeatureManager dfm = null;
+		if(DPConfig.readWeight)
+			dfm = new DIVFeatureManager(new GlobalNetworkParam(),entities);
+		else
+			dfm = new DIVFeatureManager_leafcopy(new GlobalNetworkParam(),entities);
 		DIVNetworkCompiler dnc = new DIVNetworkCompiler(NetworkConfig.typeMap, viewer);
 		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);
 		model.train(trainingInsts, numIteration); 
-		
+		//DIVFeatureManager.pw.close();
 		/****************Evaluation Part**************/
 		System.err.println("*****Evaluation*****");
 		Instance[] predInsts = model.decode(testingInsts);
