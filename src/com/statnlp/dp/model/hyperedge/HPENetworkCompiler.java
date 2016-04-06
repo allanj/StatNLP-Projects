@@ -97,7 +97,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 		network.addEdge(rootNode, new long[]{treeRootNode});
 		addToNetwork(network,output);
 		network.finalizeNetwork();
-		viewer.visualizeNetwork(network, null, "Labeled Network");
+		//viewer.visualizeNetwork(network, null, "Labeled Network");
 		//System.err.println(network);
 		//System.err.println(output.pennString());
 		

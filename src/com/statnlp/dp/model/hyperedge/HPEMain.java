@@ -56,7 +56,7 @@ public class HPEMain {
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
-//		trainingPath = "data/semeval10t1/small.txt";
+		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
 //		trainNumber = 500;
 //		testNumber = -1;
