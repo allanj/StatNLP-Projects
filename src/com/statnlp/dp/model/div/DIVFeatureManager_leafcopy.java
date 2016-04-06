@@ -36,7 +36,7 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 		this.types = types;
 	}
 	
-	
+	//do not read the weight from linear CRF
 	@Override
 	protected FeatureArray extract_helper(Network network, int parent_k, int[] children_k) {
 		
@@ -102,27 +102,26 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 		
 		/********************pairwise features********************/
 //		//split the incomplete the span to acquire pairwise features, exclude the O features
-//		if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE) && leftIndex!=rightIndex && completeness == 0){
-//			int splitPoint = childArr_1[0]; // the rightIndex of the left child
-//			String word = sent.get(splitPoint+1).getName();
-//			String tag = sent.get(splitPoint+1).getTag();
-//			String prevWord = splitPoint==0?"STR":sent.get(splitPoint).getName();
-//			String prevTag = splitPoint==0?"STR":sent.get(splitPoint).getTag();
-//			String nextWord = splitPoint+2<sent.length()?sent.get(splitPoint+2).getName():"END";
-//			String nextTag = splitPoint+2<sent.length()?sent.get(splitPoint+2).getTag():"END";
-//			String prevEntity = type;
-//			String currEn = type;
-//			if(type.equals(ONE)) { currEn = "O"; prevEntity="O";}
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E",prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE",word+","+LD+":"+prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevW-prevE-currE",prevWord+","+RD+":"+prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextW-prevE-currE",nextWord+":"+prevEntity+separator+currEn));
-//			
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE",tag+","+LD+":"+prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-prevE-currE",prevTag+","+RD+":"+prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextT-prevE-currE",nextTag+":"+prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-currT-prevE-currE",prevTag+separator+tag+":"+prevEntity+separator+currEn));
-//		}
+		if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE) && completeness == 0 && leftIndex==rightIndex-1){
+			int splitPoint = childArr_1[0]; // the rightIndex of the left child
+			String word = sent.get(splitPoint+1).getName();
+			String tag = sent.get(splitPoint+1).getTag();
+			String prevWord = splitPoint==0?"STR":sent.get(splitPoint).getName();
+			String prevTag = splitPoint==0?"STR":sent.get(splitPoint).getTag();
+			String nextWord = splitPoint+2<sent.length()?sent.get(splitPoint+2).getName():"END";
+			String nextTag = splitPoint+2<sent.length()?sent.get(splitPoint+2).getTag():"END";
+			String prevEntity = type;
+			String currEn = type;
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E",prevEntity+separator+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE",word+","+LD+":"+prevEntity+separator+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevW-prevE-currE",prevWord+","+RD+":"+prevEntity+separator+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextW-prevE-currE",nextWord+":"+prevEntity+separator+currEn));
+			
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE",tag+","+LD+":"+prevEntity+separator+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-prevE-currE",prevTag+","+RD+":"+prevEntity+separator+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextT-prevE-currE",nextTag+":"+prevEntity+separator+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-currT-prevE-currE",prevTag+separator+tag+":"+prevEntity+separator+currEn));
+		}
 //		
 //		if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE) && leftIndex!=rightIndex && completeness==1){
 //			int splitPoint = childArr_1[0];
