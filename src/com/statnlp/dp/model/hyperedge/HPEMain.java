@@ -46,6 +46,7 @@ public class HPEMain {
 		//remember the entities returned here contains also OE and ONE
 		entities = Init.initializeHyperEdgeModelTypeMap(selectedEntities);
 		String modelType = MODEL.HYPEREDGE.name();
+		DPConfig.currentModel = modelType;
 		String middle = isDev? ".dev":".test";
 		String dpRes = DPConfig.data_prefix+modelType+middle+DPConfig.dp_res_suffix; 
 		String nerEval = DPConfig.data_prefix+modelType+middle+DPConfig.ner_eval_suffix;
