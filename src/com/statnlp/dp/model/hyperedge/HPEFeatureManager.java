@@ -98,7 +98,7 @@ public class HPEFeatureManager extends FeatureManager {
 			int cleft = childrenArr[c][0]-childrenArr[c][1];
 			int cright = childrenArr[c][0];
 			String catt = childrenArr[c][3] == 1 ? "RA":"LA" ;
-			if(!childrenType[c].equals(OE) && cleft==cright && !sent.get(cleft).getName().equals("ROOT")){
+			if(isEntity(childrenType[c]) && cleft==cright && !sent.get(cleft).getName().equals("ROOT")){
 				int i = cleft;
 				String word = sent.get(i).getName();
 				String tag = sent.get(i).getTag();
@@ -339,4 +339,7 @@ public class HPEFeatureManager extends FeatureManager {
 	}
 	
 
+	private boolean isEntity(String type){
+		return !type.equals(OE) &&!type.equals(ONE);
+	}
 }
