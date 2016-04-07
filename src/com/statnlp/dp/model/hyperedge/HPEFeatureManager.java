@@ -137,7 +137,6 @@ public class HPEFeatureManager extends FeatureManager {
 		}
 		
 		//combination:
-		featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "PAE-LE-RE", pa_type+":"+childrenType[0]+":"+childrenType[1]+",comp:"+completeness+",dir:"+direction));
 		
 		
 //		if(isEntity(pa_type) && completeness==0){

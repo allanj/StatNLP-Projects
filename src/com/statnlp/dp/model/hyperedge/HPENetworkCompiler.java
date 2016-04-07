@@ -276,10 +276,10 @@ public class HPENetworkCompiler extends NetworkCompiler {
 											network.addNode(parent);
 											network.addEdge(parent, new long[]{leftChild, rightChild});
 										}
-									}else{
+									}else{// parent must be OE
 										for(int t1=0;t1<types.length;t1++){
 											for(int t2=0;t2<types.length;t2++){
-												if(types[t1].equals(OE) && isEntity(types[t2]) && m!=rightIndex) continue;
+												if(isEntity(types[t2]) && m!=rightIndex) continue;
 												if(isEntity(types[t1]) && isEntity(types[t2])) continue;
 												if(types[t1].equals(ONE) && types[t1].equals(types[t2])) continue;
 												leftChild = this.toNode(leftIndex, m, 1, 0, types[t1]);
