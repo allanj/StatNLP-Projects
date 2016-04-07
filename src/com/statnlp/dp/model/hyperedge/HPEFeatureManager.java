@@ -136,7 +136,7 @@ public class HPEFeatureManager extends FeatureManager {
 			}
 		}
 		
-		addDepFeatures(featureList,network,parentArr,children_k,sent);
+		addDepFeatures(featureList,network,parentArr,sent);
 	
 		
 		ArrayList<Integer> finalList = new ArrayList<Integer>();
@@ -153,7 +153,7 @@ public class HPEFeatureManager extends FeatureManager {
 	
 	
 
-	private void addDepFeatures(ArrayList<Integer> featureList, Network network, int[] parentArr, int[] children_k, Sentence sent){
+	private void addDepFeatures(ArrayList<Integer> featureList, Network network, int[] parentArr, Sentence sent){
 		
 		
 		int leftIndex = parentArr[0] - parentArr[1];
@@ -183,8 +183,6 @@ public class HPEFeatureManager extends FeatureManager {
 		String modifierWord = sent.get(modifierIndex).getName();
 		String modifierTag = sent.get(modifierIndex).getTag();
 		
-		
-		if(children_k.length==0) return;
 		
 		
 		if(completeness==0){

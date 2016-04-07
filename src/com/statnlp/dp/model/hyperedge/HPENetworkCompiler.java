@@ -25,7 +25,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 	private static final long serialVersionUID = -5080640847287255079L;
 
 	private long[] _nodes;
-	private final int maxSentLen = 128;
+	private final int maxSentLen = 4;
 	private int[][][] _children;
 	private HashMap<String, Integer> typeMap;
 	private String[] types;
@@ -212,7 +212,8 @@ public class HPENetworkCompiler extends NetworkCompiler {
 									}else{ // must be OE
 										for(int t1=0;t1<types.length;t1++){
 											for(int t2=0;t2<types.length;t2++){
-												if(isEntity(types[t1]) && types[t1].equals(types[t2])) continue;
+												if(isEntity(types[t2])) continue;
+												if(isEntity(types[t1]) &&  (leftIndex!=m) ) continue;
 												if(types[t1].equals(ONE) && types[t1].equals(types[t2])) continue;
 												leftChild = this.toNode(leftIndex, m, 1, 1, types[t1]);
 												rightChild = this.toNode(m+1, rightIndex, 0, 1,types[t2]);
@@ -242,10 +243,10 @@ public class HPENetworkCompiler extends NetworkCompiler {
 											network.addNode(parent);
 											network.addEdge(parent, new long[]{leftChild, rightChild});
 										}
-									}else{
+									}else{ // must be OE
 										for(int t1=0;t1<types.length;t1++){
+											if(isEntity(types[t1])) continue;
 											for(int t2=0;t2<types.length;t2++){
-												if(isEntity(types[t1]) && types[t1].equals(types[t2])) continue;
 												if(types[t1].equals(ONE) && types[t1].equals(types[t2])) continue;
 												leftChild = this.toNode(leftIndex, m, 0, 1, types[t1]);
 												rightChild = this.toNode(m, rightIndex, 0, 0, types[t2]);
@@ -278,7 +279,8 @@ public class HPENetworkCompiler extends NetworkCompiler {
 									}else{
 										for(int t1=0;t1<types.length;t1++){
 											for(int t2=0;t2<types.length;t2++){
-												if(isEntity(types[t1]) && types[t1].equals(types[t2])) continue;
+												if(types[t1].equals(OE) && isEntity(types[t2]) && m!=rightIndex) continue;
+												if(isEntity(types[t1]) && isEntity(types[t2])) continue;
 												if(types[t1].equals(ONE) && types[t1].equals(types[t2])) continue;
 												leftChild = this.toNode(leftIndex, m, 1, 0, types[t1]);
 												rightChild = this.toNode(m, rightIndex, 1, 1, types[t2]);
