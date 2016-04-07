@@ -25,7 +25,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 	private static final long serialVersionUID = -5080640847287255079L;
 
 	private long[] _nodes;
-	private final int maxSentLen = 4;
+	private final int maxSentLen = 128;
 	private int[][][] _children;
 	private HashMap<String, Integer> typeMap;
 	private String[] types;
