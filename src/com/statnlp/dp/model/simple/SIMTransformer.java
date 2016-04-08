@@ -16,8 +16,7 @@ import edu.stanford.nlp.trees.Tree;
 public class SIMTransformer extends Transformer {
 
 	
-	public static String OE = DPConfig.OE;
-	public static String ONE = DPConfig.ONE;
+	public static String GO = DPConfig.GO;
 	
 	public static String O_TYPE = DPConfig.O_TYPE;
 	public static String E_B_PREFIX = DPConfig.E_B_PREFIX;
@@ -49,9 +48,9 @@ public class SIMTransformer extends Transformer {
 			}
 			//set the part that not covered an arc.
 			for(int i=left;i<=right;i++){
-				if(sentEntities[i][0]!=null && sentEntities[i][1]==null) sentEntities[i][1]=ONE;
-				if(sentEntities[i][1]!=null && sentEntities[i][0]==null) sentEntities[i][0]=ONE;
-				if(sentEntities[i][0]==null && sentEntities[i][1]==null){sentEntities[i][0]=ONE; sentEntities[i][1]=e.getEntityType(); }
+				if(sentEntities[i][0]!=null && sentEntities[i][1]==null) sentEntities[i][1]=GO;
+				if(sentEntities[i][1]!=null && sentEntities[i][0]==null) sentEntities[i][0]=GO;
+				if(sentEntities[i][0]==null && sentEntities[i][1]==null){sentEntities[i][0]=GO; sentEntities[i][1]=e.getEntityType(); }
 			}
 		}
 	}
@@ -60,12 +59,12 @@ public class SIMTransformer extends Transformer {
 		ArrayList<Entity> incompletes = DataChecker.checkAllIncomplete(sent);
 		String[][] sentEntities = new String[sent.length()][2];
 		sentEntities[0][0] = null;
-		sentEntities[0][1] = ONE;
+		sentEntities[0][1] = GO;
 		for(int i=1;i<sentEntities.length;i++){
 			String type = sent.get(i).getEntity();
 			if(type.equals(O_TYPE)){
-				sentEntities[i][0] = ONE;
-				sentEntities[i][1] = ONE;
+				sentEntities[i][0] = GO;
+				sentEntities[i][1] = GO;
 			}
 		}
 		if(incompletes.size()>0){
@@ -75,13 +74,13 @@ public class SIMTransformer extends Transformer {
 			if(sentEntities[i][0]!=null && sentEntities[i][1]!=null) continue;
 			String type = sent.get(i).getEntity();
 			if(type.startsWith(E_B_PREFIX)){
-				sentEntities[i][0] = ONE;
+				sentEntities[i][0] = GO;
 				sentEntities[i][1] = type.substring(2);
 			}else if(type.startsWith(E_I_PREFIX)){
 				sentEntities[i][0] = type.substring(2);
 				if(i<sentEntities.length-1 && sent.get(i+1).getEntity().startsWith(E_I_PREFIX))
 					sentEntities[i][1] = type.substring(2);
-				else sentEntities[i][1] = ONE;
+				else sentEntities[i][1] = GO;
 			}
 		}
 		return sentEntities;
@@ -89,18 +88,9 @@ public class SIMTransformer extends Transformer {
 
 	@Override
 	public Tree toSpanTree(Tree dependencyRoot, Sentence sentence){
-		boolean haveEntities = false;
-		String[] sentEntities = new String[sentence.length()];
-		for(int i=0;i<sentEntities.length;i++){
-			String type = sentence.get(i).getEntity();
-			sentEntities[i] = type.equals(O_TYPE)? type: type.substring(2);
-			if(!type.equals(O_TYPE))
-				haveEntities = true;
-		}
 		Tree spanTreeERoot = new LabeledScoredTreeNode();
 		CoreLabel label = new CoreLabel();
-		String type = !haveEntities? ONE:OE;
-		label.setValue(setSpanInfo(0, sentence.length()-1, 1, 1,type));
+		label.setValue(setSpanInfo(0, sentence.length()-1, 1, 1,GO));
 		spanTreeERoot.setLabel(label);
 		String[][] leaves = getLeavesInfo(sentence);
 		constructSpanTree(spanTreeERoot,dependencyRoot, leaves);
@@ -151,7 +141,7 @@ public class SIMTransformer extends Transformer {
 						if(!leaves[i][dir].equals(leftType)){isMixed = true; break;}
 					}
 				}
-				leftType = isMixed? OE:leftType;
+				leftType = isMixed? GO:leftType;
 				currType = leftType;
 				
 				CoreLabel leftSubSpanLabel = new CoreLabel();
@@ -165,7 +155,7 @@ public class SIMTransformer extends Transformer {
 						if(!leaves[i][dir].equals(rightType)) {isMixed = true; break;}
 					}
 				}
-				rightType =isMixed?OE:rightType;
+				rightType =isMixed?GO:rightType;
 				currType = rightType;
 				
 				CoreLabel rightSpanSubLabel = new CoreLabel(); 
@@ -197,7 +187,7 @@ public class SIMTransformer extends Transformer {
 						if(!leaves[i][dir].equals(leftType)){isMixed = true; break;}
 					}
 				}
-				leftType = isMixed? OE:leftType;
+				leftType = isMixed? GO:leftType;
 				
 				currType = leftType;
 				
@@ -212,7 +202,7 @@ public class SIMTransformer extends Transformer {
 						if(!leaves[i][dir].equals(rightType)) {isMixed = true; break;}
 					}
 				}
-				rightType =isMixed?OE:rightType;
+				rightType =isMixed?GO:rightType;
 				
 				currType = rightType;
 				
@@ -258,7 +248,7 @@ public class SIMTransformer extends Transformer {
 						if(!leaves[i][dir].equals(leftType)){isMixed = true; break;}
 					}
 				}
-				leftType = isMixed? OE:leftType;
+				leftType = isMixed? GO:leftType;
 				currType = leftType;
 				
 				CoreLabel leftSpanSubLabel = new CoreLabel(); 
@@ -273,7 +263,7 @@ public class SIMTransformer extends Transformer {
 						if(!leaves[i][dir].equals(rightType)){isMixed= true; break;}
 					}
 				}
-				rightType = isMixed? OE:rightType;
+				rightType = isMixed? GO:rightType;
 				currType = rightType;
 				
 				CoreLabel rightSpanSubLabel = new CoreLabel(); 
@@ -313,7 +303,7 @@ public class SIMTransformer extends Transformer {
 						if(!leaves[i][dir].equals(leftType)){isMixed = true; break;}
 					}
 				}
-				leftType = isMixed? OE:leftType;	
+				leftType = isMixed? GO:leftType;	
 			
 				
 				currType = leftType;
@@ -331,7 +321,7 @@ public class SIMTransformer extends Transformer {
 						if(!leaves[i][dir].equals(rightType)){isMixed=true; break;}
 					}
 				}
-				rightType = isMixed? OE:rightType;	
+				rightType = isMixed? GO:rightType;	
 				currType = rightType;
 				
 				CoreLabel rightSpanSubLabel = new CoreLabel(); 
