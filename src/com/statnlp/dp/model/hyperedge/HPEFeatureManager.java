@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.DependInstance;
 import com.statnlp.dp.utils.DPConfig;
-import com.statnlp.dp.utils.Extractor;
 import com.statnlp.hybridnetworks.FeatureArray;
 import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -94,6 +93,27 @@ public class HPEFeatureManager extends FeatureManager {
 		}
 		//System.err.println("patype:"+pa_type+", "+Arrays.toString(childrenType));
 		
+		//check the invalid exist in network
+		if(pa_type.equals(OE)){
+			for(int c=0;c<children.length;c++){
+				int cleft = childrenArr[c][0]-childrenArr[c][1];
+				int cright = childrenArr[c][0];
+				int cdir = childrenArr[c][3];
+				int cComp = childrenArr[c][2];
+				if(cComp==1 && cdir==0){
+					if(isEntity(childrenType[c])) throw new RuntimeException("left complete can not exist under OE");
+				}else if(cComp==1 && cdir==1){
+					if(cleft!=cright && isEntity(childrenType[c])) {
+						System.err.println("parent type:"+pa_type);
+						System.err.println("child type:"+childrenType[c]);
+						System.err.println("parent direction:"+direction);
+						System.err.println("parent completeness:"+completeness);
+						throw new RuntimeException("right complete with sl>1 can not exist under OE");
+					}
+				}
+			}
+			
+		}
 		for(int c=0;c<children.length;c++){
 			int cleft = childrenArr[c][0]-childrenArr[c][1];
 			int cright = childrenArr[c][0];
@@ -121,6 +141,22 @@ public class HPEFeatureManager extends FeatureManager {
 				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ERW-dir", child_type+":"+nextWord+":"+catt));
 				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ERT-dir", child_type+":"+nextTag+":"+catt));
 				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELT-T-dir", child_type+":"+prevTag+","+tag+":"+catt));
+				
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "W-E-PAE", word+"+"+child_type+"+"+pa_type));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "T-E-PAE", tag+"+"+child_type+"+"+pa_type));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "prevW-E-PAE", prevWord+"+"+child_type+"+"+pa_type));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "prevT-E-PAE", prevTag+"+"+child_type+"+"+pa_type));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "nextW-E-PAE", nextWord+"+"+child_type+"+"+pa_type));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "nextT-E-PAE", nextTag+"+"+child_type+"+"+pa_type));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "prevT-T-E-PAE", prevTag+"+"+tag+"+"+child_type+"+"+pa_type));
+				
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "W-E-PAE-dir", word+"+"+child_type+"+"+pa_type+"+"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "T-E-PAE-dir", tag+"+"+child_type+"+"+pa_type+"+"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "prevW-E-PAE", prevWord+"+"+child_type+"+"+pa_type+"+"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "prevT-E-PAE", prevTag+"+"+child_type+"+"+pa_type+"+"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "nextW-E-PAE", nextWord+"+"+child_type+"+"+pa_type+"+"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "nextT-E-PAE", nextTag+"+"+child_type+"+"+pa_type+"+"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "prevT-T-E-PAE", prevTag+"+"+tag+"+"+child_type+"+"+pa_type+"+"+att));
 
 				/****Add some prefix features******/
 				for(int plen = 1;plen<=6;plen++){
@@ -131,6 +167,11 @@ public class HPEFeatureManager extends FeatureManager {
 						featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-PATTERN-SUFF-"+plen+"-dir", child_type+":"+suff+":"+catt));
 						featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-PATTERN-PREF-"+plen, child_type+":"+pref));
 						featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-PATTERN-PREF-"+plen+"-dir", child_type+":"+pref+":"+catt));
+						
+						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "WSuff-E-"+plen, suff+"+"+child_type+"+"+pa_type));
+						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "WPref-E-PREF-"+plen, pref+"+"+child_type+"+"+pa_type));
+						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "WSuff-E-"+plen+"-dir", suff+"+"+child_type+"+"+pa_type+"+"+att));
+						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "WPref-E-PREF-"+plen+"-dir", pref+"+"+child_type+"+"+pa_type+"+"+att));
 					}
 				}
 			}
