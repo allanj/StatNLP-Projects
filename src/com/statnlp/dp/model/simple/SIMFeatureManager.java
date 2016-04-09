@@ -19,8 +19,7 @@ public class SIMFeatureManager extends FeatureManager {
 	private enum FEATYPE {unigram, bigram,contextual, inbetween,entity,prefix,joint};
 	private String[] types;
 	
-	public static String OE = DPConfig.OE;
-	public static String ONE = DPConfig.ONE;
+	public static String GO = DPConfig.GO;
 	
 	public static String O_TYPE = DPConfig.O_TYPE;
 	public static String E_B_PREFIX = DPConfig.E_B_PREFIX;
@@ -95,14 +94,14 @@ public class SIMFeatureManager extends FeatureManager {
 		//System.err.println("patype:"+pa_type+", "+Arrays.toString(childrenType));
 		
 		//check the invalid exist in network
-		if(pa_type.equals(OE)){
+		if(pa_type.equals(GO)){
 			for(int c=0;c<children.length;c++){
 				int cleft = childrenArr[c][0]-childrenArr[c][1];
 				int cright = childrenArr[c][0];
 				int cdir = childrenArr[c][3];
 				int cComp = childrenArr[c][2];
 				if(cComp==1 && cdir==0){
-					if(isEntity(childrenType[c])) throw new RuntimeException("left complete can not exist under OE");
+					if(isEntity(childrenType[c])) throw new RuntimeException("left complete can not exist under GO");
 				}else if(cComp==1 && cdir==1){
 					if(cleft!=cright && isEntity(childrenType[c])) {
 						System.err.println("parent type:"+pa_type);
@@ -113,13 +112,12 @@ public class SIMFeatureManager extends FeatureManager {
 					}
 				}
 			}
-			
 		}
 		for(int c=0;c<children.length;c++){
 			int cleft = childrenArr[c][0]-childrenArr[c][1];
 			int cright = childrenArr[c][0];
 			String catt = childrenArr[c][3] == 1 ? "RA":"LA" ;
-			if(!childrenType[c].equals(OE) && cleft==cright && !sent.get(cleft).getName().equals("ROOT")){
+			if(cleft==cright && !sent.get(cleft).getName().equals("ROOT")){
 				int i = cleft;
 				String word = sent.get(i).getName();
 				String tag = sent.get(i).getTag();
@@ -156,31 +154,6 @@ public class SIMFeatureManager extends FeatureManager {
 				}
 			}
 		}
-		
-		//combination:
-		
-		
-//		if(isEntity(pa_type) && completeness==0){
-//			int splitPoint = childrenArr[0][0];
-//			String word = sent.get(splitPoint+1).getName();
-//			String tag = sent.get(splitPoint+1).getTag();
-//			String prevWord = splitPoint==0?"STR":sent.get(splitPoint).getName();
-//			String prevTag = splitPoint==0?"STR":sent.get(splitPoint).getTag();
-//			String nextWord = splitPoint+2<sent.length()?sent.get(splitPoint+2).getName():"END";
-//			String nextTag = splitPoint+2<sent.length()?sent.get(splitPoint+2).getTag():"END";
-//			String prevEntity = childrenType[0];
-//			String currEn = childrenType[1];
-//			String separator = ":";
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E",prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE",word+","+prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevW-prevE-currE",prevWord+","+prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextW-prevE-currE",nextWord+":"+prevEntity+separator+currEn));
-//			
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE",tag+","+prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-prevE-currE",prevTag+","+prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextT-prevE-currE",nextTag+":"+prevEntity+separator+currEn));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-currT-prevE-currE",prevTag+separator+tag+":"+prevEntity+separator+currEn));
-//		}
 		
 		addDepFeatures(featureList,network,parentArr,sent);
 	
@@ -386,6 +359,6 @@ public class SIMFeatureManager extends FeatureManager {
 	
 
 	private boolean isEntity(String type){
-		return !type.equals(OE) &&!type.equals(ONE);
+		return !type.equals(GO);
 	}
 }

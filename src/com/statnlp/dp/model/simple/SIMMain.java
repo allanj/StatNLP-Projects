@@ -44,8 +44,8 @@ public class SIMMain {
 		processArgs(args);
 		dataTypeSet = Init.iniOntoNotesData();
 		//remember the entities returned here contains also OE and ONE
-		entities = Init.initializeHyperEdgeModelTypeMap(selectedEntities);
-		String modelType = MODEL.HYPEREDGE.name();
+		entities = Init.initializeSimpleModelTypeMap(selectedEntities);
+		String modelType = MODEL.SIMPLE.name();
 		DPConfig.currentModel = modelType;
 		String middle = isDev? ".dev":".test";
 		String dpRes = DPConfig.data_prefix+modelType+middle+DPConfig.dp_res_suffix; 
@@ -57,12 +57,12 @@ public class SIMMain {
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
-		trainingPath = "data/semeval10t1/small.txt";
+//		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-		trainNumber = 1;
+//		trainNumber = 1;
 //		testNumber = 1;
-		numIteration = 10;
-		numThreads = 8;
+//		numIteration = 10;
+//		numThreads = 8;
 //		testingPath = trainingPath;
 		DPConfig.readWeight = false;
 		DPConfig.writeWeight = false;

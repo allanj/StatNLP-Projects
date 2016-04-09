@@ -31,10 +31,9 @@ public class SIMNetworkCompiler extends NetworkCompiler {
 	private String[] types;
 	private enum NODE {normal};
 	private  VisualizationViewerEngine viewer;
-	public static String OE = DPConfig.OE;
-	public static String ONE = DPConfig.ONE;
+	public static String GO = DPConfig.GO;
 	
-	private static boolean DEBUG = false;
+	private static boolean DEBUG = true;
 	
 	/**
 	 * Compiler constructor
@@ -85,16 +84,6 @@ public class SIMNetworkCompiler extends NetworkCompiler {
 		output.setSpans();
 		long rootNode = this.toNode_generalRoot(sent.length());
 		network.addNode(rootNode);
-		CoreLabel cl = (CoreLabel)(output.label());
-		String[] info = cl.value().split(",");
-		int pa_leftIndex = Integer.valueOf(info[0]);
-		int pa_rightIndex = Integer.valueOf(info[1]);
-		int pa_direction = Integer.valueOf(info[2]);
-		int pa_completeness = Integer.valueOf(info[3]);
-		String pa_type = info[4];
-		long treeRootNode = toNode(pa_leftIndex, pa_rightIndex, pa_direction, pa_completeness,pa_type);
-		network.addNode(treeRootNode);
-		network.addEdge(rootNode, new long[]{treeRootNode});
 		addToNetwork(network,output);
 		network.finalizeNetwork();
 		//viewer.visualizeNetwork(network, null, "Labeled Network");
@@ -168,17 +157,16 @@ public class SIMNetworkCompiler extends NetworkCompiler {
 		DependencyNetwork network = new DependencyNetwork();
 		//add the root word and other nodes
 		//all are complete nodes.
-		long rootE = this.toNode(0, 0, 1, 1, ONE);
+		long rootE = this.toNode(0, 0, 1, 1, GO);
 		network.addNode(rootE);
 		
 		for(int rightIndex = 1; rightIndex<=this.maxSentLen-1;rightIndex++){
 			//eIndex: 1,2,3,4,5,..n
 			for(String e: types){
-				if(e.equals(OE)) continue;
 				long wordRightNodeE = this.toNode(rightIndex, rightIndex, 1, 1, e); //the leaf node entity, right direction.
 				network.addNode(wordRightNodeE);
 				long wordLeftNodeE = -1;
-				if(!(rightIndex==1 && !e.equals(ONE))){
+				if(!(rightIndex==1 && !e.equals(GO))){
 					wordLeftNodeE = this.toNode(rightIndex, rightIndex, 0, 1, e);
 					network.addNode(wordLeftNodeE);
 				}
@@ -202,19 +190,18 @@ public class SIMNetworkCompiler extends NetworkCompiler {
 									long parent = this.toNode(leftIndex, rightIndex, direction, complete, types[t]);
 									long leftChild = -1;
 									long rightChild = -1;
-									if(isEntity(types[t]) || types[t].equals(ONE)){
+									if(isEntity(types[t])){
 										leftChild = this.toNode(leftIndex, m, 1, 1, types[t]);
 										rightChild = this.toNode(m+1, rightIndex, 0, 1,types[t]);
 										if(network.contains(leftChild) && network.contains(rightChild)){
 											network.addNode(parent);
 											network.addEdge(parent, new long[]{leftChild, rightChild});
 										}
-									}else{ // must be OE
+									}else{ // must be GO
 										for(int t1=0;t1<types.length;t1++){
 											for(int t2=0;t2<types.length;t2++){
 												if(isEntity(types[t2])) continue;
 												if(isEntity(types[t1]) &&  (leftIndex!=m) ) continue;
-												if(types[t1].equals(ONE) && types[t1].equals(types[t2])) continue;
 												leftChild = this.toNode(leftIndex, m, 1, 1, types[t1]);
 												rightChild = this.toNode(m+1, rightIndex, 0, 1,types[t2]);
 												if(network.contains(leftChild) && network.contains(rightChild)){
@@ -236,7 +223,7 @@ public class SIMNetworkCompiler extends NetworkCompiler {
 									long parent = this.toNode(leftIndex, rightIndex, direction, complete, types[t]);
 									long leftChild = -1;
 									long rightChild = -1;
-									if(isEntity(types[t]) || types[t].equals(ONE)){
+									if(isEntity(types[t])){
 										leftChild = this.toNode(leftIndex, m, 0, 1, types[t]);
 										rightChild = this.toNode(m, rightIndex, 0, 0, types[t]);
 										if(network.contains(leftChild) && network.contains(rightChild)){
@@ -247,7 +234,6 @@ public class SIMNetworkCompiler extends NetworkCompiler {
 										for(int t1=0;t1<types.length;t1++){
 											if(isEntity(types[t1])) continue;
 											for(int t2=0;t2<types.length;t2++){
-												if(types[t1].equals(ONE) && types[t1].equals(types[t2])) continue;
 												leftChild = this.toNode(leftIndex, m, 0, 1, types[t1]);
 												rightChild = this.toNode(m, rightIndex, 0, 0, types[t2]);
 												if(network.contains(leftChild) && network.contains(rightChild)){
@@ -262,14 +248,12 @@ public class SIMNetworkCompiler extends NetworkCompiler {
 						}
 						
 						if(complete==1 && direction==1){
-							boolean[] rootAdded = new boolean[types.length];
-							for(int x=0;x<rootAdded.length;x++) rootAdded[x]=false;
 							for(int m=leftIndex+1;m<=rightIndex;m++){
 								for(int t=0;t<types.length;t++){
 									long parent  = this.toNode(leftIndex, rightIndex, direction, complete, types[t]);
 									long leftChild = -1;
 									long rightChild = -1;
-									if(isEntity(types[t]) || types[t].equals(ONE)){
+									if(isEntity(types[t])){
 										leftChild = this.toNode(leftIndex, m, 1, 0, types[t]);
 										rightChild = this.toNode(m, rightIndex, 1, 1, types[t]);
 										if(network.contains(leftChild) && network.contains(rightChild)){
@@ -281,7 +265,6 @@ public class SIMNetworkCompiler extends NetworkCompiler {
 											for(int t2=0;t2<types.length;t2++){
 												if(isEntity(types[t2]) && m!=rightIndex) continue;
 												if(isEntity(types[t1]) && isEntity(types[t2])) continue;
-												if(types[t1].equals(ONE) && types[t1].equals(types[t2])) continue;
 												leftChild = this.toNode(leftIndex, m, 1, 0, types[t1]);
 												rightChild = this.toNode(m, rightIndex, 1, 1, types[t2]);
 												if(network.contains(leftChild) && network.contains(rightChild)){
@@ -290,12 +273,6 @@ public class SIMNetworkCompiler extends NetworkCompiler {
 												}
 											}
 										}
-									}
-									if(!rootAdded[t] && network.contains(parent) && leftIndex==0 && rightIndex>leftIndex){
-										long subRoot = this.toNode(leftIndex, rightIndex, direction, complete, "null");
-										network.addNode(subRoot);
-										network.addEdge(subRoot, new long[]{parent});
-										rootAdded[t] = true;
 									}
 									
 								}
@@ -337,10 +314,10 @@ public class SIMNetworkCompiler extends NetworkCompiler {
 		
 		Tree root = new LabeledScoredTreeNode();
 		CoreLabel rootLabel = new CoreLabel();
-		rootLabel.setValue("0,"+(inst.getInput().length()-1)+",1,1,null");
+		rootLabel.setValue("0,"+(inst.getInput().length()-1)+",1,1,"+GO);
 		root.setLabel(rootLabel);
 		this.toTreeHelper(network, network.countNodes()-1, root);
-		return root.getChild(0);
+		return root;
 	}
 	
 	private void toTreeHelper(DependencyNetwork network, int node_k, Tree parentNode){
@@ -360,10 +337,7 @@ public class SIMNetworkCompiler extends NetworkCompiler {
 			sb.append(ids_child[0]);  sb.append(",");
 			sb.append(ids_child[3]); sb.append(",");
 			sb.append(ids_child[2]); sb.append(",");
-			String type = null;
-			if(ids_child[4]==types.length)
-				type = "null";
-			else type=types[ids_child[4]];
+			String type=types[ids_child[4]];
 			sb.append(type);
 //			if(leftIndex==ids_child[0] && !type.startsWith(PARENT_IS)){
 //				Sentence sentence = (Sentence)network.getInstance().getInput();
@@ -431,20 +405,18 @@ public class SIMNetworkCompiler extends NetworkCompiler {
 	public long toNode_generalRoot(int sentLen){
 		int sentence_len = sentLen;
 		//Largest span and the node id is sentence len, because the id 0 to sentence len-1, EMPTY is the general type
-		return NetworkIDMapper.toHybridNodeID(new int[]{sentence_len-1, sentence_len-1,1,1,typeMap.size(),NODE.normal.ordinal()});
+		return NetworkIDMapper.toHybridNodeID(new int[]{sentence_len-1, sentence_len-1,1,1,typeMap.get(GO),NODE.normal.ordinal()});
 	}
 	
 	public long toNode(int leftIndex, int rightIndex, int direction, int complete, String type){
-		if(!typeMap.containsKey(type) && !type.equals("null")){
+		if(!typeMap.containsKey(type)){
 			System.err.println("The type is:"+type);
 		}
-		if(type.equals("null"))
-			return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex,rightIndex-leftIndex,complete, direction, typeMap.size(),NODE.normal.ordinal()});
 		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex,rightIndex-leftIndex,complete, direction, typeMap.get(type),NODE.normal.ordinal()});
 	}
 	
 	private boolean isEntity(String type){
-		return !type.equals(OE) &&!type.equals(ONE);
+		return !type.equals(GO);
 	}
 
 }
