@@ -131,6 +131,22 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ERT-dir", child_type+":"+nextTag+":"+att));
 				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "ELT-T-dir",child_type+":"+prevTag+","+tag+":"+att));
 				
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "W-E-PAE", word+"+"+child_type+"+"+pa_type));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "T-E-PAE", tag+"+"+child_type+"+"+pa_type));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "prevW-E-PAE", prevWord+"+"+child_type+"+"+pa_type));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "prevT-E-PAE", prevTag+"+"+child_type+"+"+pa_type));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "nextW-E-PAE", nextWord+"+"+child_type+"+"+pa_type));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "nextT-E-PAE", nextTag+"+"+child_type+"+"+pa_type));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "prevT-T-E-PAE", prevTag+"+"+tag+"+"+child_type+"+"+pa_type));
+				
+				
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "W-E-PAE-dir", word+"+"+child_type+"+"+pa_type+"+"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "T-E-PAE-dir", tag+"+"+child_type+"+"+pa_type+"+"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "prevW-E-PAE", prevWord+"+"+child_type+"+"+pa_type+"+"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "prevT-E-PAE", prevTag+"+"+child_type+"+"+pa_type+"+"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "nextW-E-PAE", nextWord+"+"+child_type+"+"+pa_type+"+"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "nextT-E-PAE", nextTag+"+"+child_type+"+"+pa_type+"+"+att));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "prevT-T-E-PAE", prevTag+"+"+tag+"+"+child_type+"+"+pa_type+"+"+att));
 	
 				/****Add some prefix features******/
 				for(int plen = 1;plen<=6;plen++){

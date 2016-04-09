@@ -45,6 +45,7 @@ public class DIVMain {
 		dataTypeSet = Init.iniOntoNotesData();
 		entities = Init.initializeUniqueModelTypeMap(selectedEntities);
 		String modelType = MODEL.DIVIDED.name();
+		DPConfig.currentModel = modelType;
 		String middle = isDev? ".dev":".test";
 		String dpRes = DPConfig.data_prefix+modelType+middle+DPConfig.dp_res_suffix; 
 		String nerEval = DPConfig.data_prefix+modelType+middle+DPConfig.ner_eval_suffix;
