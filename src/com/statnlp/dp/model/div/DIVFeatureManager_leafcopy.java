@@ -139,7 +139,6 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "nextT-E-PAE", nextTag+"+"+child_type+"+"+pa_type));
 				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "prevT-T-E-PAE", prevTag+"+"+tag+"+"+child_type+"+"+pa_type));
 				
-				
 				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "W-E-PAE-dir", word+"+"+child_type+"+"+pa_type+"+"+att));
 				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "T-E-PAE-dir", tag+"+"+child_type+"+"+pa_type+"+"+att));
 				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "prevW-E-PAE", prevWord+"+"+child_type+"+"+pa_type+"+"+att));
@@ -157,6 +156,11 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-PATTERN-SUFF-"+plen+"-dir", child_type+":"+suff+":"+att));
 						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-PATTERN-PREF-"+plen, child_type+":"+pref));
 						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-PATTERN-PREF-"+plen+"-dir", child_type+":"+pref+":"+att));
+						
+						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "WSuff-E-"+plen, suff+"+"+child_type+"+"+pa_type));
+						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "WPref-E-PREF-"+plen, pref+"+"+child_type+"+"+pa_type));
+						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "WSuff-E-"+plen+"-dir", suff+"+"+child_type+"+"+pa_type+"+"+att));
+						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "WPref-E-PREF-"+plen+"-dir", pref+"+"+child_type+"+"+pa_type+"+"+att));
 					}
 				}
 			}
