@@ -136,6 +136,19 @@ public class HPEFeatureManager extends FeatureManager {
 			}
 		}
 		
+		//concatenation of the word features
+		if(completeness==1 && !childrenType[0].equals(OE) && childrenType[1].equals(OE)){
+			int splitPoint = childrenArr[0][0];
+			String interWord = sent.get(splitPoint).getName();
+			String interTag = sent.get(splitPoint).getTag();
+			String leftType = childrenType[0];
+			String rightType = childrenType[1];
+			featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-conca-W", interWord+":"+leftType+":"+rightType));
+			featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-conca-T", interTag+":"+leftType+":"+rightType));
+			featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-conca-WT", interWord+":"+interTag+":"+leftType+":"+rightType));
+		}
+		
+		
 		addDepFeatures(featureList,network,parentArr,sent);
 	
 		
