@@ -59,7 +59,7 @@ public class HPEMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 1;
+		trainNumber = -1;
 //		testNumber = 1;
 //		numIteration = 10;
 //		numThreads = 8;
@@ -92,6 +92,7 @@ public class HPEMain {
 //		System.err.println(testingInsts[0].getInput().toString());
 //		DataChecker.checkJoint(trainingInsts, entities);
 //		DataChecker.checkJoint(testingInsts, entities);
+//		DataChecker.checkIncompeteSideType(trainingInsts);
 //		System.exit(0);
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
