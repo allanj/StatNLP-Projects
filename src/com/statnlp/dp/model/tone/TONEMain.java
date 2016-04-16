@@ -20,7 +20,7 @@ import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkModel;
 
 /**
- * Additional Dependency parsing
+ * TONE model, have one side of the direction have type.
  * @author zhanming_jie
  *
  */

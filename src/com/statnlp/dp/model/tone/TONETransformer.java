@@ -23,41 +23,8 @@ public class TONETransformer extends Transformer {
 	public static String E_B_PREFIX = DPConfig.E_B_PREFIX;
 	public static String E_I_PREFIX = DPConfig.E_I_PREFIX;
 	
-	/**
-	 * process the entities which are not covered by incomplete span.
-	 * @param sent
-	 * @param incompletes
-	 * @param sentEntities
-	 */
-	private void processInvalid(Sentence sent, ArrayList<Entity> incompletes, String[][] sentEntities){
-		for(Entity e: incompletes){
-			int left = e.getLeft();
-			int right = e.getRight();
-			//set the inside parts
-			for(int i=left;i<=right;i++){
-				int hIndex = sent.get(i).getHeadIndex();
-				if(hIndex>=left && hIndex<=right){
-					int min = Math.min(i, hIndex);
-					sentEntities[min][1] = e.getEntityType();
-					int max = Math.max(i, hIndex);
-					sentEntities[max][0] = e.getEntityType();
-					for(int k=min+1;k<=max-1;k++){
-						sentEntities[k][0] = e.getEntityType();
-						sentEntities[k][1] = e.getEntityType();
-					}
-				}
-			}
-			//set the part that not covered an arc.
-			for(int i=left;i<=right;i++){
-				if(sentEntities[i][0]!=null && sentEntities[i][1]==null) sentEntities[i][1]=ONE;
-				if(sentEntities[i][1]!=null && sentEntities[i][0]==null) sentEntities[i][0]=ONE;
-				if(sentEntities[i][0]==null && sentEntities[i][1]==null){sentEntities[i][0]=ONE; sentEntities[i][1]=e.getEntityType(); }
-			}
-		}
-	}
 	
 	private String[][] getLeavesInfo(Sentence sent){
-		ArrayList<Entity> incompletes = DataChecker.checkAllIncomplete(sent);
 		String[][] sentEntities = new String[sent.length()][2];
 		sentEntities[0][0] = null;
 		sentEntities[0][1] = ONE;
@@ -68,20 +35,12 @@ public class TONETransformer extends Transformer {
 				sentEntities[i][1] = ONE;
 			}
 		}
-		if(incompletes.size()>0){
-			processInvalid(sent, incompletes, sentEntities);
-		}
 		for(int i=1;i<sentEntities.length;i++){
 			if(sentEntities[i][0]!=null && sentEntities[i][1]!=null) continue;
 			String type = sent.get(i).getEntity();
-			if(type.startsWith(E_B_PREFIX)){
+			if(type.startsWith(E_B_PREFIX) || type.startsWith(E_I_PREFIX)){
 				sentEntities[i][0] = ONE;
 				sentEntities[i][1] = type.substring(2);
-			}else if(type.startsWith(E_I_PREFIX)){
-				sentEntities[i][0] = type.substring(2);
-				if(i<sentEntities.length-1 && sent.get(i+1).getEntity().startsWith(E_I_PREFIX))
-					sentEntities[i][1] = type.substring(2);
-				else sentEntities[i][1] = ONE;
 			}
 		}
 		return sentEntities;
@@ -104,7 +63,7 @@ public class TONETransformer extends Transformer {
 		spanTreeERoot.setLabel(label);
 		String[][] leaves = getLeavesInfo(sentence);
 		constructSpanTree(spanTreeERoot,dependencyRoot, leaves);
-		//System.err.println(spanTreeERoot.pennString() );
+//		System.err.println(spanTreeERoot.pennString() );
 		return spanTreeERoot;
 	}
 	

@@ -177,12 +177,9 @@ public class TONENetworkCompiler extends NetworkCompiler {
 				if(e.equals(OE)) continue;
 				long wordRightNodeE = this.toNode(rightIndex, rightIndex, 1, 1, e); //the leaf node entity, right direction.
 				network.addNode(wordRightNodeE);
-				long wordLeftNodeE = -1;
-				if(!(rightIndex==1 && !e.equals(ONE))){
-					wordLeftNodeE = this.toNode(rightIndex, rightIndex, 0, 1, e);
-					network.addNode(wordLeftNodeE);
-				}
 			}
+			long wordLeftNodeE = this.toNode(rightIndex, rightIndex, 0, 1, ONE);
+			network.addNode(wordLeftNodeE);
 
 			
 			for(int L=1;L<=rightIndex;L++){
