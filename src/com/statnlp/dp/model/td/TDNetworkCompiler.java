@@ -36,7 +36,7 @@ public class TDNetworkCompiler extends NetworkCompiler {
 	public static String OE = DPConfig.OE;
 	public static String ONE = DPConfig.ONE;
 	
-	private static boolean DEBUG = false;
+	private static boolean DEBUG = true;
 	
 	/**
 	 * Compiler constructor
@@ -88,11 +88,13 @@ public class TDNetworkCompiler extends NetworkCompiler {
 		output.setSpans();
 		long rootNode = this.toNode_generalRoot(sent.length());
 		network.addNode(rootNode);
+		//System.err.println(output.pennString());
 		addToNetwork(network,output);
 		network.finalizeNetwork();
-		//viewer.visualizeNetwork(network, null, "Labeled Network");
+//		viewer.visualizeNetwork(network, null, "Labeled Network");
+//		System.err.println("labeled network nodes:"+network.countNodes());
 		//System.err.println(network);
-		//System.err.println(output.pennString());
+//		System.err.println(output.pennString());
 		
 	}
 	
@@ -106,7 +108,13 @@ public class TDNetworkCompiler extends NetworkCompiler {
 		int pa_completeness = Integer.valueOf(info[3]);
 		String pa_type = info[4];
 		if(pa_leftIndex==pa_rightIndex && !pa_type.startsWith(PARENT_IS)) return; //means the span width now is 1, already enough
+		
 		long parentNode = toNode(pa_leftIndex, pa_rightIndex, pa_direction, pa_completeness,pa_type);
+		if(isEntity(pa_type)){
+			addAllDepNodes(network, parentNode);
+			return;
+		}
+		
 		Tree[] children = parent.children();
 		if(children.length!=2 && children.length!=1){
 			throw new RuntimeException("The children length should be 2 in the labeled tree.");
@@ -140,6 +148,106 @@ public class TDNetworkCompiler extends NetworkCompiler {
 		}		
 	}
 	
+	private void addAllDepNodes(DependencyNetwork network, long node){
+		int[] paArr = NetworkIDMapper.toHybridNodeArray(node);
+		int l = paArr[0] - paArr[1];
+		int r = paArr[0];
+		int comp = paArr[2];
+		int dir = paArr[3];
+		int type = paArr[4];
+		//System.err.println("incoming arr:"+Arrays.toString(paArr));
+		if(comp!=0) throw new RuntimeException("the entity should be incomplete span");
+		String et = PARENT_IS+types[type];
+		long startE = toNode(l, l, 1, 1, type);
+		long start = toNode(l, l, 1, 1, et);
+		network.addNode(startE);
+		network.addNode(start);
+		network.addEdge(start, new long[]{startE});
+		for(int rightIndex = l+1; rightIndex<=r;rightIndex++){
+			long wordRightNodeE = -1;
+			long wordLeftNodeE = -1;
+			long wordLeftNode = -1;
+			long wordRightNode = -1;
+			
+			if(rightIndex!=r) {
+				wordRightNodeE = this.toNode(rightIndex, rightIndex, 1, 1, type);
+				wordRightNode = this.toNode(rightIndex, rightIndex, 1, 1, et);
+				network.addNode(wordRightNode);
+				network.addNode(wordRightNodeE);
+				network.addEdge(wordRightNode, new long[]{wordRightNodeE});
+			}
+			wordLeftNodeE = this.toNode(rightIndex, rightIndex, 0, 1, type);
+			wordLeftNode = this.toNode(rightIndex, rightIndex, 0, 1, et);
+			network.addNode(wordLeftNode);
+			network.addNode(wordLeftNodeE);
+			network.addEdge(wordLeftNode, new long[]{wordLeftNodeE});
+			
+			for(int L=1; L<=rightIndex - l;L++){
+				int leftIndex = rightIndex - L;
+				for(int complete=0;complete<=1;complete++){
+					for(int direction=0;direction<=1;direction++){
+						if(complete==1 && leftIndex==l && rightIndex==r) continue;
+						if(complete==0 && leftIndex==l && rightIndex==r && direction!=dir) continue;
+						if(complete==1 && rightIndex==r && direction==1) continue;
+						if(complete==1 && leftIndex==l && direction==0) continue;
+						if(complete==0 && leftIndex==l && rightIndex!=r && direction==0) continue;
+						if(complete==0 && rightIndex==r && leftIndex!=l && direction==1) continue;
+						long parentE = this.toNode(leftIndex, rightIndex, direction, complete, types[type]);
+						if(complete==0){
+							for(int m=leftIndex;m<rightIndex;m++){
+								long child_1 = this.toNode(leftIndex, m, 1, 1, PARENT_IS+types[type]);
+								long child_2 = this.toNode(m+1, rightIndex, 0, 1, PARENT_IS+types[type]);
+								if(network.contains(child_1) && network.contains(child_2)){
+									network.addNode(parentE);
+									//if(Arrays.equals(NetworkIDMapper.toHybridNodeArray(parentE), new int[]{5, 4, 0, 1, 3, 0}))System.err.println(network.getInstance().getInput().toString());
+									network.addEdge(parentE, new long[]{child_1,child_2});
+								}
+							}
+							long parent = this.toNode(leftIndex, rightIndex, direction, complete, PARENT_IS+types[type]);
+							if(!(leftIndex==l && rightIndex==r) && network.contains(parentE)){
+								network.addNode(parent);
+								//if(Arrays.equals(NetworkIDMapper.toHybridNodeArray(parent), new int[]{3, 2, 0, 1, 9, 0}))System.err.println("pae:"+network.getInstance().getInput().toString());
+								network.addEdge(parent, new long[]{parentE});
+							}
+						}
+						if(complete==1 && direction==0){
+							for(int m=leftIndex;m<rightIndex;m++){
+								long child_1 = this.toNode(leftIndex, m, 0, 1, PARENT_IS+types[type]);
+								long child_2 = this.toNode(m, rightIndex, 0, 0, PARENT_IS+types[type]);
+								if(network.contains(child_1) && network.contains(child_2)){
+									network.addNode(parentE);
+									network.addEdge(parentE, new long[]{child_1,child_2});
+								}
+							}
+							if(network.contains(parentE)){
+								long parent = this.toNode(leftIndex, rightIndex, direction, complete, PARENT_IS+types[type]);
+								network.addNode(parent);
+								network.addEdge(parent, new long[]{parentE});
+							}
+						}
+						if(complete==1 && direction==1){
+							for(int m=leftIndex+1;m<=rightIndex;m++){
+								
+								long child_1 = this.toNode(leftIndex, m, 1, 0,PARENT_IS+ types[type]);
+								long child_2 = this.toNode(m, rightIndex, 1, 1,PARENT_IS+ types[type]);
+								if(network.contains(child_1) && network.contains(child_2)){
+									network.addNode(parentE);
+									network.addEdge(parentE, new long[]{child_1,child_2});
+								}
+							}
+							if(network.contains(parentE)){
+								long parent = this.toNode(leftIndex, rightIndex, direction, complete, PARENT_IS+types[type]);
+								network.addNode(parent);
+								network.addEdge(parent, new long[]{parentE});
+							}
+						}
+					}
+				}
+			}
+		}
+		
+	}
+	
 	public DependencyNetwork compileUnLabledInstance(int networkId, DependInstance inst, LocalNetworkParam param){
 		if(this._nodes==null){
 			this.compileUnlabeled();
@@ -154,7 +262,7 @@ public class TDNetworkCompiler extends NetworkCompiler {
 		//System.err.println(Arrays.toString(NetworkIDMapper.toHybridNodeArray(this._nodes[this._nodes.length-5])));
 		//System.err.println("Root: "+ Arrays.toString(NetworkIDMapper.toHybridNodeArray(root)));
 		//System.err.println("Number of nodes under this root Index: "+ (rootIdx+1));
-		network.contains(network);
+		//network.contains(network);
 		return network;
 	}
 	
@@ -339,7 +447,7 @@ public class TDNetworkCompiler extends NetworkCompiler {
 		//viewer.visualizeNetwork(dependNetwork, null, "Testing Labeled Model:"+network.getInstance().getInstanceId());
 		Tree forest = this.toTree(dependNetwork,inst);
 //		printNetwork(dependNetwork, (Sentence)dependNetwork.getInstance().getInput());
-		if(DEBUG) System.err.println("[Result] "+forest.pennString());
+		//if(DEBUG) System.err.println("[Result] "+forest.pennString());
 		inst.setPrediction(forest);
 		return inst;
 	}
@@ -485,8 +593,12 @@ public class TDNetworkCompiler extends NetworkCompiler {
 		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex,rightIndex-leftIndex,complete, direction, typeMap.get(type),NODE.normal.ordinal()});
 	}
 	
+	public long toNode(int leftIndex, int rightIndex, int direction, int complete, int typeIdx){
+		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex,rightIndex-leftIndex,complete, direction, typeIdx,NODE.normal.ordinal()});
+	}
+	
 	private boolean isEntity(String type){
-		return !type.equals(OE) &&!type.equals(ONE);
+		return !type.equals(OE) &&!type.equals(ONE) && !type.equals(PARENT_IS+OE)&& !type.equals(PARENT_IS+ONE) && !type.equals(PARENT_IS + "null");
 	}
 
 }
