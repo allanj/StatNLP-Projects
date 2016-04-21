@@ -136,7 +136,7 @@ public class HPEFeatureManager extends FeatureManager {
 			}
 		}
 		
-		addDepFeatures(featureList,network,parentArr,sent);
+		//addDepFeatures(featureList,network,parentArr,sent);
 	
 		
 		ArrayList<Integer> finalList = new ArrayList<Integer>();
