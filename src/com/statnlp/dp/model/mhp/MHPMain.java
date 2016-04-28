@@ -140,9 +140,9 @@ public class MHPMain {
 		/****************Evaluation Part**************/
 		System.err.println("*****Evaluation*****");
 		Instance[] predInsts = model.decode(testingInsts);
-		MHPEvaluator.evalDP(predInsts, dpRes);
-		MHPEvaluator.evalNER(predInsts, nerEval);
-		MHPEvaluator.writeJointResult(predInsts, jointRes, modelType);
+		Evaluator.evalDP(predInsts, dpRes);
+		Evaluator.evalNER(predInsts, nerEval);
+		Evaluator.writeJointResult(predInsts, jointRes, modelType);
 	}
 	
 	public static void processArgs(String[] args){

@@ -103,6 +103,7 @@ public class MHPInstance extends DependInstance {
 		String[] res = new String[this.sentence.length()];
 		res[0] = O_TYPE;
 		es[0] = ONE;
+		System.err.println("finding....");
 		this.findAll(es, spanRoot);
 		for(int i=1;i<es.length;i++){
 			if(es[i].equals(ONE)){
