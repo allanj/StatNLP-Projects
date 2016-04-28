@@ -3,7 +3,6 @@ package com.statnlp.dp;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DPConfig.MODEL;
@@ -12,7 +11,7 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.UnnamedDependency;
 
-public class DependInstance extends Instance {
+public class DependInstance extends ModelInstance {
 
 	
 	private static final long serialVersionUID = 7609419266155327236L;
@@ -136,9 +135,6 @@ public class DependInstance extends Instance {
 		return this.prediction!=null;
 	}
 
-	public ArrayList<UnnamedDependency> getDependencies(){
-		return this.dependencies;
-	}
 	
 	@Override
 	public void setPrediction(Object o) {
@@ -147,14 +143,11 @@ public class DependInstance extends Instance {
 
 	}
 	
-	public HashMap<Integer, ArrayList<Integer>> getDependencyMap(ArrayList<UnnamedDependency> dependencies){
-		return this.transform.dependencies2Map(dependencies);
-	}
 	
-	public ArrayList<UnnamedDependency> toDependencies(){
+	public ArrayList<UnnamedDependency> toDependencies(Tree root){
 		//This root is the span root
 		ArrayList<UnnamedDependency> list = new ArrayList<UnnamedDependency>();
-		findAllDependencies(this.prediction, list);
+		findAllDependencies(root, list);
 		return list;
 	}
 
