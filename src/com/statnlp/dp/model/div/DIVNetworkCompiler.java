@@ -154,7 +154,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 		//System.err.println(Arrays.toString(NetworkIDMapper.toHybridNodeArray(this._nodes[this._nodes.length-5])));
 		//System.err.println("Root: "+ Arrays.toString(NetworkIDMapper.toHybridNodeArray(root)));
 		//System.err.println("Number of nodes under this root Index: "+ (rootIdx+1));
-		network.contains(network);
+		//network.contains(network);
 		return network;
 	}
 	
