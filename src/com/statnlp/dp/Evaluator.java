@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Instance;
@@ -15,7 +16,7 @@ import edu.stanford.nlp.trees.UnnamedDependency;
 
 public class Evaluator {
 
-	
+	public static boolean DEBUG = false;
 
 	/**
 	 * Evaluate the dependency
@@ -30,7 +31,7 @@ public class Evaluator {
 		for(Instance org_inst: testInsts){
 			DependInstance inst = (DependInstance)org_inst;
 			Sentence sent = inst.getInput();
-			ArrayList<UnnamedDependency> predDependencies = inst.toDependencies(inst.getPrediction());
+			ArrayList<UnnamedDependency> predDependencies = inst.toDependencies();
 			ArrayList<UnnamedDependency> corrDependencies = inst.getDependencies();
 			int[] predHeads = Transformer.getHeads(predDependencies, inst.getInput());
 			int[] trueHeads = Transformer.getHeads(corrDependencies, inst.getInput());
@@ -134,10 +135,15 @@ public class Evaluator {
 	
 	public static void writeJointResult(Instance[] predictions, String jointResult, String modelType) throws IOException{
 		PrintWriter pw = RAWF.writer(jointResult);
+		PrintWriter pwDebug = null;
+		if(DEBUG) {
+			System.err.println("[Evaluator DEBUG]");
+			pwDebug = RAWF.writer("data/debug/eval.bug");
+		}
 		for(int index=0;index<predictions.length;index++){
 			DependInstance dInst = (DependInstance)predictions[index];
 			Sentence sent = dInst.getInput();
-			ArrayList<UnnamedDependency> predDependencies = dInst.toDependencies(dInst.getPrediction());
+			ArrayList<UnnamedDependency> predDependencies = dInst.toDependencies();
 			ArrayList<UnnamedDependency> corrDependencies = dInst.getDependencies();
 			int[] predHeads = Transformer.getHeads(predDependencies, dInst.getInput());
 			int[] trueHeads = Transformer.getHeads(corrDependencies, dInst.getInput());
@@ -147,13 +153,17 @@ public class Evaluator {
 				pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+predEntities[i]+" "+trueHeads[i]+" "+predHeads[i]+"\n");
 			}
 			pw.write("\n");
-			if(DPConfig.DEBUG){
-				pw.write("## predicted span tree:\n");
-				pw.write(dInst.getPrediction().pennString()+"\n");
-				pw.write("## true span tree:\n");
-				pw.write(dInst.getOutput().pennString()+"\n");
+			if(DEBUG){
+				if(dInst.resCovered){
+					pwDebug.write("instance Id:"+dInst.getInstanceId()+"\n" );
+					pwDebug.write(dInst.getInput().toString()+"\n" );
+					pwDebug.write(Arrays.toString(predEntities) + "\n" );
+					pwDebug.write(dInst.getPrediction().pennString()+"\n" );
+					pwDebug.write("***************Splitting Line*************** \n" );
+				}
 			}
 		}
+		if(DEBUG) pwDebug.close();
 		pw.close();
 	}
 	

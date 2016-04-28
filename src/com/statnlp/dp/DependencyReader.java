@@ -39,6 +39,10 @@ public class DependencyReader {
 		return readInstance(path,isLabeled,number,entities, 10000, transformer, splitEntity,null);
 	}
 	
+	public static DependInstance[] readInstance(String path, boolean isLabeled, int number,String[] entities, Transformer transformer, boolean splitEntity, HashMap<String, Integer> typeMap){
+		return readInstance(path,isLabeled,number,entities, 10000, transformer, splitEntity,typeMap);
+	}
+	
 
 	public static DependInstance[] readInstance(String path, boolean isLabeled, int number,String[] entities, int maxLength, Transformer transformer, boolean splitEntity, HashMap<String, Integer> typeMap){
 		ArrayList<DependInstance> data = new ArrayList<DependInstance>();

@@ -151,10 +151,10 @@ public class DependInstance extends Instance {
 		return this.transform.dependencies2Map(dependencies);
 	}
 	
-	public ArrayList<UnnamedDependency> toDependencies(Tree root){
+	public ArrayList<UnnamedDependency> toDependencies(){
 		//This root is the span root
 		ArrayList<UnnamedDependency> list = new ArrayList<UnnamedDependency>();
-		findAllDependencies(root, list);
+		findAllDependencies(this.prediction, list);
 		return list;
 	}
 
@@ -163,13 +163,14 @@ public class DependInstance extends Instance {
 	 * Find all the dependencies from our span tree and output it as the dependencies list
 	 * @param current : The span tree used for extracting the dependencies and entites information
 	 * @param dependencies : dependencies list.
+	 * The index of direction and completeness changed...remember to modify other classes.
 	 */
 	private void findAllDependencies(Tree current, ArrayList<UnnamedDependency> dependencies){
 		CoreLabel label = (CoreLabel)(current.label());
 		String[] info = label.value().split(",");
 		int pa_leftIndex = Integer.valueOf(info[0]);
 		int pa_rightIndex = Integer.valueOf(info[1]);
-		int pa_direction = Integer.valueOf(info[2]);
+		int pa_direction = Integer.valueOf(info[2]);  //previously the position for direction is 2.
 		int pa_completeness = Integer.valueOf(info[3]);
 		String type = null;
 		if(info.length>4)
