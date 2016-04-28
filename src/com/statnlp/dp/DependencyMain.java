@@ -64,7 +64,8 @@ public class DependencyMain {
 			testingInsts = DependencyReader.readCNN(testFile, false,testNumber,trans);
 		}else{
 			trainingInsts = DependencyReader.readInstance(trainingPath, true,trainNumber,entities,trans);
-			testingInsts = isPipe? DependencyReader.readFromPipeline(testFile,testNumber,trans): DependencyReader.readInstance(testFile, false,testNumber,entities,trans);
+			//testingInsts = isPipe? DependencyReader.readFromPipeline(testFile,testNumber,trans): DependencyReader.readInstance(testFile, false,testNumber,entities,trans);
+			testingInsts = DependencyReader.readInstance(testFile, false,testNumber,entities,trans);
 		}
 		
 		
@@ -73,6 +74,7 @@ public class DependencyMain {
 		NetworkConfig._numThreads = numThreads;
 		//0.1 is the best after tunning the parameters
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = 0.1;
+		System.err.println("[Info] Regularization Parameter: "+NetworkConfig.L2_REGULARIZATION_CONSTANT);
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
 		DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(), isPipe);
 		DependencyNetworkCompiler dnc = new DependencyNetworkCompiler();
@@ -122,7 +124,6 @@ public class DependencyMain {
 			System.err.println("[Info] numThreads: "+numThreads);
 			System.err.println("[Info] is Pipeline: "+isPipe);
 			System.err.println("[Info] Using development set??: "+isDev);
-			System.err.println("[Info] Regularization Parameter: "+DPConfig.L2);
 			if(isPipe){
 				System.err.println("[Info] *********PipeLine: from NER res to DP****");
 			}
