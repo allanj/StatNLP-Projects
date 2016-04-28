@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.statnlp.commons.types.Instance;
-import com.statnlp.dp.Evaluator;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.Init;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
@@ -30,20 +29,21 @@ public class EMain {
 	public static boolean isDev;
 	public static String[] selectedEntities = {"person","organization","gpe","MISC"};
 	public static HashSet<String> dataTypeSet;
+	public static HashMap<String, Integer> entityMap;
 	
 	public static void initializeEntityMap(){
-		NetworkConfig.entityMap = new HashMap<String, Integer>();
+		entityMap = new HashMap<String, Integer>();
 		int index = 0;
-		NetworkConfig.entityMap.put("O", index++);  
+		entityMap.put("O", index++);  
 		for(int i=0;i<selectedEntities.length;i++){
-			NetworkConfig.entityMap.put("B-"+selectedEntities[i], index++);
-			NetworkConfig.entityMap.put("I-"+selectedEntities[i], index++);
+			entityMap.put("B-"+selectedEntities[i], index++);
+			entityMap.put("I-"+selectedEntities[i], index++);
 		}
-		entities = new String[NetworkConfig.entityMap.size()]; //not include the EMPTY
-		Iterator<String> iter = NetworkConfig.entityMap.keySet().iterator();
+		entities = new String[entityMap.size()];
+		Iterator<String> iter = entityMap.keySet().iterator();
 		while(iter.hasNext()){
 			String entity = iter.next();
-			entities[NetworkConfig.entityMap.get(entity)] = entity;
+			entities[entityMap.get(entity)] = entity;
 		}
 	}
 
@@ -51,9 +51,6 @@ public class EMain {
 	
 	public static void main(String[] args) throws IOException, InterruptedException{
 		// TODO Auto-generated method stub
-		
-		
-
 		
 		trainNumber = 80;
 		testNumber = 2;
@@ -63,7 +60,7 @@ public class EMain {
 		processArgs(args);
 		dataTypeSet = Init.iniOntoNotesData();
 		initializeEntityMap();
-		String modelType = "ecrf";
+		String modelType = DPConfig.MODEL.ecrf.name();
 		
 		
 		String middle = isDev? ".dev":".test";
@@ -82,13 +79,19 @@ public class EMain {
 		
 		List<ECRFInstance> trainInstances = null;
 		List<ECRFInstance> testInstances = null;
+		/***********DEBUG*****************/
+//		DPConfig.ecrftrain = "data/semeval10t1/ecrf.small.txt";
+//		testFile="data/semeval10t1/ecrf.smalltest.txt";
+		DPConfig.writeWeight = true;
+		DPConfig.readWeight = false;
+		/***************************/
 		if(dataTypeSet.contains(DPConfig.dataType)){
-			trainInstances = EReader.readCNN(DPConfig.ecrftrain, true, trainNumber, NetworkConfig.entityMap);
-			testInstances = EReader.readCNN(testFile, false, testNumber, NetworkConfig.entityMap);
+			trainInstances = EReader.readCNN(DPConfig.ecrftrain, true, trainNumber, entityMap);
+			testInstances = EReader.readCNN(testFile, false, testNumber, entityMap);
 		}else{
-			trainInstances = EReader.readData(DPConfig.ecrftrain,true,trainNumber, NetworkConfig.entityMap);
-			testInstances = isPipe?EReader.readDP2NERPipe(testFile, testNumber,NetworkConfig.entityMap)
-					:EReader.readData(testFile,false,testNumber,NetworkConfig.entityMap);
+			trainInstances = EReader.readData(DPConfig.ecrftrain,true,trainNumber, entityMap);
+			testInstances = isPipe?EReader.readDP2NERPipe(testFile, testNumber,entityMap)
+					:EReader.readData(testFile,false,testNumber,entityMap);
 		}
 		
 //		Formatter.ner2Text(trainInstances, "data/testRandom2.txt");
@@ -99,15 +102,16 @@ public class EMain {
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2;
 		NetworkConfig._numThreads = numThreads;
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
+		NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY = false;
 		
 		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(),entities,isPipe);
-		ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(NetworkConfig.entityMap, entities);
+		ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(entityMap, entities);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		ECRFInstance[] ecrfs = trainInstances.toArray(new ECRFInstance[trainInstances.size()]);
 		model.train(ecrfs, numIteration);
 		Instance[] predictions = model.decode(testInstances.toArray(new ECRFInstance[testInstances.size()]));
-		Evaluator.evalNER(predictions, nerOut);
-		Evaluator.writeNERResult(predictions, nerRes, true);
+		ECRFEval.evalNER(predictions, nerOut);
+		ECRFEval.writeNERResult(predictions, nerRes, true);
 	}
 
 	

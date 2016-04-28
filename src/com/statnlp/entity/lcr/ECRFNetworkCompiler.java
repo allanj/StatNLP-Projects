@@ -63,7 +63,7 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 		
 		long root = toNode_root(lcrfInstance.size());
 		int rootIdx = Arrays.binarySearch(lcrfNetwork.getAllNodes(),root);
-		
+		//System.err.println(rootIdx+" final score:"+network.getMax(rootIdx));
 		for(int i=0;i<lcrfInstance.size();i++){
 			int child_k = lcrfNetwork.getMaxPath(rootIdx)[0];
 			/*****************debug allan 27/03/2016. 00.21am*******************/
@@ -129,16 +129,27 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 		for(int i=0;i<_size;i++){
 			long[] currentNodes = new long[entities.length];
 			for(int l=0;l<entities.length;l++){
+				if(i==0 && entities[l].startsWith("I-")){ currentNodes[l]=-1; continue;}
 				long node = toNode(i,l);
 				currentNodes[l] = node;
 				lcrfNetwork.addNode(node);
-				for(long child: children)
+				for(long child: children){
+					if(child==-1) continue;
+					int[] childArr = NetworkIDMapper.toHybridNodeArray(child);
+					if(entities[childArr[1]].startsWith("B-") && entities[l].startsWith("I-") && !entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
+					if(entities[childArr[1]].startsWith("I-") && entities[l].startsWith("I-") && !entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
+					if(entities[childArr[1]].startsWith("I-") && entities[l].startsWith("B-") && entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
+					if(entities[childArr[1]].equals("O") && entities[l].startsWith("I-")) continue;
 					lcrfNetwork.addEdge(node, new long[]{child});
+				}
 			}
 			long root = toNode_root(i+1);
 			lcrfNetwork.addNode(root);
-			for(long child:currentNodes)
+			for(long child:currentNodes){
+				if(child==-1) continue;
 				lcrfNetwork.addEdge(root, new long[]{child});
+			}
+				
 			children = currentNodes;
 			
 		}

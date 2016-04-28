@@ -14,7 +14,7 @@ public class ECRFFeatureManager extends FeatureManager {
 
 	private static final long serialVersionUID = 376931974939202432L;
 
-	public enum FEATYPE {entity};
+	public enum FEATYPE {local,entity};
 	protected String[] entities;
 	protected boolean isPipeLine; 
 	
@@ -22,6 +22,7 @@ public class ECRFFeatureManager extends FeatureManager {
 		super(param_g);
 		this.entities = entities;
 		this.isPipeLine = isPipeLine;
+		
 	}
 	//
 	@Override
@@ -55,49 +56,53 @@ public class ECRFFeatureManager extends FeatureManager {
 		String childWord = childPos>=0? inst.getInput().get(childPos).getName():"STR";
 		String childTag = childPos>=0? inst.getInput().get(childPos).getTag():"STR";
 		
-		if(!entities[eId].equals("O")){
-			boolean corr = true;
-			  
-			if(entities[childEId].equals("O") && entities[eId].startsWith("I-")) corr = false;
-			if(entities[childEId].equals("STR") && entities[eId].startsWith("I-")) corr = false;
-			if(entities[eId].startsWith("I-") && entities[childEId].length()>2 && !entities[childEId].substring(2).equals(entities[eId].substring(2))) corr = false;
-			if(entities[childEId].startsWith("I-") && entities[eId].startsWith("I-") && childPos==0) corr = false;
-			if(corr){
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "EW",entities[eId]+":"+currWord));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "ET",entities[eId]+":"+currTag));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "ELW",entities[eId]+":"+lw));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "ELT",entities[eId]+":"+lt));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "ERW",entities[eId]+":"+rw));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "ERT",entities[eId]+":"+rt));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "ELT-T",entities[eId]+":"+lt+","+currTag));
-				/****Add some prefix features******/
-				for(int plen = 1;plen<=6;plen++){
-					if(currWord.length()>=plen){
-						String suff = currWord.substring(currWord.length()-plen, currWord.length());
-						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-PATTERN-SUFF-"+plen, entities[eId]+":"+suff));
-						String pref = currWord.substring(0,plen);
-						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-PATTERN-PREF-"+plen, entities[eId]+":"+pref));
-					}
-				}
-				
-				String prevEntity = entities[childEId];
-				if(entities[eId].startsWith("B-"))
-					prevEntity = "ESTR";
-				if(prevEntity.equals("ESTR") || (prevEntity.length()>2 &&entities[eId].length()>2 && prevEntity.substring(2).equals(entities[eId].substring(2)))){
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E",prevEntity+":"+entities[eId]));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE",currWord+":"+prevEntity+":"+entities[eId]));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevW-prevE-currE",lw+":"+prevEntity+":"+entities[eId]));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextW-prevE-currE",rw+":"+prevEntity+":"+entities[eId]));
-					
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE",currTag+":"+prevEntity+":"+entities[eId]));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-prevE-currE",lt+":"+prevEntity+":"+entities[eId]));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextT-prevE-currE",rt+":"+prevEntity+":"+entities[eId]));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-currT-prevE-currE",lt+":"+rt+":"+prevEntity+":"+entities[eId]));
-				}
-			}
-			
-		}
 		
+		
+		
+//		String currEn = entities[eId].equals("O")?entities[eId]:entities[eId].substring(2);
+		String currEn = entities[eId];
+		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "EW",  	currEn+":"+currWord));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ET",	currEn+":"+currTag));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELW",	currEn+":"+lw));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELT",	currEn+":"+lt));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ERW",	currEn+":"+rw));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ERT",	currEn+":"+rt));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELT-T",	currEn+":"+lt+","+currTag));
+		/****Add some prefix features******/
+		for(int plen = 1;plen<=6;plen++){
+			if(currWord.length()>=plen){
+				String suff = currWord.substring(currWord.length()-plen, currWord.length());
+				featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-SUFF-"+plen, currEn+":"+suff));
+				String pref = currWord.substring(0,plen);
+				featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-PREF-"+plen, currEn+":"+pref));
+			}
+		}
+//		
+//		
+//		String prevEntity = entities[childEId];
+//		if((prevEntity.length()>2 && entities[eId].length()>2 && prevEntity.substring(2).equals(entities[eId].substring(2)))){
+//			prevEntity = prevEntity.substring(2);
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E",prevEntity+":"+currEn));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE",currWord+":"+prevEntity+":"+currEn));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevW-prevE-currE",lw+":"+prevEntity+":"+currEn));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextW-prevE-currE",rw+":"+prevEntity+":"+currEn));
+//			
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE",currTag+":"+prevEntity+":"+currEn));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-prevE-currE",lt+":"+prevEntity+":"+currEn));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextT-prevE-currE",rt+":"+prevEntity+":"+currEn));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-currT-prevE-currE",lt+":"+currTag+":"+prevEntity+":"+currEn));			
+//		}
+//		if(prevEntity.equals("O") && prevEntity.equals(entities[eId])){
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E",prevEntity+":"+currEn));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE",currWord+":"+prevEntity+":"+currEn));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevW-prevE-currE",lw+":"+prevEntity+":"+currEn));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextW-prevE-currE",rw+":"+prevEntity+":"+currEn));
+//			
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE",currTag+":"+prevEntity+":"+currEn));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-prevE-currE",lt+":"+prevEntity+":"+currEn));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextT-prevE-currE",rt+":"+prevEntity+":"+currEn));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-currT-prevE-currE",lt+":"+currTag+":"+prevEntity+":"+currEn));	
+//		}
 		
 		
 		/*********Pairwise features********/
