@@ -5,7 +5,8 @@ import java.util.HashMap;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
-import com.statnlp.hybridnetworks.NetworkConfig;
+import com.statnlp.dp.utils.DPConfig;
+import com.statnlp.dp.utils.DPConfig.MODEL;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.Tree;
@@ -18,16 +19,25 @@ public class DependInstance extends Instance {
 	protected Sentence sentence;
 	protected Tree output; //output is the span tree;
 	protected Tree prediction; //prediction is also the dependency spanning tree
-	private ArrayList<UnnamedDependency> dependencies; //only for the output
-	private Tree dependencyRoot;
+	protected ArrayList<UnnamedDependency> dependencies; //only for the output
+	protected Tree dependencyRoot;
 	public int[] unValidNum;
 	public int[][] outsideHeads;
 	public int[] entityNum;
 	public int continousNum;
 	private Transformer transform;
 	
-	private boolean haveEntity = false;
+	public boolean resCovered;
 	
+	protected boolean haveEntity = false;
+	
+	protected  String OE = DPConfig.OE;
+	protected  String ONE = DPConfig.ONE;
+	protected  String GO = DPConfig.GO;
+	protected  String O_TYPE = DPConfig.O_TYPE;
+	protected  String E_B_PREFIX = DPConfig.E_B_PREFIX;
+	protected  String E_I_PREFIX = DPConfig.E_I_PREFIX;
+	protected  String PARENT_IS = DPConfig.PARENT_IS;
 	
 	
 	public DependInstance(int instanceId, double weight) {
@@ -50,11 +60,11 @@ public class DependInstance extends Instance {
 		
 	}
 	
-	public void setHaveEntity(){
+	public void setHaveEntity(HashMap<String, Integer> typeMap){
 		this.haveEntity = true;
-		this.unValidNum = new int[NetworkConfig.typeMap.size()];
-		this.outsideHeads = new int[NetworkConfig.typeMap.size()][10];
-		entityNum = new int[NetworkConfig.typeMap.size()];
+		this.unValidNum = new int[typeMap.size()];
+		this.outsideHeads = new int[typeMap.size()][10];
+		entityNum = new int[typeMap.size()];
 		continousNum = 0;
 	}
 	
@@ -170,7 +180,7 @@ public class DependInstance extends Instance {
 		CoreLabel governorLabel = new CoreLabel();
 		CoreLabel dependentLabel = new CoreLabel();
 //		System.err.println("left:"+pa_leftIndex+", right:"+pa_rightIndex);
-		if(pa_completeness==0 && ( (info.length>4 && type.startsWith("pae")) || info.length==4) ){
+		if(pa_completeness==0 && ( (info.length>4 && type.startsWith("pae")) || info.length==4 || validModel()    ) ){
 			if(pa_direction==0){
 				governorLabel.setSentIndex(pa_rightIndex);
 				governorLabel.setValue("index:"+pa_rightIndex);
@@ -202,20 +212,32 @@ public class DependInstance extends Instance {
 		
 		String[] es = new String[this.sentence.length()];
 		boolean[] set = new boolean[this.sentence.length()];
-		es[0] = "O";
+		es[0] = O_TYPE;
 		for(int i=1;i<es.length;i++) {es[i] = "UNDEF"; set[i] =false;}
-		findAllONE(es, spanRoot);
-		findAllE(es, spanRoot);
-		//System.err.println(Arrays.toString(es));
-		for(int i=1;i<es.length;i++){
-			if(es[i].equals("UNDEF")) {
-				System.err.println("Some spans are not finalized the type. Info:\n\t"+this._instanceId+"\n"+this.getInput().toString());
-				es[i] = "O";
+		if(DPConfig.currentModel.equals(MODEL.SIMPLE.name())){
+			resCovered = false;
+			this.findAllE(es, spanRoot);
+			for(int i=1;i<es.length;i++){
+				if(es[i].equals("UNDEF")) {
+					es[i] = O_TYPE;
+				}
+				if((es[i-1].startsWith(E_I_PREFIX) || es[i-1].startsWith(E_B_PREFIX)) && es[i].startsWith(E_B_PREFIX) && es[i-1].substring(2, es[i-1].length()).equals(es[i].substring(2, es[i].length())))
+					es[i] = E_I_PREFIX+es[i-1].substring(2, es[i-1].length());
 			}
-			if((es[i-1].startsWith("I-") || es[i-1].startsWith("B-")) && es[i].startsWith("B-") && es[i-1].substring(2, es[i-1].length()).equals(es[i].substring(2, es[i].length())))
-				es[i] = "I-"+es[i-1].substring(2, es[i-1].length());
+		}else{
+			this.findAllONE(es, spanRoot);
+			resCovered = false;
+			this.findAllE(es, spanRoot);
+			for(int i=1;i<es.length;i++){
+				if(es[i].equals("UNDEF")) {
+					System.err.println("Some spans are not finalized the type. Info:\n\t"+this._instanceId+"\n"+this.getInput().toString());
+					es[i] = O_TYPE;
+				}
+				if((es[i-1].startsWith(E_I_PREFIX) || es[i-1].startsWith(E_B_PREFIX)) && es[i].startsWith(E_B_PREFIX) && es[i-1].substring(2, es[i-1].length()).equals(es[i].substring(2, es[i].length())))
+					es[i] = E_I_PREFIX+es[i-1].substring(2, es[i-1].length());
+			}
 		}
-//		System.err.println(Arrays.toString(es));
+		
 		return es;
 	}
 	
@@ -225,10 +247,10 @@ public class DependInstance extends Instance {
 		int l = Integer.valueOf(info[0]);
 		int r = Integer.valueOf(info[1]);
 		String type = info[4];
-		if(type.equals("ONE")){
-			for(int i=l;i<=r;i++) es[i] = "O";
+		if(type.equals(ONE)){
+			for(int i=l;i<=r;i++) es[i] = O_TYPE;
 			return;
-		}else if(!type.startsWith("pae") && !type.equals("OE") && !type.equals("ONE")){
+		}else if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE)){
 			return;
 		}else{
 			for(Tree child: current.children()){
@@ -243,12 +265,16 @@ public class DependInstance extends Instance {
 		int l = Integer.valueOf(info[0]);
 		int r = Integer.valueOf(info[1]);
 		String type = info[4];
-		if(!type.startsWith("pae") && !type.equals("OE") && !type.equals("ONE")){
-			es[l] = "B-"+type;
-			for(int i=l+1;i<=r;i++)
-				es[i]="I-"+type;
+		if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE) && !type.equals(GO)){
+			if((es[l].startsWith(E_B_PREFIX) || es[l].startsWith(E_I_PREFIX)) && !es[l].substring(2).equals(type)) resCovered = true;
+			es[l] = E_B_PREFIX+type;
+			for(int i=l+1;i<=r;i++){
+				if((es[i].startsWith(E_B_PREFIX) || es[i].startsWith(E_I_PREFIX)) && !es[i].substring(2).equals(type)) resCovered = true;
+				es[i]=E_I_PREFIX+type;
+			}
+				
 			return;
-		}else if(type.equals("ONE")){
+		}else if(type.equals(ONE)){
 			return;
 		}else{
 			for(Tree child: current.children()){
@@ -258,6 +284,10 @@ public class DependInstance extends Instance {
 	}
 
 	
+	
+	private boolean validModel(){
+		return DPConfig.currentModel.equals(MODEL.HYPEREDGE.name()) || DPConfig.currentModel.equals(MODEL.SIMPLE.name());
+	}
 	
 	
 

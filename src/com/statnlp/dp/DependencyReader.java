@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -31,15 +32,15 @@ public class DependencyReader {
 	public static String[] others = DPConfig.others;
 	
 	public static DependInstance[] readInstance(String path, boolean isLabeled, int number,String[] entities, Transformer transformer){
-		return readInstance(path,isLabeled,number,entities, 10000, transformer, false);
+		return readInstance(path,isLabeled,number,entities, 10000, transformer, false,null);
 	}
 	
 	public static DependInstance[] readInstance(String path, boolean isLabeled, int number,String[] entities, Transformer transformer, boolean splitEntity){
-		return readInstance(path,isLabeled,number,entities, 10000, transformer, splitEntity);
+		return readInstance(path,isLabeled,number,entities, 10000, transformer, splitEntity,null);
 	}
 	
 
-	public static DependInstance[] readInstance(String path, boolean isLabeled, int number,String[] entities, int maxLength, Transformer transformer, boolean splitEntity){
+	public static DependInstance[] readInstance(String path, boolean isLabeled, int number,String[] entities, int maxLength, Transformer transformer, boolean splitEntity, HashMap<String, Integer> typeMap){
 		ArrayList<DependInstance> data = new ArrayList<DependInstance>();
 		int maxSpanLen = -1;
 		int maxLen = -1;
@@ -75,7 +76,7 @@ public class DependencyReader {
 					if(dependencyTree.size()==sent.length() && sent.length()< maxLength){
 						sent.setRecognized();
 						DependInstance inst = new DependInstance(index++,1.0,sent,dependencies,dependencyTree,transformer);
-						if(entities!=null) inst.setHaveEntity();
+						if(entities!=null && typeMap!=null) inst.setHaveEntity(typeMap);
 						inst.continousNum = conNum;
 						for(UnnamedDependency ud: dependencies){
 							CoreLabel mo = (CoreLabel)ud.dependent();
@@ -171,6 +172,10 @@ public class DependencyReader {
 	}
 	
 	public static DependInstance[] readCNN(String path, boolean isLabeled, int number, Transformer transformer){
+		return readCNN(path, isLabeled, number, transformer, null);
+	}
+	
+	public static DependInstance[] readCNN(String path, boolean isLabeled, int number, Transformer transformer, HashMap<String, Integer> typeMap){
 		ArrayList<DependInstance> data = new ArrayList<DependInstance>();
 		int maxLen = -1;
 		try {
@@ -243,4 +248,7 @@ public class DependencyReader {
 		myData.toArray(dataArr);
 		return dataArr;
 	}
+
+
+
 }
