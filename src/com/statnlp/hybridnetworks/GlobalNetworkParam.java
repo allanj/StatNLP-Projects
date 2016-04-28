@@ -1,5 +1,5 @@
 /** Statistical Natural Language Processing System
-    Copyright (C) 2014  Lu, Wei
+    Copyright (C) 2014-2016  Lu, Wei
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,45 +22,85 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
-import com.statnlp.commons.ml.opt.LBFGSOptimizer;
-import com.statnlp.commons.ml.opt.MathsVector;
+import com.statnlp.commons.ml.opt.LBFGS;
 import com.statnlp.commons.ml.opt.LBFGS.ExceptionWithIflag;
+import com.statnlp.commons.ml.opt.MathsVector;
+import com.statnlp.commons.ml.opt.Optimizer;
+import com.statnlp.commons.ml.opt.OptimizerFactory;
 
 //TODO: other optimization and regularization methods. Such as the L1 regularization.
 
+/**
+ * The set of parameters (such as weights, training method, optimizer, etc.) in the global scope
+ * @author Wei Lu <luwei@statnlp.com>
+ *
+ */
 public class GlobalNetworkParam implements Serializable{
 	
 	private static final long serialVersionUID = -1216927656396018976L;
 	
 	//these parameters are used for discriminative training using LBFGS.
+	/** The L2 regularization parameter weight */
 	protected transient double _kappa;
-	protected transient LBFGSOptimizer _opt;
+	/** The optimizer */
+	protected transient Optimizer _opt;
+	/** The optimizer factory */
+	protected transient OptimizerFactory _optFactory;
+	/** The gradient for each dimension */
 	protected transient double[] _counts;
+	/** A variable to store previous value of the objective function */
 	protected transient double _obj_old;
+	/** A variable to store current value of the objective function */
 	protected transient double _obj;
+	/** A variable for batch SGD optimization, if applicable */
+	protected transient int _batchSize;
+	
 	protected transient int _version;
 	
-	//feature type - output - input
+	/** Map from feature type to [a map from output to [a map from input to feature ID]] */
 	protected HashMap<String, HashMap<String, HashMap<String, Integer>>> _featureIntMap;
-	//feature type - input
+	/** Map from feature type to input */
 	protected HashMap<String, ArrayList<String>> _type2inputMap;
-	//subglobalmap
+	/** A feature int map (similar to {@link #_featureIntMap}) for each local thread */
 	protected ArrayList<HashMap<String, HashMap<String, HashMap<String, Integer>>>> _subFeatureIntMaps;
+	/** The size of each feature int maps for each local thread */
+	protected int[] _subSize;
 	
 	protected String[][] _feature2rep;//three-dimensional array representation of the feature.
+	/** The weights parameter */
 	protected double[] _weights;
+	/** Store the best weights when using the batch sgd */
+	protected double[] _bestWeight;
+	/** A flag whether the model is discriminative */
 	protected boolean _isDiscriminative;
+	/**
+	 * The current number of features that will be updated as the process goes.
+	 * @see #_fixedFeaturesSize
+	 */
 	protected int _size;
-	protected int[] _subSize;
+	/**
+	 * The final number of features
+	 * @see #_size
+	 */
 	protected int _fixedFeaturesSize;
+	/** A flag describing whether the set of features is already fixed */
 	protected boolean _locked = false;
 	
+	/** A counter for how many consecutive times the decrease in objective value is less than 0.01% */
+	protected int smallChangeCount = 0;
+	/** The total number of instances for the coefficient the batch SGD regularization term*/
+	protected int totalNumInsts;
+	
 	public GlobalNetworkParam(){
+		this(OptimizerFactory.getLBFGSFactory());
+	}
+	
+	public GlobalNetworkParam(OptimizerFactory optimizerFactory){
 		this._locked = false;
 		this._version = -1;
 		this._size = 0;
@@ -69,20 +109,25 @@ public class GlobalNetworkParam implements Serializable{
 		this._obj = Double.NEGATIVE_INFINITY;
 		this._isDiscriminative = !NetworkConfig.TRAIN_MODE_IS_GENERATIVE;
 		if(this.isDiscriminative()){
-			this._opt = new LBFGSOptimizer();
+			this._batchSize = NetworkConfig.batchSize;
 			this._kappa = NetworkConfig.L2_REGULARIZATION_CONSTANT;
 		}
 		this._featureIntMap = new HashMap<String, HashMap<String, HashMap<String, Integer>>>();
 		this._type2inputMap = new HashMap<String, ArrayList<String>>();
-		if(!NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION){
+		this._optFactory = optimizerFactory;
+		if (!NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION){
 			this._subFeatureIntMaps = new ArrayList<HashMap<String, HashMap<String, HashMap<String, Integer>>>>();
-			for(int i=0;i<NetworkConfig._numThreads;i++){
+			for (int i = 0; i < NetworkConfig._numThreads; i++){
 				this._subFeatureIntMaps.add(new HashMap<String, HashMap<String, HashMap<String, Integer>>>());
 			}
 			this._subSize = new int[NetworkConfig._numThreads];
 		}
 	}
 	
+	/**
+	 * Get the map from feature type to [a map from output to [a map from input to feature ID]]
+	 * @return
+	 */
 	public HashMap<String, HashMap<String, HashMap<String, Integer>>> getFeatureIntMap(){
 		return this._featureIntMap;
 	}
@@ -91,10 +136,20 @@ public class GlobalNetworkParam implements Serializable{
 		return this._weights;
 	}
 	
+	/**
+	 * Return the current number of features
+	 * @see #countFixedFeatures()
+	 * @return
+	 */
 	public int countFeatures(){
 		return this._size;
 	}
 	
+	/**
+	 * Return the final number of features
+	 * @return
+	 * @see #countFeatures()
+	 */
 	public int countFixedFeatures(){
 		return this._fixedFeaturesSize;
 	}
@@ -103,12 +158,21 @@ public class GlobalNetworkParam implements Serializable{
 		return f_global < this._fixedFeaturesSize;
 	}
 	
+	/**
+	 * Return the String[] representation of the feature with the specified index
+	 * @param f_global
+	 * @return
+	 */
 	public String[] getFeatureRep(int f_global){
 		return this._feature2rep[f_global];
 	}
 	
+	/**
+	 * Add certain value to the specified feature (identified by the id)
+	 * @param feature
+	 * @param count
+	 */
 	public synchronized void addCount(int feature, double count){
-		
 		if(Double.isNaN(count)){
 			throw new RuntimeException("count is NaN.");
 		}
@@ -148,11 +212,23 @@ public class GlobalNetworkParam implements Serializable{
 		return this._weights[f];
 	}
 	
+	/**
+	 * Set a weight at the specified index if it is not fixed yet
+	 * @param f
+	 * @param weight
+	 * @see #overRideWeight(int, double)
+	 */
 	public synchronized void setWeight(int f, double weight){
 		if(this.isFixed(f)) return;
 		this._weights[f] = weight;
 	}
 	
+	/**
+	 * Force set a weight at the specified index
+	 * @param f
+	 * @param weight
+	 * @see #setWeight(int, double)
+	 */
 	public synchronized void overRideWeight(int f, double weight){
 		this._weights[f] = weight;
 	}
@@ -174,8 +250,11 @@ public class GlobalNetworkParam implements Serializable{
 		this._fixedFeaturesSize = this._size;
 	}
 	
+	/**
+	 * Expand the feature set to include possible combinations not seen during training.
+	 * Only works for non-discriminative model
+	 */
 	private void expandFeaturesForGenerativeModelDuringTesting(){
-		
 //		this.unlockForNewFeaturesAndFixCurrentFeatures();
 		
 		//if it is a discriminative model, then do not expand the features.
@@ -206,7 +285,6 @@ public class GlobalNetworkParam implements Serializable{
 	
 
 	public void lockItAndKeepExistingFeatureWeights(){
-		
 		Random r = new Random(NetworkConfig.RANDOM_INIT_FEATURE_SEED);
 		
 		if(this.isLocked()) return;
@@ -245,17 +323,18 @@ public class GlobalNetworkParam implements Serializable{
 			}
 		}
 		this._version = 0;
-		this._opt = new LBFGSOptimizer();
+		this._opt = this._optFactory.create(this._weights.length);
 		this._locked = true;
 		
 		System.err.println(this._size+" features.");
 		
 	}
 	
-	//if it is locked it means no new features will be allowed.
+	/**
+	 * Lock current features.
+	 * If this is locked it means no new features will be allowed.
+	 */
 	public void lockIt(){
-		
-		//System.err.println("Before locked:"+this._featureIntMap.toString());
 		Random r = new Random(NetworkConfig.RANDOM_INIT_FEATURE_SEED);
 		
 		if(this.isLocked()) return;
@@ -292,15 +371,10 @@ public class GlobalNetworkParam implements Serializable{
 			}
 		}
 		this._version = 0;
-		this._opt = new LBFGSOptimizer();
+		this._opt = this._optFactory.create(this._weights.length);
 		this._locked = true;
 		
 		System.err.println(this._size+" features.");
-		/**Debug for features**/
-//		for(int i=0;i<this._size;i++){
-//			System.err.println(Arrays.toString(this._feature2rep[i]));
-//		}
-		
 		
 	}
 	
@@ -315,107 +389,101 @@ public class GlobalNetworkParam implements Serializable{
 	public int getVersion(){
 		return this._version;
 	}
-
 	
-	public int toFeature(String type, String output, String input){
+	public int toFeature(String type , String output , String input){
 		return this.toFeature(null, type, output, input);
 	}
-	
-	public int toFeature(Network network, String type, String output, String input){
-		
-		
-		//process later, if threadId = -1, global mode.
-		
-		if(this.isLocked()){
-			if(!this._featureIntMap.containsKey(type)){
-				return -1;
-			} else {
-				HashMap<String, HashMap<String, Integer>> output2input = this._featureIntMap.get(type);
-				if(!output2input.containsKey(output)){
-					return -1;
-				} else {
-					HashMap<String, Integer> input2id = output2input.get(output);
-					if(!input2id.containsKey(input)){
-						return -1;
-					} else {
-						return input2id.get(input);
-					}
-				}
-			}
+
+	/**
+	 * Converts a tuple of feature type, input, and output into the feature index.
+	 * @param type The feature type (e.g., "EMISSION", "FEATURE_1", etc.)
+	 * @param output The string representing output label associated with this feature. 
+	 * 				 Note that this does not have to be the surface form of the label, as
+	 * 				 any distinguishing string value will work (so, instead of "NN", "DT", 
+	 * 				 you can just as well put the indices, like "0", "1")
+	 * @param input The input (e.g., for emission feature in HMM this might be the word itself) 
+	 * @return
+	 */
+	public int toFeature(Network network , String type , String output , String input){ //process later , if threadId = −1, global mode.
+		int threadId = network != null ? network.getThreadId() : -1;
+		boolean shouldNotCreateNewFeature = false;
+		try{
+			shouldNotCreateNewFeature = (NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY && network.getInstance().getInstanceId() < 0);
+		} catch (NullPointerException e){
+			throw new NetworkException("Missing network on some toFeature calls while trying to extract only from labeled networks.");
 		}
-		
-		if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION) {
-			if(NetworkConfig._ONLY_EXTRACT_TRAINING_FEATURES)
-				throw new RuntimeException("Extracting training features only is not supported in sequential feature extraction");
-			return this.toSeqFeature(type, output, input);
-		}
-		int threadId = network!=null? network.getThreadId():-1;
-		
-		
-		
-		if(threadId==-1)
-			throw new RuntimeException("Thread id=-1, is it the sequential touching?");
-		if(!this._subFeatureIntMaps.get(threadId).containsKey(type)){
-			this._subFeatureIntMaps.get(threadId).put(type, new HashMap<String, HashMap<String, Integer>>());
-		}
-		
-		HashMap<String, HashMap<String, Integer>> mapByType = this._subFeatureIntMaps.get(threadId).get(type);
-		
-		if(!mapByType.containsKey(output))
-			mapByType.put(output, new HashMap<String, Integer>());
-		
-		HashMap<String, Integer> subMap = mapByType.get(output);
-		if(!subMap.containsKey(input)){
-			subMap.put(input, this._subSize[threadId]++);
-		}
-		return subMap.get(input);
-		
-	}
-	
-	public int toSeqFeature(String type, String output, String input){
-		
-		
-		if(!this._featureIntMap.containsKey(type)){
-			this._featureIntMap.put(type, new HashMap<String, HashMap<String, Integer>>());
-		}
-		
-		HashMap<String, HashMap<String, Integer>> mapByType = this._featureIntMap.get(type);
-		
-		if(!mapByType.containsKey(output))
-			mapByType.put(output, new HashMap<String, Integer>());
-		
-		HashMap<String, Integer> subMap = mapByType.get(output);
-		if(!subMap.containsKey(input)){
-			subMap.put(input, this._size++);
-			if(!this._type2inputMap.containsKey(type)){
-				this._type2inputMap.put(type, new ArrayList<String>());
-			}
-			ArrayList<String> inputs = this._type2inputMap.get(type);
-			int index = Collections.binarySearch(inputs, input);
-			if(index<0){
-				inputs.add(-1-index, input);
-			}
-		}
-		return subMap.get(input);
-	}
-	
-	//globally update the parameters.
-	public synchronized boolean update(){
-		
-		boolean r;
-		if(this.isDiscriminative()){
-			r = this.updateDiscriminative();
+		HashMap<String, HashMap<String, HashMap<String, Integer>>> featureIntMap = null;
+		if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION || this.isLocked()){
+			featureIntMap = this._featureIntMap;
 		} else {
-			r = this.updateGenerative();
+			if(threadId == -1){
+				throw new NetworkException("Missing network on some toFeature calls while in parallel touch.");
+			}
+			featureIntMap = this._subFeatureIntMaps.get(threadId);
+		}
+		
+		//if it is locked, then we might return a dummy feature
+		//if the feature does not appear to be present.
+		if(this.isLocked() || shouldNotCreateNewFeature){
+			if(!featureIntMap.containsKey(type)){
+				return -1;
+			}
+			HashMap<String, HashMap<String, Integer>> output2input = featureIntMap.get(type);
+			if(!output2input.containsKey(output)){
+				return -1;
+			}
+			HashMap<String, Integer> input2id = output2input.get(output);
+			if(!input2id.containsKey(input)){
+				return -1;
+			}
+			return input2id.get(input);
+		}
+		
+		if(!featureIntMap.containsKey(type)){
+			featureIntMap.put(type, new HashMap<String, HashMap<String, Integer>>());
+		}
+
+		HashMap<String, HashMap<String, Integer>> outputToInputToIdx = featureIntMap.get(type);
+		if(!outputToInputToIdx.containsKey(output)){
+			outputToInputToIdx.put(output, new HashMap<String, Integer>());
+		}
+		
+		HashMap<String, Integer> inputToIdx = outputToInputToIdx.get(output);
+		if(!inputToIdx.containsKey(input)){
+			if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION){
+				inputToIdx.put(input, this._size++);
+			} else {
+				inputToIdx.put(input, this._subSize[threadId]++);
+			}
+		}
+
+		return inputToIdx.get(input);
+	}
+	
+	/**
+	 * Globally update the parameters.
+	 * This will also set {@link #_obj_old} to the value of {@link #_obj}.
+	 * @return true if the optimization is deemed to be finished, false otherwise
+	 */
+	public synchronized boolean update(){
+		boolean done;
+		if(this.isDiscriminative()){
+			done = this.updateDiscriminative();
+		} else {
+			done = this.updateGenerative();
 		}
 		
 		this._obj_old = this._obj;
 		
-		return r;
+		return done;
 	}
 	
+	/**
+	 * Update the weights using generative algorithm (e.g., for HMM)
+	 * @return true if the difference between previous and current objective function value
+	 * 		   is less than {@link NetworkConfig#objtol}, false otherwise.
+	 */
 	private boolean updateGenerative(){
-		
 //		HashMap<String, Double> word2count = new HashMap<String, Double>();
 		
 		Iterator<String> types = this._featureIntMap.keySet().iterator();
@@ -493,27 +561,63 @@ public class GlobalNetworkParam implements Serializable{
 		return done;
 	}
 	
-	//if the optimization seems to be done, it will return true.
+	public List<Double> toList(double[] arr){
+		List<Double> result = new ArrayList<Double>();
+		for(double num: arr){
+			result.add(num);
+		}
+		return result;
+	}
+	
+	/**
+	 * Update the parameters using discriminative algorithm (e.g., CRF).
+	 * If the optimization seems to be done, it will return true.
+	 * @return true if the difference between previous objective value and
+	 * 		   current objective value is less than {@link NetworkConfig#objtol}
+	 * 		   or the optimizer deems the optimization is finished, or
+	 * 		   the decrease is less than 0.01% for three iterations, false otherwise.
+	 */
 	protected boolean updateDiscriminative(){
-		
     	this._opt.setVariables(this._weights);
     	this._opt.setObjective(-this._obj);
     	this._opt.setGradients(this._counts);
     	
-//    	int fid = 10;
-//    	System.err.println(Arrays.toString(this.getFeatureRep(fid))+"\t"+this._counts[fid]);
-//    	System.exit(1);
-    	
     	boolean done = false;
     	
     	try{
+    		// The _weights parameters will be updated inside this optimize method.
+    		// This is possible since the _weights array is passed to the optimizer above,
+    		// and the optimizer will set the weights directly, as arrays are passed by reference
         	done = this._opt.optimize();
     	} catch(ExceptionWithIflag e){
     		throw new NetworkException("Exception with Iflag:"+e.getMessage());
     	}
 		
-    	if(Math.abs(this.getObj()-this.getObj_old())<NetworkConfig.objtol){
-    		done = true;
+    	if(!NetworkConfig.USE_STRUCTURED_SVM){
+	    	double diff = this.getObj()-this.getObj_old();
+	    	if(diff >= 0 && diff < NetworkConfig.objtol){
+	    		done = true;
+	    	}
+	    	double diffRatio = Math.abs(diff/this.getObj_old());
+	    	if(diffRatio < 1e-4){
+	    		this.smallChangeCount += 1;
+	    	} else {
+	    		this.smallChangeCount = 0;
+	    	}
+	    	if(this.smallChangeCount == 3){
+	    		done = true;
+	    	}
+    	}
+    	if(done && !NetworkConfig.USE_STRUCTURED_SVM){
+    		// If we stop early, we need to copy solution_cache,
+    		// as noted in the Javadoc for solution_cache in LBFGS class.
+    		// This is because the _weights will contain the next value to be evaluated, 
+    		// and so does not correspond to the current objective value.
+    		// In practice, though, the two are usually very close to each other (if we
+    		// are stopping near the solution), so not copying will also work.
+    		for(int i=0; i<this._weights.length; i++){
+        		this._weights[i] = LBFGS.solution_cache[i];
+        	}
     	}
     	
 		this._version ++;
@@ -524,24 +628,39 @@ public class GlobalNetworkParam implements Serializable{
 		return this._isDiscriminative;
 	}
 	
+	/**
+	 * Set {@link #_counts} (the gradient) and {@link #_obj} to the regularization term, 
+	 * essentially zeroing the values to be updated with the model gradient and objective value. 
+	 */
 	protected synchronized void resetCountsAndObj(){
+		
+		double coef = 1.0;
+		if(NetworkConfig.USE_BATCH_SGD){
+			coef = this._batchSize*1.0/this.totalNumInsts;
+			if(coef>1) coef = 1.0;
+		}
+		
 		
 		for(int k = 0 ; k<this._size; k++){
 			this._counts[k] = 0.0;
 			//for regularization
 			if(this.isDiscriminative() && this._kappa > 0 && k>=this._fixedFeaturesSize){
-				this._counts[k] += 2 * this._kappa * this._weights[k];
+				this._counts[k] += 2 * coef * this._kappa * this._weights[k];
 			}
 		}
 		this._obj = 0.0;
 		//for regularization
 		if(this.isDiscriminative() && this._kappa > 0){
-			this._obj += - this._kappa * MathsVector.square(this._weights);
+			this._obj += - coef * this._kappa * MathsVector.square(this._weights);
 		}
 		//NOTES:
 		//for additional terms such as regularization terms:
 		//always add to _obj the term g(x) you would like to maximize.
 		//always add to _counts the NEGATION of the term g(x)'s gradient.
+	}
+	
+	public void setInstsNum(int number){
+		this.totalNumInsts = number;
 	}
 	
 	public boolean checkEqual(GlobalNetworkParam p){
@@ -550,7 +669,7 @@ public class GlobalNetworkParam implements Serializable{
 		return v1 && v2;
 	}
 	
-	private void writeObject(ObjectOutputStream out)throws IOException{
+	private void writeObject(ObjectOutputStream out) throws IOException{
 		out.writeObject(this._featureIntMap);
 		out.writeObject(this._feature2rep);
 		out.writeObject(this._weights);
@@ -560,7 +679,7 @@ public class GlobalNetworkParam implements Serializable{
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void readObject(ObjectInputStream in)throws IOException, ClassNotFoundException{
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException{
 		this._featureIntMap = (HashMap<String, HashMap<String, HashMap<String, Integer>>>)in.readObject();
 		this._feature2rep = (String[][])in.readObject();
 		this._weights = (double[])in.readObject();

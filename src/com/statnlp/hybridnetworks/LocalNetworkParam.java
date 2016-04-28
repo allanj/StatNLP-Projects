@@ -1,5 +1,5 @@
 /** Statistical Natural Language Processing System
-    Copyright (C) 2014-2015  Lu, Wei
+    Copyright (C) 2014-2016  Lu, Wei
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,9 +21,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import com.statnlp.sp.FeatureArrayCache;
-
 //one thread should have one such LocalFeatureMap.
+/**
+ * The set of parameters (such as weights, training method, optimizer, etc.) for each thread
+ * @author Wei Lu <luwei@statnlp.com>
+ *
+ */
 public class LocalNetworkParam implements Serializable{
 	
 	private static final long serialVersionUID = -2097104968915519992L;
@@ -41,7 +44,10 @@ public class LocalNetworkParam implements Serializable{
 	protected int[] _fs;
 	//the counts for all the features.
 	protected double[] _counts;
-	//mapping from global features to local features.
+	/**
+	 * Mapping from global features to local features. Used when extracting features.
+	 * If cache is used, this one can be discarded after touch process completes.
+	 */
 	protected HashMap<Integer, Integer> _globalFeature2LocalFeature;
 	//check if it is finalized.
 	protected boolean _isFinalized;
@@ -55,8 +61,6 @@ public class LocalNetworkParam implements Serializable{
 	
 	//if this is true, then we bypass the local params.
 	protected boolean _globalMode;
-	
-	public FeatureArrayCache _faCache = new FeatureArrayCache();
 	
 	public LocalNetworkParam(int threadId, FeatureManager fm, int numNetworks){
 		this._threadId = threadId;
@@ -72,8 +76,6 @@ public class LocalNetworkParam implements Serializable{
 		
 		if(!NetworkConfig._CACHE_FEATURES_DURING_TRAINING){
 			this.disableCache();
-		}else{
-			this._cacheEnabled = true; //Allan add this line
 		}
 		if(NetworkConfig._numThreads==1){
 			this._globalMode = true;
@@ -100,11 +102,15 @@ public class LocalNetworkParam implements Serializable{
 		}
 		//if it is not really a valid feature.
 		if(f_global == -1){
-			throw new RuntimeException("z");
+			throw new RuntimeException("LocalNetworkParam receives invalid feature [-1] to be converted into local feature");
 //			return -1;
 		}
-		if(!this._globalFeature2LocalFeature.containsKey(f_global))
+		if(!this._globalFeature2LocalFeature.containsKey(f_global)){
+			if(this._isFinalized){
+				throw new NetworkException("New global feature ["+f_global+"] encountered after parameters are finalized");
+			}
 			this._globalFeature2LocalFeature.put(f_global, this._globalFeature2LocalFeature.size());
+		}
 		return this._globalFeature2LocalFeature.get(f_global);
 	}
 	
@@ -136,20 +142,23 @@ public class LocalNetworkParam implements Serializable{
 		this._obj += obj;
 	}
 	
-	//get the weight of a feature
-	public double getWeight(int f){
+	/**
+	 * Get the weight of a feature identified by the feature ID
+	 * @param featureID
+	 * @return
+	 */
+	public double getWeight(int featureID){
 		if(this.isGlobalMode()){
-			return this._fm.getParam_G().getWeight(f);
+			return this._fm.getParam_G().getWeight(featureID);
 		} else {
-			try{
-				return this._fm.getParam_G().getWeight(this._fs[f]);
-			} catch(Exception e){
-				throw new RuntimeException("fs is now:"+this._fs);
-			}
+			return this._fm.getParam_G().getWeight(this._fs[featureID]);
 		}
 	}
 	
-	//the number of features.
+	/**
+	 * The number of features.
+	 * @return
+	 */
 	public int size(){
 		return this._fs.length;
 	}
@@ -170,7 +179,6 @@ public class LocalNetworkParam implements Serializable{
 			return;
 		}
 		this._counts[f_local] += count;
-		
 		
 	}
 	
@@ -199,7 +207,12 @@ public class LocalNetworkParam implements Serializable{
 	}
 	
 	public FeatureArray extract(Network network, int parent_k, int[] children_k, int children_k_index){
-		if(this.isCacheEnabled()){
+		// Do not cache in the first touch when parallel touch and extract only from labeled is enabled,
+		// since the local feature indices will change
+		boolean shouldCache = this.isCacheEnabled() && (NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION
+														|| !NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY
+														|| this._isFinalized);
+		if(shouldCache){
 			if(this._cache == null){
 				this._cache = new FeatureArray[this._numNetworks][][];
 			}
@@ -219,7 +232,7 @@ public class LocalNetworkParam implements Serializable{
 			fa = fa.toLocal(this);
 		}
 		
-		if(this.isCacheEnabled()){
+		if(shouldCache){
 			this._cache[network.getNetworkId()][parent_k][children_k_index] = fa;
 		}
 		
@@ -240,9 +253,6 @@ public class LocalNetworkParam implements Serializable{
 			int f_global = features.next();
 			int f_local = this._globalFeature2LocalFeature.get(f_global);
 			this._fs[f_local] = f_global;
-		}
-		if(NetworkConfig._CACHE_FEATURES_DURING_TRAINING){
-			this._globalFeature2LocalFeature = null;
 		}
 		this._isFinalized = true;
 		this._counts = new double[this._fs.length];

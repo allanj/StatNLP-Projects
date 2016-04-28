@@ -1,5 +1,5 @@
 /** Statistical Natural Language Processing System
-    Copyright (C) 2014-2015  Lu, Wei
+    Copyright (C) 2014-2016  Lu, Wei
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,35 +22,66 @@ package com.statnlp.hybridnetworks;
 import java.io.Serializable;
 
 /**
- * @author wei_lu
- *
+ * An interface defining a hypergraph
+ * @author Wei Lu <luwei@statnlp.com>
  */
 public interface HyperGraph extends Serializable{
 	
-	//count the total number of nodes.
+	/**
+	 * Count the total number of nodes.
+	 * @return
+	 */
 	public int countNodes();
 	
-	//get the node with index k.
+	/**
+	 * Get the node with index k.
+	 * @param k
+	 * @return
+	 */
 	public long getNode(int k);
 	
+	/**
+	 * Get the array of nodes in this network
+	 * @param k
+	 * @return
+	 */
 	public int[] getNodeArray(int k);
 	
-	//get the children for node with index k.
+	/**
+	 * Get the children for node with index k.
+	 * @param k
+	 * @return
+	 */
 	public int[][] getChildren(int k);
 	
 	//check whether the node with index k is removed.
 	public boolean isRemoved(int k);
 	
-	//remove the node with index k.
+	/**
+	 * Remove the node with index k.
+	 * @param k
+	 */
 	public void remove(int k);
 	
-	//check whether the node with index k is the root of the network.
+	/**
+	 * Check whether the node with index k is the root of the network.
+	 * @param k
+	 * @return
+	 */
 	public boolean isRoot(int k);
 	
-	//check whether the node with index k is a leaf of the network.
+	/**
+	 * Check whether the node with index k is a leaf of the network.
+	 * @param k
+	 * @return
+	 */
 	public boolean isLeaf(int k);
 	
-	//check if the network contains a particular node.
+	/**
+	 * Check if the network contains a particular node.
+	 * @param node
+	 * @return
+	 */
 	public boolean contains(long node);
 	
 }

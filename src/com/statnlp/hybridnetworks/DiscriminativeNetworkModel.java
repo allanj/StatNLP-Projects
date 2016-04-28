@@ -1,5 +1,5 @@
 /** Statistical Natural Language Processing System
-    Copyright (C) 2014-2015  Lu, Wei
+    Copyright (C) 2014-2016  Lu, Wei
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,7 +61,6 @@ public class DiscriminativeNetworkModel extends NetworkModel {
 				Instance inst_new = inst.duplicate();
 				inst_new.setInstanceId(-inst.getInstanceId());
 				inst_new.setWeight(-inst.getWeight());
-				inst_new.removeOutput();
 				inst_new.setUnlabeled();
 				insts[threadId][i*2+1] = inst_new;
 			}

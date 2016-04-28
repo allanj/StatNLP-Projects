@@ -1,5 +1,5 @@
 /** Statistical Natural Language Processing System
-    Copyright (C) 2014  Lu, Wei
+    Copyright (C) 2014-2016  Lu, Wei
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
  */
 package com.statnlp.hybridnetworks;
 
-import java.util.HashMap;
 import java.util.Random;
 
 public class NetworkConfig {
@@ -42,29 +41,23 @@ public class NetworkConfig {
 	public static int _NETWORK_MAX_DEPTH = 901;
 	public static int _nGRAM = 1;//2;//1;
 	public static double objtol = 10e-15;//the value used for checking the objective increment for generative models.
+	public static int batchSize = 20; //batch size for batch SGD (if applicable) batch size for each thread
+	public static int RANDOM_BATCH_SEED = 2345;
 	
 	public static int _SEMANTIC_FOREST_MAX_DEPTH = 20;//the max depth of the forest when creating the semantic forest.
 	public static int _SEMANTIC_PARSING_NGRAM = 1;//2;
 	
 	public static boolean DEBUG_MODE = false;//true;//false;//true;
 	public static boolean REBUILD_FOREST_EVERY_TIME = false;
+	public static boolean USE_STRUCTURED_SVM = false;
+	public static boolean USE_BATCH_SGD = false;
 	
 	public static boolean _CACHE_FEATURES_DURING_TRAINING = true;
-	public static boolean _SEQUENTIAL_FEATURE_EXTRACTION = true;
-	
-	//always set this one to false, since there might be some bugs
-	public static final boolean _ONLY_EXTRACT_TRAINING_FEATURES = false;
+	public static boolean _SEQUENTIAL_FEATURE_EXTRACTION = true ;
+	public static boolean _BUILD_FEATURES_FROM_LABELED_ONLY = false;
 	
 	public static int _numThreads = 10;
 	
 	public static int _maxSpanLen = 2;//the upper-bound of the length of a span.
-	
-	public static double L1_REGULARIZATION_CONSTANT = 0.01;
-	
-	public static HashMap<String, Integer> entityMap;
-	public static String EMPTY = "EMPTY";
-	
-	//For additional dependency parsing 
-	public static HashMap<String, Integer> typeMap;
 	
 }

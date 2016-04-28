@@ -1,5 +1,5 @@
 /** Statistical Natural Language Processing System
-    Copyright (C) 2014-2015  Lu, Wei
+    Copyright (C) 2014-2016  Lu, Wei
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,30 +16,42 @@
  */
 package com.statnlp.hybridnetworks;
 
+import java.util.HashSet;
+import java.util.concurrent.Callable;
+
 import com.statnlp.commons.types.Instance;
 
-public class LocalNetworkLearnerThread extends Thread {
+public class LocalNetworkLearnerThread extends Thread implements Callable<Void> {
 	
-	//the id of the thread.
+	/** The ID of the thread the lowest ID should be 0. */
 	private int _threadId = -1;
 	
-	//the max number of nodes in the network.
+	/** Whether this thread is performing touch */
+	private boolean isTouching ;
+	
+	/** The maximum number of nodes in the network. */
 	private int _networkCapacity = 1000000;
-	//the local feature map.
+	/** The local feature map. */
 	private LocalNetworkParam _param;
 	
-	//check whether we cache the networks.
-//	private boolean _cacheNetworks = true;
+	/** A flag indicating whether we cache the networks. */
 	private boolean _cacheNetworks = true;
-	//the networks.
+	/** The networks. */
 	private Network[] _networks;
 	
 	private Instance[] _instances;
 	private NetworkCompiler _builder;
+	/** The current iteration number */
 	private int _it;
-	private boolean isTouching;
 	
+	/** Prepare the list of instance ids for the batch selection */
+	private HashSet<Integer> chargeInstsIds = null;
 	
+	/**
+	 * Construct a new learner thread using current networks (if cached) or builder (if not cached),
+	 * also advancing the iteration number by 1.
+	 * @return
+	 */
 	public LocalNetworkLearnerThread copyThread(){
 		if(this._cacheNetworks){
 			return new LocalNetworkLearnerThread(this._threadId, this._param, this._instances, this._networks, this._it+1);
@@ -64,11 +76,20 @@ public class LocalNetworkLearnerThread extends Thread {
 		this._it = it;
 	}
 	
-	//please make sure the threadId is 0-indexed.
+	/**
+	 * Construct a learner thread
+	 * Please make sure the threadId is 0-indexed.
+	 * @param threadId Should start from 0
+	 * @param fm The feature manager
+	 * @param instances The instances
+	 * @param builder The network compiler
+	 * @param it Starting iteration numbe
+	 */
 	public LocalNetworkLearnerThread(int threadId, FeatureManager fm, Instance[] instances, NetworkCompiler builder, int it){
 		this._threadId = threadId;
 		this._param = new LocalNetworkParam(this._threadId, fm, instances.length);
 		fm.setLocalNetworkParams(this._threadId, this._param);
+		
 		this._builder = builder;
 		this._instances = instances;
 		
@@ -83,50 +104,64 @@ public class LocalNetworkLearnerThread extends Thread {
 	}
 	
     @Override
-    public void run() {
+    public void run () {
     	if(!isTouching){
-        	this.train(this._it);
-    	}else{
+    		this.train(this._it);
+    	} else {
     		this.touch();
     	}
     }
     
-    public void setTouch(){
-    	this.isTouching = true;
+    public Void call(){
+    	this.train(this._it);
+    	return null;
     }
     
-    public void setUnTouch(){
-    	this.isTouching = false;
-    }
-    
+    /**
+     * Go through all networks to know the possible features, 
+     * and caching the networks if {@link #_cacheNetworks} is true.
+     */
 	public void touch(){
-		
-		//for now, disable the feature cache...
-//		this._param.disableCache();
-		
 		long time = System.currentTimeMillis();
 		//extract the features..
 		for(int networkId = 0; networkId< this._instances.length; networkId++){
 			if(networkId%100==0)
 				System.err.print('.');
+			if(NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY
+					&& ((!this._param._isFinalized && this.getNetwork(networkId).getInstance().getInstanceId() < 0))){
+				// When extracting features only for labeled, the first touch is only to extract features from labeled instances
+				// The second touch, enabled only when caching is enabled, which is after the LocalNetworkParam being finalized,
+				// is only for feature caching
+				continue;
+			}
 			this.getNetwork(networkId).touch();
 		}
 		System.err.println();
 		time = System.currentTimeMillis() - time;
 		System.out.println("Thread "+this._threadId + " touch time: "+ time/1000.0+" secs.");
-		
-		if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION)
-			this._param.finalizeIt();
-		
+	}
+
+	public void setTouch(){
+		this.isTouching = true;
+	}
+
+	public void setUnTouch(){
+		this.isTouching = false;
 	}
 	
+	/**
+	 * Do one iteration of training
+	 * add the batch size here is we are using the batch gradient descent, 
+	 * every time we shuffle the list.
+	 * @param it
+	 */
 	private void train(int it){
-		
-		for(int networkId = 0; networkId< this._instances.length; networkId++){
-			Network network = this.getNetwork(networkId);
+		for(int i = 0; i< this._instances.length; i++){
+			if(NetworkConfig.USE_BATCH_SGD && !this.chargeInstsIds.contains(this._instances[i].getInstanceId()) && !this.chargeInstsIds.contains(-this._instances[i].getInstanceId()) )
+				continue;
+			Network network = this.getNetwork(i);
 			network.train();
 		}
-		
 	}
 	
 	private Network getNetwork(int networkId){
@@ -147,8 +182,16 @@ public class LocalNetworkLearnerThread extends Thread {
 		return this._param;
 	}
 	
-	public Network[] getNetworks(){
-		return this._networks;
+	public int getIterationNumber(){
+		return this._it;
+	}
+
+	public void setIterationNumber(int it) {
+		this._it = it;
+	}
+	
+	public void setInstanceIdSet(HashSet<Integer> set){
+		this.chargeInstsIds = set;
 	}
 	
 }

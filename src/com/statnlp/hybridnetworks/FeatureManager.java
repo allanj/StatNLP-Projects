@@ -1,5 +1,5 @@
 /** Statistical Natural Language Processing System
-    Copyright (C) 2014  Lu, Wei
+    Copyright (C) 2014-2016  Lu, Wei
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,12 +16,21 @@
  */
 package com.statnlp.hybridnetworks;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
+/**
+ * The base class for the feature manager.
+ * The only function to be implemented is the {@link #extract_helper(Network, int, int[])} method.
+ * @author Wei Lu <luwei@statnlp.com>
+ *
+ */
 public abstract class FeatureManager implements Serializable{
 	
 	private static final long serialVersionUID = 7999836838043433954L;
@@ -31,13 +40,16 @@ public abstract class FeatureManager implements Serializable{
 	//the cache that stores the features
 	protected transient FeatureArray[][][] _cache;
 	
-	//the parameters associated with the network.
+	/**
+	 * The parameters associated with the network.
+	 */
 	protected GlobalNetworkParam _param_g;
-	//the local feature maps, one for each thread.
-	protected LocalNetworkParam[] _params_l;
+	/**
+	 * The local feature maps, one for each thread.
+	 */
+	protected transient LocalNetworkParam[] _params_l;
 	//check whether the cache is enabled.
 	protected boolean _cacheEnabled = false;
-	
 	
 	protected int _numThreads;
 	
@@ -52,10 +64,12 @@ public abstract class FeatureManager implements Serializable{
 		this._params_l[threadId] = param_l;
 	}
 	
-	
-	//update the parameters.
+	/**
+	 * Go through all threads, accumulating the value of the objective function and the gradients, 
+	 * and then update the weights to be evaluated next
+	 * @return
+	 */
 	public synchronized boolean update(){
-		
 		//if the number of thread is 1, then your local param fetches information directly from the global param.
 		if(NetworkConfig._numThreads!=1){
 			this._param_g.resetCountsAndObj();
@@ -108,88 +122,61 @@ public abstract class FeatureManager implements Serializable{
 	
 	public void mergeSubFeaturesToGlobalFeatures(){
 		HashMap<String, HashMap<String, HashMap<String, Integer>>> globalFeature2IntMap = this._param_g.getFeatureIntMap();
-		
-		//if global mode, only 1 thread
-		if(this._param_g._subFeatureIntMaps.size()==1){
-			this._param_g._featureIntMap = new HashMap<String, HashMap<String, HashMap<String, Integer>>>(this._param_g._subFeatureIntMaps.get(0));
-			this._param_g._size = this._param_g._subSize[0];
-			this._params_l[0].finalizeIt();
-			this._param_g._subFeatureIntMaps.set(0, null);
-		}else{
-			this._param_g._size = 0;
-			for(int t=0;t<this._param_g._subFeatureIntMaps.size();t++){
-				addIntoGlobalFeatures(globalFeature2IntMap, this._param_g._subFeatureIntMaps.get(t),this._params_l[t]._globalFeature2LocalFeature);
-				this._params_l[t].finalizeIt();
-				this._param_g._subFeatureIntMaps.set(t, null);
-			}
-			//System.err.println(globalFeature2IntMap.toString());
+
+		this._param_g._size = 0;
+		for(int t=0;t<this._param_g._subFeatureIntMaps.size();t++){
+			addIntoGlobalFeatures(globalFeature2IntMap, this._param_g._subFeatureIntMaps.get(t), this._params_l[t]._globalFeature2LocalFeature);
+			this._param_g._subFeatureIntMaps.set(t, null);
 		}
-		//to release the memory
-//		for(int t=0;t<this._param_g._subFeatureIntMaps.size();t++){
-//			this._param_g._subFeatureIntMaps.set(t, null);
-//		}
-		
-		//complete the type2int map. only in generative model
-		if(NetworkConfig.TRAIN_MODE_IS_GENERATIVE){
-			completeType2Int(globalFeature2IntMap, this._param_g._type2inputMap); 
-		}
-		
 	}
-	
+
 	private void addIntoGlobalFeatures(HashMap<String, HashMap<String, HashMap<String, Integer>>> globalMap, HashMap<String, HashMap<String, HashMap<String, Integer>>> localMap, HashMap<Integer, Integer> gf2lf){
 		Iterator<String> iter1 = localMap.keySet().iterator();
 		while(iter1.hasNext()){
 			String localType = iter1.next();
 			HashMap<String, HashMap<String, Integer>> localOutput2input = localMap.get(localType);
-			if(globalMap.containsKey(localType)){
-				HashMap<String, HashMap<String, Integer>> globalOutput2input = globalMap.get(localType);
-				Iterator<String> iter2 = localOutput2input.keySet().iterator();
-				while(iter2.hasNext()){
-					String localOutput = iter2.next();
-					HashMap<String, Integer> localInput2int = localOutput2input.get(localOutput);
-					if(globalOutput2input.containsKey(localOutput)){
-						HashMap<String, Integer> globalInput2int = globalOutput2input.get(localOutput);
-						Iterator<String> iter3 = localInput2int.keySet().iterator();
-						while(iter3.hasNext()){
-							String localInput = iter3.next();
-							if(!globalInput2int.containsKey(localInput)){
-								globalInput2int.put(localInput, this._param_g._size++);
-							}
-							gf2lf.put(globalInput2int.get(localInput), localInput2int.get(localInput));
-						}
-					}else{
-						//not contain the local output
-						HashMap<String, Integer> globalInput2int = new HashMap<String, Integer>(); 
-						Iterator<String> iter3 = localInput2int.keySet().iterator();
-						while(iter3.hasNext()){
-							String localInput = iter3.next();
-							globalInput2int.put(localInput, this._param_g._size++);
-							gf2lf.put(globalInput2int.get(localInput), localInput2int.get(localInput));
-						}
-						globalOutput2input.put(localOutput, globalInput2int);
-					}
+			if(!globalMap.containsKey(localType)){
+				globalMap.put(localType, new HashMap<String, HashMap<String, Integer>>());
+			}
+			HashMap<String, HashMap<String, Integer>> globalOutput2input = globalMap.get(localType);
+			Iterator<String> iter2 = localOutput2input.keySet().iterator();
+			while(iter2.hasNext()){
+				String localOutput = iter2.next();
+				HashMap<String, Integer> localInput2int = localOutput2input.get(localOutput);
+				if(!globalOutput2input.containsKey(localOutput)){
+					globalOutput2input.put(localOutput, new HashMap<String, Integer>());
 				}
-			}else{
-				HashMap<String, HashMap<String, Integer>> globalOutput2input = new HashMap<String, HashMap<String, Integer>>();
-				Iterator<String> iter2 = localOutput2input.keySet().iterator();
-				while(iter2.hasNext()){
-					String localOutput = iter2.next();
-					HashMap<String, Integer> globalInput2int = new HashMap<String, Integer>(); 
-					HashMap<String, Integer> localInput2int = localOutput2input.get(localOutput);
-					Iterator<String> iter3 = localInput2int.keySet().iterator();
-					while(iter3.hasNext()){
-						String localInput = iter3.next();
+				HashMap<String, Integer> globalInput2int = globalOutput2input.get(localOutput);
+				Iterator<String> iter3 = localInput2int.keySet().iterator();
+				while(iter3.hasNext()){
+					String localInput = iter3.next();
+					if(!globalInput2int.containsKey(localInput)){
 						globalInput2int.put(localInput, this._param_g._size++);
-						gf2lf.put(globalInput2int.get(localInput), localInput2int.get(localInput));
 					}
-					globalOutput2input.put(localOutput, globalInput2int);
+					gf2lf.put(globalInput2int.get(localInput), localInput2int.get(localInput));
 				}
-				globalMap.put(localType, globalOutput2input);
 			}
 		}
 	}
-	
-	private void completeType2Int(HashMap<String, HashMap<String, HashMap<String, Integer>>> globalMap,HashMap<String, ArrayList<String>> type2Input){
+
+	public void addIntoLocalFeatures(HashMap<Integer, Integer> globalFeaturesToLocalFeatures){
+		HashMap<String, HashMap<String, HashMap<String, Integer>>> globalMap = this._param_g.getFeatureIntMap();
+		for(String type: globalMap.keySet()){
+			HashMap<String, HashMap<String, Integer>> outputToInputToIndex = globalMap.get(type);
+			for(String output: outputToInputToIndex.keySet()){
+				HashMap<String, Integer> inputToIndex = outputToInputToIndex.get(output);
+				for(Integer featureIndex: inputToIndex.values()){
+					if(!globalFeaturesToLocalFeatures.containsKey(featureIndex)){
+						globalFeaturesToLocalFeatures.put(featureIndex, globalFeaturesToLocalFeatures.size());
+					}
+				}
+			}
+		}
+	}
+
+	public void completeType2Int(){
+		HashMap<String, HashMap<String, HashMap<String, Integer>>> globalMap = this._param_g._featureIntMap;
+		HashMap<String, ArrayList<String>> type2Input = this._param_g._type2inputMap;
 		Iterator<String> iterType = globalMap.keySet().iterator();
 		while(iterType.hasNext()){
 			String type = iterType.next();
@@ -213,10 +200,27 @@ public abstract class FeatureManager implements Serializable{
 			}
 		}
 	}
-	
-	
+
+	/**
+	 * Extract the features from the specified network, parent index, and child indices, 
+	 * caching if necessary.<br>
+	 * <code>children_k</code> is the child nodes of a single hyperedge in this network 
+	 * with the parent as the root node.<br>
+	 * The <code>children_k_index</code> specifies the index of the child (<code>children_k</code>) 
+	 * in the parent's list of children. This is mainly used for caching purpose.
+	 * @param network
+	 * @param parent_k
+	 * @param children_k
+	 * @param children_k_index
+	 * @return
+	 */
 	public FeatureArray extract(Network network, int parent_k, int[] children_k, int children_k_index){
-		if(this.isCacheEnabled()){
+		// Do not cache in the first touch when parallel touch and extract only from labeled is enabled,
+		// since the local feature indices will change
+		boolean shouldCache = this.isCacheEnabled() && (NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION
+														|| !NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY
+														|| this._param_g.isLocked());
+		if(shouldCache){
 			if(this._cache[network.getNetworkId()] == null){
 				this._cache[network.getNetworkId()] = new FeatureArray[network.countNodes()][];
 			}
@@ -230,12 +234,34 @@ public abstract class FeatureManager implements Serializable{
 		
 		FeatureArray fa = this.extract_helper(network, parent_k, children_k);
 		
-		if(this.isCacheEnabled()){
+		if(shouldCache){
 			this._cache[network.getNetworkId()][parent_k][children_k_index] = fa;
 		}
 		return fa;
 	}
 	
+	/**
+	 * Extract the features from the specified network, parent index, and child indices<br>
+	 * <code>children_k</code> is the child nodes of a SINGLE hyperedge in this network 
+	 * with the parent as the root node.<br>
+	 * @param network The network
+	 * @param parent_k The node index of the parent node
+	 * @param children_k The node indices of the children of a SINGLE hyperedge
+	 * @return
+	 */
 	protected abstract FeatureArray extract_helper(Network network, int parent_k, int[] children_k);
+	
+	private void writeObject(ObjectOutputStream oos) throws IOException{
+		oos.writeObject(this._param_g);
+		oos.writeBoolean(this._cacheEnabled);
+		oos.writeInt(this._numThreads);
+	}
+	
+	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
+		this._param_g = (GlobalNetworkParam)ois.readObject();
+		this._cacheEnabled = ois.readBoolean();
+		this._numThreads = ois.readInt();
+		this._params_l = new LocalNetworkParam[NetworkConfig._numThreads];
+	}
 	
 }

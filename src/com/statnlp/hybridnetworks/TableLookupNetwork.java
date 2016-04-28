@@ -1,5 +1,5 @@
 /** Statistical Natural Language Processing System
-    Copyright (C) 2014  Lu, Wei
+    Copyright (C) 2014-2016  Lu, Wei
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,6 +24,15 @@ import java.util.Iterator;
 
 import com.statnlp.commons.types.Instance;
 
+/**
+ * An extension of {@link Network} which defines more functions related to managing nodes and edges.<br>
+ * Subclasses might want to override {@link #isRemoved(int)} and {@link #remove(int)} to disable the auto-removal 
+ * of nodes performed in this class.<br>
+ * The main functions of this class are {@link #addNode(long)}, {@link #addEdge(long, long[])}, and {@link #finalizeNetwork()}.<br>
+ * Always call {@link #finalizeNetwork()} after no more nodes and edges are going to be added 
+ * @author Wei Lu <luwei@statnlp.com>
+ *
+ */
 public abstract class TableLookupNetwork extends Network{
 	
 	private static final long serialVersionUID = -7250820762892368213L;
@@ -74,6 +83,11 @@ public abstract class TableLookupNetwork extends Network{
 		return true;
 	}
 	
+	/**
+	 * A convenience method to check whether a network is contained in (is a subgraph of) another network 
+	 * @param network
+	 * @return
+	 */
 	public boolean contains(TableLookupNetwork network){
 //		if (true)
 //		return true;
@@ -108,7 +122,6 @@ public abstract class TableLookupNetwork extends Network{
 							}
 							System.err.println(node1+"\t"+Arrays.toString(NetworkIDMapper.toHybridNodeArray(node1)));
 							System.err.println(node2+"\t"+Arrays.toString(NetworkIDMapper.toHybridNodeArray(node2)));
-							System.err.println(network.getInstance().getInput().toString());
 							throw new RuntimeException("does not contain!");
 //							return false;
 						}
@@ -127,19 +140,39 @@ public abstract class TableLookupNetwork extends Network{
 		return true;
 	}
 	
+	/**
+	 * Default constructor. Note that the network constructed using this default constructor is lacking 
+	 * the {@link LocalNetworkParam} object required for actual use.
+	 * Use this only for generating generic network, which is later actualized using another constructor.
+	 * @see #TableLookupNetwork(int, Instance, LocalNetworkParam)
+	 */
 	public TableLookupNetwork(){
 //		this._nodes_tmp = new HashSet<Long>();
 		this._children_tmp = new HashMap<Long, ArrayList<long[]>>();
 	}
 	
-	//the constructor
+	/**
+	 * Construct a network with the specified instance and parameter
+	 * @param networkId
+	 * @param inst
+	 * @param param
+	 */
 	public TableLookupNetwork(int networkId, Instance inst, LocalNetworkParam param){
 		super(networkId, inst, param);
 //		this._nodes_tmp = new HashSet<Long>();
 		this._children_tmp = new HashMap<Long, ArrayList<long[]>>();
 	}
 	
-	//the constructor
+	/**
+	 * Construct a network with the specified nodes and edges.<br>
+	 * This is mainly used to create a subgraph of a larger graph by modifying the number of nodes
+	 * by overriding {@link #countNodes()}
+	 * @param networkId
+	 * @param inst
+	 * @param nodes
+	 * @param children
+	 * @param param
+	 */
 	public TableLookupNetwork(int networkId, Instance inst, long[] nodes, int[][][] children, LocalNetworkParam param){
 		super(networkId, inst, param);
 		this._nodes = nodes;
@@ -173,25 +206,38 @@ public abstract class TableLookupNetwork extends Network{
 		return this._nodes.length;
 	}
 	
-	//remove the node k from the network.
+	/**
+	 * Remove the node k from the network.
+	 */
 	public void remove(int k){
 		this._nodes[k] = -1;
-		if (this._inside!=null)
-		this._inside[k] = Double.NEGATIVE_INFINITY;
-		if (this._outside!=null)
-		this._outside[k] = Double.NEGATIVE_INFINITY;
+		if (this._inside!=null){
+			this._inside[k] = Double.NEGATIVE_INFINITY;
+		}
+		if (this._outside!=null){
+			this._outside[k] = Double.NEGATIVE_INFINITY;
+		}
 	}
 	
-	//check if the node k is removed from the network.
+	/**
+	 * Check if the node k is removed from the network.
+	 */
 	public boolean isRemoved(int k){
 		return this._nodes[k] == -1;
 	}
 	
+	/**
+	 * Check if the node is present in this network.
+	 */
 	public boolean contains(long node){
 		return this._children_tmp.containsKey(node);
 	}
 	
-	//add one cell to the network.
+	/**
+	 * Add one node to the network.
+	 * @param node The node to be added
+	 * @return
+	 */
 	public boolean addNode(long node){
 //		if(node==901360616258948L){
 //			throw new RuntimeException("s");
@@ -201,10 +247,6 @@ public abstract class TableLookupNetwork extends Network{
 //			throw new NetworkException("The node is already added:"+node);
 		this._children_tmp.put(node, null);
 		return true;
-	}
-	
-	public int tmpNumNodes(){
-		return this._children_tmp.size();
 	}
 	
 	public int numNodes_tmp(){
@@ -231,7 +273,10 @@ public abstract class TableLookupNetwork extends Network{
 //		}
 //	}
 	
-	//remove all such nodes that is not a descendent of the root.
+	/**
+	 * Remove all such nodes that is not a descendent of the root<br>
+	 * This is a useful method to reduce the number of nodes and edges during network creation.
+	 */
 	public void checkValidNodesAndRemoveUnused(){
 		long[] nodes = new long[this.countTmpNodes_tmp()];
 		double[] validity = new double[this.countTmpNodes_tmp()];
@@ -269,6 +314,10 @@ public abstract class TableLookupNetwork extends Network{
 		}
 	}
 	
+	/**
+	 * Finalize this network, by converting the temporary arrays for nodes and edges into the finalized one.<br>
+	 * This method must be called before this network can be used.
+	 */
 	public void finalizeNetwork(){
 //		System.err.println(this._nodes_tmp.size()+"<<<");
 		Iterator<Long> node_ids = this._children_tmp.keySet().iterator();
@@ -319,9 +368,7 @@ public abstract class TableLookupNetwork extends Network{
 		for(long child : children){
 			if(child >= parent){
 				System.err.println(Arrays.toString(NetworkIDMapper.toHybridNodeArray(parent)));
-				for(int i=0;i<children.length;i++){
-					System.err.println(Arrays.toString(NetworkIDMapper.toHybridNodeArray(children[i])));
-				}
+				System.err.println(Arrays.toString(NetworkIDMapper.toHybridNodeArray(children[0])));
 				System.err.println();
 				throw new NetworkException("This link seems to be invalid:"+parent+"\t"+Arrays.toString(children));
 			}
@@ -340,7 +387,14 @@ public abstract class TableLookupNetwork extends Network{
 		}
 	}
 	
-	//add the links. only do this after the cells are added.
+	/**
+	 * Add an edge to this network. Only do this after the respective nodes are added.
+	 * @param parent The parent node
+	 * @param children The child nodes of a SINGLE hyperedge. Note that this only add one edge, 
+	 * 				   with the parent as the root and the children as the leaves in the hyperedge.
+	 * 				   To add multiple edges, multiple calls to this method is necessary.
+	 * @throws NetworkException If the edge is already added
+	 */
 	public void addEdge(long parent, long[] children){
 		this.checkLinkValidity(parent, children);
 		if(!this._children_tmp.containsKey(parent) || this._children_tmp.get(parent)==null){
@@ -349,27 +403,10 @@ public abstract class TableLookupNetwork extends Network{
 		ArrayList<long[]> existing_children = this._children_tmp.get(parent);
 		for(int k = 0; k<existing_children.size(); k++){
 			if(Arrays.equals(existing_children.get(k), children)){
-				System.err.println("[DEBUG] parent: "+Arrays.toString(NetworkIDMapper.toHybridNodeArray(parent)));
-				System.err.println("[DEBUG] chilren_1: "+Arrays.toString(NetworkIDMapper.toHybridNodeArray(children[0])));
-				if(children.length>1)
-					System.err.println("[DEBUG] chilren_2: "+Arrays.toString(NetworkIDMapper.toHybridNodeArray(children[1])));
 				throw new NetworkException("This children is already added. Add again???");
 			}
 		}
 		existing_children.add(children);
-	}
-	
-	public boolean containsEdge(long parent, long[] children){
-		if(this._children_tmp.get(parent)!=null){
-			ArrayList<long[]> existing_children = this._children_tmp.get(parent);
-			for(int k = 0; k<existing_children.size(); k++){
-				if(Arrays.equals(existing_children.get(k), children)){
-					return true;
-				}
-			}
-			return false;
-		}
-		return false;
 	}
 	
 	@Override
@@ -385,6 +422,14 @@ public abstract class TableLookupNetwork extends Network{
 		return false;
 	}
 	
+	public double totalLossUpTo(int k, int[] child_k){
+		return 0.0;
+	}
+	
+	/**
+	 * Count the number of invalid nodes
+	 * @return
+	 */
 	public int countInValidNodes(){
 		int count = 0;
 		for(int k = 0; k<this._nodes.length; k++){

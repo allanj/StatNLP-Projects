@@ -1,5 +1,5 @@
 /** Statistical Natural Language Processing System
-    Copyright (C) 2014-2015  Lu, Wei
+    Copyright (C) 2014-2016  Lu, Wei
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,8 +19,6 @@ package com.statnlp.hybridnetworks;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import com.statnlp.sp.FeatureArrayCache;
-
 public class FeatureArray implements Serializable{
 	
 	private static final long serialVersionUID = 9170537017171193020L;
@@ -30,53 +28,31 @@ public class FeatureArray implements Serializable{
 	private boolean _isLocal = false;
 	private FeatureArray _next;
 	
-//	private int _version = Integer.MIN_VALUE;
-	
 	public static FeatureArray EMPTY = new FeatureArray(new int[0]);
-	public static FeatureArray NEGATIVE_INFINITY = new FeatureArray(-10000);
+	public static FeatureArray NEGATIVE_INFINITY = new FeatureArray(-10000); // TODO why this instead of Double.NEGATIVE_INFINITY?
 //	public static FeatureArray NEGATIVE_INFINITY = new FeatureArray(Double.NEGATIVE_INFINITY);
-	
-	public static FeatureArrayCache _cache = new FeatureArrayCache();
-
-	public static FeatureArray createFeatureArray(int[] fs, FeatureArray next){
-		FeatureArray fa = new FeatureArray(fs, next);
-		return _cache.toFeatureArray(fa);
-	}
-	
-	public static FeatureArray createFeatureArray(int[] fs){
-		FeatureArray fa = new FeatureArray(fs);
-		return _cache.toFeatureArray(fa);
-	}
-	
-	public static FeatureArray createFeatureArray(int[] fs, FeatureArray next, FeatureArrayCache faCache){
-		FeatureArray fa = new FeatureArray(fs, next);
-		return faCache.toFeatureArray(fa);
-	}
-	
-	public static FeatureArray createFeatureArray(int[] fs, FeatureArrayCache faCache){
-		FeatureArray fa = new FeatureArray(fs);
-		return faCache.toFeatureArray(fa);
-	}
 	
 	public String viewCurrent(){
 		return Arrays.toString(this._fs);
 	}
-	
-	private FeatureArray(int[] fs, FeatureArray next) {
+
+	public FeatureArray(int[] fs, FeatureArray next) {
 		this._fs = fs;
 		this._next = next;
 	}
 	
+	/**
+	 * Construct a feature array containing the features identified by their indices
+	 * @param fs
+	 */
 	public FeatureArray(int[] fs) {
 		this._fs = fs;
 		this._next = null;
 	}
 	
-	private FeatureArray(double score) {
+	public FeatureArray(double score) {
 		this._score = score;
 	}
-	
-	public boolean getIsLocal(){return this._isLocal;}
 	
 	public FeatureArray toLocal(LocalNetworkParam param){
 		if(this==NEGATIVE_INFINITY){
@@ -86,21 +62,37 @@ public class FeatureArray implements Serializable{
 			return this;
 		}
 		
-		int[] fs_local = new int[this._fs.length];
-		for(int k = 0; k<this._fs.length; k++){
-			if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION)
-				fs_local[k] = param.toLocalFeature(this._fs[k]);
-			else fs_local[k] = this._fs[k];
-			if(fs_local[k]==-1){
+		int length = this._fs.length;
+		if(NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY){
+			for(int fs: this._fs){
+				if(fs == -1){
+					length--;
+				}
+			}
+		}
+		
+		int[] fs_local = new int[length];
+		int localIdx = 0;
+		for(int k = 0; k<this._fs.length; k++, localIdx++){
+			if(this._fs[k] == -1 && NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY){
+				localIdx--;
+				continue;
+			}
+			if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION || param._isFinalized){
+				fs_local[localIdx] = param.toLocalFeature(this._fs[k]);
+			} else {
+				fs_local[localIdx] = this._fs[k];
+			}
+			if(fs_local[localIdx]==-1){
 				throw new RuntimeException("The local feature got an id of -1 for "+this._fs[k]);
 			}
 		}
 		
 		FeatureArray fa;
 		if(this._next!=null){
-			fa = FeatureArray.createFeatureArray(fs_local, this._next.toLocal(param), param._faCache);
+			fa = new FeatureArray(fs_local, this._next.toLocal(param));
 		} else {
-			fa = FeatureArray.createFeatureArray(fs_local, param._faCache);
+			fa = new FeatureArray(fs_local);
 		}
 		fa._isLocal = true;
 		return fa;
@@ -133,6 +125,11 @@ public class FeatureArray implements Serializable{
 		
 	}
 	
+	/**
+	 * Return the sum of weights of the features in this array
+	 * @param param
+	 * @return
+	 */
 	public double getScore(LocalNetworkParam param){
 		if(this == NEGATIVE_INFINITY){
 			return this._score;
@@ -207,9 +204,6 @@ public class FeatureArray implements Serializable{
 	public boolean equals(Object o){
 		if(o instanceof FeatureArray){
 			FeatureArray fa = (FeatureArray)o;
-			if(this._fs.length!=fa._fs.length){
-				return false;
-			}
 			for(int k = 0; k< this._fs.length; k++){
 				if(this._fs[k]!=fa._fs[k]){
 					return false;
