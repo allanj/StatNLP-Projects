@@ -556,6 +556,7 @@ public class LBFGS {
                         // if (iprint[1 - 1] >= 0)
                         // lb1(iprint, iter, nfun, gnorm, n, m, x, f, g, stp, finish);
 
+                        // Aldrian: the next value of x (the weights) is set inside this mcsrch method
                         Mcsrch.mcsrch(n, x, f, g, w, ispt + point * n, stp, ftol, xtol,
                                         maxfev, info, nfev, diag, iprint);
 

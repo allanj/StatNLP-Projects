@@ -25,13 +25,17 @@ package com.statnlp.commons.ml.opt;
  */
 public class L1ProximalGradientDescentOptimizer {
 	
-	private double _learningRate = 1E-10;
+	private double _learningRate = 0.7;
 	private double[] _x;
 	private double[] _g;
 	private double _regularization;
 	
 	public L1ProximalGradientDescentOptimizer(double learningRate, double regularization){
 		this._learningRate = learningRate;
+		this._regularization = regularization;
+	}
+	
+	public L1ProximalGradientDescentOptimizer(double regularization){
 		this._regularization = regularization;
 	}
 	
