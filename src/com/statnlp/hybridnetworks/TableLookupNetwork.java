@@ -108,6 +108,7 @@ public abstract class TableLookupNetwork extends Network{
 							}
 							System.err.println(node1+"\t"+Arrays.toString(NetworkIDMapper.toHybridNodeArray(node1)));
 							System.err.println(node2+"\t"+Arrays.toString(NetworkIDMapper.toHybridNodeArray(node2)));
+							System.err.println(network.getInstance().getInput().toString());
 							throw new RuntimeException("does not contain!");
 //							return false;
 						}

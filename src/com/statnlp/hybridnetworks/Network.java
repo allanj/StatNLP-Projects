@@ -32,6 +32,8 @@ public abstract class Network implements Serializable, HyperGraph{
 	protected static double[][] maxSharedArray = new double[NetworkConfig._numThreads][];
 	protected static int[][][] maxPathsSharedArrays = new int[NetworkConfig._numThreads][][];
 	
+//	public static GlobalNetworkParam g_Param = null;
+	
 	//the ids associated with the network (within the scope of the thread).
 	protected int _networkId;
 	//the id of the thread
@@ -555,6 +557,10 @@ public abstract class Network implements Serializable, HyperGraph{
 		for(int i = 0; i<this.countNodes(); i++)
 			sb.append(Arrays.toString(NetworkIDMapper.toHybridNodeArray(this.getNode(i))));
 		return sb.toString();
+	}
+	
+	public LocalNetworkParam getLocalParam(){
+		return this._param;
 	}
 	
 }
