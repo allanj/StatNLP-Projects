@@ -128,6 +128,8 @@ public class DIVMain {
 		NetworkConfig._numThreads = numThreads;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //DPConfig.L2;
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
+		NetworkConfig.USE_STRUCTURED_SVM = true;
+		NetworkConfig.batchSize = 100;
 		
 		
 		ModelViewer viewer = new ModelViewer(4,entities);
