@@ -1,7 +1,9 @@
 package com.statnlp.dp;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.dp.utils.DPConfig;
@@ -31,9 +33,27 @@ public class DependencyMain {
 	public static boolean isDev;
 	public static HashSet<String> dataTypeSet;
 	
+	
+	
+	public static String[] initializeTypeMap(){
+		HashMap<String, Integer> typeMap = new HashMap<String, Integer>();
+		typeMap.put("O", 0);
+		typeMap.put("person", 1);  typeMap.put("gpe", 2);  
+		typeMap.put("EMPTY", 5); 
+		typeMap.put("organization", 3);
+		typeMap.put("MISC", 4);
+		String[] entities = new String[typeMap.size()];
+		Iterator<String> iter = typeMap.keySet().iterator();
+		while(iter.hasNext()){
+			String entity = iter.next();
+			entities[typeMap.get(entity)] = entity;
+		}
+		return entities;
+	}
+	
 	public static void main(String[] args) throws InterruptedException, IOException {
 	
-		entities = Init.initializeTypeMap();
+		entities = initializeTypeMap();
 		dataTypeSet = Init.iniOntoNotesData();
 		processArgs(args);
 		testFile = DPConfig.testingPath;

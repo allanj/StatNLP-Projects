@@ -1,9 +1,11 @@
 package com.statnlp.dp.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.DependInstance;
+import com.statnlp.dp.commons.Entity;
 import com.statnlp.hybridnetworks.NetworkConfig;
 
 import edu.stanford.nlp.ling.CoreLabel;
@@ -12,7 +14,12 @@ import edu.stanford.nlp.trees.UnnamedDependency;
 public class DataChecker {
 	
 	
-	public static void checkJoint(DependInstance[] insts, String[] entities){
+	/**
+	 * Check all the instance whether they are incomplete or not.
+	 * @param insts
+	 * @param entities
+	 */
+	public static void checkJoint(DependInstance[] insts, String[] entities, HashMap<String, Integer> typeMap){
 		int totalNum = 0;
 		int totalNotIncomplete = 0;
 		for(DependInstance inst: insts){
@@ -31,7 +38,7 @@ public class DataChecker {
 						if(!prevEntity.equals("O")){
 							end = i;
 							currNum++;
-							totalNum+=joinChecking( inst,  sent,  start,  end,  prevEntity);
+							totalNum+=joinChecking( inst,  sent,  start,  end,  prevEntity,  typeMap);
 							//debug:
 							if((end>start+1) && !(sent.get(start).getHeadIndex()==end-1 || sent.get(end-1).getHeadIndex()==start))
 								totalNotIncomplete++;
@@ -40,7 +47,7 @@ public class DataChecker {
 					}else{
 						end = i;
 						currNum++;
-						totalNum+=joinChecking( inst,  sent,  start,  end,  prevEntity);
+						totalNum+=joinChecking( inst,  sent,  start,  end,  prevEntity,typeMap);
 						if((end>start+1)  && !(sent.get(start).getHeadIndex()==end-1 || sent.get(end-1).getHeadIndex()==start)){
 							totalNotIncomplete++;
 //							System.err.println(sent.toString());
@@ -56,7 +63,7 @@ public class DataChecker {
 			if(!lastE.equals("O")){
 				currNum++;
 				end = sent.length();
-				totalNum+=joinChecking( inst,  sent,  start,  end,  prevEntity);
+				totalNum+=joinChecking( inst,  sent,  start,  end,  prevEntity, typeMap);
 				if((end>start+1) && !(sent.get(start).getHeadIndex()==end-1 || sent.get(end-1).getHeadIndex()==start))
 					totalNotIncomplete++;
 			}
@@ -77,7 +84,7 @@ public class DataChecker {
 		}
 		System.err.println("Total invalid:"+totalNum);
 		int[] all = new int[entities.length];
-		int[][] allOutside = new int[NetworkConfig.typeMap.size()/2][10];
+		int[][] allOutside = new int[typeMap.size()/2][10];
 		int[] total = new int[entities.length];
 		for(DependInstance inst: insts){
 			for(int i=0;i<all.length;i++){
@@ -111,10 +118,10 @@ public class DataChecker {
 	}
 	
 	
-	private static int  joinChecking(DependInstance inst, Sentence sent, int start, int end, String prevEntity){
+	private static int  joinChecking(DependInstance inst, Sentence sent, int start, int end, String prevEntity, HashMap<String, Integer> typeMap){
 		int totalNum = 0;
 //		System.err.println(prevEntity);
-		inst.entityNum[NetworkConfig.typeMap.get(prevEntity)]++;
+		inst.entityNum[typeMap.get(prevEntity)]++;
 		//for start, end-1
 		boolean hInside = true;
 		int outside = 0;
@@ -127,12 +134,12 @@ public class DataChecker {
 //		if(outside==2 && prevEntity.equals("organization")){
 //			System.err.println(sent.toString());
 //		}
-		inst.outsideHeads[NetworkConfig.typeMap.get(prevEntity)][outside]++;
+		inst.outsideHeads[typeMap.get(prevEntity)][outside]++;
 		if(start!=end-1 && !checkInside(sent.get(start).getHeadIndex(), start, end) && !checkInside(sent.get(end-1).getHeadIndex(), start, end)){
-			inst.outsideHeads[NetworkConfig.typeMap.get(prevEntity)][9]++;
+			inst.outsideHeads[typeMap.get(prevEntity)][9]++;
 			for(int k=start+1;k<end-1;k++){
 				if(!(sent.get(k).getHeadIndex()>=start && sent.get(k).getHeadIndex()<end)) {
-					inst.outsideHeads[NetworkConfig.typeMap.get(prevEntity)][8]++;
+					inst.outsideHeads[typeMap.get(prevEntity)][8]++;
 					break;
 				}
 			}
@@ -152,17 +159,17 @@ public class DataChecker {
 //			}
 				
 			totalNum++;
-			inst.unValidNum[NetworkConfig.typeMap.get(prevEntity)]++;
+			inst.unValidNum[typeMap.get(prevEntity)]++;
 		}
 		return totalNum;
 	}
 	
 	
 	/**
-	 * right exclusive
+	 * check the head is inside the span or not
 	 * @param head
-	 * @param left
-	 * @param right
+	 * @param left:inclusive
+	 * @param right:exclusive
 	 * @return
 	 */
 	private static boolean checkInside(int head, int left, int right){
@@ -172,7 +179,11 @@ public class DataChecker {
 	}
 
 
-	
+	/**
+	 * check wheter this list of dependency link is projective for one whole dependency structure
+	 * @param list
+	 * @return
+	 */
 	public static boolean checkProjective(ArrayList<UnnamedDependency> list){
 		for(int i=0;i<list.size()-1;i++){
 			UnnamedDependency dependency_i = list.get(i);
@@ -193,7 +204,13 @@ public class DataChecker {
 		return true;
 	}
 
-
+	
+	/**
+	 * Count the number of entities (all categories) 
+	 * @param insts
+	 * @param entities
+	 * @return
+	 */
 	public static int[] countEntities(DependInstance[] insts, String[] entities){
 		int[] total = new int[entities.length];
 		for(DependInstance dpInst: insts){
@@ -209,4 +226,100 @@ public class DataChecker {
 		}
 		return total;
 	}
+	
+	
+	/**
+	 * Similar to check Joint method, but only check whether its incomplete return a boolean value
+	 * @param sent: just check for one sentence.
+	 * @param entities
+	 */
+	public static ArrayList<Entity> checkAllIncomplete(Sentence sent){
+		int start = 0; int end = -1;
+		ArrayList<Entity> elist = new ArrayList<Entity>();
+		String prevEntity = "";
+		for(int i=1;i<sent.length();i++){
+			String e = sent.get(i).getEntity();
+			e = e.equals("O")? e: e.substring(2);
+			prevEntity = sent.get(i-1).getEntity();
+			prevEntity = prevEntity.equals("O")? prevEntity:prevEntity.substring(2);
+			//Need to fix the case of continuous two entity, start:inclusive, end:exclusive..Fixed by the reader already
+			if(!e.equals(prevEntity)){
+				if(!e.equals("O")){
+					if(!prevEntity.equals("O")){
+						end = i;
+						if(notIncomplete(sent,start,end))
+							elist.add(new Entity(prevEntity,start,end-1));
+					}
+					start = i;
+				}else{
+					end = i;
+					if(notIncomplete(sent,start,end)){
+						elist.add(new Entity(prevEntity,start,end-1));
+					}
+				}
+			}
+		}
+		String lastE = sent.get(sent.length()-1).getEntity();
+		lastE = lastE.equals("O")? lastE: lastE.substring(2);
+		if(!lastE.equals("O")){
+			end = sent.length();
+			if(notIncomplete(sent,start,end))
+				elist.add(new Entity(lastE,start,end-1));
+		}
+		return elist;
+	}
+	
+	/**
+	 * check this entity is incomplete or not
+	 * @param sent: sentence
+	 * @param start: inclusive
+	 * @param end: exlucsive
+	 * @return
+	 */
+	private static boolean notIncomplete(Sentence sent, int start, int end){
+		return (end>start+1)  && !(sent.get(start).getHeadIndex()==end-1 || sent.get(end-1).getHeadIndex()==start);
+	}
+
+	
+	
+	public static void checkIncompeteSideType(DependInstance[] insts){
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+		int numIsE = 0;
+		int total  = 0;
+		for(DependInstance inst:insts){
+			ArrayList<UnnamedDependency> deps = inst.toDependencies(inst.getOutput());
+			for(UnnamedDependency dep: deps){
+				CoreLabel headLabel = (CoreLabel)dep.governor();
+				CoreLabel moLabel = (CoreLabel)dep.dependent();
+				String head = headLabel.ner().length()>2? headLabel.ner().substring(2):headLabel.ner();
+				String mo = moLabel.ner().length()>2?moLabel.ner().substring(2):moLabel.ner();
+				String x = head+","+mo;
+				if(moLabel.ner().startsWith("B-")) total++;
+				if(head.equals(mo) && !head.equals("O") ){
+					for(int i= headLabel.sentIndex()+1;i<moLabel.sentIndex();i++){
+						String e = inst.getInput().get(i).getEntity();
+						e = e.length()>2?e.substring(2):e;
+						if(!e.equals(head)){
+							numIsE++;
+//							System.err.println(headLabel.sentIndex());
+//							System.err.println(moLabel.sentIndex());
+//							System.err.println(inst.getInput().toString());
+							System.err.println(inst.getInstanceId());
+							break;
+						}
+					}
+				}
+				if(map.containsKey(x)){
+					int num = map.get(x);
+					map.put(x, num+1);
+				}else{
+					map.put(x, 1);
+				}
+			}
+		}
+		System.err.println(map.toString());
+		System.err.println(numIsE +",total:"+total);
+	}
+
+
 }

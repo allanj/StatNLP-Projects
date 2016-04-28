@@ -2,7 +2,9 @@ package com.statnlp.dp.model.div;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.dp.DependInstance;
@@ -26,6 +28,9 @@ import com.statnlp.hybridnetworks.NetworkModel;
  */
 public class DIVMain {
 	
+	public static String PARENT_IS = DPConfig.PARENT_IS;
+	public static String OE = DPConfig.OE;
+	public static String ONE = DPConfig.ONE;
 	public static String[] entities; 
 	public static int trainNumber = -1;
 	public static int testNumber = -1;
@@ -37,13 +42,38 @@ public class DIVMain {
 	public static boolean isDev = true;
 	public static String[] selectedEntities = {"person","organization","gpe","MISC"};
 	public static HashSet<String> dataTypeSet;
+	public static HashMap<String, Integer> typeMap;
+	
+	public static String[] initializeUniqueModelTypeMap(String[] selectedEntities){
+		typeMap = new HashMap<String, Integer>();
+		int index = 0;
+		typeMap.put(OE, index++);
+		typeMap.put(ONE, index++);
+		for(int i=0;i<selectedEntities.length;i++){
+			typeMap.put(selectedEntities[i],index++);
+		}
+		typeMap.put(PARENT_IS+OE, index++);
+		typeMap.put(PARENT_IS+ONE, index++);
+		for(int i=0;i<selectedEntities.length;i++){
+			typeMap.put(PARENT_IS+selectedEntities[i],index++);
+		}
+		String[] entities = new String[typeMap.size()/2];
+		Iterator<String> iter = typeMap.keySet().iterator();
+		while(iter.hasNext()){
+			String entity = iter.next();
+			if(!entity.startsWith(PARENT_IS))
+				entities[typeMap.get(entity)] = entity;
+		}
+		return entities;
+	}
+	
 	
 	public static void main(String[] args) throws InterruptedException, IOException {
 		
 		
 		processArgs(args);
 		dataTypeSet = Init.iniOntoNotesData();
-		entities = Init.initializeUniqueModelTypeMap(selectedEntities);
+		entities = initializeUniqueModelTypeMap(selectedEntities);
 		String modelType = MODEL.DIVIDED.name();
 		DPConfig.currentModel = modelType;
 		String middle = isDev? ".dev":".test";
@@ -106,7 +136,7 @@ public class DIVMain {
 			dfm = new DIVFeatureManager(new GlobalNetworkParam(),entities);
 		else
 			dfm = new DIVFeatureManager_leafcopy(new GlobalNetworkParam(),entities);
-		DIVNetworkCompiler dnc = new DIVNetworkCompiler(NetworkConfig.typeMap, viewer);
+		DIVNetworkCompiler dnc = new DIVNetworkCompiler(typeMap, viewer);
 		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);
 		model.train(trainingInsts, numIteration); 
 		//DIVFeatureManager.pw.close();

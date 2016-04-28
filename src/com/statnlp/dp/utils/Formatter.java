@@ -10,7 +10,6 @@ import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.DependInstance;
 import com.statnlp.dp.DependencyReader;
 import com.statnlp.dp.Transformer;
-import com.statnlp.dp.model.MDPTransformer;
 import com.statnlp.entity.lcr.ECRFInstance;
 
 public class Formatter {
@@ -104,6 +103,23 @@ public class Formatter {
 		}
 	}
 	
+	public static void semevalToText(DependInstance[] insts, String output){
+		try {
+			PrintWriter pw = RAWF.writer(output);
+			for(DependInstance inst:insts){
+				Sentence sent = inst.getInput();
+				for(int i=1;i<sent.length();i++){
+					pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+sent.get(i).getHeadIndex()+"\n");
+				}
+				pw.write("\n");
+			}
+			pw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public static void ner2Text(List<ECRFInstance> insts, String output){
 		try {
 			PrintWriter pw = RAWF.writer(output);
@@ -122,12 +138,6 @@ public class Formatter {
 	}
 	
 	public static void main(String[] args){
-		String[] entities = Init.initializeTypeMap();
-		Transformer tran = new MDPTransformer();
-		DependInstance[] trainingInsts = DependencyReader.readInstance(DPConfig.trainingPath, true,-1,entities,tran, true);
-		semeval10ToMST(trainingInsts, "data/formst/train.ulab");
-		DependInstance[] testingInsts = DependencyReader.readInstance(DPConfig.testingPath, false,-1,entities,tran, true);
-		semeval10ToMST(testingInsts, "data/formst/test.ulab");
 	}
 	
 
