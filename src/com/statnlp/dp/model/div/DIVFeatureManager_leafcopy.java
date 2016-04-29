@@ -228,7 +228,7 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 //				}
 //				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-whole-words",child_1_type+":"+sb.toString()) );
 				
-				if(leftIndex!=rightIndex){
+				
 					/**************inside boundary features**************/
 //					String lw = sent.get(leftIndex).getName();
 //					String rw = sent.get(rightIndex).getName();
@@ -241,20 +241,23 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 //					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LT-RW",  child_1_type+":"+lt+":"+rw));
 //
 //					/********************outside boundary features***************************/
-//					String lb = leftIndex>1? sent.get(leftIndex-1).getName():"STR";
-//					String lbt = leftIndex>1? sent.get(leftIndex-1).getTag():"STR";
-//					String rb = rightIndex<sent.length()-1? sent.get(rightIndex+1).getName():"END";
-//					String rbt = rightIndex<sent.length()-1? sent.get(rightIndex+1).getTag():"END";
+					String lb = leftIndex>1? sent.get(leftIndex-1).getName():"STR";
+					String lbt = leftIndex>1? sent.get(leftIndex-1).getTag():"STR";
+					String rb = rightIndex<sent.length()-1? sent.get(rightIndex+1).getName():"END";
+					String rbt = rightIndex<sent.length()-1? sent.get(rightIndex+1).getTag():"END";
 //					String rightPrefix = leftIndex==rightIndex?E_B_PREFIX:E_I_PREFIX;
-//					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBW-1",E_B_PREFIX+child_1_type+":"+lb+":LEFT_1_BD"));
-//					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBT-1",E_B_PREFIX+child_1_type+":"+lbt+":LEFT_1_BD"));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBW-1",E_B_PREFIX+child_1_type+":"+lb+":START"));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBT-1",E_B_PREFIX+child_1_type+":"+lbt+":START"));
 //					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBWT-1",E_B_PREFIX+child_1_type+":"+lb+","+lbt+":LEFT_1_BD"));
-//					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBW-1",rightPrefix+child_1_type+":"+rb+":RIGHT_1_BD"));
-//					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBT-1",rightPrefix+child_1_type+":"+rbt+":RIGHT_1_BD"));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBW-1",child_1_type+":"+rb+":END"));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBT-1",child_1_type+":"+rbt+":END"));
 //					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBWT-1",rightPrefix+child_1_type+":"+rb+","+rbt+":RIGHT_1_BD"));
 //					
 //					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBW-RBW",E_B_PREFIX+child_1_type+":"+lb+":"+rb));
-//					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBT-RBT",E_B_PREFIX+child_1_type+":"+lbt+":"+rbt));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBT-RBT",child_1_type+":"+lbt+":"+rbt));
+					for(int i=leftIndex;i<=rightIndex;i++){
+						featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBT-RBT-INB",child_1_type+":"+lbt+":"+sent.get(i).getTag()+":"+rbt));
+					}
 //
 //					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBT-LT", E_B_PREFIX+child_1_type+":"+lbt+","+lt));
 //					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBT-LW", E_B_PREFIX+child_1_type+":"+lbt+","+lw));
@@ -265,7 +268,7 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 //					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBT-RW", rightPrefix+child_1_type+":"+rbt+","+rw));
 //					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBW-RT", rightPrefix+child_1_type+":"+rb+","+rt));
 //					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBW-RW", rightPrefix+child_1_type+":"+rb+","+rw));
-				}
+				
 //
 				/**********************add some joint features**************under the IF statement of outmost entity****************/
 				/****Bigram features without dist info******/
