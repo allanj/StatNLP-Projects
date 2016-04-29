@@ -94,7 +94,7 @@ public class HPEFeatureManager extends FeatureManager {
 		//System.err.println("patype:"+pa_type+", "+Arrays.toString(childrenType));
 		
 		//pairwise features
-		if(completeness==0 && !childrenType[0].equals(OE) && childrenType[1].equals(OE)){
+		if(completeness==0 && isEntity(pa_type)){
 			int splitPoint = childrenArr[0][0]; // the rightIndex of the left child
 			addPairwise(featureList, network, splitPoint, sent, childrenType[0], childrenType[1]);
 		}
@@ -175,7 +175,6 @@ public class HPEFeatureManager extends FeatureManager {
 				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERT-RBW",etype+":"+rwt+":"+rb));
 				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERT-RBT",etype+":"+rwt+":"+rbt));
 				if(direction==1 && !childrenType[1].equals(OE) && childrenArr[1][1]> 0){
-					
 					addPairwise(featureList, network, eright, sent, etype, childrenType[1]);
 				}else if(direction==0 && !childrenType[0].equals(OE) && childrenArr[0][1]> 0){
 					addPairwise(featureList, network, eleft, sent, childrenType[0], etype);
