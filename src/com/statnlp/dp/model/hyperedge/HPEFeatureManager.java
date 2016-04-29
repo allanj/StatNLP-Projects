@@ -174,9 +174,10 @@ public class HPEFeatureManager extends FeatureManager {
 				
 				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERT-RBW",etype+":"+rwt+":"+rb));
 				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERT-RBT",etype+":"+rwt+":"+rbt));
-				if(direction==1 && !childrenType[1].equals(OE)){
+				if(direction==1 && !childrenType[1].equals(OE) && childrenArr[1][1]> 0){
+					
 					addPairwise(featureList, network, eright, sent, etype, childrenType[1]);
-				}else if(direction==0 && !childrenType[0].equals(OE)){
+				}else if(direction==0 && !childrenType[0].equals(OE) && childrenArr[0][1]> 0){
 					addPairwise(featureList, network, eleft, sent, childrenType[0], etype);
 				}
 			}
