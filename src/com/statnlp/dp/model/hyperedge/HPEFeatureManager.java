@@ -94,6 +94,28 @@ public class HPEFeatureManager extends FeatureManager {
 		}
 		//System.err.println("patype:"+pa_type+", "+Arrays.toString(childrenType));
 		
+		//pairwise features
+		if(completeness==0 && !childrenType[0].equals(OE) && childrenType[1].equals(OE)){
+			int splitPoint = childrenArr[0][0]; // the rightIndex of the left child
+			String word = sent.get(splitPoint+1).getName();
+			String tag = sent.get(splitPoint+1).getTag();
+			String prevWord = splitPoint==0?"STR":sent.get(splitPoint).getName();
+			String prevTag = splitPoint==0?"STR":sent.get(splitPoint).getTag();
+			String nextWord = splitPoint+2<sent.length()?sent.get(splitPoint+2).getName():"END";
+			String nextTag = splitPoint+2<sent.length()?sent.get(splitPoint+2).getTag():"END";
+			String prevEntity = childrenType[0];
+			String currEn = childrenType[1];
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E",prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE",word+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevW-prevE-currE",prevWord+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextW-prevE-currE",nextWord+":"+prevEntity+":"+currEn));
+			
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE",tag+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-prevE-currE",prevTag+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextT-prevE-currE",nextTag+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-currT-prevE-currE",prevTag+":"+tag+":"+prevEntity+":"+currEn));
+		}
+		
 		for(int c=0;c<children.length;c++){
 			int cleft = childrenArr[c][0]-childrenArr[c][1];
 			int cright = childrenArr[c][0];
@@ -135,6 +157,9 @@ public class HPEFeatureManager extends FeatureManager {
 				}
 			}
 		}
+		
+		
+		
 		
 		addDepFeatures(featureList,network,parentArr,sent);
 	
