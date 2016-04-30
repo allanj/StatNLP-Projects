@@ -7,8 +7,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import com.statnlp.commons.types.Instance;
-import com.statnlp.dp.DependInstance;
-import com.statnlp.dp.DependencyReader;
 import com.statnlp.dp.Evaluator;
 import com.statnlp.dp.Transformer;
 import com.statnlp.dp.model.ModelViewer;
@@ -105,14 +103,14 @@ public class DIVMain {
 		System.err.println("[Info] dpRes: "+dpRes);
 		System.err.println("[Info] ner eval: "+nerEval);
 		System.err.println("[Info] joint Res: "+jointRes);
-		DependInstance[] trainingInsts = null;
-		DependInstance[] testingInsts = null;
+		DIVInstance[] trainingInsts = null;
+		DIVInstance[] testingInsts = null;
 		if(dataTypeSet.contains(DPConfig.dataType)){
-			trainingInsts = DependencyReader.readCNN(trainingPath, true,trainNumber,tran);
-			testingInsts = DependencyReader.readCNN(decodePath, false,testNumber,tran);
+			trainingInsts = DIVReader.readCNN(trainingPath, true,trainNumber,tran);
+			testingInsts = DIVReader.readCNN(decodePath, false,testNumber,tran);
 		}else{
-			trainingInsts = DependencyReader.readInstance(trainingPath, true,trainNumber,selectedEntities,tran, false);
-			testingInsts = DependencyReader.readInstance(decodePath, false,testNumber,selectedEntities,tran, false);
+			trainingInsts = DIVReader.readInstance(trainingPath, true,trainNumber,selectedEntities,tran, false);
+			testingInsts = DIVReader.readInstance(decodePath, false,testNumber,selectedEntities,tran, false);
 		}
 //		Formatter.semevalToText(trinInsts, "data/"+DPConfig.dataType+"/proj/en.train.txt");
 //		Formatter.semevalToText(devInsts, "data/"+DPConfig.dataType+"/proj/en.devel.txt");

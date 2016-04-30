@@ -6,10 +6,7 @@ import java.util.Iterator;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
-import com.statnlp.dp.DependInstance;
-import com.statnlp.dp.DependencyNetwork;
 import com.statnlp.dp.utils.DPConfig;
-import com.statnlp.hybridnetworks.FeatureArray;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
@@ -59,7 +56,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 
 	@Override
 	public Network compile(int networkId, Instance inst, LocalNetworkParam param) {
-		DependInstance di = (DependInstance)inst;
+		DIVInstance di = (DIVInstance)inst;
 		if(di.isLabeled()){
 			//System.err.println("[Info] Compiling Labeled Network...");
 			return this.compileLabledInstance(networkId, di, param);
@@ -69,13 +66,13 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 		}
 	}
 
-	public DependencyNetwork compileLabledInstance(int networkId, DependInstance inst, LocalNetworkParam param){
-		DependencyNetwork network = new DependencyNetwork(networkId,inst,param);
+	public DIVNetwork compileLabledInstance(int networkId, DIVInstance inst, LocalNetworkParam param){
+		DIVNetwork network = new DIVNetwork(networkId,inst,param);
 		Sentence sent = inst.getInput();
 		Tree tree = inst.getOutput();
 		this.compile(network, sent, tree);
 		if(DEBUG){
-			DependencyNetwork unlabeled = compileUnLabledInstance(networkId, inst, param);
+			DIVNetwork unlabeled = compileUnLabledInstance(networkId, inst, param);
 			if(!unlabeled.contains(network)){
 				System.err.println(sent.toString());
 				throw new NetworkException("Labeled network is not contained in the unlabeled version");
@@ -84,7 +81,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 		return network;
 	}
 	
-	private void compile(DependencyNetwork network, Sentence sent, Tree output){
+	private void compile(DIVNetwork network, Sentence sent, Tree output){
 		output.setSpans();
 		long rootNode = this.toNode_generalRoot(sent.length());
 		network.addNode(rootNode);
@@ -96,7 +93,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 		
 	}
 	
-	private void addToNetwork(DependencyNetwork network, Tree parent){
+	private void addToNetwork(DIVNetwork network, Tree parent){
 		if(parent.isLeaf()) return; //means headindex==modifier index
 		CoreLabel cl = (CoreLabel)(parent.label());
 		String[] info = cl.value().split(",");
@@ -140,13 +137,13 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 		}		
 	}
 	
-	public DependencyNetwork compileUnLabledInstance(int networkId, DependInstance inst, LocalNetworkParam param){
+	public DIVNetwork compileUnLabledInstance(int networkId, DIVInstance inst, LocalNetworkParam param){
 		if(this._nodes==null){
 			this.compileUnlabeled();
 		}
 		long root = this.toNode_generalRoot(inst.getInput().length());
 		int rootIdx = Arrays.binarySearch(this._nodes, root);
-		DependencyNetwork network = new DependencyNetwork(networkId,inst,this._nodes,this._children, param,rootIdx+1 );
+		DIVNetwork network = new DIVNetwork(networkId,inst,this._nodes,this._children, param,rootIdx+1 );
 		//viewer.visualizeNetwork(network, null, "UnLabeled Network");
 		//System.err.println("[Info] Compile Unlabeled instance, length: "+inst.getInput().length());
 		//System.err.println("My root:"+Arrays.toString(NetworkIDMapper.toHybridNodeArray(root)));
@@ -162,7 +159,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 		if(this._nodes!=null){
 			return;
 		}
-		DependencyNetwork network = new DependencyNetwork();
+		DIVNetwork network = new DIVNetwork();
 		//add the root word and other nodes
 		//all are complete nodes.
 		long rootWordNode1 = this.toNode(0, 0, 1, 1,PARENT_IS+ONE);
@@ -332,8 +329,8 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 	
 	@Override
 	public Instance decompile(Network network) {
-		DependencyNetwork dependNetwork = (DependencyNetwork)network;
-		DependInstance inst = (DependInstance)(dependNetwork.getInstance());
+		DIVNetwork dependNetwork = (DIVNetwork)network;
+		DIVInstance inst = (DIVInstance)(dependNetwork.getInstance());
 		inst = inst.duplicate();
 		if(dependNetwork.getMax()==Double.NEGATIVE_INFINITY) return inst;
 		//viewer.visualizeNetwork(dependNetwork, null, "Testing Labeled Model:"+network.getInstance().getInstanceId());
@@ -344,7 +341,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 		return inst;
 	}
 	
-	private Tree toTree(DependencyNetwork network,DependInstance inst){
+	private Tree toTree(DIVNetwork network,DIVInstance inst){
 		
 		Tree root = new LabeledScoredTreeNode();
 		CoreLabel rootLabel = new CoreLabel();
@@ -379,7 +376,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 		return root;
 	}
 	
-	private void toTreeHelper(DependencyNetwork network, int node_k, Tree parentNode){
+	private void toTreeHelper(DIVNetwork network, int node_k, Tree parentNode){
 		int[] children_k = network.getMaxPath(node_k);
 //		System.err.println("node_k:"+node_k+" score:"+network.getMax(node_k));
 //		System.err.println("Parent Node:"+parentNode.toString());
@@ -415,58 +412,8 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 	}
 	
 	
-	public void printNetwork(DependencyNetwork network, Sentence sent){
-		int len = -1;
-		if(sent==null) len = this.maxSentLen;
-		else len = sent.length();
-		long root = this.toNode_generalRoot(len);
-		long[] nodes = network.getAllNodes();
-		System.err.println("Number of nodes: "+nodes.length);
-		int rootIndex = Arrays.binarySearch(nodes, root);
-//		System.err.println("root node: "+Arrays.toString(NetworkIDMapper.toHybridNodeArray(root))+" , at index:"+rootIndex);
-		int level = 0;
-		printAll(rootIndex,network,level);
-		
-	}
+
 	
-	private void printAll(int index, DependencyNetwork network, int level){
-		long current = network.getNode(index);
-		for(int i=0;i<level;i++)
-			System.err.print("\t");
-		int[] arr = NetworkIDMapper.toHybridNodeArray(current);
-		int leftIndex = arr[0]-arr[1];
-		String direction = arr[3]==0? "left":"right";
-		String complete = arr[2]==0? "incomplete":"complete";
-		String type = null;
-		
-		if(arr[4]==2*types.length)
-			type = "pae:null";
-		else if(arr[4]>types.length-1){
-			type = "pae:"+types[arr[4]-types.length];
-		}else{
-			type = types[arr[4]];
-		}
-		System.err.println("current node: "+leftIndex+","+arr[0]+","+direction+","+complete+","+type+" , at index:"+index);
-		int[][] children = network.getChildren(index);
-		for(int i=0;i<children.length;i++){
-			int[] twochilds = children[i];
-			for(int j=0;j<twochilds.length;j++)
-				printAll(twochilds[j],network,level+1);
-		}
-	}
-	
-	@SuppressWarnings("unused")
-	private void printNodes(long[] nodes){
-		System.err.println("Print all the nodes:...");
-		for(long node: nodes){
-			int[] arr = NetworkIDMapper.toHybridNodeArray(node);
-			int leftIndex = arr[0]-arr[1];
-			String direction = arr[3]==0? "left":"right";
-			String complete = arr[2]==0? "incomplete":"complete";
-			String type = types[arr[4]];
-			System.err.println("current node: "+leftIndex+","+arr[0]+","+direction+","+complete+","+type);
-		}
-	}
 	
 	//Node composition
 	//Span Len (eIndex-bIndex), eIndex, direction(0--left,1--right), complete (0--incomplete,1), node Type
