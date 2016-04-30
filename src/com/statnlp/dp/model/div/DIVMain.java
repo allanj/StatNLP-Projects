@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import com.statnlp.commons.ml.opt.OptimizerFactory;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.dp.Evaluator;
 import com.statnlp.dp.Transformer;
@@ -86,8 +87,8 @@ public class DIVMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 2;
-//		testNumber = -1;
+//		trainNumber = 100;
+//		testNumber = 100;
 //		numIteration = 20;
 //		numThreads = 8;
 //		testingPath = trainingPath;
@@ -126,17 +127,16 @@ public class DIVMain {
 		NetworkConfig._numThreads = numThreads;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //DPConfig.L2;
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
-		NetworkConfig.USE_STRUCTURED_SVM = false;
-		NetworkConfig.USE_BATCH_SGD = false;
-//		NetworkConfig.batchSize = 1000;
+		NetworkConfig.USE_STRUCTURED_SVM = true;
+		NetworkConfig.batchSize = 10000;
 		
 		
 		ModelViewer viewer = new ModelViewer(4,entities);
 		FeatureManager dfm = null;
 		if(DPConfig.readWeight)
-			dfm = new DIVFeatureManager(new GlobalNetworkParam(),entities);
+			dfm = new DIVFeatureManager(new GlobalNetworkParam(OptimizerFactory.getStochasticGradientDescentFactory()),entities);
 		else
-			dfm = new DIVFeatureManager_leafcopy(new GlobalNetworkParam(),entities);
+			dfm = new DIVFeatureManager_leafcopy(new GlobalNetworkParam(OptimizerFactory.getStochasticGradientDescentFactory()),entities);
 		DIVNetworkCompiler dnc = new DIVNetworkCompiler(typeMap, viewer);
 		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);
 		model.train(trainingInsts, numIteration); 
