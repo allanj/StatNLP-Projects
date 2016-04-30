@@ -16,6 +16,7 @@
  */
 package com.statnlp.hybridnetworks;
 
+import java.util.HashMap;
 import java.util.Random;
 
 public class NetworkConfig {
@@ -59,5 +60,6 @@ public class NetworkConfig {
 	public static int _numThreads = 10;
 	
 	public static int _maxSpanLen = 2;//the upper-bound of the length of a span.
+	
 	
 }

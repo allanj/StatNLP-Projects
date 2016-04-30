@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -193,6 +194,10 @@ public abstract class NetworkModel implements Serializable{
 					break;
 				}
 			}
+			//use the best weights 
+			if(NetworkConfig.USE_STRUCTURED_SVM){
+				this._fm.getParam_G().setBestWeights();
+			}
 		} finally {
 			pool.shutdown();
 		}
@@ -274,6 +279,15 @@ public abstract class NetworkModel implements Serializable{
 				results[k++] = output;
 			}
 		}
+		
+		Arrays.sort(results, new Comparator<Instance>(){
+			@Override
+			public int compare(Instance o1, Instance o2) {
+				if(o1.getInstanceId()<o2.getInstanceId())
+				return -1;
+				else return 1;
+			}
+		});
 		
 		return results;
 	}

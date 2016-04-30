@@ -59,6 +59,8 @@ public class GlobalNetworkParam implements Serializable{
 	protected transient double _obj;
 	/** A variable for batch SGD optimization, if applicable */
 	protected transient int _batchSize;
+	/** A variable to store current value of the objective function */
+	protected transient double _bestObj;
 	
 	protected transient int _version;
 	
@@ -74,7 +76,7 @@ public class GlobalNetworkParam implements Serializable{
 	protected String[][] _feature2rep;//three-dimensional array representation of the feature.
 	/** The weights parameter */
 	protected double[] _weights;
-	/** Store the best weights when using the batch sgd */
+	/** Store the best weights when using the sgd */
 	protected double[] _bestWeight;
 	/** A flag whether the model is discriminative */
 	protected boolean _isDiscriminative;
@@ -107,6 +109,7 @@ public class GlobalNetworkParam implements Serializable{
 		this._fixedFeaturesSize = 0;
 		this._obj_old = Double.NEGATIVE_INFINITY;
 		this._obj = Double.NEGATIVE_INFINITY;
+		this._bestObj = Double.NEGATIVE_INFINITY;
 		this._isDiscriminative = !NetworkConfig.TRAIN_MODE_IS_GENERATIVE;
 		if(this.isDiscriminative()){
 			this._batchSize = NetworkConfig.batchSize;
@@ -619,6 +622,13 @@ public class GlobalNetworkParam implements Serializable{
         		this._weights[i] = LBFGS.solution_cache[i];
         	}
     	}
+    	if(NetworkConfig.USE_STRUCTURED_SVM){
+    		if(this._obj > this._bestObj){
+    			this._bestObj = this._obj;
+    			this._bestWeight = this._weights.clone();
+    		}
+    		//System.err.println("best obj:"+this._bestObj);
+    	}
     	
 		this._version ++;
 		return done;
@@ -661,6 +671,10 @@ public class GlobalNetworkParam implements Serializable{
 	
 	public void setInstsNum(int number){
 		this.totalNumInsts = number;
+	}
+	
+	public void setBestWeights(){
+		this._weights = this._bestWeight;
 	}
 	
 	public boolean checkEqual(GlobalNetworkParam p){
