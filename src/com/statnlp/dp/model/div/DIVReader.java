@@ -3,11 +3,9 @@ package com.statnlp.dp.model.div;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;

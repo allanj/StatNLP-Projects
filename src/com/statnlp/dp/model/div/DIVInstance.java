@@ -4,10 +4,7 @@ import java.util.ArrayList;
 
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.DependInstance;
-import com.statnlp.dp.ModelInstance;
 import com.statnlp.dp.Transformer;
-import com.statnlp.dp.utils.DPConfig;
-import com.statnlp.dp.utils.DPConfig.MODEL;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.Tree;
