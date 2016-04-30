@@ -87,11 +87,11 @@ public class DIVMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 100;
-//		testNumber = 100;
-//		numIteration = 20;
-//		numThreads = 8;
-//		testingPath = trainingPath;
+		trainNumber = 100;
+		testNumber = 100;
+		numIteration = 20;
+		numThreads = 8;
+		testingPath = trainingPath;
 		DPConfig.readWeight = false;
 		DPConfig.writeWeight = false;
 		/************/
@@ -128,15 +128,16 @@ public class DIVMain {
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //DPConfig.L2;
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
 		NetworkConfig.USE_STRUCTURED_SVM = true;
+		NetworkConfig.USE_BATCH_SGD = true;
 		NetworkConfig.batchSize = 10000;
 		
 		
 		ModelViewer viewer = new ModelViewer(4,entities);
 		FeatureManager dfm = null;
 		if(DPConfig.readWeight)
-			dfm = new DIVFeatureManager(new GlobalNetworkParam(OptimizerFactory.getStochasticGradientDescentFactory()),entities);
+			dfm = new DIVFeatureManager(new GlobalNetworkParam(OptimizerFactory.getGradientDescentFactory()),entities);
 		else
-			dfm = new DIVFeatureManager_leafcopy(new GlobalNetworkParam(OptimizerFactory.getStochasticGradientDescentFactory()),entities);
+			dfm = new DIVFeatureManager_leafcopy(new GlobalNetworkParam(OptimizerFactory.getGradientDescentFactory()),entities);
 		DIVNetworkCompiler dnc = new DIVNetworkCompiler(typeMap, viewer);
 		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);
 		model.train(trainingInsts, numIteration); 
