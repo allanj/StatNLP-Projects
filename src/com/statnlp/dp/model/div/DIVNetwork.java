@@ -11,6 +11,10 @@ public class DIVNetwork extends DependencyNetwork {
 
 	
 	private static final long serialVersionUID = 991556477287748391L;
+	private static String OE = DPConfig.OE;
+	private static String ONE = DPConfig.ONE;
+	private static String PARENT_IS = DPConfig.PARENT_IS;
+	
 	
 	public DIVNetwork() {
 		// TODO Auto-generated constructor stub
@@ -35,18 +39,28 @@ public class DIVNetwork extends DependencyNetwork {
 	
 	public double totalLossUpTo(int k, int[] child_k){
 		DIVInstance instance = (DIVInstance)this.getInstance();
-		
-		int[] paArr = getNodeArray(k);
 		Sentence sent = instance.getInput();
 		
+		int[] paArr = getNodeArray(k);
+		int left = paArr[1]- paArr[0];
+		int right = paArr[0];
+		int comp = paArr[2];
+		int direction = paArr[3];
+		int typeIdx = paArr[4];
+		
+		
 		double loss = 0;
-		if(paArr[1]==0){
-			int idx = paArr[0];
-			String e = sent.get(idx).getEntity().length()<2? DPConfig.ONE: sent.get(idx).getEntity().substring(2);
-			int eIdx = DIVMain.typeMap.get(e);
-			if(paArr[4]!=eIdx)
-				return 1.0;
-			else return 0.0;
+		
+		int[] carr = getNodeArray(child_k[0]);
+		if(child_k.length==1 && typeIdx==DIVMain.typeMap.get(PARENT_IS+OE) && carr[4]>1 && carr[4]<6 ){
+			double err = 0;
+			for(int i=left;i<=right;i++){
+				String e = sent.get(i).getEntity().length()<2? DPConfig.ONE: sent.get(i).getEntity().substring(2);
+				int eIdx = DIVMain.typeMap.get(e);
+				if(carr[4]!=eIdx)
+					err++;
+			}
+			return err;
 		}else{
 			for(int i=0;i<child_k.length;i++)
 				loss+=_loss[child_k[i]];

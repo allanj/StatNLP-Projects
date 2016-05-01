@@ -46,10 +46,10 @@ public class DIVMain {
 	public static String[] initializeUniqueModelTypeMap(String[] selectedEntities){
 		typeMap = new HashMap<String, Integer>();
 		int index = 0;
-		typeMap.put(OE, index++);
-		typeMap.put(ONE, index++);
+		typeMap.put(OE, index++); //0
+		typeMap.put(ONE, index++); //1
 		for(int i=0;i<selectedEntities.length;i++){
-			typeMap.put(selectedEntities[i],index++);
+			typeMap.put(selectedEntities[i],index++); //2,3,4,5,
 		}
 		typeMap.put(PARENT_IS+OE, index++);
 		typeMap.put(PARENT_IS+ONE, index++);
@@ -87,11 +87,11 @@ public class DIVMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-		trainNumber = 100;
-		testNumber = 100;
-		numIteration = 20;
-		numThreads = 8;
-		testingPath = trainingPath;
+//		trainNumber = 100;
+//		testNumber = 100;
+//		numIteration = 20;
+//		numThreads = 8;
+//		testingPath = trainingPath;
 		DPConfig.readWeight = false;
 		DPConfig.writeWeight = false;
 		/************/
