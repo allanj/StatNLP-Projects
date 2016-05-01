@@ -42,7 +42,7 @@ public class DIVNetwork extends DependencyNetwork {
 		Sentence sent = instance.getInput();
 		
 		int[] paArr = getNodeArray(k);
-		int left = paArr[1]- paArr[0];
+		int left = paArr[0]- paArr[1];
 		int right = paArr[0];
 		int comp = paArr[2];
 		int direction = paArr[3];
@@ -50,6 +50,8 @@ public class DIVNetwork extends DependencyNetwork {
 		
 		
 		double loss = 0;
+		if(child_k.length==0)
+			return 0.0;
 		
 		int[] carr = getNodeArray(child_k[0]);
 		if(child_k.length==1 && typeIdx==DIVMain.typeMap.get(PARENT_IS+OE) && carr[4]>1 && carr[4]<6 ){
