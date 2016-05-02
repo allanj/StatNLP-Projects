@@ -189,11 +189,8 @@ public abstract class NetworkModel implements Serializable{
 						System.err.println(nowf);
 						//this._fm.getParam_G().setWeight(tf, 0.0);
 					}else{
-						if(this._fm._param_g._feature2rep[tf][0].equals("local"))
-							this._fm.getParam_G().overRideWeight(tf, f2weight.get(nowf)/2);
-						else{
+						if(ftypes.contains(this._fm._param_g._feature2rep[tf][0]))
 							this._fm.getParam_G().overRideWeight(tf, f2weight.get(nowf));
-						}
 						totalObtained++;
 						//f2weight.remove(nowf);
 					}
@@ -214,18 +211,15 @@ public abstract class NetworkModel implements Serializable{
 		long startTime = System.currentTimeMillis();
 		try{
 			for(int it = 0; it<maxNumIterations; it++){
-				//everytime before start, read the weight:
+				//everytime before start, read the weight because we fixed the weight:
 				if(DPConfig.readWeight){
 					for(int tf=0;tf<this._fm._param_g._feature2rep.length;tf++){
 						String nowf = Arrays.toString(this._fm._param_g._feature2rep[tf]);
 						if(!f2weight.containsKey(nowf)){
 							System.err.println(nowf);
 						}else{
-							if(this._fm._param_g._feature2rep[tf][0].equals("local"))
-								this._fm.getParam_G().overRideWeight(tf, f2weight.get(nowf)/2);
-							else{
+							if(ftypes.contains(this._fm._param_g._feature2rep[tf][0]))
 								this._fm.getParam_G().overRideWeight(tf, f2weight.get(nowf));
-							}
 						}
 					}
 				}
