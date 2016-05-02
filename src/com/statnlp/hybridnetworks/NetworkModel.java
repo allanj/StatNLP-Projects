@@ -185,13 +185,15 @@ public abstract class NetworkModel implements Serializable{
 				int totalObtained = 0;
 				for(int tf=0;tf<this._fm._param_g._feature2rep.length;tf++){
 					String nowf = Arrays.toString(this._fm._param_g._feature2rep[tf]);
-					if(!f2weight.containsKey(nowf)){
+					if(!f2weight.containsKey(nowf) && ftypes.contains(this._fm._param_g._feature2rep[tf][0])){
 						System.err.println(nowf);
 						//this._fm.getParam_G().setWeight(tf, 0.0);
 					}else{
-						if(ftypes.contains(this._fm._param_g._feature2rep[tf][0]))
+						if(ftypes.contains(this._fm._param_g._feature2rep[tf][0])){
 							this._fm.getParam_G().overRideWeight(tf, f2weight.get(nowf));
-						totalObtained++;
+							totalObtained++;
+						}
+							
 						//f2weight.remove(nowf);
 					}
 				}
@@ -215,8 +217,8 @@ public abstract class NetworkModel implements Serializable{
 				if(DPConfig.readWeight){
 					for(int tf=0;tf<this._fm._param_g._feature2rep.length;tf++){
 						String nowf = Arrays.toString(this._fm._param_g._feature2rep[tf]);
-						if(!f2weight.containsKey(nowf)){
-							System.err.println(nowf);
+						if(!f2weight.containsKey(nowf) && ftypes.contains(this._fm._param_g._feature2rep[tf][0])){
+							
 						}else{
 							if(ftypes.contains(this._fm._param_g._feature2rep[tf][0]))
 								this._fm.getParam_G().overRideWeight(tf, f2weight.get(nowf));
