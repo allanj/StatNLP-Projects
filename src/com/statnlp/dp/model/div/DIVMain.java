@@ -87,12 +87,12 @@ public class DIVMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 100;
-//		testNumber = 100;
+//		trainNumber = 1;
+//		testNumber = 10;
 //		numIteration = 20;
 //		numThreads = 8;
 //		testingPath = trainingPath;
-		DPConfig.readWeight = false;
+		DPConfig.readWeight = true;
 		DPConfig.writeWeight = false;
 		/************/
 		
@@ -127,17 +127,13 @@ public class DIVMain {
 		NetworkConfig._numThreads = numThreads;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //DPConfig.L2;
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
-		NetworkConfig.USE_STRUCTURED_SVM = true;
+		NetworkConfig.USE_STRUCTURED_SVM = false;
 		NetworkConfig.USE_BATCH_SGD = true;
 		NetworkConfig.batchSize = 10000;
 		
 		
 		ModelViewer viewer = new ModelViewer(4,entities);
-		FeatureManager dfm = null;
-		if(DPConfig.readWeight)
-			dfm = new DIVFeatureManager(new GlobalNetworkParam(OptimizerFactory.getGradientDescentFactory()),entities);
-		else
-			dfm = new DIVFeatureManager_leafcopy(new GlobalNetworkParam(OptimizerFactory.getGradientDescentFactory()),entities);
+		FeatureManager dfm = new DIVFeatureManager(new GlobalNetworkParam(OptimizerFactory.getGradientDescentFactory()),entities);
 		DIVNetworkCompiler dnc = new DIVNetworkCompiler(typeMap, viewer);
 		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);
 		model.train(trainingInsts, numIteration); 
@@ -174,6 +170,8 @@ public class DIVMain {
 					case "-windows": DPConfig.windows = true; break;
 					case "-comb": DPConfig.comb = true; break;
 					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
+					case "-rw": DPConfig.weightPath=args[i+1]; DPConfig.readWeight = true;DPConfig.writeWeight = false; break;
+					case "-ww":DPConfig.weightPath=args[i+1]; DPConfig.readWeight = false; DPConfig.writeWeight = true; break;
 					default: System.err.println("Invalid arguments: "+args[i]+", please check usage."); System.err.println(usage);System.exit(0);
 				}
 			}

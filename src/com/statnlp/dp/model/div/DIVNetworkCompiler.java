@@ -191,9 +191,9 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 					network.addEdge(wordRightNode, new long[]{wordRightNodeE});
 					//Should use the first one. can yield the best result
 					//if(wordLeftNodeE!=-1 && !(pae.equals(OE) && isEntity(e)) ){
-					boolean exp;
-					if(DPConfig.readWeight) exp = wordLeftNodeE!=-1;
-					else exp = wordLeftNodeE!=-1 && !(pae.equals(OE) && isEntity(e));
+					boolean exp= wordLeftNodeE!=-1 && !(pae.equals(OE) && isEntity(e));
+//					if(DPConfig.readWeight) exp = wordLeftNodeE!=-1;
+//					else exp = wordLeftNodeE!=-1 && !(pae.equals(OE) && isEntity(e));
 					if(exp){
 						long wordLeftNode = this.toNode(rightIndex, rightIndex, 0, 1,PARENT_IS+pae);
 						network.addNode(wordLeftNode);
