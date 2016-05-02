@@ -92,8 +92,8 @@ public class DIVMain {
 //		numIteration = 20;
 //		numThreads = 8;
 //		testingPath = trainingPath;
-		DPConfig.readWeight = true;
-		DPConfig.writeWeight = false;
+//		DPConfig.readWeight = false;
+//		DPConfig.writeWeight = false;
 		/************/
 		
 		
@@ -127,13 +127,10 @@ public class DIVMain {
 		NetworkConfig._numThreads = numThreads;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //DPConfig.L2;
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
-		NetworkConfig.USE_STRUCTURED_SVM = false;
-		NetworkConfig.USE_BATCH_SGD = true;
-		NetworkConfig.batchSize = 10000;
 		
 		
 		ModelViewer viewer = new ModelViewer(4,entities);
-		FeatureManager dfm = new DIVFeatureManager(new GlobalNetworkParam(OptimizerFactory.getGradientDescentFactory()),entities);
+		FeatureManager dfm = new DIVFeatureManager_leafcopy(new GlobalNetworkParam(),entities);
 		DIVNetworkCompiler dnc = new DIVNetworkCompiler(typeMap, viewer);
 		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);
 		model.train(trainingInsts, numIteration); 
