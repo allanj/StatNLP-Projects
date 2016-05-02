@@ -618,9 +618,9 @@ public class GlobalNetworkParam implements Serializable{
     		// and so does not correspond to the current objective value.
     		// In practice, though, the two are usually very close to each other (if we
     		// are stopping near the solution), so not copying will also work.
-    		for(int i=0; i<this._weights.length; i++){
-        		this._weights[i] = LBFGS.solution_cache[i];
-        	}
+//    		for(int i=0; i<this._weights.length; i++){
+//        		this._weights[i] = LBFGS.solution_cache[i];
+//        	}
     	}
     	if(NetworkConfig.USE_STRUCTURED_SVM){
     		if(this._obj > this._bestObj){
