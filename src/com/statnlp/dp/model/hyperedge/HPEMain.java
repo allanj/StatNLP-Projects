@@ -80,13 +80,13 @@ public class HPEMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 30;
+//		trainNumber = 10;
 //		testNumber = 30;
 //		numIteration = 20;
 //		numThreads = 8;
 //		testingPath = trainingPath;
-		DPConfig.readWeight = false;
-		DPConfig.writeWeight = false;
+//		DPConfig.readWeight = true;
+//		DPConfig.writeWeight = false;
 		/************/
 		
 		
@@ -161,6 +161,8 @@ public class HPEMain {
 					case "-windows": DPConfig.windows = true; break;
 					case "-comb": DPConfig.comb = true; break;
 					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
+					case "-rw": DPConfig.weightPath=args[i+1]; DPConfig.readWeight = true;DPConfig.writeWeight = false; break;
+					case "-ww":DPConfig.weightPath=args[i+1]; DPConfig.readWeight = false; DPConfig.writeWeight = true; break;
 					default: System.err.println("Invalid arguments: "+args[i]+", please check usage."); System.err.println(usage);System.exit(0);
 				}
 			}
