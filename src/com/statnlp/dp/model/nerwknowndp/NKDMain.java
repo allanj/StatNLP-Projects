@@ -30,6 +30,8 @@ public class NKDMain {
 	public static String PARENT_IS = DPConfig.PARENT_IS;
 	public static String OE = DPConfig.OE;
 	public static String ONE = DPConfig.ONE;
+	public static String E_B_PREFIX = DPConfig.E_B_PREFIX;
+	public static String E_I_PREFIX = DPConfig.E_I_PREFIX;
 	public static String[] entities; 
 	public static int trainNumber = -1;
 	public static int testNumber = -1;
@@ -87,11 +89,11 @@ public class NKDMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 100;
-//		testNumber = 1000;
-//		numIteration = 30;
-//		numThreads = 8;
-//		testingPath = trainingPath;
+		trainNumber = 100;
+		testNumber = 100;
+		numIteration = 40;
+		numThreads = 8;
+		testingPath = trainingPath;
 //		DPConfig.readWeight = false;
 //		DPConfig.writeWeight = false;
 		/************/
