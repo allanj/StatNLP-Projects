@@ -182,6 +182,54 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 					}
 					
 				}
+				
+				for(int i=leftIndex;i<=rightIndex-1;i++){
+					String blw = sent.get(i).getName();
+					String brw = sent.get(i+1).getName();
+					String blt = sent.get(i).getTag();
+					String brt =sent.get(i+1).getTag();
+					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-BI-WORD", child_1_type+":"+blw+":"+brw));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-BI-TAG", child_1_type+":"+blt+":"+brt));
+				}
+				//trigram
+				for(int i=leftIndex;i<=rightIndex-2;i++){
+					String tlw = sent.get(i).getName();
+					String tlt = sent.get(i).getTag();
+					String tmw = sent.get(i+1).getName();
+					String tmt =sent.get(i+1).getTag();
+					String trw = sent.get(i+2).getName();
+					String trt =sent.get(i+2).getTag();
+					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-TRI-WORD", child_1_type+":"+tlw+":"+tmw+":"+trw));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-TRI-TAG", child_1_type+":"+tlt+":"+tmt+":"+trt));
+				}
+				//4-gram
+				for(int i=leftIndex;i<=rightIndex-3;i++){
+					String flw = sent.get(i).getName();
+					String flt = sent.get(i).getTag();
+					String fm1w = sent.get(i+1).getName();
+					String fm1t =sent.get(i+1).getTag();
+					String fm2w = sent.get(i+2).getName();
+					String fm2t =sent.get(i+2).getTag();
+					String frw = sent.get(i+3).getName();
+					String frt =sent.get(i+3).getTag();
+					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-FG-WORD", child_1_type+":"+flw+":"+fm1w+":"+fm2w+":"+frw));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-FG-TAG", child_1_type+":"+flt+":"+fm1t+":"+fm2t+":"+frt));
+				}
+				//5-gram
+				for(int i=leftIndex;i<=rightIndex-4;i++){
+					String flw = sent.get(i).getName();
+					String flt = sent.get(i).getTag();
+					String fm1w = sent.get(i+1).getName();
+					String fm1t =sent.get(i+1).getTag();
+					String fm2w = sent.get(i+2).getName();
+					String fm2t =sent.get(i+2).getTag();
+					String fm3w = sent.get(i+3).getName();
+					String fm3t =sent.get(i+3).getTag();
+					String frw = sent.get(i+4).getName();
+					String frt =sent.get(i+4).getTag();
+					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-FivG-WORD", child_1_type+":"+flw+":"+fm1w+":"+fm2w+":"+fm3w+":"+frw));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-FivG-TAG", child_1_type+":"+flt+":"+fm1t+":"+fm2t+":"+fm3t+":"+frt));
+				}
 			}
 			
 			addDepFeatures(featureList,network,parentArr,children_k,sent);
