@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.DependInstance;
 import com.statnlp.dp.Transformer;
+import com.statnlp.dp.commons.PositionType;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.Tree;
@@ -93,11 +94,7 @@ public class D2DInstance extends DependInstance {
 	}
 	
 	
-	/**
-	 * This one is only used by unique model
-	 * @param spanRoot
-	 * @return
-	 */
+	
 	@Override
 	public String[] toEntities(Tree spanRoot){
 //		System.err.println(spanRoot.pennString());
@@ -117,9 +114,9 @@ public class D2DInstance extends DependInstance {
 		this.findAllE(spanRoot, esArr);
 		for(int i=1;i<es.length;i++){
 			if(esArr.get(i).size()==0) es[i] = O_TYPE;
-			else if(esArr.get(i).size()==1) es[i] = esArr.get(i).get(0).type;
+			else if(esArr.get(i).size()==1) es[i] = esArr.get(i).get(0).getType();
 			else if(esArr.get(i).size()==2){
-				es[i] = esArr.get(i).get(0).length >= esArr.get(i).get(1).length? esArr.get(i).get(0).type: esArr.get(i).get(1).type;
+				es[i] = esArr.get(i).get(0).getLength() >= esArr.get(i).get(1).getLength()? esArr.get(i).get(0).getType(): esArr.get(i).get(1).getType();
 			}else{
 				throw new RuntimeException("one word cannot have more two types");
 			}

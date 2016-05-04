@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.DependInstance;
 import com.statnlp.dp.Transformer;
+import com.statnlp.dp.commons.PositionType;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.Tree;
@@ -93,70 +94,62 @@ public class DIVInstance extends DependInstance {
 	}
 	
 	
-	/**
-	 * This one is only used by unique model
-	 * @param spanRoot
-	 * @return
-	 */
 	@Override
 	public String[] toEntities(Tree spanRoot){
 //		System.err.println(spanRoot.pennString());
-		
+		ArrayList<ArrayList<PositionType>> esArr = new ArrayList<ArrayList<PositionType>>();
+		for(int i=0;i<this.sentence.length();i++){
+			ArrayList<PositionType> list = new ArrayList<PositionType>();
+			esArr.add(list);
+		}
 		String[] es = new String[this.sentence.length()];
-		boolean[] set = new boolean[this.sentence.length()];
+		
+		String[] res = new String[this.sentence.length()];
 		es[0] = O_TYPE;
-		for(int i=1;i<es.length;i++) {es[i] = "UNDEF"; set[i] =false;}
-		this.findAllONE(es, spanRoot);
-		resCovered = false;
-		this.findAllE(es, spanRoot);
+		res[0] = es[0];
+		ArrayList<PositionType> rootPosType = new ArrayList<PositionType>();
+		rootPosType.add(new PositionType(O_TYPE, 1));
+		esArr.set(0, rootPosType);
+		this.findAllE(spanRoot, esArr);
 		for(int i=1;i<es.length;i++){
-			if(es[i].equals("UNDEF")) {
-				System.err.println("Some spans are not finalized the type. Info:\n\t"+this._instanceId+"\n"+this.getInput().toString());
-				es[i] = O_TYPE;
+			if(esArr.get(i).size()==0) es[i] = O_TYPE;
+			else if(esArr.get(i).size()==1) es[i] = esArr.get(i).get(0).getType();
+			else if(esArr.get(i).size()==2){
+				es[i] = esArr.get(i).get(0).getLength() >= esArr.get(i).get(1).getLength()? esArr.get(i).get(0).getType(): esArr.get(i).get(1).getType();
+			}else{
+				throw new RuntimeException("one word cannot have more two types");
 			}
-			if((es[i-1].startsWith(E_I_PREFIX) || es[i-1].startsWith(E_B_PREFIX)) && es[i].startsWith(E_B_PREFIX) && es[i-1].substring(2, es[i-1].length()).equals(es[i].substring(2, es[i].length())))
-				es[i] = E_I_PREFIX+es[i-1].substring(2, es[i-1].length());
+			if(!es[i-1].equals(es[i]) && !es[i].equals(O_TYPE)){
+				res[i] = E_B_PREFIX + es[i];
+			}else if(es[i-1].equals(es[i]) && !es[i].equals(O_TYPE)){
+				res[i] = E_I_PREFIX + es[i];
+			}else if(es[i].equals(O_TYPE)){
+				res[i] = O_TYPE;
+			}
 		}
-		return es;
+		
+		
+		return res;
 	}
 	
-	private void findAllONE(String[] es, Tree current){
+	
+	private void findAllE(Tree current, ArrayList<ArrayList<PositionType>> esArr){
 		CoreLabel label = (CoreLabel)(current.label());
 		String[] info = label.value().split(",");
 		int l = Integer.valueOf(info[0]);
 		int r = Integer.valueOf(info[1]);
 		String type = info[4];
-		if(type.equals(ONE)){
-			for(int i=l;i<=r;i++) es[i] = O_TYPE;
-			return;
-		}else if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE)){
-			return;
-		}else{
-			for(Tree child: current.children()){
-				findAllONE(es,child);
-			}
-		}
-	}
-	
-	private void findAllE(String[] es, Tree current){
-		CoreLabel label = (CoreLabel)(current.label());
-		String[] info = label.value().split(",");
-		int l = Integer.valueOf(info[0]);
-		int r = Integer.valueOf(info[1]);
-		String type = info[4];
-		if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE) && !type.equals(GO)){
-			if((es[l].startsWith(E_B_PREFIX) || es[l].startsWith(E_I_PREFIX)) && !es[l].substring(2).equals(type)) resCovered = true;
-			es[l] = E_B_PREFIX+type;
-			for(int i=l+1;i<=r;i++){
-				if((es[i].startsWith(E_B_PREFIX) || es[i].startsWith(E_I_PREFIX)) && !es[i].substring(2).equals(type)) resCovered = true;
-				es[i]=E_I_PREFIX+type;
+		if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE) ){
+			for(int i=l;i<=r;i++){
+				ArrayList<PositionType> posList = esArr.get(i);
+				posList.add(new PositionType(type, l-r+1));
 			}
 			return;
 		}else if(type.equals(ONE)){
 			return;
 		}else{
 			for(Tree child: current.children()){
-				findAllE(es,child);
+				findAllE(child,esArr);
 			}
 		}
 	}
