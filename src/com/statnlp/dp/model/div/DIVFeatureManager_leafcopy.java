@@ -232,6 +232,25 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 				}
 			}
 			
+			//joint features
+			if(!child_1_type.equals("OE") && !child_1_type.equals("ONE") && completeness==0 && !child_1_type.startsWith(PARENT_IS)){
+				
+				
+				/****Bigram features without dist info******/
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword", "JOINT:"+child_1_type+":"+headWord+":"+modifierWord));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag", "JOINT:"+child_1_type+":"+headTag+":"+modifierTag));
+				
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword-dist", "JOINT:"+child_1_type+":"+headWord+":"+modifierWord+attDist));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag-dist", "JOINT:"+child_1_type+":"+headTag+":"+modifierTag+attDist));
+//				
+				
+				//add more dependency features here.
+				for(int i=leftIndex+1;i<rightIndex;i++){
+					featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-inbetween-1", "JOINT:"+child_1_type+":"+leftTag+","+sent.get(i).getTag()+","+rightTag));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-inbetween-2", "JOINT:"+child_1_type+":"+leftTag+","+sent.get(i).getTag()+","+rightTag+attDist));
+				}
+			}
+			
 			addDepFeatures(featureList,network,parentArr,children_k,sent);
 		}
 	
