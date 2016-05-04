@@ -257,9 +257,20 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 				/****Bigram features without dist info******/
 				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword", "JOINT:"+child_1_type+":"+headWord+":"+modifierWord));
 				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag", "JOINT:"+child_1_type+":"+headTag+":"+modifierTag));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramnametag",  "JOINT:"+child_1_type+":"+headWord+","+headTag+","+modifierWord+","+modifierTag));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headallmoditag", "JOINT:"+child_1_type+":"+headWord+","+headTag+","+modifierTag));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headallmodiword", "JOINT:"+child_1_type+":"+headWord+","+headTag+","+modifierWord));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headtagmodiall", "JOINT:"+child_1_type+":"+headTag+","+modifierWord+","+modifierTag));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headwordmodiall", "JOINT:"+child_1_type+":"+headWord+","+modifierWord+","+modifierTag));
+				
 				
 				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword-dist", "JOINT:"+child_1_type+":"+headWord+":"+modifierWord+attDist));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag-dist", "JOINT:"+child_1_type+":"+headTag+":"+modifierTag+attDist));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-joint-bigramtag-dist", "JOINT:"+child_1_type+":"+headTag+":"+modifierTag+attDist));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramnametag-dist",  "JOINT:"+child_1_type+":"+headWord+","+headTag+","+modifierWord+","+modifierTag+attDist));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headallmoditag-dist", "JOINT:"+child_1_type+":"+headWord+","+headTag+","+modifierTag+attDist));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headallmodiword-dist", "JOINT:"+child_1_type+":"+headWord+","+headTag+","+modifierWord+attDist));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headtagmodiall-dist", "JOINT:"+child_1_type+":"+headTag+","+modifierWord+","+modifierTag+attDist));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-headwordmodiall-dist", "JOINT:"+child_1_type+":"+headWord+","+modifierWord+","+modifierTag+attDist));
 //				
 				
 				//add more dependency features here.
