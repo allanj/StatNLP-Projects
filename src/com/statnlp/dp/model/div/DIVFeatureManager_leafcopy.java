@@ -206,8 +206,17 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 					String brw = sent.get(i+1).getName();
 					String blt = sent.get(i).getTag();
 					String brt =sent.get(i+1).getTag();
+					String prevWord = i>1?sent.get(i-1).getName():"STR";
+					String prevTag = i>1?sent.get(i-1).getTag():"STR";
+					String nextWord = i<sent.length()-1? sent.get(i+1).getName():"END";
+					String nextTag = i<sent.length()-1? sent.get(i+1).getTag():"END";
 					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-BI-WORD", child_1_type+":"+blw+":"+brw));
 					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-BI-TAG", child_1_type+":"+blt+":"+brt));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-BI-ELW", child_1_type+":"+prevWord));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-BI-ELT", child_1_type+":"+prevTag));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-BI-ERW", child_1_type+":"+nextWord));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-BI-ERT", child_1_type+":"+nextTag));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-BI-ELT-T",child_1_type+":"+prevTag+","+blt+":"+brt));
 				}
 				//trigram
 				for(int i=leftIndex;i<=rightIndex-2;i++){
@@ -217,8 +226,17 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 					String tmt =sent.get(i+1).getTag();
 					String trw = sent.get(i+2).getName();
 					String trt =sent.get(i+2).getTag();
+					String prevWord = i>1?sent.get(i-1).getName():"STR";
+					String prevTag = i>1?sent.get(i-1).getTag():"STR";
+					String nextWord = i<sent.length()-1? sent.get(i+1).getName():"END";
+					String nextTag = i<sent.length()-1? sent.get(i+1).getTag():"END";
 					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-TRI-WORD", child_1_type+":"+tlw+":"+tmw+":"+trw));
 					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-TRI-TAG", child_1_type+":"+tlt+":"+tmt+":"+trt));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-TRI-ELW", child_1_type+":"+prevWord));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-TRI-ELT", child_1_type+":"+prevTag));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-TRI-ERW", child_1_type+":"+nextWord));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-TRI-ERT", child_1_type+":"+nextTag));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-TRI-ELT-T",child_1_type+":"+prevTag+","+tlt+":"+tmt+":"+trt));
 				}
 				//4-gram
 				for(int i=leftIndex;i<=rightIndex-3;i++){
@@ -230,8 +248,17 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 					String fm2t =sent.get(i+2).getTag();
 					String frw = sent.get(i+3).getName();
 					String frt =sent.get(i+3).getTag();
+					String prevWord = i>1?sent.get(i-1).getName():"STR";
+					String prevTag = i>1?sent.get(i-1).getTag():"STR";
+					String nextWord = i<sent.length()-1? sent.get(i+1).getName():"END";
+					String nextTag = i<sent.length()-1? sent.get(i+1).getTag():"END";
 					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-FG-WORD", child_1_type+":"+flw+":"+fm1w+":"+fm2w+":"+frw));
 					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-FG-TAG", child_1_type+":"+flt+":"+fm1t+":"+fm2t+":"+frt));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-FG-ELW", child_1_type+":"+prevWord));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-FG-ELT", child_1_type+":"+prevTag));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-FG-ERW", child_1_type+":"+nextWord));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-FG-ERT", child_1_type+":"+nextTag));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-FG-ELT-T",child_1_type+":"+prevTag+","+flt+":"+fm1t+":"+fm2t+":"+frt));
 				}
 				//5-gram
 				for(int i=leftIndex;i<=rightIndex-4;i++){
@@ -245,8 +272,17 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 					String fm3t =sent.get(i+3).getTag();
 					String frw = sent.get(i+4).getName();
 					String frt =sent.get(i+4).getTag();
+					String prevWord = i>1?sent.get(i-1).getName():"STR";
+					String prevTag = i>1?sent.get(i-1).getTag():"STR";
+					String nextWord = i<sent.length()-1? sent.get(i+1).getName():"END";
+					String nextTag = i<sent.length()-1? sent.get(i+1).getTag():"END";
 					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-FivG-WORD", child_1_type+":"+flw+":"+fm1w+":"+fm2w+":"+fm3w+":"+frw));
 					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-FivG-TAG", child_1_type+":"+flt+":"+fm1t+":"+fm2t+":"+fm3t+":"+frt));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-FivG-ELW", child_1_type+":"+prevWord));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-FivG-ELT", child_1_type+":"+prevTag));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-FivG-ERW", child_1_type+":"+nextWord));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-FivG-ERT", child_1_type+":"+nextTag));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-FivG-ELT-T",child_1_type+":"+prevTag+","+flt+":"+fm1t+":"+fm2t+":"+fm3t+":"+frt));
 				}
 			}
 			
