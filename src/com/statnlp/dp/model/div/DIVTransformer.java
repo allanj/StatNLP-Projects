@@ -71,7 +71,6 @@ public class DIVTransformer extends Transformer {
 		}
 		if(incompletes.size()>0){
 			processInvalid(sent, incompletes, sentEntities);
-			System.err.println("invalid");
 		}
 		for(int i=1;i<sentEntities.length;i++){
 			if(sentEntities[i][0]!=null && sentEntities[i][1]!=null) continue;

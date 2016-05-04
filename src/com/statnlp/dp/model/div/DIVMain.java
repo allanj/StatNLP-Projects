@@ -111,7 +111,6 @@ public class DIVMain {
 			testingInsts = DIVReader.readCNN(decodePath, false,testNumber,tran);
 		}else{
 			trainingInsts = DIVReader.readInstance(trainingPath, true,trainNumber,selectedEntities,tran, false);
-			System.exit(0);
 			testingInsts = DIVReader.readInstance(decodePath, false,testNumber,selectedEntities,tran, false);
 		}
 //		Formatter.semevalToText(trinInsts, "data/"+DPConfig.dataType+"/proj/en.train.txt");

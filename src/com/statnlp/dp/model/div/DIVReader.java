@@ -11,6 +11,7 @@ import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
 import com.statnlp.dp.Transformer;
+import com.statnlp.dp.commons.Entity;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DataChecker;
 
@@ -76,9 +77,11 @@ public class DIVReader {
 						continue;
 					}
 					Tree dependencyTree = transformer.toDependencyTree(dependencies, sent);
-					if(dependencyTree.size()==sent.length() && sent.length()< maxLength){
+					ArrayList<Entity> checkInvalid = DataChecker.checkAllIncomplete(sent);
+					if(dependencyTree.size()==sent.length() && sent.length()< maxLength ){
 						sent.setRecognized();
 						DIVInstance inst = new DIVInstance(index++,1.0,sent,dependencies,dependencyTree,transformer.toSpanTree(dependencyTree, sent));
+						
 						if(entities!=null && typeMap!=null) inst.setHaveEntity(typeMap);
 						inst.continousNum = conNum;
 						for(UnnamedDependency ud: dependencies){
@@ -88,12 +91,12 @@ public class DIVReader {
 							he.setNER(sent.get(he.sentIndex()).getEntity());
 						}
 						maxLen = Math.max(maxLen, inst.getInput().length());
-						if(isLabeled) {
+						if(isLabeled && checkInvalid.size()==0 ) {
 							sent.setRecognized();
 							inst.setLabeled();
 							data.add(inst);
 						}
-						else {
+						else if (!isLabeled){
 							inst.setUnlabeled();
 							data.add(inst);
 						}
