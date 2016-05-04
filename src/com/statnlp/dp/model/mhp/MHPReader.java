@@ -81,7 +81,7 @@ public class MHPReader {
 					Tree dependencyTree = transformer.toDependencyTree(dependencies, sent);
 					if(dependencyTree.size()==sent.length() && sent.length()< maxLength){
 						sent.setRecognized();
-						MHPInstance inst = new MHPInstance(index++,1.0,sent,dependencies,dependencyTree,transformer);
+						MHPInstance inst = new MHPInstance(index++,1.0,sent,dependencies,dependencyTree,transformer.toSpanTree(dependencyTree, sent));
 						if(entities!=null && typeMap!=null) inst.setHaveEntity(typeMap);
 						inst.continousNum = conNum;
 						for(UnnamedDependency ud: dependencies){
@@ -207,7 +207,7 @@ public class MHPReader {
 					}
 					Tree dependencyTree = transformer.toDependencyTree(dependencies, sent);
 					if(dependencyTree.size()==sent.length()){
-						MHPInstance inst = new MHPInstance(index++,1.0,sent,dependencies,dependencyTree,transformer);
+						MHPInstance inst = new MHPInstance(index++,1.0,sent,dependencies,dependencyTree,transformer.toSpanTree(dependencyTree, sent));
 						maxLen = Math.max(maxLen, inst.getInput().length());
 						if(isLabeled) {
 							sent.setRecognized();

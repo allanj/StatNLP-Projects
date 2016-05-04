@@ -22,8 +22,8 @@ public class D2DInstance extends DependInstance {
 		super(instanceId, weight, sent);
 	}
 
-	public D2DInstance(int instanceId, double weight, Sentence sentence, ArrayList<UnnamedDependency> dependencies, Tree dependencyRoot, Transformer transform) {
-		super(instanceId,weight,sentence,dependencies,dependencyRoot,transform);
+	public D2DInstance(int instanceId, double weight, Sentence sentence, ArrayList<UnnamedDependency> dependencies, Tree dependencyRoot, Tree output) {
+		super(instanceId,weight,sentence,dependencies,dependencyRoot,output);
 	}
 	
 	

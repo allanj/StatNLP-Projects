@@ -87,11 +87,11 @@ public class DIVMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-		trainNumber = 100;
-		testNumber = 100;
-		numIteration = 40;
-		numThreads = 8;
-		testingPath = trainingPath;
+		trainNumber = -1;
+//		testNumber = 100;
+//		numIteration = 40;
+//		numThreads = 8;
+//		testingPath = trainingPath;
 //		DPConfig.readWeight = false;
 //		DPConfig.writeWeight = false;
 		/************/
@@ -111,6 +111,7 @@ public class DIVMain {
 			testingInsts = DIVReader.readCNN(decodePath, false,testNumber,tran);
 		}else{
 			trainingInsts = DIVReader.readInstance(trainingPath, true,trainNumber,selectedEntities,tran, false);
+			System.exit(0);
 			testingInsts = DIVReader.readInstance(decodePath, false,testNumber,selectedEntities,tran, false);
 		}
 //		Formatter.semevalToText(trinInsts, "data/"+DPConfig.dataType+"/proj/en.train.txt");

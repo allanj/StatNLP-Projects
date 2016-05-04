@@ -23,8 +23,8 @@ public class NKDInstance extends DependInstance {
 		super(instanceId, weight, sent);
 	}
 
-	public NKDInstance(int instanceId, double weight, Sentence sentence, ArrayList<UnnamedDependency> dependencies, Tree dependencyRoot, Transformer transform) {
-		super(instanceId,weight,sentence,dependencies,dependencyRoot,transform);
+	public NKDInstance(int instanceId, double weight, Sentence sentence, ArrayList<UnnamedDependency> dependencies, Tree dependencyRoot, Tree output) {
+		super(instanceId,weight,sentence,dependencies,dependencyRoot,output);
 		toHead();
 	}
 	
@@ -130,7 +130,6 @@ public class NKDInstance extends DependInstance {
 		es[0] = O_TYPE;
 		for(int i=1;i<es.length;i++) {es[i] = "UNDEF"; set[i] =false;}
 		this.findAllONE(es, spanRoot);
-		resCovered = false;
 		this.findAllE(es, spanRoot);
 		for(int i=1;i<es.length;i++){
 			if(es[i].equals("UNDEF")) {
@@ -168,10 +167,8 @@ public class NKDInstance extends DependInstance {
 		int r = Integer.valueOf(info[1]);
 		String type = info[4];
 		if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE) && !type.equals(GO)){
-			if((es[l].startsWith(E_B_PREFIX) || es[l].startsWith(E_I_PREFIX)) && !es[l].substring(2).equals(type)) resCovered = true;
 			es[l] = E_B_PREFIX+type;
 			for(int i=l+1;i<=r;i++){
-				if((es[i].startsWith(E_B_PREFIX) || es[i].startsWith(E_I_PREFIX)) && !es[i].substring(2).equals(type)) resCovered = true;
 				es[i]=E_I_PREFIX+type;
 			}
 			return;

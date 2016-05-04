@@ -13,6 +13,7 @@ import edu.stanford.nlp.trees.UnnamedDependency;
 
 public class DIVInstance extends DependInstance {
 
+	private boolean invalid;
 	
 	public DIVInstance(int instanceId, double weight) {
 		super(instanceId, weight);
@@ -22,8 +23,8 @@ public class DIVInstance extends DependInstance {
 		super(instanceId, weight, sent);
 	}
 
-	public DIVInstance(int instanceId, double weight, Sentence sentence, ArrayList<UnnamedDependency> dependencies, Tree dependencyRoot, Transformer transform) {
-		super(instanceId,weight,sentence,dependencies,dependencyRoot,transform);
+	public DIVInstance(int instanceId, double weight, Sentence sentence, ArrayList<UnnamedDependency> dependencies, Tree dependencyRoot, Tree output) {
+		super(instanceId,weight,sentence,dependencies,dependencyRoot,output);
 	}
 	
 	

@@ -26,8 +26,8 @@ public class MHPInstance extends DependInstance {
 		super(instanceId, weight,sentence);
 	}
 	
-	public MHPInstance(int instanceId, double weight, Sentence sentence, ArrayList<UnnamedDependency> dependencies, Tree dependencyRoot, Transformer transform) {
-		super(instanceId, weight,sentence,dependencies,dependencyRoot,transform);
+	public MHPInstance(int instanceId, double weight, Sentence sentence, ArrayList<UnnamedDependency> dependencies, Tree dependencyRoot,Tree output) {
+		super(instanceId, weight,sentence,dependencies,dependencyRoot,output);
 		
 	}
 	
