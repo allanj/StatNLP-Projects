@@ -80,7 +80,7 @@ public class HPEMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 10;
+//		trainNumber = 100;
 //		testNumber = 30;
 //		numIteration = 20;
 //		numThreads = 8;
