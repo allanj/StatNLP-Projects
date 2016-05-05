@@ -297,6 +297,43 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 				}
 				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-whole-words",child_1_type+":"+sb.toString()) );
 				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-whole-tags",child_1_type+":"+sbTags.toString()) );
+				
+				
+				//boundary features
+				String lw = sent.get(leftIndex).getName();
+				String rw = sent.get(rightIndex).getName();
+				String lt = sent.get(leftIndex).getTag();
+				String rt =sent.get(rightIndex).getTag();
+				String lb = leftIndex>0? sent.get(leftIndex-1).getName():"STR";
+				String lbt = leftIndex>0? sent.get(leftIndex-1).getTag():"STR";
+				String rb = rightIndex<sent.length()-1? sent.get(rightIndex+1).getName():"END";
+				String rbt = rightIndex<sent.length()-1? sent.get(rightIndex+1).getTag():"END";
+				
+				//boundary
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBW-1",child_1_type+":"+lb+":LEFT_1_BD"));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBT-1",child_1_type+":"+lbt+":LEFT_1_BD"));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ELBWT-1",child_1_type+":"+lb+","+lbt+":LEFT_1_BD"));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBW-1",child_1_type+":"+rb+":RIGHT_1_BD"));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBT-1",child_1_type+":"+rbt+":RIGHT_1_BD"));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"ERBWT-1",child_1_type+":"+rb+","+rbt+":RIGHT_1_BD"));
+				
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LW-RW",child_1_type+":"+lw+":"+rw));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LT-RT",child_1_type+":"+lt+":"+rt));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LWT-RWT",child_1_type+":"+lw+":"+lt+"-"+rw+":"+rt));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LW-RT",child_1_type+":"+lw+":"+rt));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-IN-LT-RW",child_1_type+":"+lt+":"+rw));
+				
+				
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBT-LT", child_1_type+":"+lbt+","+lt));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBT-LW", child_1_type+":"+lbt+","+lw));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBW-LT", child_1_type+":"+lb+","+lt));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-LBW-LW", child_1_type+":"+lb+","+lw));
+				
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBT-RT", child_1_type+":"+rbt+","+rt));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBT-RW", child_1_type+":"+rbt+","+rw));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBW-RT", child_1_type+":"+rb+","+rt));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-RBW-RW", child_1_type+":"+rb+","+rw));
+				
 			}
 			
 			//joint features
