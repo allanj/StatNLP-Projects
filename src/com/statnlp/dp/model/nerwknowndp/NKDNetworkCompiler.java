@@ -138,7 +138,7 @@ public class NKDNetworkCompiler extends NetworkCompiler {
 	}
 	
 	public NKDNetwork compileUnLabledInstance(int networkId, NKDInstance inst, LocalNetworkParam param){
-		this.compileUnlabeled(inst);
+		NKDNetwork construct = this.compileUnlabeled(inst);
 		long root = this.toNode_generalRoot(inst.getInput().length());
 		int rootIdx = Arrays.binarySearch(this._nodes, root);
 		if(rootIdx<0){
@@ -146,7 +146,7 @@ public class NKDNetworkCompiler extends NetworkCompiler {
 			throw new RuntimeException(inst.getInput().toString());
 		}
 		
-		NKDNetwork network = new NKDNetwork(networkId,inst,this._nodes,this._children, param,rootIdx+1 );
+		NKDNetwork network = new NKDNetwork(networkId,inst,construct.getAllNodes(),construct.getAllChildren(), param,rootIdx+1 );
 		//viewer.visualizeNetwork(network, null, "UnLabeled Network");
 		//System.err.println("[Info] Compile Unlabeled instance, length: "+inst.getInput().length());
 		//System.err.println("My root:"+Arrays.toString(NetworkIDMapper.toHybridNodeArray(root)));
@@ -158,7 +158,7 @@ public class NKDNetworkCompiler extends NetworkCompiler {
 		return network;
 	}
 	
-	public void compileUnlabeled(NKDInstance inst){
+	public NKDNetwork compileUnlabeled(NKDInstance inst){
 		
 		int[] heads = inst.getHead();
 		NKDNetwork network = new NKDNetwork();
@@ -318,8 +318,9 @@ public class NKDNetworkCompiler extends NetworkCompiler {
 		}
 		
 		network.finalizeNetwork();
-		this._nodes = network.getAllNodes();
-		this._children = network.getAllChildren();
+		return network;
+//		this._nodes = network.getAllNodes();
+//		this._children = network.getAllChildren();
 		
 		//printNodes(this._nodes);
 //		System.err.println(network.countNodes()+" nodes..");

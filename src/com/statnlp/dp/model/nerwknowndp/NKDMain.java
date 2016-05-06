@@ -87,13 +87,13 @@ public class NKDMain {
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
-		trainingPath = "data/semeval10t1/small.txt";
+//		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 100;
-//		testNumber = 100;
+		trainNumber = 20;
+		testNumber = 20;
 //		numIteration = 40;
 //		numThreads = 8;
-		testingPath = trainingPath;
+//		testingPath = trainingPath;
 //		DPConfig.readWeight = false;
 //		DPConfig.writeWeight = false;
 		/************/
