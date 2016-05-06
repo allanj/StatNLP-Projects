@@ -89,8 +89,8 @@ public class NKDMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-		trainNumber = 20;
-		testNumber = 20;
+//		trainNumber = 20;
+//		testNumber = 20;
 //		numIteration = 40;
 //		numThreads = 8;
 //		testingPath = trainingPath;

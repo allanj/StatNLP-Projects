@@ -140,7 +140,7 @@ public class NKDNetworkCompiler extends NetworkCompiler {
 	public NKDNetwork compileUnLabledInstance(int networkId, NKDInstance inst, LocalNetworkParam param){
 		NKDNetwork construct = this.compileUnlabeled(inst);
 		long root = this.toNode_generalRoot(inst.getInput().length());
-		int rootIdx = Arrays.binarySearch(this._nodes, root);
+		int rootIdx = Arrays.binarySearch(construct.getAllNodes(), root);
 		if(rootIdx<0){
 			System.err.println("inst id:"+inst.getInstanceId()+":"+(rootIdx+1));
 			throw new RuntimeException(inst.getInput().toString());
