@@ -158,7 +158,7 @@ public class NKDNetworkCompiler extends NetworkCompiler {
 		return network;
 	}
 	
-	public synchronized void compileUnlabeled(NKDInstance inst){
+	public void compileUnlabeled(NKDInstance inst){
 		
 		int[] heads = inst.getHead();
 		NKDNetwork network = new NKDNetwork();
