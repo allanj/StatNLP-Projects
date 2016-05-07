@@ -176,7 +176,7 @@ public class D2DFeatureManager extends FeatureManager {
 //				}
 			}
 			
-			addDepFeatures(featureList,network,parentArr,children_k,sent);
+			//addDepFeatures(featureList,network,parentArr,children_k,sent);
 		}
 	
 		
