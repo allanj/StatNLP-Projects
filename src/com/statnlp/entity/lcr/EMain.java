@@ -82,8 +82,9 @@ public class EMain {
 		/***********DEBUG*****************/
 //		DPConfig.ecrftrain = "data/semeval10t1/ecrf.small.txt";
 //		testFile="data/semeval10t1/ecrf.smalltest.txt";
-		DPConfig.writeWeight = true;
-		DPConfig.readWeight = false;
+//		DPConfig.writeWeight = true;
+//		DPConfig.readWeight = false;
+//		testFile = DPConfig.ecrftrain;
 		/***************************/
 		if(dataTypeSet.contains(DPConfig.dataType)){
 			trainInstances = EReader.readCNN(DPConfig.ecrftrain, true, trainNumber, entityMap);
