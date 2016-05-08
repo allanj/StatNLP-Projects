@@ -66,27 +66,28 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 		//System.err.println(rootIdx+" final score:"+network.getMax(rootIdx));
 		for(int i=0;i<lcrfInstance.size();i++){
 			int child_k = lcrfNetwork.getMaxPath(rootIdx)[0];
-			/*****************debug allan 27/03/2016. 00.21am*******************/
-//			System.err.println(rootIdx+" score:"+network.getMax(rootIdx));
-//			int[][] childrenList_k = network.getChildren(rootIdx);
-//			for(int children_k_index = 0; children_k_index < childrenList_k.length; children_k_index++){
-//				int[] candi_children_k = childrenList_k[children_k_index];
-//				if(Arrays.equals(lcrfNetwork.getMaxPath(rootIdx), candi_children_k)){
-//					FeatureArray fa = network.getLocalParam().extract(network, rootIdx, candi_children_k, children_k_index);
-//					System.err.println(fa.toString() + " score:"+fa.getScore(network.getLocalParam()));
-//					
-//					break;
-//				}
-//			}
-			/**************************************/
 			long child = lcrfNetwork.getNode(child_k);
 			rootIdx = child_k;
 			int tagID = NetworkIDMapper.toHybridNodeArray(child)[1];
 			prediction.add(0, entities[tagID]);
 		}
-
-		result.setPrediction(prediction);
 		
+		ArrayList<String> res = new ArrayList<String>();
+		String prev = "O";
+		for(int i=0;i<prediction.size();i++){
+			if(prediction.get(i).equals(prev)){
+				if(prev.equals("O"))
+					res.add("O");
+				else 
+					res.add("I-"+prediction.get(i));
+			}else{
+				if(prediction.get(i).equals("O"))
+					res.add("O");
+				else res.add("B-"+prediction.get(i));
+			}
+			prev = prediction.get(i);
+		}
+		result.setPrediction(res);
 		return result;
 	}
 
@@ -95,9 +96,11 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 		long leaf = toNode_leaf();
 		long[] children = new long[]{leaf};
 		lcrfNetwork.addNode(leaf);
+		
 		for(int i=0;i<inst.size();i++){
 			
-			long node = toNode(i,entityMap.get(inst.getOutput().get(i)));
+			String output = inst.getOutput().get(i).length()>2?inst.getOutput().get(i).substring(2):inst.getOutput().get(i) ;
+			long node = toNode(i,entityMap.get(output));
 			lcrfNetwork.addNode(node);
 			long[] currentNodes = new long[]{node};
 			lcrfNetwork.addEdge(node, children);
