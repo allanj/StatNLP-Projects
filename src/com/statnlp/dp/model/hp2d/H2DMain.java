@@ -80,8 +80,8 @@ public class H2DMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 10;
-//		testNumber = 10;
+//		trainNumber = 5;
+//		testNumber = 5;
 //		numIteration = 20;
 //		numThreads = 8;
 //		testingPath = trainingPath;

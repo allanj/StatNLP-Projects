@@ -177,11 +177,8 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 				if(e.equals(OE)) continue;
 				long wordRightNodeE = this.toNode(rightIndex, rightIndex, 1, 1, e); //the leaf node entity, right direction.
 				network.addNode(wordRightNodeE);
-				long wordLeftNodeE = -1;
-				if(!(rightIndex==1 && !e.equals(ONE))){
-					wordLeftNodeE = this.toNode(rightIndex, rightIndex, 0, 1, e);
-					network.addNode(wordLeftNodeE);
-				}
+				long wordLeftNodeE  = this.toNode(rightIndex, rightIndex, 0, 1, e);
+				network.addNode(wordLeftNodeE);
 			}
 
 			
@@ -212,9 +209,7 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 									}else{ // must be OE
 										for(int t1=0;t1<types.length;t1++){
 											for(int t2=0;t2<types.length;t2++){
-												if(isEntity(types[t2])) continue;
-												if(isEntity(types[t1]) &&  (leftIndex!=m) ) continue;
-												if(types[t1].equals(ONE) && types[t1].equals(types[t2])) continue;
+												if(!types[t1].equals(OE) && types[t1].equals(types[t2])) continue;
 												leftChild = this.toNode(leftIndex, m, 1, 1, types[t1]);
 												rightChild = this.toNode(m+1, rightIndex, 0, 1,types[t2]);
 												if(network.contains(leftChild) && network.contains(rightChild)){
@@ -245,9 +240,11 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 										}
 									}else{ // must be OE
 										for(int t1=0;t1<types.length;t1++){
-											if(isEntity(types[t1])) continue;
 											for(int t2=0;t2<types.length;t2++){
-												if(types[t1].equals(ONE) && types[t1].equals(types[t2])) continue;
+												if(!types[t1].equals(OE) && types[t1].equals(types[t2])) continue;
+												if(types[t1].equals(ONE) && isEntity(types[t2])) continue;
+												if(isEntity(types[t1]) && isEntity(types[t2])) continue;
+												if(isEntity(types[t1]) && types[t2].equals(ONE)) continue;
 												leftChild = this.toNode(leftIndex, m, 0, 1, types[t1]);
 												rightChild = this.toNode(m, rightIndex, 0, 0, types[t2]);
 												if(network.contains(leftChild) && network.contains(rightChild)){
@@ -279,9 +276,11 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 									}else{// parent must be OE
 										for(int t1=0;t1<types.length;t1++){
 											for(int t2=0;t2<types.length;t2++){
-												if(isEntity(types[t2]) && m!=rightIndex) continue;
+												if(!types[t1].equals(OE) && types[t1].equals(types[t2])) continue;
+												if(types[t1].equals(ONE) && isEntity(types[t2])) continue;
 												if(isEntity(types[t1]) && isEntity(types[t2])) continue;
-												if(types[t1].equals(ONE) && types[t1].equals(types[t2])) continue;
+												if(isEntity(types[t1]) && types[t2].equals(ONE)) continue;
+												
 												leftChild = this.toNode(leftIndex, m, 1, 0, types[t1]);
 												rightChild = this.toNode(m, rightIndex, 1, 1, types[t2]);
 												if(network.contains(leftChild) && network.contains(rightChild)){
@@ -365,10 +364,6 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 				type = "null";
 			else type=types[ids_child[4]];
 			sb.append(type);
-//			if(leftIndex==ids_child[0] && !type.startsWith(PARENT_IS)){
-//				Sentence sentence = (Sentence)network.getInstance().getInput();
-//				System.err.println(sentence.get(leftIndex).getName()+" left:"+leftIndex+", right:"+ids_child[0]+", cmp:"+ids_child[3]+", dir:"+ids_child[2]+", "+type);
-//			}
 			childLabel.setValue(sb.toString());
 			childNode.setLabel(childLabel);
 			parentNode.addChild(childNode);

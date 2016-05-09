@@ -5,9 +5,7 @@ import java.util.Iterator;
 
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.Transformer;
-import com.statnlp.dp.commons.Entity;
 import com.statnlp.dp.utils.DPConfig;
-import com.statnlp.dp.utils.DataChecker;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.LabeledScoredTreeNode;
@@ -23,65 +21,19 @@ public class H2DTransformer extends Transformer {
 	public static String E_B_PREFIX = DPConfig.E_B_PREFIX;
 	public static String E_I_PREFIX = DPConfig.E_I_PREFIX;
 	
-	/**
-	 * process the entities which are not covered by incomplete span.
-	 * @param sent
-	 * @param incompletes
-	 * @param sentEntities
-	 */
-	private void processInvalid(Sentence sent, ArrayList<Entity> incompletes, String[][] sentEntities){
-		for(Entity e: incompletes){
-			int left = e.getLeft();
-			int right = e.getRight();
-			//set the inside parts
-			for(int i=left;i<=right;i++){
-				int hIndex = sent.get(i).getHeadIndex();
-				if(hIndex>=left && hIndex<=right){
-					int min = Math.min(i, hIndex);
-					sentEntities[min][1] = e.getEntityType();
-					int max = Math.max(i, hIndex);
-					sentEntities[max][0] = e.getEntityType();
-					for(int k=min+1;k<=max-1;k++){
-						sentEntities[k][0] = e.getEntityType();
-						sentEntities[k][1] = e.getEntityType();
-					}
-				}
-			}
-			//set the part that not covered an arc.
-			for(int i=left;i<=right;i++){
-				if(sentEntities[i][0]!=null && sentEntities[i][1]==null) sentEntities[i][1]=ONE;
-				if(sentEntities[i][1]!=null && sentEntities[i][0]==null) sentEntities[i][0]=ONE;
-				if(sentEntities[i][0]==null && sentEntities[i][1]==null){sentEntities[i][0]=ONE; sentEntities[i][1]=e.getEntityType(); }
-			}
-		}
-	}
 	
-	private String[][] getLeavesInfo(Sentence sent){
-		ArrayList<Entity> incompletes = DataChecker.checkAllIncomplete(sent);
-		String[][] sentEntities = new String[sent.length()][2];
-		sentEntities[0][0] = null;
-		sentEntities[0][1] = ONE;
+	private String[] getLeavesInfo(Sentence sent){
+		String[] sentEntities = new String[sent.length()];
+		sentEntities[0] = ONE;
 		for(int i=1;i<sentEntities.length;i++){
 			String type = sent.get(i).getEntity();
 			if(type.equals(O_TYPE)){
-				sentEntities[i][0] = ONE;
-				sentEntities[i][1] = ONE;
+				sentEntities[i] = ONE;
 			}
-		}
-		if(incompletes.size()>0){
-			processInvalid(sent, incompletes, sentEntities);
-		}
-		for(int i=1;i<sentEntities.length;i++){
-			if(sentEntities[i][0]!=null && sentEntities[i][1]!=null) continue;
-			String type = sent.get(i).getEntity();
 			if(type.startsWith(E_B_PREFIX)){
-				sentEntities[i][0] = ONE;
-				sentEntities[i][1] = type.substring(2);
+				sentEntities[i] = type.substring(2);
 			}else if(type.startsWith(E_I_PREFIX)){
-				sentEntities[i][0] = type.substring(2);
-				if(i<sentEntities.length-1 && sent.get(i+1).getEntity().startsWith(E_I_PREFIX))
-					sentEntities[i][1] = type.substring(2);
-				else sentEntities[i][1] = ONE;
+				sentEntities[i] = type.substring(2);
 			}
 		}
 		return sentEntities;
@@ -102,7 +54,7 @@ public class H2DTransformer extends Transformer {
 		String type = !haveEntities? ONE:OE;
 		label.setValue(setSpanInfo(0, sentence.length()-1, 1, 1,type));
 		spanTreeERoot.setLabel(label);
-		String[][] leaves = getLeavesInfo(sentence);
+		String[] leaves = getLeavesInfo(sentence);
 		constructSpanTree(spanTreeERoot,dependencyRoot, leaves);
 		//System.err.println(spanTreeERoot.pennString() );
 		return spanTreeERoot;
@@ -114,7 +66,7 @@ public class H2DTransformer extends Transformer {
 	 * @param currentDependency
 	 * @param sentence
 	 */
-	private void constructSpanTree(Tree currentSpan, Tree currentDependency,String[][] leaves){
+	private void constructSpanTree(Tree currentSpan, Tree currentDependency,String[] leaves){
 		
 		CoreLabel currentSpanLabel = (CoreLabel)(currentSpan.label());
 		String[] info = currentSpanLabel.value().split(",");
@@ -122,7 +74,7 @@ public class H2DTransformer extends Transformer {
 		int pa_rightIndex = Integer.valueOf(info[1]);
 		int pa_direction = Integer.valueOf(info[2]);
 		int pa_completeness = Integer.valueOf(info[3]);
-		String pa_type = info[4];
+		//String pa_type = info[4];
 		String currType = null;
 		if(pa_leftIndex==pa_rightIndex){
 			return;
@@ -145,11 +97,9 @@ public class H2DTransformer extends Transformer {
 				
 				
 				boolean isMixed = false;
-				String leftType = leaves[pa_leftIndex][1];
+				String leftType = leaves[pa_leftIndex];
 				for(int i=pa_leftIndex+1;i<=maxSentIndex;i++){
-					for(int dir=0;dir<=1;dir++){
-						if(!leaves[i][dir].equals(leftType)){isMixed = true; break;}
-					}
+					if(!leaves[i].equals(leftType)){isMixed = true; break;}
 				}
 				leftType = isMixed? OE:leftType;
 				currType = leftType;
@@ -159,11 +109,9 @@ public class H2DTransformer extends Transformer {
 				leftChildSubSpan.setLabel(leftSubSpanLabel);
 				
 				isMixed = false;
-				String rightType = leaves[pa_rightIndex][0];
+				String rightType = leaves[pa_rightIndex];
 				for(int i=maxSentIndex+1; i<=pa_rightIndex-1;i++){
-					for(int dir=0;dir<=1;dir++){
-						if(!leaves[i][dir].equals(rightType)) {isMixed = true; break;}
-					}
+					if(!leaves[i].equals(rightType)) {isMixed = true; break;}
 				}
 				rightType =isMixed?OE:rightType;
 				currType = rightType;
@@ -191,11 +139,9 @@ public class H2DTransformer extends Transformer {
 				Tree rightChildSubSpan = new LabeledScoredTreeNode();
 				
 				boolean isMixed = false;
-				String leftType = leaves[pa_leftIndex][1];
+				String leftType = leaves[pa_leftIndex];
 				for(int i=pa_leftIndex+1;i<=minIndex-1;i++){
-					for(int dir=0;dir<=1;dir++){
-						if(!leaves[i][dir].equals(leftType)){isMixed = true; break;}
-					}
+					if(!leaves[i].equals(leftType)){isMixed = true; break;}
 				}
 				leftType = isMixed? OE:leftType;
 				
@@ -206,11 +152,9 @@ public class H2DTransformer extends Transformer {
 				leftChildSubSpan.setLabel(leftSpanSubLabel);
 				
 				isMixed = false;
-				String rightType = leaves[pa_rightIndex][0];
+				String rightType = leaves[pa_rightIndex];
 				for(int i=minIndex;i<=pa_rightIndex-1;i++){
-					for(int dir=0;dir<=1;dir++){
-						if(!leaves[i][dir].equals(rightType)) {isMixed = true; break;}
-					}
+					if(!leaves[i].equals(rightType)) {isMixed = true; break;}
 				}
 				rightType =isMixed?OE:rightType;
 				
@@ -251,12 +195,9 @@ public class H2DTransformer extends Transformer {
 				Tree rightChildSubSpan = new LabeledScoredTreeNode();
 				
 				boolean isMixed = false;
-				String leftType = leaves[pa_leftIndex][1];
+				String leftType = leaves[pa_leftIndex];
 				for(int i=pa_leftIndex+1;i<=lastChildWordIndex;i++){
-					for(int dir=0;dir<=1;dir++){
-						if(i==lastChildWordIndex && dir==1) continue;
-						if(!leaves[i][dir].equals(leftType)){isMixed = true; break;}
-					}
+					if(!leaves[i].equals(leftType)){isMixed = true; break;}
 				}
 				leftType = isMixed? OE:leftType;
 				currType = leftType;
@@ -267,11 +208,9 @@ public class H2DTransformer extends Transformer {
 				
 				
 				isMixed = false;
-				String rightType = leaves[lastChildWordIndex][1];
+				String rightType = leaves[lastChildWordIndex];
 				for(int i=lastChildWordIndex+1;i<=pa_rightIndex;i++){
-					for(int dir=0;dir<=1;dir++){
-						if(!leaves[i][dir].equals(rightType)){isMixed= true; break;}
-					}
+					if(!leaves[i].equals(rightType)){isMixed= true; break;}
 				}
 				rightType = isMixed? OE:rightType;
 				currType = rightType;
@@ -307,11 +246,9 @@ public class H2DTransformer extends Transformer {
 				Tree leftChildSubSpan = new LabeledScoredTreeNode();
 				Tree rightChildSubSpan = new LabeledScoredTreeNode();
 				boolean isMixed = false;
-				String leftType = leaves[firstChildWordIndex][0];
+				String leftType = leaves[firstChildWordIndex];
 				for(int i=pa_leftIndex;i<=firstChildWordIndex-1;i++){
-					for(int dir=0;dir<=1;dir++){
-						if(!leaves[i][dir].equals(leftType)){isMixed = true; break;}
-					}
+					if(!leaves[i].equals(leftType)){isMixed = true; break;}
 				}
 				leftType = isMixed? OE:leftType;	
 			
@@ -324,12 +261,9 @@ public class H2DTransformer extends Transformer {
 				
 				
 				isMixed = false;
-				String rightType = leaves[firstChildWordIndex][1];
+				String rightType = leaves[firstChildWordIndex];
 				for(int i=firstChildWordIndex+1;i<=pa_rightIndex;i++){
-					for(int dir=0;dir<=1;dir++){
-						if(i==pa_rightIndex && dir==1) continue;
-						if(!leaves[i][dir].equals(rightType)){isMixed=true; break;}
-					}
+					if(!leaves[i].equals(rightType)){isMixed=true; break;}
 				}
 				rightType = isMixed? OE:rightType;	
 				currType = rightType;
