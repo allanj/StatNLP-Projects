@@ -95,7 +95,6 @@ public class LDPMain {
 			testingInsts = LDPReader.readInstance(testFile, false,testNumber,entities,trans);
 		}
 		
-		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
 		NetworkConfig._CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig._numThreads = numThreads;

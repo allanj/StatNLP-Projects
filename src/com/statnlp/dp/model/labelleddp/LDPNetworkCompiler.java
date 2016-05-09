@@ -94,10 +94,8 @@ public class LDPNetworkCompiler extends NetworkCompiler {
 		int child_direction_2 = Integer.valueOf(childInfo_2[2]);
 		int child_completeness_2 = Integer.valueOf(childInfo_2[3]);
 		String child_label_2 = childInfo_2[4];
-//		System.err.println("child 2 Info:"+Arrays.toString(childInfo_2));
 		long childNode_2 = toNode(child_leftIndex_2, child_rightIndex_2, child_direction_2, child_completeness_2,child_label_2);
 		network.addNode(childNode_2);
-//		System.err.println("network node child 2:"+Arrays.toString(NetworkIDMapper.toHybridNodeArray(childNode_2)));
 		network.addEdge(parentNode, new long[]{childNode_1,childNode_2});
 		addToNetwork(network, children[0]);
 		addToNetwork(network, children[1]);
@@ -274,7 +272,11 @@ public class LDPNetworkCompiler extends NetworkCompiler {
 	}
 	
 	public long toNode(int leftIndex, int rightIndex, int direction, int complete, String label){
-		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex,rightIndex-leftIndex,complete, direction, DepLabel.get(label).getId() ,Network.NODE_TYPE.max.ordinal()});
+		int id = -1;
+		if(label.equals(COMP))
+			id = DepLabel.LABELS.size();
+		else id = DepLabel.get(label).getId();
+		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex,rightIndex-leftIndex,complete, direction, id ,Network.NODE_TYPE.max.ordinal()});
 	}
 	
 	public long toNode(int leftIndex, int rightIndex, int direction, int complete, int label_id){
