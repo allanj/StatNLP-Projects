@@ -6,7 +6,6 @@ import java.util.HashMap;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.ModelInstance;
 import com.statnlp.dp.utils.DPConfig;
-import com.statnlp.dp.utils.DPConfig.MODEL;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.Tree;
@@ -162,26 +161,26 @@ public class LDPInstance extends ModelInstance {
 		int pa_rightIndex = Integer.valueOf(info[1]);
 		int pa_direction = Integer.valueOf(info[2]);  //previously the position for direction is 2.
 		int pa_completeness = Integer.valueOf(info[3]);
-		String type = null;
-		if(info.length>4)
-			type = info[4];
+		String depLabel = info[4];
 		if(pa_rightIndex==pa_leftIndex) return;
 		if(pa_rightIndex<pa_leftIndex) 
 			throw new RuntimeException("Your tree is wrongly constructed. The left Index should be smaller than the right in a span");
 		CoreLabel governorLabel = new CoreLabel();
 		CoreLabel dependentLabel = new CoreLabel();
 //		System.err.println("left:"+pa_leftIndex+", right:"+pa_rightIndex);
-		if(pa_completeness==0 && ( (info.length>4 && type.startsWith("pae")) || info.length==4 || validModel()    ) ){
+		if(pa_completeness==0 ){
 			if(pa_direction==0){
 				governorLabel.setSentIndex(pa_rightIndex);
 				governorLabel.setValue("index:"+pa_rightIndex);
 				dependentLabel.setSentIndex(pa_leftIndex);
 				dependentLabel.setValue("index:"+pa_leftIndex);
+				dependentLabel.setTag(depLabel);
 			}else{
 				governorLabel.setSentIndex(pa_leftIndex);
 				governorLabel.setValue("index:"+pa_leftIndex);
 				dependentLabel.setSentIndex(pa_rightIndex);
 				dependentLabel.setValue("index:"+pa_rightIndex);
+				dependentLabel.setTag(depLabel);
 			}
 			dependencies.add(new UnnamedDependency(governorLabel, dependentLabel));
 			
@@ -191,90 +190,22 @@ public class LDPInstance extends ModelInstance {
 			findAllDependencies(child,dependencies);
 		}
 	}
-	
-	
+
 	/**
-	 * This one is only used by unique model
+	 * Useless since we don't have entities
 	 * @param spanRoot
 	 * @return
 	 */
-	public String[] toEntities(Tree spanRoot){
-//		System.err.println(spanRoot.pennString());
-		
-		String[] es = new String[this.sentence.length()];
-		boolean[] set = new boolean[this.sentence.length()];
-		es[0] = O_TYPE;
-		for(int i=1;i<es.length;i++) {es[i] = "UNDEF"; set[i] =false;}
-		if(DPConfig.currentModel.equals(MODEL.SIMPLE.name())){
-			this.findAllE(es, spanRoot);
-			for(int i=1;i<es.length;i++){
-				if(es[i].equals("UNDEF")) {
-					es[i] = O_TYPE;
-				}
-				if((es[i-1].startsWith(E_I_PREFIX) || es[i-1].startsWith(E_B_PREFIX)) && es[i].startsWith(E_B_PREFIX) && es[i-1].substring(2, es[i-1].length()).equals(es[i].substring(2, es[i].length())))
-					es[i] = E_I_PREFIX+es[i-1].substring(2, es[i-1].length());
-			}
-		}else{
-			this.findAllONE(es, spanRoot);
-			this.findAllE(es, spanRoot);
-			for(int i=1;i<es.length;i++){
-				if(es[i].equals("UNDEF")) {
-					System.err.println("Some spans are not finalized the type. Info:\n\t"+this._instanceId+"\n"+this.getInput().toString());
-					es[i] = O_TYPE;
-				}
-				if((es[i-1].startsWith(E_I_PREFIX) || es[i-1].startsWith(E_B_PREFIX)) && es[i].startsWith(E_B_PREFIX) && es[i-1].substring(2, es[i-1].length()).equals(es[i].substring(2, es[i].length())))
-					es[i] = E_I_PREFIX+es[i-1].substring(2, es[i-1].length());
-			}
-		}
-		
-		return es;
+	@Override
+	public String[] toEntities(Tree spanRoot) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
-	private void findAllONE(String[] es, Tree current){
-		CoreLabel label = (CoreLabel)(current.label());
-		String[] info = label.value().split(",");
-		int l = Integer.valueOf(info[0]);
-		int r = Integer.valueOf(info[1]);
-		String type = info[4];
-		if(type.equals(ONE)){
-			for(int i=l;i<=r;i++) es[i] = O_TYPE;
-			return;
-		}else if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE)){
-			return;
-		}else{
-			for(Tree child: current.children()){
-				findAllONE(es,child);
-			}
-		}
-	}
 	
-	private void findAllE(String[] es, Tree current){
-		CoreLabel label = (CoreLabel)(current.label());
-		String[] info = label.value().split(",");
-		int l = Integer.valueOf(info[0]);
-		int r = Integer.valueOf(info[1]);
-		String type = info[4];
-		if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE) && !type.equals(GO)){
-			es[l] = E_B_PREFIX+type;
-			for(int i=l+1;i<=r;i++){
-				es[i]=E_I_PREFIX+type;
-			}
-				
-			return;
-		}else if(type.equals(ONE)){
-			return;
-		}else{
-			for(Tree child: current.children()){
-				findAllE(es,child);
-			}
-		}
-	}
 
 	
 	
-	private boolean validModel(){
-		return DPConfig.currentModel.equals(MODEL.HYPEREDGE.name()) || DPConfig.currentModel.equals(MODEL.SIMPLE.name());
-	}
 	
 	
 

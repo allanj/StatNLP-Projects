@@ -159,7 +159,7 @@ public class LDPReader {
 				headLabel.setValue("index:"+headIndex);
 				modifierLabel.setSentIndex(words.size()-1);
 				modifierLabel.setValue("index:"+modifierLabel.sentIndex());
-				modifierLabel.setTag(values[10]);
+				modifierLabel.setTag(values[10]); // modifier tag is the label.
 				dependencies.add(new UnnamedDependency(headLabel, modifierLabel));
 				maxSpanLen = Math.max(Math.abs(headIndex-modifierLabel.sentIndex()), maxSpanLen);
 			}

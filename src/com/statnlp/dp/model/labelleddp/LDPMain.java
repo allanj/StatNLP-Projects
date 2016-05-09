@@ -66,17 +66,22 @@ public class LDPMain {
 		String middle = isDev? ".dev":".test";
 		String modelType = "only";
 		String dpOut = DPConfig.data_prefix+modelType+middle+DPConfig.dp_res_suffix;
+		String depLabOut = DPConfig.data_prefix+modelType+middle+DPConfig.dp_lab_res_suffix;
 		testFile = isDev? DPConfig.devPath:DPConfig.testingPath;
 		
 		if(isPipe) {
 			testFile = isDev?DPConfig.ner2dp_ner_dev_input: DPConfig.ner2dp_ner_test_input;
 			dpOut = DPConfig.data_prefix+middle+".pp.ner2dp.dp.res.txt";
 		}
-		System.err.println("[Info] DEBUG MODE: "+DPConfig.DEBUG);
+		/**********Debug info******************/
+//		trainingPath = "data/semeval10t1/small.txt";
+//		testFile = trainingPath;
+		/**************************/
 		
+		System.err.println("[Info] DEBUG MODE: "+DPConfig.DEBUG);
 		System.err.println("[Info] train path: "+trainingPath);
 		System.err.println("[Info] testFile: "+testFile);
-		System.err.println("[Info] nerOut: "+dpOut);
+		System.err.println("[Info] dpOut: "+dpOut);
 		
 		LDPTransformer trans = new LDPTransformer();
 		LDPInstance[] trainingInsts = null;
@@ -106,6 +111,7 @@ public class LDPMain {
 		/****************Evaluation Part**************/
 		Instance[] predInsts = model.decode(testingInsts);
 		Evaluator.evalDP(predInsts, dpOut);
+		Evaluator.evalLabelledDP(predInsts, depLabOut);
 		
 	}
 	

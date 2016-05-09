@@ -33,9 +33,6 @@ public class LDPTransformer extends Transformer {
 		int pa_direction = Integer.valueOf(info[2]);
 		int pa_completeness = Integer.valueOf(info[3]);
 		if(pa_leftIndex==pa_rightIndex) return;
-//		CoreLabel currentWordLabel = (CoreLabel)(currentDependency.label());
-//		int currentSentIndex = currentWordLabel.sentIndex();
-//		System.err.println("Current word Index:"+currentSentIndex);
 		if(pa_completeness==0){
 			if(pa_direction==1){
 				Tree lastChildWord = currentDependency.lastChild();

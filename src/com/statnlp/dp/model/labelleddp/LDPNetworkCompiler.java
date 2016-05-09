@@ -2,12 +2,14 @@ package com.statnlp.dp.model.labelleddp;
 
 import java.util.Arrays;
 
+
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
+import com.statnlp.ui.visualize.VisualizationViewerEngine;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.LabeledScoredTreeNode;
@@ -21,14 +23,15 @@ public class LDPNetworkCompiler extends NetworkCompiler {
 	private int maxSentLen = 128;
 	private int[][][] _children;
 	private String rootDepLabel = LDPConfig.rootDepLabel;
+	public static String COMP = LDPConfig.COMPLABEL;
 	
 	public LDPNetworkCompiler() {
-		
+		NetworkIDMapper.setCapacity(new int[]{1000,1000,1000,1000,1000,1000});
 	}
 
 	@Override
 	public Network compile(int networkId, Instance inst, LocalNetworkParam param) {
-		NetworkIDMapper.setCapacity(new int[]{1000,1000,1000,1000,1000,1000});
+		
 		LDPInstance di = (LDPInstance)inst;
 		if(di.isLabeled()){
 			return this.compileLabledInstance(networkId, di, param);
@@ -51,6 +54,8 @@ public class LDPNetworkCompiler extends NetworkCompiler {
 		
 		addToNetwork(network,output);
 		network.finalizeNetwork();
+		
+		
 
 		return network;
 	}
@@ -157,6 +162,7 @@ public class LDPNetworkCompiler extends NetworkCompiler {
 										network.addEdge(parent, new long[]{child_1,child_2});
 									}else{
 										for(int l=0;l<DepLabel.LABELS.size();l++){
+											if(DepLabel.get(l).getForm().equals(rootDepLabel) && direction==1 && leftIndex==0) continue;
 											long parent = this.toNode(leftIndex, rightIndex, direction, complete,l);
 											network.addNode(parent);
 											network.addEdge(parent, new long[]{child_1,child_2});
@@ -184,10 +190,13 @@ public class LDPNetworkCompiler extends NetworkCompiler {
 						}
 						
 						if(complete==1 && direction==1){
+							
 							long parent = this.toNode(leftIndex, rightIndex, direction, complete,  DepLabel.LABELS.size());
+							
 							for(int m=leftIndex+1;m<=rightIndex;m++){
 								long child_2 = this.toNode(m, rightIndex, 1, 1, DepLabel.LABELS.size());
 								for(int l=0;l<DepLabel.LABELS.size();l++){
+									if(leftIndex==0 && !DepLabel.get(l).getForm().equals(rootDepLabel)) continue;
 									long child_1 = this.toNode(leftIndex, m, 1, 0,l);
 									if(network.contains(child_1) && network.contains(child_2)){
 										network.addNode(parent);
@@ -219,7 +228,6 @@ public class LDPNetworkCompiler extends NetworkCompiler {
 		inst = inst.duplicate();
 		if(dependNetwork.getMax()==Double.NEGATIVE_INFINITY) return inst;
 		Tree forest = this.toTree(dependNetwork,inst);
-//		System.err.println("[Result] "+forest.toString());
 		inst.setPrediction(forest);
 		return inst;
 	}
@@ -228,7 +236,7 @@ public class LDPNetworkCompiler extends NetworkCompiler {
 		
 		Tree root = new LabeledScoredTreeNode();
 		CoreLabel rootLabel = new CoreLabel();
-		rootLabel.setValue("0,"+(inst.getInput().length()-1)+",1,1");
+		rootLabel.setValue("0,"+(inst.getInput().length()-1)+",1,1,"+COMP);
 		root.setLabel(rootLabel);
 		this.toTreeHelper(network, network.countNodes()-1, root);
 		return root;
@@ -236,9 +244,6 @@ public class LDPNetworkCompiler extends NetworkCompiler {
 	
 	private void toTreeHelper(LDPNetwork network, int node_k, Tree parentNode){
 		int[] children_k = network.getMaxPath(node_k);
-//		System.err.println("node_k:"+node_k);
-//		System.err.println("Parent Node:"+parentNode.toString());
-//		System.err.println("Children length:"+children_k.length);
 		for(int k=0;k<children_k.length;k++){
 			long child = network.getNode(children_k[k]);
 			int[] ids_child = NetworkIDMapper.toHybridNodeArray(child);
@@ -249,7 +254,11 @@ public class LDPNetworkCompiler extends NetworkCompiler {
 			sb.append(leftIndex);  sb.append(",");
 			sb.append(ids_child[0]);  sb.append(",");
 			sb.append(ids_child[3]); sb.append(",");
-			sb.append(ids_child[2]);
+			sb.append(ids_child[2]);sb.append(",");
+			if(ids_child[4]==DepLabel.LABELS.size())
+				sb.append(COMP);
+			else
+				sb.append(DepLabel.get(ids_child[4]));
 			childLabel.setValue(sb.toString());
 			childNode.setLabel(childLabel);
 			parentNode.addChild(childNode);
@@ -258,56 +267,17 @@ public class LDPNetworkCompiler extends NetworkCompiler {
 		
 	}
 	
-	
-	public void printNetwork(LDPNetwork network, Sentence sent){
-//		DependInstance inst = (DependInstance)network.getInstance();
-		int len = -1;
-		if(sent==null) len = this.maxSentLen;
-		else len = sent.length();
-		long root = this.toNode_root(len);
-		long[] nodes = network.getAllNodes();
-		System.err.println("Number of nodes: "+nodes.length);
-		int rootIndex = Arrays.binarySearch(nodes, root);
-		System.err.println("root node: "+Arrays.toString(NetworkIDMapper.toHybridNodeArray(root))+" , at index:"+rootIndex);
-		int level = 0;
-//		System.err.println("node at index 3:"+Arrays.toString(NetworkIDMapper.toHybridNodeArray(network.getNode(3))));
-		printAll(rootIndex,network,level);
-	}
-	
-	private void printAll(int index, LDPNetwork network, int level){
-		long current = network.getNode(index);
-		for(int i=0;i<level;i++)
-			System.err.print("\t");
-		int[] arr = NetworkIDMapper.toHybridNodeArray(current);
-		int leftIndex = arr[0]-arr[1];
-		String direction = arr[3]==0? "left":"right";
-		String complete = arr[2]==0? "incomplete":"complete";
-		System.err.println("current node: "+leftIndex+","+arr[0]+","+direction+","+complete+" , at index:"+index);
-		int[][] children = network.getChildren(index);
-		for(int i=0;i<children.length;i++){
-			int[] twochilds = children[i];
-			for(int j=0;j<twochilds.length;j++)
-				printAll(twochilds[j],network,level+1);
-		}
-	}
-	
 	//Node composition
 	//Span Len (eIndex-bIndex), eIndex, direction(0--left,1--right), complete (0--incomplete,1), node Type
 	public long toNode_root(int sentLen){
-		int sentence_len = sentLen;
-		//Largest span and the node id is sentence len, because the id 0 to sentence len-1
-		return NetworkIDMapper.toHybridNodeID(new int[]{sentence_len-1, sentence_len-1,1,1,DepLabel.LABELS.size(),  Network.NODE_TYPE.max.ordinal()});
+		return NetworkIDMapper.toHybridNodeID(new int[]{sentLen-1, sentLen-1,1,1,DepLabel.LABELS.size(),  Network.NODE_TYPE.max.ordinal()});
 	}
 	
 	public long toNode(int leftIndex, int rightIndex, int direction, int complete, String label){
-		//dfn has the id the sentence.
-		//could be same span but not same word id.
 		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex,rightIndex-leftIndex,complete, direction, DepLabel.get(label).getId() ,Network.NODE_TYPE.max.ordinal()});
 	}
 	
 	public long toNode(int leftIndex, int rightIndex, int direction, int complete, int label_id){
-		//dfn has the id the sentence.
-		//could be same span but not same word id.
 		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex,rightIndex-leftIndex,complete, direction, label_id ,Network.NODE_TYPE.max.ordinal()});
 	}
 
