@@ -95,7 +95,7 @@ public class HPEFeatureManager extends FeatureManager {
 		//System.err.println("patype:"+pa_type+", "+Arrays.toString(childrenType));
 		
 		//pairwise features
-		if(completeness==0 && !childrenType[0].equals(OE) && childrenType[1].equals(OE)){
+		if(completeness==0 && !childrenType[0].equals(OE) && !childrenType[1].equals(OE)){
 			int splitPoint = childrenArr[0][0]; // the rightIndex of the left child
 			String word = sent.get(splitPoint+1).getName();
 			String tag = sent.get(splitPoint+1).getTag();
@@ -161,7 +161,7 @@ public class HPEFeatureManager extends FeatureManager {
 		
 		
 		
-		//addDepFeatures(featureList,network,parentArr,sent);
+		addDepFeatures(featureList,network,parentArr,sent);
 	
 		
 		ArrayList<Integer> finalList = new ArrayList<Integer>();
