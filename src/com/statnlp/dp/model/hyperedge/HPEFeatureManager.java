@@ -156,6 +156,36 @@ public class HPEFeatureManager extends FeatureManager {
 					}
 				}
 			}
+			if(childrenArr[c][2]==0 && isEntity(childrenType[c])){
+				for(int i=cleft;i<=cright-1;i++){
+					String blw = sent.get(i).getName();
+					String brw = sent.get(i+1).getName();
+					String blt = sent.get(i).getTag();
+					String brt =sent.get(i+1).getTag();
+					String prevWord = i>1?sent.get(i-1).getName():"STR";
+					String prevTag = i>1?sent.get(i-1).getTag():"STR";
+					String nextWord = i<sent.length()-2? sent.get(i+2).getName():"END";
+					String nextTag = i<sent.length()-2? sent.get(i+2).getTag():"END";
+					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-BI-WORD", childrenType[c]+":"+blw+":"+brw));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-BI-TAG", childrenType[c]+":"+blt+":"+brt));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-BI-ELW", childrenType[c]+":"+prevWord));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-BI-ELT", childrenType[c]+":"+prevTag));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-BI-ERW", childrenType[c]+":"+nextWord));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-BI-ERT", childrenType[c]+":"+nextTag));
+					featureList.add(this._param_g.toFeature(network, FEATYPE.entity.name(), "E-BI-ELT-T",childrenType[c]+":"+prevTag+","+blt+":"+brt));
+				}
+				StringBuilder sb = new StringBuilder("");
+				StringBuilder sbTags = new StringBuilder("");
+				for(int i=cleft;i<=cleft;i++){
+					String word = sent.get(i).getName();
+					String tag = sent.get(i).getTag();
+					sb.append("<sep>"+word);
+					sbTags.append("<sep>"+tag);
+					
+				}
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-whole-words",childrenType[c]+":"+sb.toString()) );
+				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(),"E-whole-tags",childrenType[c]+":"+sbTags.toString()) );
+			}
 		}
 		
 		if(isEntity(pa_type) && completeness==0){
