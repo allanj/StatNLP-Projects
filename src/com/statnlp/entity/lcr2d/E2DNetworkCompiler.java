@@ -12,6 +12,8 @@ import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
 
+import edu.stanford.nlp.ling.tokensregex.types.Expressions.AndExpression;
+
 public class E2DNetworkCompiler extends NetworkCompiler{
 
 	private static final long serialVersionUID = -2388666010977956073L;
@@ -166,6 +168,7 @@ public class E2DNetworkCompiler extends NetworkCompiler{
 			long[] currentNodes = new long[entities.length];
 			
 			for(int l=0;l<entities.length;l++){
+				if(i==0 && !entities[l].equals("O")) continue;
 				long node = toNode(i, l, 0);
 				lcrfNetwork.addNode(node);
 				for(long child: children){

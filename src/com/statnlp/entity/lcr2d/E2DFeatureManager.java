@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.utils.Extractor;
+import com.statnlp.entity.lcr2d.E2DNetworkCompiler.NODE_TYPES;
 import com.statnlp.hybridnetworks.FeatureArray;
 import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -40,6 +41,7 @@ public class E2DFeatureManager extends FeatureManager {
 		int pos = nodeArr[0]-1;
 		if(pos<0 || pos >= inst.size())
 			return FeatureArray.EMPTY;
+		if(nodeArr[4]==NODE_TYPES.LEAF.ordinal() || nodeArr[4]==NODE_TYPES.ROOT.ordinal()) return FeatureArray.EMPTY;
 			
 		int eId = nodeArr[2];
 		String att = nodeArr[1]==0? "LA":"RA";
