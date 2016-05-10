@@ -80,11 +80,11 @@ public class HPEMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-		trainNumber = 10;
-		testNumber = 10;
+//		trainNumber = 10;
+//		testNumber = 10;
 //		numIteration = 20;
 //		numThreads = 8;
-		testingPath = trainingPath;
+//		testingPath = trainingPath;
 //		DPConfig.readWeight = true;
 //		DPConfig.writeWeight = false;
 		/************/

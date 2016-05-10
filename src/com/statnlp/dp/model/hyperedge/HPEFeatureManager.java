@@ -158,7 +158,16 @@ public class HPEFeatureManager extends FeatureManager {
 			}
 		}
 		
-		
+		if(isEntity(pa_type) && completeness==0){
+			featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword", "JOINT:"+pa_type+":"+headWord+":"+modifierWord));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag", "JOINT:"+pa_type+":"+headTag+":"+modifierTag));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword-dist", "JOINT:"+pa_type+":"+headWord+":"+modifierWord+attDist));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-joint-bigramtag-dist", "JOINT:"+pa_type+":"+headTag+":"+modifierTag+attDist));
+			for(int i=leftIndex+1;i<rightIndex;i++){
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-inbetween-1", "JOINT:"+pa_type+":"+leftTag+","+sent.get(i).getTag()+","+rightTag));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-inbetween-2", "JOINT:"+pa_type+":"+leftTag+","+sent.get(i).getTag()+","+rightTag+attDist));
+			}
+		}
 		
 		
 		addDepFeatures(featureList,network,parentArr,sent);
@@ -363,5 +372,8 @@ public class HPEFeatureManager extends FeatureManager {
 		}
 	}
 	
+	private boolean isEntity(String type){
+		return !type.equals("null") && !type.equals(ONE) && !type.equals(OE);
+	}
 
 }
