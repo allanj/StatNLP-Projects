@@ -36,9 +36,8 @@ public class EMain {
 		int index = 0;
 		entityMap.put("O", index++);  
 		for(int i=0;i<selectedEntities.length;i++){
-			entityMap.put(selectedEntities[i], index++);
-//			entityMap.put("B-"+selectedEntities[i], index++);
-//			entityMap.put("I-"+selectedEntities[i], index++);
+			entityMap.put("B-"+selectedEntities[i], index++);
+			entityMap.put("I-"+selectedEntities[i], index++);
 		}
 		entities = new String[entityMap.size()];
 		Iterator<String> iter = entityMap.keySet().iterator();
@@ -82,7 +81,7 @@ public class EMain {
 		List<ECRFInstance> testInstances = null;
 		/***********DEBUG*****************/
 //		DPConfig.ecrftrain = "data/semeval10t1/ecrf.small.txt";
-//		testFile="data/semeval10t1/ecrf.small.txt";
+//		testFile="data/semeval10t1/ecrf.smalltest.txt";
 //		DPConfig.writeWeight = true;
 //		DPConfig.readWeight = false;
 //		testFile = DPConfig.ecrftrain;

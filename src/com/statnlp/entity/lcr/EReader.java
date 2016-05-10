@@ -40,11 +40,11 @@ public class EReader {
 			String[] values = line.split("\\t");
 			//String entity = values[3].equals("O")? values[3]: values[3].substring(2, values[3].length());
 			String entity = values[3];
-//			if(!entityMap.containsKey(entity)) {
-//				if(!entity.equals("O"))
-//					entity = entity.substring(0, 2)+"MISC";
-//				else entity = "O";
-//			}
+			if(!entityMap.containsKey(entity)) {
+				if(!entity.equals("O"))
+					entity = entity.substring(0, 2)+"MISC";
+				else entity = "O";
+			}
 			words.add(new WordToken(values[1],values[2],Integer.valueOf(values[4])-1,entity));
 			es.add(entity);
 		}
