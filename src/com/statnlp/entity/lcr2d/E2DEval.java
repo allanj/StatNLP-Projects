@@ -10,7 +10,7 @@ import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.utils.DPConfig;
 
-public class ECRFEval {
+public class E2DEval {
 
 	
 	/**
@@ -22,7 +22,7 @@ public class ECRFEval {
 	public static void evalNER(Instance[] testInsts, String nerOut) throws IOException{
 		PrintWriter pw = RAWF.writer(nerOut);
 		for(int index=0;index<testInsts.length;index++){
-			ECRFInstance eInst = (ECRFInstance)testInsts[index];
+			E2DInstance eInst = (E2DInstance)testInsts[index];
 			ArrayList<String> predEntities = eInst.getPrediction();
 			ArrayList<String> trueEntities = eInst.getOutput();
 			Sentence sent = eInst.getInput();
@@ -58,7 +58,7 @@ public class ECRFEval {
 		PrintWriter pw = RAWF.writer(nerResult);
 		for(int index=0;index<predictions.length;index++){
 			Instance inst = predictions[index];
-			ECRFInstance eInst = (ECRFInstance)inst;
+			E2DInstance eInst = (E2DInstance)inst;
 			ArrayList<String> predEntities = eInst.getPrediction();
 			ArrayList<String> trueEntities = eInst.getOutput();
 			Sentence sent = eInst.getInput();

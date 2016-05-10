@@ -3,19 +3,19 @@ package com.statnlp.entity.lcr2d;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.TableLookupNetwork;
 
-public class ECRFNetwork extends TableLookupNetwork{
+public class E2DNetwork extends TableLookupNetwork{
 
 	int _numNodes = -1;
 	
-	public ECRFNetwork(){
+	public E2DNetwork(){
 		
 	}
 	
-	public ECRFNetwork(int networkId, ECRFInstance inst, LocalNetworkParam param){
+	public E2DNetwork(int networkId, E2DInstance inst, LocalNetworkParam param){
 		super(networkId, inst, param);
 	}
 	
-	public ECRFNetwork(int networkId, ECRFInstance inst, long[] node, int[][][] children, LocalNetworkParam param, int numNodes){
+	public E2DNetwork(int networkId, E2DInstance inst, long[] node, int[][][] children, LocalNetworkParam param, int numNodes){
 		super(networkId, inst,node, children, param);
 		this._numNodes = numNodes;
 	}

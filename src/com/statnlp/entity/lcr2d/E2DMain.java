@@ -15,7 +15,7 @@ import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkModel;
 
-public class EMain {
+public class E2DMain {
 
 	public static String[] entities; 
 	public static int trainNumber = -100;
@@ -78,8 +78,8 @@ public class EMain {
 		System.err.println("[Info] nerOut: "+nerOut);
 		System.err.println("[Info] nerRes: "+nerRes);
 		
-		List<ECRFInstance> trainInstances = null;
-		List<ECRFInstance> testInstances = null;
+		List<E2DInstance> trainInstances = null;
+		List<E2DInstance> testInstances = null;
 		/***********DEBUG*****************/
 //		DPConfig.ecrftrain = "data/semeval10t1/ecrf.small.txt";
 //		testFile="data/semeval10t1/ecrf.small.txt";
@@ -88,12 +88,12 @@ public class EMain {
 //		testFile = DPConfig.ecrftrain;
 		/***************************/
 		if(dataTypeSet.contains(DPConfig.dataType)){
-			trainInstances = EReader.readCNN(DPConfig.ecrftrain, true, trainNumber, entityMap);
-			testInstances = EReader.readCNN(testFile, false, testNumber, entityMap);
+			trainInstances = E2DReader.readCNN(DPConfig.ecrftrain, true, trainNumber, entityMap);
+			testInstances = E2DReader.readCNN(testFile, false, testNumber, entityMap);
 		}else{
-			trainInstances = EReader.readData(DPConfig.ecrftrain,true,trainNumber, entityMap);
-			testInstances = isPipe?EReader.readDP2NERPipe(testFile, testNumber,entityMap)
-					:EReader.readData(testFile,false,testNumber,entityMap);
+			trainInstances = E2DReader.readData(DPConfig.ecrftrain,true,trainNumber, entityMap);
+			testInstances = isPipe?E2DReader.readDP2NERPipe(testFile, testNumber,entityMap)
+					:E2DReader.readData(testFile,false,testNumber,entityMap);
 		}
 		
 //		Formatter.ner2Text(trainInstances, "data/testRandom2.txt");
@@ -106,14 +106,14 @@ public class EMain {
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
 		NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY = false;
 		
-		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(),entities,isPipe);
-		ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(entityMap, entities);
+		E2DFeatureManager fa = new E2DFeatureManager(new GlobalNetworkParam(),entities,isPipe);
+		E2DNetworkCompiler compiler = new E2DNetworkCompiler(entityMap, entities);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
-		ECRFInstance[] ecrfs = trainInstances.toArray(new ECRFInstance[trainInstances.size()]);
+		E2DInstance[] ecrfs = trainInstances.toArray(new E2DInstance[trainInstances.size()]);
 		model.train(ecrfs, numIteration);
-		Instance[] predictions = model.decode(testInstances.toArray(new ECRFInstance[testInstances.size()]));
-		ECRFEval.evalNER(predictions, nerOut);
-		ECRFEval.writeNERResult(predictions, nerRes, true);
+		Instance[] predictions = model.decode(testInstances.toArray(new E2DInstance[testInstances.size()]));
+		E2DEval.evalNER(predictions, nerOut);
+		E2DEval.writeNERResult(predictions, nerRes, true);
 	}
 
 	

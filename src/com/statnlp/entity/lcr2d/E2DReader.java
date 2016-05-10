@@ -13,12 +13,12 @@ import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
 import com.statnlp.dp.utils.DPConfig;
 
-public class EReader {
+public class E2DReader {
 
-	public static List<ECRFInstance> readData(String path, boolean setLabel, int number,HashMap<String, Integer> entityMap) throws IOException{
+	public static List<E2DInstance> readData(String path, boolean setLabel, int number,HashMap<String, Integer> entityMap) throws IOException{
 		BufferedReader br = RAWF.reader(path);
 		String line = null;
-		List<ECRFInstance> insts = new ArrayList<ECRFInstance>();
+		List<E2DInstance> insts = new ArrayList<E2DInstance>();
 		int index =1;
 		ArrayList<WordToken> words = new ArrayList<WordToken>();
 		ArrayList<String> es = new ArrayList<String>();
@@ -28,7 +28,7 @@ public class EReader {
 				WordToken[] wordsArr = new WordToken[words.size()];
 				words.toArray(wordsArr);
 				Sentence sent = new Sentence(wordsArr);
-				ECRFInstance inst = new ECRFInstance(index++,1.0,sent);
+				E2DInstance inst = new E2DInstance(index++,1.0,sent);
 				inst.entities = es;
 				if(setLabel) inst.setLabeled(); else inst.setUnlabeled();
 				insts.add(inst);
@@ -49,17 +49,17 @@ public class EReader {
 			es.add(entity);
 		}
 		br.close();
-		List<ECRFInstance> myInsts = insts;
+		List<E2DInstance> myInsts = insts;
 		String type = setLabel? "Training":"Testing";
 		System.err.println(type+" instance, total:"+ myInsts.size()+" Instance. ");
 		return myInsts;
 	}
 
 	
-	public static List<ECRFInstance> readDP2NERPipe(String path, int number,HashMap<String, Integer> entityMap) throws IOException{
+	public static List<E2DInstance> readDP2NERPipe(String path, int number,HashMap<String, Integer> entityMap) throws IOException{
 		BufferedReader br = RAWF.reader(path);
 		String line = null;
-		List<ECRFInstance> insts = new ArrayList<ECRFInstance>();
+		List<E2DInstance> insts = new ArrayList<E2DInstance>();
 		int index =1;
 		ArrayList<WordToken> words = new ArrayList<WordToken>();
 		ArrayList<String> es = new ArrayList<String>();
@@ -69,7 +69,7 @@ public class EReader {
 				WordToken[] wordsArr = new WordToken[words.size()];
 				words.toArray(wordsArr);
 				Sentence sent = new Sentence(wordsArr);
-				ECRFInstance inst = new ECRFInstance(index++,1.0,sent);
+				E2DInstance inst = new E2DInstance(index++,1.0,sent);
 				inst.entities = es;
 				inst.setUnlabeled();
 				insts.add(inst);
@@ -86,15 +86,15 @@ public class EReader {
 			es.add(entity);
 		}
 		br.close();
-		List<ECRFInstance> myInsts = insts;
+		List<E2DInstance> myInsts = insts;
 		System.err.println("[Pipeline] Testing instance, total:"+ myInsts.size()+" Instance. ");
 		return myInsts;
 	}
 	
-	public static List<ECRFInstance> readCNN(String path, boolean setLabel, int number,HashMap<String, Integer> entityMap) throws IOException{
+	public static List<E2DInstance> readCNN(String path, boolean setLabel, int number,HashMap<String, Integer> entityMap) throws IOException{
 		BufferedReader br = RAWF.reader(path);
 		String line = null;
-		List<ECRFInstance> insts = new ArrayList<ECRFInstance>();
+		List<E2DInstance> insts = new ArrayList<E2DInstance>();
 		int index =1;
 		ArrayList<WordToken> words = new ArrayList<WordToken>();
 		ArrayList<String> es = new ArrayList<String>();
@@ -104,7 +104,7 @@ public class EReader {
 				WordToken[] wordsArr = new WordToken[words.size()];
 				words.toArray(wordsArr);
 				Sentence sent = new Sentence(wordsArr);
-				ECRFInstance inst = new ECRFInstance(index++,1.0,sent);
+				E2DInstance inst = new E2DInstance(index++,1.0,sent);
 				inst.entities = es;
 				if(setLabel) inst.setLabeled(); else inst.setUnlabeled();
 				insts.add(inst);
@@ -120,7 +120,7 @@ public class EReader {
 			es.add(entity);
 		}
 		br.close();
-		List<ECRFInstance> myInsts = insts;
+		List<E2DInstance> myInsts = insts;
 		String type = setLabel? "Training":"Testing";
 		System.err.println(type+" instance, total:"+ myInsts.size()+" Instance. ");
 		return myInsts;

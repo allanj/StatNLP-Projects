@@ -6,7 +6,7 @@ import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
 
 
-public class ECRFInstance extends Instance {
+public class E2DInstance extends Instance {
 
 
 	private static final long serialVersionUID = 1851514046050983662L;
@@ -14,7 +14,7 @@ public class ECRFInstance extends Instance {
 	protected ArrayList<String> entities;
 	protected ArrayList<String> predictons;
 	
-	public ECRFInstance(int instanceId, double weight, Sentence sent) {
+	public E2DInstance(int instanceId, double weight, Sentence sent) {
 		super(instanceId, weight);
 		this.sentence = sent;
 		// TODO Auto-generated constructor stub
@@ -27,8 +27,8 @@ public class ECRFInstance extends Instance {
 	}
 
 	@Override
-	public ECRFInstance duplicate() {
-		ECRFInstance inst = new ECRFInstance(this._instanceId, this._weight,this.sentence);
+	public E2DInstance duplicate() {
+		E2DInstance inst = new E2DInstance(this._instanceId, this._weight,this.sentence);
 		if(entities!=null)
 			inst.entities = (ArrayList<String>)entities.clone();
 		else inst.entities = null;
