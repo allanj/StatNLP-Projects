@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.DependInstance;
 import com.statnlp.dp.utils.DPConfig;
-import com.statnlp.dp.utils.Extractor;
 import com.statnlp.hybridnetworks.FeatureArray;
 import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -94,6 +93,16 @@ public class H2DFeatureManager extends FeatureManager {
 		}
 		//System.err.println("patype:"+pa_type+", "+Arrays.toString(childrenType));
 		
+		if(!childrenType[0].equals(OE) && !childrenType[1].equals(OE) && completeness==1){
+			int splitPoint = childrenArr[0][0];
+			String word = sent.get(splitPoint).getName();
+			String tag = sent.get(splitPoint).getTag();
+			String prevEntity = childrenType[0];
+			String currEn = childrenType[1];
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE-samePos",word+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE-samePos",tag+":"+prevEntity+":"+currEn));
+		}
+		
 		//pairwise features
 		if(completeness==0 && !childrenType[0].equals(OE) && !childrenType[1].equals(OE)){
 			int splitPoint = childrenArr[0][0]; // the rightIndex of the left child
@@ -150,7 +159,16 @@ public class H2DFeatureManager extends FeatureManager {
 		}
 		
 		
-		
+		if(isEntity(pa_type) && completeness==0){
+			featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword", "JOINT:"+pa_type+":"+headWord+":"+modifierWord));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag", "JOINT:"+pa_type+":"+headTag+":"+modifierTag));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-bigramword-dist", "JOINT:"+pa_type+":"+headWord+":"+modifierWord+attDist));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(),"joint-bigramtag-dist", "JOINT:"+pa_type+":"+headTag+":"+modifierTag+attDist));
+			for(int i=leftIndex+1;i<rightIndex;i++){
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-inbetween-1", "JOINT:"+pa_type+":"+leftTag+","+sent.get(i).getTag()+","+rightTag));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "joint-inbetween-2", "JOINT:"+pa_type+":"+leftTag+","+sent.get(i).getTag()+","+rightTag+attDist));
+			}
+		}
 		
 		addDepFeatures(featureList,network,parentArr,sent);
 	
@@ -353,6 +371,8 @@ public class H2DFeatureManager extends FeatureManager {
 			}
 		}
 	}
-	
+	private boolean isEntity(String type){
+		return !type.equals("null") && !type.equals(ONE) && !type.equals(OE);
+	}
 
 }
