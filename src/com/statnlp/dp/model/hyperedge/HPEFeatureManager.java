@@ -94,6 +94,17 @@ public class HPEFeatureManager extends FeatureManager {
 		}
 		//System.err.println("patype:"+pa_type+", "+Arrays.toString(childrenType));
 		
+		//same position feature:
+		if(!childrenType[0].equals(OE) && !childrenType[1].equals(OE) && completeness==1){
+			int splitPoint = childrenArr[0][0];
+			String word = sent.get(splitPoint).getName();
+			String tag = sent.get(splitPoint).getTag();
+			String prevEntity = childrenType[0];
+			String currEn = childrenType[1];
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE-samePos",word+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE-samePos",tag+":"+prevEntity+":"+currEn));
+		}
+		
 		//pairwise features
 		if(completeness==0 && !childrenType[0].equals(OE) && !childrenType[1].equals(OE)){
 			int splitPoint = childrenArr[0][0]; // the rightIndex of the left child
