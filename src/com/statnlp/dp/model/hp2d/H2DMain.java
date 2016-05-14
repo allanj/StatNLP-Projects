@@ -80,13 +80,14 @@ public class H2DMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 5;
+		trainNumber = 1;
 //		testNumber = 5;
 //		numIteration = 20;
 //		numThreads = 8;
 //		testingPath = trainingPath;
-//		DPConfig.readWeight = true;
-//		DPConfig.writeWeight = false;
+		DPConfig.readWeight = true;
+		DPConfig.writeWeight = false;
+		DPConfig.weightPath = "data/semeval10t1/ecrf2dWeight.txt";
 		/************/
 		
 		

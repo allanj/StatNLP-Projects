@@ -25,7 +25,7 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 	private static final long serialVersionUID = -5080640847287255079L;
 
 	private long[] _nodes;
-	private final int maxSentLen = 128;
+	private final int maxSentLen = 50;
 	private int[][][] _children;
 	private HashMap<String, Integer> typeMap;
 	private String[] types;
