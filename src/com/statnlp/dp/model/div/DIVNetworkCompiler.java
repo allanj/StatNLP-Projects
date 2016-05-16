@@ -347,40 +347,12 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 		CoreLabel rootLabel = new CoreLabel();
 		rootLabel.setValue("0,"+(inst.getInput().length()-1)+",1,1,"+PARENT_IS+"null");
 		root.setLabel(rootLabel);
-		/***************************Debug information 9.23pm Allan*******************************/
-//		long mynode = this.toNode(6, 6, 1, 1, "pae:"+OE);
-//		int node_k = Arrays.binarySearch(network.getAllNodes(), mynode);
-//		long pa = network.getNode(node_k);
-//		int[] paArr = NetworkIDMapper.toHybridNodeArray(pa);
-//		int paLeft = paArr[0]-paArr[1]; int paRight= paArr[0];
-//		String patype = null;
-//		if(paArr[4]==2*types.length)
-//			patype = PARENT_IS+"null";
-//		else if(paArr[4]>types.length-1){
-//			patype = PARENT_IS+types[paArr[4]-types.length];
-//		}else{
-//			patype = types[paArr[4]];
-//		}
-//		System.err.println("max score for this node:"+network.getMax(node_k));
-//		int[][] children = network.getChildren(node_k);
-//		for(int c=0;c<children.length;c++){
-//			int[] children_k_list = children[c];
-//			FeatureArray fa = network.getLocalParam().extract(network, node_k, children_k_list, c);
-//			long c1 = network.getNode(children_k_list[0]);
-//			int splitPoint = NetworkIDMapper.toHybridNodeArray(c1)[0];
-//			System.err.println("current split point:"+splitPoint);
-//			System.err.println(fa.toString() + " score:"+fa.getScore(network.getLocalParam()));
-//		}
-		/********************************************************/
 		this.toTreeHelper(network, network.countNodes()-1, root);
 		return root;
 	}
 	
 	private void toTreeHelper(DIVNetwork network, int node_k, Tree parentNode){
 		int[] children_k = network.getMaxPath(node_k);
-//		System.err.println("node_k:"+node_k+" score:"+network.getMax(node_k));
-//		System.err.println("Parent Node:"+parentNode.toString());
-//		System.err.println("Children length:"+children_k.length);
 		for(int k=0;k<children_k.length;k++){
 			long child = network.getNode(children_k[k]);
 			int[] ids_child = NetworkIDMapper.toHybridNodeArray(child);
