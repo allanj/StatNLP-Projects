@@ -62,6 +62,9 @@ public abstract class Network implements Serializable, HyperGraph{
 	//this stores the paths associated with the above tree
 	protected transient int[][] _max_paths;
 	
+	//store the marginal score for each index.
+	protected transient double[] _marginal;
+	
 	/**
 	 * Default constructor. Note that the network constructed using this default constructor is lacking 
 	 * the {@link LocalNetworkParam} object required for actual use.
@@ -178,6 +181,15 @@ public abstract class Network implements Serializable, HyperGraph{
 	public double sum(){
 		this.inside();
 		return this.getInside();
+	}
+	
+	/**
+	 * Return the marginal score for the network at a specific index (Note: do not support SSVM yet)
+	 * @param k
+	 * @return
+	 */
+	public double getMarginal(int k){
+		return this._marginal[k];
 	}
 	
 	/**
@@ -327,6 +339,19 @@ public abstract class Network implements Serializable, HyperGraph{
 //		time = System.currentTimeMillis() - time;
 //		System.err.println("MAX TIME:"+time+" ms");
 	}
+	
+	/**
+	 * Calculate the marginal score for all nodes
+	 */
+	public void marginal(){
+		this._marginal = new double[this.countNodes()];
+		double sum = this.sum();
+		this.outside();
+		Arrays.fill(this._marginal, Double.NEGATIVE_INFINITY);
+		for(int k=0;k< this.countNodes();k++)
+			this.marginal(k,sum);
+	}
+
 	
 	/**
 	 * Calculate the inside score for the specified node
@@ -647,6 +672,23 @@ public abstract class Network implements Serializable, HyperGraph{
 //		System.err.println("max["+k+"]"+_max[k]);
 	}
 
+	/**
+	 * Calculate the marginal score at the specific node
+	 * @param k
+	 */
+	protected void marginal(int k, double sum){
+		if(this.isRemoved(k)){
+			this._marginal[k] = Double.NEGATIVE_INFINITY;
+			return;
+		}
+		//since inside and outside are in log space
+		double alpha = this._inside[k];
+		double beta = this._outside[k];
+		double total = sum;
+		
+		this._marginal[k] = this._inside[k] + this._outside[k] - sum;
+	}
+	
 	private double sumLog(double inside, double score) {
 		double v1 = inside;
 		double v2 = score;

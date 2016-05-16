@@ -118,7 +118,7 @@ public class GlobalNetworkParam implements Serializable{
 		this._featureIntMap = new HashMap<String, HashMap<String, HashMap<String, Integer>>>();
 		this._type2inputMap = new HashMap<String, ArrayList<String>>();
 		this._optFactory = optimizerFactory;
-		if (!NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION && NetworkConfig._numThreads>1){
+		if (!NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION && NetworkConfig._numThreads > 1){
 			this._subFeatureIntMaps = new ArrayList<HashMap<String, HashMap<String, HashMap<String, Integer>>>>();
 			for (int i = 0; i < NetworkConfig._numThreads; i++){
 				this._subFeatureIntMaps.add(new HashMap<String, HashMap<String, HashMap<String, Integer>>>());
@@ -601,9 +601,8 @@ public class GlobalNetworkParam implements Serializable{
 	    	if(diff >= 0 && diff < NetworkConfig.objtol){
 	    		done = true;
 	    	}
-//	    	double diffRatio = Math.abs(diff/this.getObj_old());
-	    	double diffRatio = diff;
-	    	if(diffRatio < 1e-7){
+	    	double diffRatio = Math.abs(diff/this.getObj_old());
+	    	if(diffRatio < 1e-4){
 	    		this.smallChangeCount += 1;
 	    	} else {
 	    		this.smallChangeCount = 0;
