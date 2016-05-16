@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import com.statnlp.commons.ml.opt.OptimizerFactory;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.dp.Evaluator;
 import com.statnlp.dp.Transformer;
@@ -85,12 +84,12 @@ public class DIVMain {
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
-		trainingPath = "data/semeval10t1/small.txt";
+//		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-		trainNumber = 2;
-//		testNumber = 100;
-		numIteration = 40;
-		numThreads = 8;
+//		trainNumber = 50;
+//		testNumber = 50;
+//		numIteration = 40;
+//		numThreads = 8;
 //		testingPath = trainingPath;
 //		DPConfig.readWeight = false;
 //		DPConfig.writeWeight = false;
@@ -127,7 +126,7 @@ public class DIVMain {
 		NetworkConfig._numThreads = numThreads;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //DPConfig.L2;
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
-		
+		NetworkConfig._MAX_MARGINAL = true;
 		
 		ModelViewer viewer = new ModelViewer(4,entities);
 		FeatureManager dfm = new DIVFeatureManager_leafcopy(new GlobalNetworkParam(),entities);

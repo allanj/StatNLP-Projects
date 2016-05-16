@@ -332,8 +332,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 	
 	@Override
 	public Instance decompile(Network network) {
-		if(NetworkConfig._MAX_MARGINAL)
-			return maxMarginalDecode(network);
+		
 		DIVNetwork dependNetwork = (DIVNetwork)network;
 		DIVInstance inst = (DIVInstance)(dependNetwork.getInstance());
 		inst = inst.duplicate();
@@ -343,6 +342,8 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 //		printNetwork(dependNetwork, (Sentence)dependNetwork.getInstance().getInput());
 		if(DEBUG) System.err.println("[Result] "+forest.pennString());
 		inst.setPrediction(forest);
+		if(NetworkConfig._MAX_MARGINAL)
+			maxMarginalDecode(network, inst);
 		return inst;
 	}
 	
@@ -388,10 +389,9 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 		
 	}
 	
-	private Instance maxMarginalDecode(Network network){
+	private void maxMarginalDecode(Network network, DIVInstance dupRes){
 		DIVNetwork dependNetwork = (DIVNetwork)network;
 		DIVInstance inst = (DIVInstance)(dependNetwork.getInstance());
-		inst = inst.duplicate();
 		ArrayList<String> prediction = new ArrayList<String>();
 		prediction.add("O");
 		for(int i=1;i<inst.size();i++){
@@ -402,14 +402,45 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 				long right = this.toNode(i, i, 1, 1, types[l]);
 				int l_idx = Arrays.binarySearch(this._nodes, left);
 				int r_idx = Arrays.binarySearch(this._nodes, right);
-				if(l_idx<0 || r_idx<0) continue;
-				double leftMargin = dependNetwork.getMarginal(l_idx);
-				double rightMargin = dependNetwork.getMarginal(r_idx);
-				double total = leftMargin + rightMargin;
-				if(total > max){
-					bestLabel = l;
-					max = total;
+				if(l_idx>=0 && r_idx>=0){
+					double leftMargin = dependNetwork.getMarginal(l_idx);
+					double rightMargin = dependNetwork.getMarginal(r_idx);
+					double total = leftMargin + rightMargin;
+					if(total > max){
+						bestLabel = l;
+						max = total;
+					}
 				}
+				
+				
+				left = this.toNode(i, i, 0, 1, ONE);
+				right = this.toNode(i, i, 1, 1, types[l]);
+				l_idx = Arrays.binarySearch(this._nodes, left);
+				r_idx = Arrays.binarySearch(this._nodes, right);
+				if(l_idx>=0 && r_idx>=0){
+					double leftMargin = dependNetwork.getMarginal(l_idx);
+					double rightMargin = dependNetwork.getMarginal(r_idx);
+					double total = leftMargin + rightMargin;
+					if(total > max){
+						bestLabel = l;
+						max = total;
+					}
+				}
+				
+				left = this.toNode(i, i, 0, 1, types[l]);
+				right = this.toNode(i, i, 1, 1, ONE);
+				l_idx = Arrays.binarySearch(this._nodes, left);
+				r_idx = Arrays.binarySearch(this._nodes, right);
+				if(l_idx>=0 && r_idx>=0){
+					double leftMargin = dependNetwork.getMarginal(l_idx);
+					double rightMargin = dependNetwork.getMarginal(r_idx);
+					double total = leftMargin + rightMargin;
+					if(total > max){
+						bestLabel = l;
+						max = total;
+					}
+				}
+				
 			}
 			if(bestLabel==-1)
 				System.err.println("index:"+i+" sentence len:"+inst.size());
@@ -436,8 +467,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 			prev = current;
 		}
 		String[] resEn = new String[res.size()];
-		inst.setPredEntities(res.toArray(resEn));
-		return inst;
+		dupRes.setPredEntities(res.toArray(resEn));
 	}
 
 	
