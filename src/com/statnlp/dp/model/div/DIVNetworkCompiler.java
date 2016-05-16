@@ -1,8 +1,10 @@
 package com.statnlp.dp.model.div;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Random;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
@@ -10,6 +12,7 @@ import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
+import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkException;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
 import com.statnlp.ui.visualize.VisualizationViewerEngine;
@@ -329,6 +332,8 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 	
 	@Override
 	public Instance decompile(Network network) {
+		if(NetworkConfig._MAX_MARGINAL)
+			return maxMarginalDecode(network);
 		DIVNetwork dependNetwork = (DIVNetwork)network;
 		DIVInstance inst = (DIVInstance)(dependNetwork.getInstance());
 		inst = inst.duplicate();
@@ -383,7 +388,57 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 		
 	}
 	
-	
+	private Instance maxMarginalDecode(Network network){
+		DIVNetwork dependNetwork = (DIVNetwork)network;
+		DIVInstance inst = (DIVInstance)(dependNetwork.getInstance());
+		inst = inst.duplicate();
+		ArrayList<String> prediction = new ArrayList<String>();
+		prediction.add("O");
+		for(int i=1;i<inst.size();i++){
+			double max = Double.NEGATIVE_INFINITY;
+			int bestLabel = -1;
+			for(int l=0;l<types.length;l++){
+				long left = this.toNode(i, i, 0, 1, types[l]);
+				long right = this.toNode(i, i, 1, 1, types[l]);
+				int l_idx = Arrays.binarySearch(this._nodes, left);
+				int r_idx = Arrays.binarySearch(this._nodes, right);
+				if(l_idx<0 || r_idx<0) continue;
+				double leftMargin = dependNetwork.getMarginal(l_idx);
+				double rightMargin = dependNetwork.getMarginal(r_idx);
+				double total = leftMargin + rightMargin;
+				if(total > max){
+					bestLabel = l;
+					max = total;
+				}
+			}
+			if(bestLabel==-1)
+				System.err.println("index:"+i+" sentence len:"+inst.size());
+			String ans = types[bestLabel];
+			if(types[bestLabel].equals(ONE))
+				ans = "O";
+			prediction.add(ans);
+		}
+		ArrayList<String> res = new ArrayList<String>();
+		res.add("O");
+		String prev = "O";
+		for(int i=1;i<prediction.size();i++){
+			String current = prediction.get(i);
+			if(current.equals(prev)){
+				if(prev.equals("O"))
+					res.add("O");
+				else 
+					res.add("I-"+current);
+			}else{
+				if(current.equals("O"))
+					res.add("O");
+				else res.add("B-"+current);
+			}
+			prev = current;
+		}
+		String[] resEn = new String[res.size()];
+		inst.setPredEntities(res.toArray(resEn));
+		return inst;
+	}
 
 	
 	

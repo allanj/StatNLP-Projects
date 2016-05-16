@@ -14,6 +14,7 @@ import edu.stanford.nlp.trees.UnnamedDependency;
 public class DIVInstance extends DependInstance {
 
 	private boolean invalid;
+	private String[] predEntities; //0 index is rootl
 	
 	public DIVInstance(int instanceId, double weight) {
 		super(instanceId, weight);
@@ -47,6 +48,10 @@ public class DIVInstance extends DependInstance {
 		if(dependencyRoot==null)
 			di.dependencyRoot = null;
 		else di.dependencyRoot = dependencyRoot.deepCopy();
+		
+		if(predEntities==null)
+			di.predEntities = null;
+		else di.predEntities = predEntities.clone();
 		return di;
 	}
 
@@ -155,5 +160,14 @@ public class DIVInstance extends DependInstance {
 		}
 	}
 
+	public String[] getPredEntities() {
+		return predEntities;
+	}
 
+	public void setPredEntities(String[] predEntities) {
+		this.predEntities = predEntities;
+	}
+
+	
+	
 }
