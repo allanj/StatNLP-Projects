@@ -37,8 +37,6 @@ import java.util.concurrent.Future;
 
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Instance;
-import com.statnlp.dp.DependencyFeatureManager;
-import com.statnlp.dp.DependencyFeatureManager.FEATYPE;
 import com.statnlp.dp.utils.DPConfig;
 
 public abstract class NetworkModel implements Serializable{
@@ -163,11 +161,10 @@ public abstract class NetworkModel implements Serializable{
 		
 		double obj_old = Double.NEGATIVE_INFINITY;
 		
-		 //now read the weight
+		//now read the weight
 		HashMap<String, Double> f2weight = null;
 		HashSet<String> ftypes = new HashSet<String>();
-		for(DependencyFeatureManager.FEATYPE t: DependencyFeatureManager.FEATYPE.values()){
-			if(t.name().equals(DependencyFeatureManager.FEATYPE.pipe.name())) continue;
+		for(DPConfig.WEIGHT_TYPE t: DPConfig.WEIGHT_TYPE.values()){
 			ftypes.add(t.name());
 		}
 		if(DPConfig.readWeight){
@@ -181,11 +178,11 @@ public abstract class NetworkModel implements Serializable{
 					f2weight.put(values[0], Double.parseDouble(values[1]));
 				}
 				br.close();
-				System.err.println("[Info] Total number of dep weight:"+f2weight.size());
+				System.err.println("[Info] Total number of ecrf weight:"+f2weight.size());
 				int totalObtained = 0;
 				for(int tf=0;tf<this._fm._param_g._feature2rep.length;tf++){
 					String nowf = Arrays.toString(this._fm._param_g._feature2rep[tf]);
-					if(!f2weight.containsKey(nowf) && ftypes.contains(this._fm._param_g._feature2rep[tf][0])){
+					if(!f2weight.containsKey(nowf)){
 						System.err.println(nowf);
 						//this._fm.getParam_G().setWeight(tf, 0.0);
 					}else{
@@ -213,18 +210,6 @@ public abstract class NetworkModel implements Serializable{
 		long startTime = System.currentTimeMillis();
 		try{
 			for(int it = 0; it<maxNumIterations; it++){
-				//everytime before start, read the weight because we fixed the weight:
-				if(DPConfig.readWeight){
-					for(int tf=0;tf<this._fm._param_g._feature2rep.length;tf++){
-						String nowf = Arrays.toString(this._fm._param_g._feature2rep[tf]);
-						if(!f2weight.containsKey(nowf) && ftypes.contains(this._fm._param_g._feature2rep[tf][0])){
-							
-						}else{
-							if(ftypes.contains(this._fm._param_g._feature2rep[tf][0]))
-								this._fm.getParam_G().overRideWeight(tf, f2weight.get(nowf));
-						}
-					}
-				}
 				//at each iteration, shuffle the inst ids. and reset the set, which is already in the learner thread
 				if(NetworkConfig.USE_BATCH_SGD){
 					batchInstIds.clear();
@@ -260,6 +245,19 @@ public abstract class NetworkModel implements Serializable{
 					System.out.println("Training completes. No significant progress (<objtol) after "+it+" iterations.");
 					break;
 				}
+				//everytime before start, read the weight because we fixed the weight:
+				if(DPConfig.readWeight){
+					for(int tf=0;tf<this._fm._param_g._feature2rep.length;tf++){
+						String nowf = Arrays.toString(this._fm._param_g._feature2rep[tf]);
+						if(!f2weight.containsKey(nowf) && ftypes.contains(this._fm._param_g._feature2rep[tf][0])){
+							
+						}else{
+							if(ftypes.contains(this._fm._param_g._feature2rep[tf][0]))
+								this._fm.getParam_G().overRideWeight(tf, f2weight.get(nowf));
+						}
+					}
+				}
+
 			}
 			//use the best weights 
 			if(NetworkConfig.USE_STRUCTURED_SVM){
@@ -287,7 +285,7 @@ public abstract class NetworkModel implements Serializable{
 	}
 
 	private void touch(Instance[][] insts, boolean keepExisting) throws InterruptedException {
-		if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION){
+		if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION || NetworkConfig._numThreads == 1){
 			for(int threadId = 0; threadId<this._numThreads; threadId++){
 				if(!keepExisting){
 					this._learners[threadId] = new LocalNetworkLearnerThread(threadId, this._fm, insts[threadId], this._compiler, 0);

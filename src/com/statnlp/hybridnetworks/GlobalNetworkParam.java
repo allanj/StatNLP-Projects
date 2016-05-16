@@ -118,7 +118,7 @@ public class GlobalNetworkParam implements Serializable{
 		this._featureIntMap = new HashMap<String, HashMap<String, HashMap<String, Integer>>>();
 		this._type2inputMap = new HashMap<String, ArrayList<String>>();
 		this._optFactory = optimizerFactory;
-		if (!NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION){
+		if (!NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION && NetworkConfig._numThreads>1){
 			this._subFeatureIntMaps = new ArrayList<HashMap<String, HashMap<String, HashMap<String, Integer>>>>();
 			for (int i = 0; i < NetworkConfig._numThreads; i++){
 				this._subFeatureIntMaps.add(new HashMap<String, HashMap<String, HashMap<String, Integer>>>());
@@ -416,7 +416,7 @@ public class GlobalNetworkParam implements Serializable{
 			throw new NetworkException("Missing network on some toFeature calls while trying to extract only from labeled networks.");
 		}
 		HashMap<String, HashMap<String, HashMap<String, Integer>>> featureIntMap = null;
-		if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION || this.isLocked()){
+		if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION || NetworkConfig._numThreads == 1 || this.isLocked()){
 			featureIntMap = this._featureIntMap;
 		} else {
 			if(threadId == -1){
@@ -453,7 +453,7 @@ public class GlobalNetworkParam implements Serializable{
 		
 		HashMap<String, Integer> inputToIdx = outputToInputToIdx.get(output);
 		if(!inputToIdx.containsKey(input)){
-			if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION){
+			if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION || NetworkConfig._numThreads == 1){
 				inputToIdx.put(input, this._size++);
 			} else {
 				inputToIdx.put(input, this._subSize[threadId]++);
@@ -601,8 +601,9 @@ public class GlobalNetworkParam implements Serializable{
 	    	if(diff >= 0 && diff < NetworkConfig.objtol){
 	    		done = true;
 	    	}
-	    	double diffRatio = Math.abs(diff/this.getObj_old());
-	    	if(diffRatio < 1e-4){
+//	    	double diffRatio = Math.abs(diff/this.getObj_old());
+	    	double diffRatio = diff;
+	    	if(diffRatio < 1e-7){
 	    		this.smallChangeCount += 1;
 	    	} else {
 	    		this.smallChangeCount = 0;
@@ -618,9 +619,9 @@ public class GlobalNetworkParam implements Serializable{
     		// and so does not correspond to the current objective value.
     		// In practice, though, the two are usually very close to each other (if we
     		// are stopping near the solution), so not copying will also work.
-//    		for(int i=0; i<this._weights.length; i++){
-//        		this._weights[i] = LBFGS.solution_cache[i];
-//        	}
+    		for(int i=0; i<this._weights.length; i++){
+        		this._weights[i] = LBFGS.solution_cache[i];
+        	}
     	}
     	if(NetworkConfig.USE_STRUCTURED_SVM){
     		if(this._obj > this._bestObj){

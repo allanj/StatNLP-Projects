@@ -78,7 +78,7 @@ public class FeatureArray implements Serializable{
 				localIdx--;
 				continue;
 			}
-			if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION || param._isFinalized){
+			if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION || NetworkConfig._numThreads == 1 || param._isFinalized){
 				fs_local[localIdx] = param.toLocalFeature(this._fs[k]);
 			} else {
 				fs_local[localIdx] = this._fs[k];

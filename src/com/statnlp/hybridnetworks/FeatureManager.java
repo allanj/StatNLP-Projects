@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -219,6 +220,7 @@ public abstract class FeatureManager implements Serializable{
 		// since the local feature indices will change
 		boolean shouldCache = this.isCacheEnabled() && (NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION
 														|| !NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY
+														|| NetworkConfig._numThreads == 1
 														|| this._param_g.isLocked());
 		if(shouldCache){
 			if(this._cache[network.getNetworkId()] == null){
