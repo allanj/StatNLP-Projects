@@ -77,7 +77,7 @@ public class DIVReader {
 						continue;
 					}
 					Tree dependencyTree = transformer.toDependencyTree(dependencies, sent);
-					//ArrayList<Entity> checkInvalid = DataChecker.checkAllIncomplete(sent);
+					ArrayList<Entity> checkInvalid = DataChecker.checkAllIncomplete(sent);
 					if(dependencyTree.size()==sent.length() && sent.length()< maxLength ){
 						sent.setRecognized();
 						DIVInstance inst = new DIVInstance(index++,1.0,sent,dependencies,dependencyTree,transformer.toSpanTree(dependencyTree, sent));
@@ -91,14 +91,16 @@ public class DIVReader {
 							he.setNER(sent.get(he.sentIndex()).getEntity());
 						}
 						maxLen = Math.max(maxLen, inst.getInput().length());
-						if(isLabeled /* && checkInvalid.size()==0*/ ) {
-							sent.setRecognized();
-							inst.setLabeled();
-							data.add(inst);
-						}
-						else if (!isLabeled){
-							inst.setUnlabeled();
-							data.add(inst);
+						if(checkInvalid.size()==0){
+							if(isLabeled) {
+								sent.setRecognized();
+								inst.setLabeled();
+								data.add(inst);
+							}
+							else if (!isLabeled){
+								inst.setUnlabeled();
+								data.add(inst);
+							}
 						}
 					}
 					words = new ArrayList<WordToken>();
