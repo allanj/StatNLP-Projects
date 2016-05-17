@@ -24,15 +24,12 @@ public class DependInstance extends ModelInstance {
 	public int[][] outsideHeads;
 	public int[] entityNum;
 	public int continousNum;
-	private Transformer transform;
 	
-	public boolean resCovered;
 	
 	protected boolean haveEntity = false;
 	
 	protected  String OE = DPConfig.OE;
 	protected  String ONE = DPConfig.ONE;
-	protected  String GO = DPConfig.GO;
 	protected  String O_TYPE = DPConfig.O_TYPE;
 	protected  String E_B_PREFIX = DPConfig.E_B_PREFIX;
 	protected  String E_I_PREFIX = DPConfig.E_I_PREFIX;
@@ -49,14 +46,12 @@ public class DependInstance extends ModelInstance {
 		this.sentence = sentence;
 	}
 	
-	public DependInstance(int instanceId, double weight, Sentence sentence, ArrayList<UnnamedDependency> dependencies, Tree dependencyRoot, Transformer transform) {
+	public DependInstance(int instanceId, double weight, Sentence sentence, ArrayList<UnnamedDependency> dependencies, Tree dependencyRoot, Tree output) {
 		super(instanceId, weight);
 		this.sentence = sentence;
 		this.dependencies = dependencies;
 		this.dependencyRoot = dependencyRoot.deepCopy();
-		this.transform = transform;
-		this.output = this.transform.toSpanTree(dependencyRoot.deepCopy(), sentence);
-		
+		this.output = output;
 	}
 	
 	public void setHaveEntity(HashMap<String, Integer> typeMap){
@@ -208,28 +203,15 @@ public class DependInstance extends ModelInstance {
 		boolean[] set = new boolean[this.sentence.length()];
 		es[0] = O_TYPE;
 		for(int i=1;i<es.length;i++) {es[i] = "UNDEF"; set[i] =false;}
-		if(DPConfig.currentModel.equals(MODEL.SIMPLE.name())){
-			resCovered = false;
-			this.findAllE(es, spanRoot);
-			for(int i=1;i<es.length;i++){
-				if(es[i].equals("UNDEF")) {
-					es[i] = O_TYPE;
-				}
-				if((es[i-1].startsWith(E_I_PREFIX) || es[i-1].startsWith(E_B_PREFIX)) && es[i].startsWith(E_B_PREFIX) && es[i-1].substring(2, es[i-1].length()).equals(es[i].substring(2, es[i].length())))
-					es[i] = E_I_PREFIX+es[i-1].substring(2, es[i-1].length());
+		this.findAllONE(es, spanRoot);
+		this.findAllE(es, spanRoot);
+		for(int i=1;i<es.length;i++){
+			if(es[i].equals("UNDEF")) {
+				System.err.println("Some spans are not finalized the type. Info:\n\t"+this._instanceId+"\n"+this.getInput().toString());
+				es[i] = O_TYPE;
 			}
-		}else{
-			this.findAllONE(es, spanRoot);
-			resCovered = false;
-			this.findAllE(es, spanRoot);
-			for(int i=1;i<es.length;i++){
-				if(es[i].equals("UNDEF")) {
-					System.err.println("Some spans are not finalized the type. Info:\n\t"+this._instanceId+"\n"+this.getInput().toString());
-					es[i] = O_TYPE;
-				}
-				if((es[i-1].startsWith(E_I_PREFIX) || es[i-1].startsWith(E_B_PREFIX)) && es[i].startsWith(E_B_PREFIX) && es[i-1].substring(2, es[i-1].length()).equals(es[i].substring(2, es[i].length())))
-					es[i] = E_I_PREFIX+es[i-1].substring(2, es[i-1].length());
-			}
+			if((es[i-1].startsWith(E_I_PREFIX) || es[i-1].startsWith(E_B_PREFIX)) && es[i].startsWith(E_B_PREFIX) && es[i-1].substring(2, es[i-1].length()).equals(es[i].substring(2, es[i].length())))
+				es[i] = E_I_PREFIX+es[i-1].substring(2, es[i-1].length());
 		}
 		
 		return es;
@@ -259,11 +241,9 @@ public class DependInstance extends ModelInstance {
 		int l = Integer.valueOf(info[0]);
 		int r = Integer.valueOf(info[1]);
 		String type = info[4];
-		if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE) && !type.equals(GO)){
-			if((es[l].startsWith(E_B_PREFIX) || es[l].startsWith(E_I_PREFIX)) && !es[l].substring(2).equals(type)) resCovered = true;
+		if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE)){
 			es[l] = E_B_PREFIX+type;
 			for(int i=l+1;i<=r;i++){
-				if((es[i].startsWith(E_B_PREFIX) || es[i].startsWith(E_I_PREFIX)) && !es[i].substring(2).equals(type)) resCovered = true;
 				es[i]=E_I_PREFIX+type;
 			}
 				
@@ -280,7 +260,7 @@ public class DependInstance extends ModelInstance {
 	
 	
 	private boolean validModel(){
-		return DPConfig.currentModel.equals(MODEL.HYPEREDGE.name()) || DPConfig.currentModel.equals(MODEL.SIMPLE.name());
+		return DPConfig.currentModel.equals(MODEL.HYPEREDGE.name());
 	}
 	
 	

@@ -9,6 +9,7 @@ import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.utils.DPConfig;
+import com.statnlp.hybridnetworks.NetworkConfig;
 
 import edu.stanford.nlp.trees.UnnamedDependency;
 
@@ -42,11 +43,44 @@ public class Evaluator {
 			pw.write("\n");
 		}
 		pw.close();
-		System.err.println("****");
-		System.err.println("[Dependency] Correct: "+dp_corr);
-		System.err.println("[Dependency] total: "+dp_total);
-		System.err.println("[Dependency] UAS: "+dp_corr*1.0/dp_total);
-		System.err.println("****");
+		System.out.println("**Evaluating Dependency Result**");
+		System.out.println("[Dependency] Correct: "+dp_corr);
+		System.out.println("[Dependency] total: "+dp_total);
+		System.out.println("[Dependency] UAS: "+dp_corr*1.0/dp_total);
+		System.out.println("*************************");
+	}
+	
+	public static void evalLabelledDP(Instance[] testInsts, String depLabOut) throws IOException{
+		int dp_corr=0;
+		int dp_total=0;
+		PrintWriter pw = RAWF.writer(depLabOut);
+		for(Instance org_inst: testInsts){
+			ModelInstance inst = (ModelInstance)org_inst;
+			Sentence sent = inst.getInput();
+			ArrayList<UnnamedDependency> predDependencies = inst.toDependencies(inst.getPrediction());
+			ArrayList<UnnamedDependency> corrDependencies = inst.toDependencies(inst.getOutput());
+			int[] predHeads = Transformer.getHeads(predDependencies, inst.getInput());
+			int[] trueHeads = Transformer.getHeads(corrDependencies, inst.getInput());
+			String[] predLabs = Transformer.getDepLabel(predDependencies, sent);
+			String[] trueLabs = Transformer.getDepLabel(corrDependencies, sent);
+//			System.out.println(Arrays.toString(trueHeads));
+//			System.out.println(Arrays.toString(predHeads));
+//			System.out.println(Arrays.toString(trueLabs));
+//			System.out.println(Arrays.toString(predLabs));
+			for(int i=1;i<predHeads.length;i++){
+				if(predHeads[i]==trueHeads[i] && predLabs[i].equals(trueLabs[i]))
+					dp_corr++;
+				dp_total++;
+				pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+trueHeads[i]+" "+predHeads[i]+" "+trueLabs[i]+" "+predLabs[i]+"\n");
+			}
+			pw.write("\n");
+		}
+		pw.close();
+		System.out.println("****");
+		System.out.println("[Labeled Dependency] Correct: "+dp_corr);
+		System.out.println("[Labeled Dependency] total: "+dp_total);
+		System.out.println("[Labeled Dependency] LAS: "+dp_corr*1.0/dp_total);
+		System.out.println("****");
 	}
 	
 	/**
@@ -60,6 +94,8 @@ public class Evaluator {
 		for(int index=0;index<testInsts.length;index++){
 			ModelInstance inst = (ModelInstance)testInsts[index];
 			String[] predEntities = inst.toEntities(inst.getPrediction());
+			if(NetworkConfig._MAX_MARGINAL)
+				predEntities = inst.getPredEntities();
 			Sentence sent = inst.getInput();
 			for(int i=1;i<sent.length();i++){
 				pw.write(sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+predEntities[i]+"\n");
@@ -71,9 +107,9 @@ public class Evaluator {
 	}
 	
 	
-	private static void evalNER(String outputFile) throws IOException{
+	protected static void evalNER(String outputFile) throws IOException{
 		try{
-			System.err.println("perl data/semeval10t1/conlleval.pl < "+outputFile);
+			System.out.println("perl data/semeval10t1/conlleval.pl < "+outputFile);
 			ProcessBuilder pb = null;
 			if(DPConfig.windows){
 				pb = new ProcessBuilder("D:/Perl64/bin/perl","E:/Framework/data/semeval10t1/conlleval.pl"); 
@@ -115,6 +151,9 @@ public class Evaluator {
 		if(DEBUG) pwDebug.close();
 		pw.close();
 	}
+	
+	
+	
 	
 	public static void main(String[] args) throws IOException{
 		evalNER("data/semeval10t1/ecrf.dev.ner.res.txt");

@@ -13,7 +13,7 @@ public class DependencyFeatureManager extends FeatureManager {
 
 	private static final long serialVersionUID = 7274939836196010680L;
 
-	private enum FEATYPE {unigram, bigram,contextual, inbetween, prefix,pipe};
+	public enum FEATYPE {unigram, bigram,contextual, inbetween, prefix,pipe};
 	protected boolean isPipe;
 	
 	public DependencyFeatureManager(GlobalNetworkParam param_g, boolean isPipe) {
@@ -122,7 +122,6 @@ public class DependencyFeatureManager extends FeatureManager {
 					featureList.add(this._param_g.toFeature(network,FEATYPE.prefix.name(), "head-prefix-h", preHead));
 				}
 			}
-			
 			
 			/**Unigram feature without dist info**/
 			featureList.add(this._param_g.toFeature(network,FEATYPE.unigram.name(), "headword", headWord));;

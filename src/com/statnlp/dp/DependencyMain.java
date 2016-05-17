@@ -58,6 +58,7 @@ public class DependencyMain {
 		processArgs(args);
 		testFile = DPConfig.testingPath;
 		trainingPath = DPConfig.trainingPath;
+		DPConfig.writeWeight = true;
 		
 		
 		

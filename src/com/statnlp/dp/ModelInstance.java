@@ -17,6 +17,7 @@ public abstract class ModelInstance extends Instance {
 	protected Sentence sentence;
 	protected Tree output; //output is the span tree;
 	protected Tree prediction; //prediction is also the dependency spanning tree
+	protected String[] predEntities; //0 index is rootl
 	
 	public ModelInstance(int instanceId, double weight) {
 		super(instanceId, weight);
@@ -79,6 +80,15 @@ public abstract class ModelInstance extends Instance {
 		this.prediction = pred;
 
 	}
+	
+	public String[] getPredEntities() {
+		return predEntities;
+	}
+
+	public void setPredEntities(String[] predEntities) {
+		this.predEntities = predEntities;
+	}
+
 	
 	public abstract ArrayList<UnnamedDependency> toDependencies(Tree root);
 	

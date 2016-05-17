@@ -122,6 +122,16 @@ public abstract class Transformer {
 		return heads;
 	}
 	
+	public static String[] getDepLabel(ArrayList<UnnamedDependency> dependencies, Sentence sent){
+		String[] labs = new String[sent.length()];
+		for(UnnamedDependency dependency: dependencies){
+			CoreLabel modifierLabel = (CoreLabel)dependency.dependent();
+			int modifier = modifierLabel.sentIndex();
+			labs[modifier] = modifierLabel.tag();
+		}
+		return labs;
+	}
+	
 	public static void toMSTFormat(DependInstance[] insts, String output){
 		try {
 			PrintWriter pw  = RAWF.writer(output);
