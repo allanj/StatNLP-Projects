@@ -12,6 +12,7 @@ import java.util.Random;
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
+import com.statnlp.dp.commons.Entity;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DataChecker;
 
@@ -77,6 +78,7 @@ public class DependencyReader {
 						continue;
 					}
 					Tree dependencyTree = transformer.toDependencyTree(dependencies, sent);
+					ArrayList<Entity> checkInvalid = DataChecker.checkAllIncomplete(sent);
 					if(dependencyTree.size()==sent.length() && sent.length()< maxLength){
 						sent.setRecognized();
 						DependInstance inst = new DependInstance(index++,1.0,sent,dependencies,dependencyTree,transformer.toSpanTree(dependencyTree, sent));
@@ -90,15 +92,18 @@ public class DependencyReader {
 							he.setNER(sent.get(he.sentIndex()).getEntity());
 						}
 						maxLen = Math.max(maxLen, inst.getInput().length());
-						if(isLabeled) {
-							sent.setRecognized();
-							inst.setLabeled();
-							data.add(inst);
+						if(checkInvalid.size()==0){
+							if(isLabeled) {
+								sent.setRecognized();
+								inst.setLabeled();
+								data.add(inst);
+							}
+							else {
+								inst.setUnlabeled();
+								data.add(inst);
+							}
 						}
-						else {
-							inst.setUnlabeled();
-							data.add(inst);
-						}
+						
 					}
 					words = new ArrayList<WordToken>();
 					words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
