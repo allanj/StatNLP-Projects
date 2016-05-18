@@ -68,8 +68,7 @@ public class LocalNetworkDecoderThread extends Thread{
 		this._param.disableCache();
 		if(NetworkConfig._MAX_MARGINAL)
 			network.marginal();
-		else
-			network.max();
+		network.max();
 //		System.err.println("max="+network.getMax());
 		return this._compiler.decompile(network);
 	}
