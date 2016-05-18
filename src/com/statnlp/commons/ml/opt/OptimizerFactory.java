@@ -98,6 +98,13 @@ public abstract class OptimizerFactory {
 		return new GradientDescentOptimizerFactory(AdaptiveMethod.ADADELTA, 0.0, phi, eps);
 	}
 	
+	/**
+	 * Used by allan
+	 */
+	public static SGDOptimizerFactory getStochasticGradientDescentFactory(){
+		return new SGDOptimizerFactory();
+	}
+	
 	public abstract Optimizer create(int numWeights);
 
 }
