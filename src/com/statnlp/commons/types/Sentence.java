@@ -37,6 +37,7 @@ public class Sentence extends TokenArray{
 		this._tokens  = tokens;
 	}
 	
+	
 	@Override
 	public WordToken get(int index) {
 		return (WordToken)this._tokens[index];
