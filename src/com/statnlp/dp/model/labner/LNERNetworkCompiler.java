@@ -1,7 +1,7 @@
 package com.statnlp.dp.model.labner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
@@ -10,7 +10,6 @@ import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
-import com.statnlp.ui.visualize.VisualizationViewerEngine;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.LabeledScoredTreeNode;
@@ -23,7 +22,6 @@ public class LNERNetworkCompiler extends NetworkCompiler {
 	private long[] _nodes;
 	private int maxSentLen = 128;
 	private int[][][] _children;
-	private String rootDepLabel = LNERConfig.rootDepLabel;
 	private String COMP = LNERConfig.COMPLABEL;
 	private String O_TYPE = DPConfig.O_TYPE; 
 	
@@ -158,18 +156,22 @@ public class LNERNetworkCompiler extends NetworkCompiler {
 									if(leftIndex!=m && left != NERLabel.LABELS.size()) continue;
 									child_1 = this.toNode(leftIndex, m, 1, 1, left);
 									for(int right=0; right <= NERLabel.LABELS.size(); right++){
-										if((m+1)==rightIndex && right == NERLabel.LABELS.size()) continue;
-										if((m+1)!= rightIndex && right != NERLabel.LABELS.size()) continue;
-										child_2 = this.toNode(leftIndex, m, 1, 1, right);
-										int pa_type = -1;
-										if(left==NERLabel.LABELS.size() || right==NERLabel.LABELS.size()) pa_type = NERLabel.LABELS.size();
-										else if(left==right) pa_type = left;
-										else pa_type = NERLabel.LABELS.size();
+										if((m+1)== rightIndex && right == NERLabel.LABELS.size()) continue;
+										if((m+1)!= rightIndex && right != NERLabel.LABELS.size()) continue; 
+										child_2 = this.toNode(m+1, rightIndex, 0, 1, right);
+										
 										if(network.contains(child_1) && network.contains(child_2)){
-											long parent = this.toNode(leftIndex, rightIndex, direction, complete,pa_type);
-											network.addNode(parent);
-											network.addEdge(parent, new long[]{child_1,child_2});
+											for(int pa_type=0; pa_type<NERLabel.LABELS.size(); pa_type++){
+												if(left==right && left!=NERLabel.LABELS.size() && pa_type!=left) continue;
+												if(left==NERLabel.LABELS.size() && right!=NERLabel.LABELS.size() && (pa_type!=right && pa_type!=NERLabel.get(O_TYPE).getId())) continue;
+												if(right==NERLabel.LABELS.size() && left!=NERLabel.LABELS.size() && (pa_type!=left && pa_type!=NERLabel.get(O_TYPE).getId())) continue;
+												if(left!=right && left!=NERLabel.LABELS.size() && right!=NERLabel.LABELS.size() && pa_type!=NERLabel.get(O_TYPE).getId()) continue;
+												long parent = this.toNode(leftIndex, rightIndex, direction, complete, pa_type);
+												network.addNode(parent);
+												network.addEdge(parent, new long[]{child_1,child_2});
+											}
 										}
+										
 									}
 								}
 							}
@@ -184,6 +186,7 @@ public class LNERNetworkCompiler extends NetworkCompiler {
 									long child_1 = this.toNode(leftIndex, m, 0, 1, left);
 									
 									for(int right=0;right<NERLabel.LABELS.size();right++){
+										if(left != NERLabel.LABELS.size() && right!=NERLabel.get(O_TYPE).getId() && left!=right) continue;
 										long child_2 = this.toNode(m, rightIndex, 0, 0, right);
 										if(network.contains(child_1) && network.contains(child_2)){
 											network.addNode(parent);
@@ -208,6 +211,7 @@ public class LNERNetworkCompiler extends NetworkCompiler {
 									long child_2 = this.toNode(m, rightIndex, 1, 1, right);
 									
 									for(int left=0; left<NERLabel.LABELS.size();left++){
+										if(right!= NERLabel.LABELS.size() && left!=NERLabel.get(O_TYPE).getId() && left!=right) continue;
 										long child_1 = this.toNode(leftIndex, m, 1, 0, left);
 										if(network.contains(child_1) && network.contains(child_2)){
 											network.addNode(parent);
@@ -242,6 +246,7 @@ public class LNERNetworkCompiler extends NetworkCompiler {
 		if(dependNetwork.getMax()==Double.NEGATIVE_INFINITY) return inst;
 		Tree forest = this.toTree(dependNetwork,inst);
 		inst.setPrediction(forest);
+		inst.toEntities(forest);
 		return inst;
 	}
 	
@@ -252,6 +257,7 @@ public class LNERNetworkCompiler extends NetworkCompiler {
 		rootLabel.setValue("0,"+(inst.getInput().length()-1)+",1,1,"+COMP);
 		root.setLabel(rootLabel);
 		this.toTreeHelper(network, network.countNodes()-1, root);
+		//System.err.println(root.pennString());
 		return root;
 	}
 	

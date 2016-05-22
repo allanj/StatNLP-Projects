@@ -25,6 +25,10 @@ public class LNERInstance extends ModelInstance {
 	public int[] entityNum;
 	public int continousNum;
 	
+	private String COMP = LNERConfig.COMPLABEL;
+	
+	protected String[] predEntities;
+	
 	
 	protected boolean haveEntity = false;
 	
@@ -197,11 +201,56 @@ public class LNERInstance extends ModelInstance {
 	 */
 	@Override
 	public String[] toEntities(Tree spanRoot) {
-		// TODO Auto-generated method stub
-		return null;
+		String[] res = new String[this.size()];
+		this.predEntities = new String[size()];
+		findAllE(spanRoot,res);
+		for(int i=0;i<res.length;i++)
+			if(res[i]==null) res[i] = O_TYPE;
+		String prev = O_TYPE;
+		for(int i=1;i<res.length;i++){
+			String current = res[i];
+			if(current.equals(prev)){
+				if(prev.equals(O_TYPE))
+					predEntities[i] = O_TYPE;
+				else 
+					predEntities[i] = E_I_PREFIX+current; 
+			}else{
+				if(current.equals(O_TYPE))
+					predEntities[i] = O_TYPE;
+				else predEntities[i] = E_B_PREFIX+current; 
+			}
+			prev = current;
+		}
+		return predEntities;
+	}
+	
+	private void findAllE(Tree current, String[] res){
+		CoreLabel label = (CoreLabel)(current.label());
+		String[] info = label.value().split(",");
+		int l = Integer.valueOf(info[0]);
+		int r = Integer.valueOf(info[1]);
+		//int pa_completeness = Integer.valueOf(info[3]);
+		String type = info[4];
+		if(!type.equals(COMP) && !type.equals(O_TYPE)){
+			for(int i=l;i<=r;i++){
+				res[i] = type;
+			}
+			return;
+		}else{
+			for(Tree child: current.children()){
+				findAllE(child,res);
+			}
+		}
 	}
 	
 	
+	public String[] getPredEntities(){
+		return this.predEntities;
+	}
+	
+	public void setPredEntities(String[] predictions){
+		this.predEntities = predictions;
+	}
 
 	
 	

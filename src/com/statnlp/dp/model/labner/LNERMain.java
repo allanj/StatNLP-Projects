@@ -73,7 +73,9 @@ public class LNERMain {
 			dpOut = DPConfig.data_prefix+middle+".pp.ner2dp.dp.res.txt";
 		}
 		/**********Debug info******************/
+//		trainNumber = 20;
 //		trainingPath = "data/semeval10t1/small.txt";
+//		testNumber = 20;
 //		testFile = trainingPath;
 		/**************************/
 		
@@ -94,7 +96,7 @@ public class LNERMain {
 //			System.err.println("Number of Labels:"+DepLabel.LABELS.size());
 			testingInsts = LNERReader.readInstance(testFile, false,testNumber,entities,trans);
 		}
-		
+		System.err.println(NERLabel.LABELS.toString());
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
 		NetworkConfig._CACHE_FEATURES_DURING_TRAINING = true;
@@ -111,7 +113,7 @@ public class LNERMain {
 		/****************Evaluation Part**************/
 		Instance[] predInsts = model.decode(testingInsts);
 		Evaluator.evalDP(predInsts, dpOut);
-		Evaluator.evalLabelledDP(predInsts, depLabOut);
+		Evaluator.evalNER(predInsts, depLabOut);
 		
 	}
 	

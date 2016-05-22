@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
+import com.statnlp.commons.types.WordToken;
 import com.statnlp.dp.Transformer;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DataChecker;
@@ -54,23 +55,23 @@ public class LNERReader {
 			BufferedReader br = RAWF.reader(path);
 			String line = null;
 			int index = 1;
-			ArrayList<LNERToken> words = new ArrayList<LNERToken>();
-			words.add(new LNERToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
+			ArrayList<WordToken> words = new ArrayList<WordToken>();
+			words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
 			ArrayList<UnnamedDependency> dependencies = new ArrayList<UnnamedDependency>();
 			String prev_Entity = "";
 			int conNum = 0;
 			while((line = br.readLine())!=null){
 				if(line.startsWith("#")) continue;
 				if(line.equals("")){
-					LNERToken[] wordsArr = new LNERToken[words.size()];
+					WordToken[] wordsArr = new WordToken[words.size()];
 					words.toArray(wordsArr);
 					Sentence sent = new Sentence(wordsArr);
 					boolean projectiveness=  DataChecker.checkProjective(dependencies);
 //					System.err.println("Instance "+(index+1)+", projective:"+projectiveness); index++;
 					if(!projectiveness) {
 						dependencies = new ArrayList<UnnamedDependency>();
-						words = new ArrayList<LNERToken>();
-						words.add(new LNERToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
+						words = new ArrayList<WordToken>();
+						words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
 						conNum = 0;
 						continue;
 					}
@@ -98,8 +99,8 @@ public class LNERReader {
 							data.add(inst);
 						}
 					}
-					words = new ArrayList<LNERToken>();
-					words.add(new LNERToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
+					words = new ArrayList<WordToken>();
+					words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
 					conNum = 0;
 					dependencies = new ArrayList<UnnamedDependency>();
 					if(number!= -1 && data.size()==number) break;
@@ -110,7 +111,7 @@ public class LNERReader {
 				
 				String entity = values[12];
 				if(!prev_Entity.equals("")){
-					words.add(new LNERToken(values[1],values[4],headIndex,E_I_PREFIX+prev_Entity)); 
+					words.add(new WordToken(values[1],values[4],headIndex,E_I_PREFIX+prev_Entity,values[10])); 
 					if((entity.contains(prev_Entity) || prev_Entity.equals(MISC))  && entity.endsWith(")")) prev_Entity = "";
 				}else{
 					boolean added = false;
@@ -127,9 +128,9 @@ public class LNERReader {
 							//merge the continuous case
 							previousLastEn =  words.get(words.size()-1).getEntity();
 							if(!splitEntity &&!previousLastEn.equals(O_TYPE) && entity.contains(previousLastEn.substring(2))){
-								words.add(new LNERToken(values[1],values[4],headIndex,E_I_PREFIX+entities[i]));
+								words.add(new WordToken(values[1],values[4],headIndex,E_I_PREFIX+entities[i]));
 							}else
-								words.add(new LNERToken(values[1],values[4],headIndex,E_B_PREFIX+entities[i]));
+								words.add(new WordToken(values[1],values[4],headIndex,E_B_PREFIX+entities[i]));
 							prev_Entity = entities[i];
 							if(entity.endsWith(")")) prev_Entity="";
 							added = true;
@@ -141,13 +142,13 @@ public class LNERReader {
 						if(entity.startsWith("(") && (miscSet.contains(entity.substring(1)) || miscSet.contains(entity.substring(1,entity.length()-1)) )){
 							previousLastEn =  words.get(words.size()-1).getEntity();
 							if(!splitEntity &&!previousLastEn.equals(O_TYPE) && previousLastEn.substring(2).equals(MISC)){
-								words.add(new LNERToken(values[1],values[4],headIndex,E_I_PREFIX+MISC));
+								words.add(new WordToken(values[1],values[4],headIndex,E_I_PREFIX+MISC));
 							}else
-								words.add(new LNERToken(values[1],values[4],headIndex,E_B_PREFIX+MISC));
+								words.add(new WordToken(values[1],values[4],headIndex,E_B_PREFIX+MISC));
 							prev_Entity = MISC;
 							if(entity.endsWith(")")) prev_Entity="";
 						}else
-							words.add(new LNERToken(values[1],values[4],headIndex,O_TYPE)); 
+							words.add(new WordToken(values[1],values[4],headIndex,O_TYPE)); 
 					}
 				}
 				
@@ -187,21 +188,21 @@ public class LNERReader {
 			BufferedReader br = RAWF.reader(path);
 			String line = null;
 			int index = 1;
-			ArrayList<LNERToken> words = new ArrayList<LNERToken>();
-			words.add(new LNERToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
+			ArrayList<WordToken> words = new ArrayList<WordToken>();
+			words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
 			ArrayList<UnnamedDependency> dependencies = new ArrayList<UnnamedDependency>();
 			
 			while((line = br.readLine())!=null){
 				if(line.startsWith("#")) continue;
 				if(line.equals("")){
-					LNERToken[] wordsArr = new LNERToken[words.size()];
+					WordToken[] wordsArr = new WordToken[words.size()];
 					words.toArray(wordsArr);
 					Sentence sent = new Sentence(wordsArr);
 					boolean projectiveness=  DataChecker.checkProjective(dependencies);
 					if(!projectiveness) {
 						dependencies = new ArrayList<UnnamedDependency>();
-						words = new ArrayList<LNERToken>();
-						words.add(new LNERToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
+						words = new ArrayList<WordToken>();
+						words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
 						continue;
 					}
 					Tree dependencyTree = transformer.toDependencyTree(dependencies, sent);
@@ -220,8 +221,8 @@ public class LNERReader {
 						
 					}
 //					System.err.println("Reading: "+inst.getDependencies().toString());
-					words = new ArrayList<LNERToken>();
-					words.add(new LNERToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
+					words = new ArrayList<WordToken>();
+					words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
 					if(number!= -1 && data.size()==number) break;
 					dependencies = new ArrayList<UnnamedDependency>();
 					continue;
@@ -231,7 +232,7 @@ public class LNERReader {
 				String entity = values[3];
 				
 				
-				words.add(new LNERToken(values[1],values[2],headIndex,entity));
+				words.add(new WordToken(values[1],values[2],headIndex,entity));
 				CoreLabel headLabel = new CoreLabel();
 				CoreLabel modifierLabel = new CoreLabel();
 				
