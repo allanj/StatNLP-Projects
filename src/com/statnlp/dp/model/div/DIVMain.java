@@ -11,7 +11,9 @@ import com.statnlp.dp.Evaluator;
 import com.statnlp.dp.Transformer;
 import com.statnlp.dp.model.ModelViewer;
 import com.statnlp.dp.utils.DPConfig;
+import com.statnlp.dp.utils.DataChecker;
 import com.statnlp.dp.utils.DPConfig.MODEL;
+import com.statnlp.dp.utils.Formatter;
 import com.statnlp.dp.utils.Init;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.FeatureManager;
@@ -86,8 +88,8 @@ public class DIVMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 50;
-//		testNumber = 50;
+//		trainNumber = 10;
+//		testNumber = 10;
 //		numIteration = 40;
 //		numThreads = 8;
 //		testingPath = trainingPath;
@@ -112,7 +114,8 @@ public class DIVMain {
 			trainingInsts = DIVReader.readInstance(trainingPath, true,trainNumber,selectedEntities,tran, false);
 			testingInsts = DIVReader.readInstance(decodePath, false,testNumber,selectedEntities,tran, false);
 		}
-//		Formatter.semevalToText(trinInsts, "data/"+DPConfig.dataType+"/proj/en.train.txt");
+//		Formatter.semevalToNER(trainingInsts, "data/"+DPConfig.dataType+"/ecrf.train.part.txt");
+//		Formatter.semevalToNER(testingInsts, "data/"+DPConfig.dataType+"/ecrf.test.part.txt");
 //		Formatter.semevalToText(devInsts, "data/"+DPConfig.dataType+"/proj/en.devel.txt");
 //		Formatter.semevalToText(tInsts, "data/"+DPConfig.dataType+"/proj/en.test.txt");
 //		System.exit(0);
@@ -126,7 +129,7 @@ public class DIVMain {
 		NetworkConfig._numThreads = numThreads;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //DPConfig.L2;
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
-		NetworkConfig._MAX_MARGINAL = true;
+		NetworkConfig._MAX_MARGINAL = false;
 		
 		ModelViewer viewer = new ModelViewer(4,entities);
 		FeatureManager dfm = new DIVFeatureManager_leafcopy(new GlobalNetworkParam(),entities);

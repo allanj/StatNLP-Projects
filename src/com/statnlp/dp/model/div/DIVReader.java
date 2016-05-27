@@ -91,7 +91,7 @@ public class DIVReader {
 							he.setNER(sent.get(he.sentIndex()).getEntity());
 						}
 						maxLen = Math.max(maxLen, inst.getInput().length());
-						if(checkInvalid.size()==0){
+						//if(checkInvalid.size()==0){
 							if(isLabeled) {
 								sent.setRecognized();
 								inst.setLabeled();
@@ -101,7 +101,7 @@ public class DIVReader {
 								inst.setUnlabeled();
 								data.add(inst);
 							}
-						}
+						//}
 					}
 					words = new ArrayList<WordToken>();
 					words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
@@ -115,7 +115,7 @@ public class DIVReader {
 				
 				String entity = values[12];
 				if(!prev_Entity.equals("")){
-					words.add(new WordToken(values[1],values[4],headIndex,E_I_PREFIX+prev_Entity)); 
+					words.add(new WordToken(values[1],values[4],headIndex,E_I_PREFIX+prev_Entity, values[10])); 
 					if((entity.contains(prev_Entity) || prev_Entity.equals(MISC))  && entity.endsWith(")")) prev_Entity = "";
 				}else{
 					boolean added = false;
@@ -132,9 +132,9 @@ public class DIVReader {
 							//merge the continuous case
 							previousLastEn =  words.get(words.size()-1).getEntity();
 							if(!splitEntity &&!previousLastEn.equals(O_TYPE) && entity.contains(previousLastEn.substring(2))){
-								words.add(new WordToken(values[1],values[4],headIndex,E_I_PREFIX+entities[i]));
+								words.add(new WordToken(values[1],values[4],headIndex,E_I_PREFIX+entities[i], values[10]));
 							}else
-								words.add(new WordToken(values[1],values[4],headIndex,E_B_PREFIX+entities[i]));
+								words.add(new WordToken(values[1],values[4],headIndex,E_B_PREFIX+entities[i], values[10]));
 							prev_Entity = entities[i];
 							if(entity.endsWith(")")) prev_Entity="";
 							added = true;
@@ -146,13 +146,13 @@ public class DIVReader {
 						if(entity.startsWith("(") && (miscSet.contains(entity.substring(1)) || miscSet.contains(entity.substring(1,entity.length()-1)) )){
 							previousLastEn =  words.get(words.size()-1).getEntity();
 							if(!splitEntity &&!previousLastEn.equals(O_TYPE) && previousLastEn.substring(2).equals(MISC)){
-								words.add(new WordToken(values[1],values[4],headIndex,E_I_PREFIX+MISC));
+								words.add(new WordToken(values[1],values[4],headIndex,E_I_PREFIX+MISC, values[10]));
 							}else
-								words.add(new WordToken(values[1],values[4],headIndex,E_B_PREFIX+MISC));
+								words.add(new WordToken(values[1],values[4],headIndex,E_B_PREFIX+MISC, values[10]));
 							prev_Entity = MISC;
 							if(entity.endsWith(")")) prev_Entity="";
 						}else
-							words.add(new WordToken(values[1],values[4],headIndex,O_TYPE)); 
+							words.add(new WordToken(values[1],values[4],headIndex,O_TYPE, values[10])); 
 					}
 				}
 				
