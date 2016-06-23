@@ -15,7 +15,7 @@ public class BFFeatureManager extends FeatureManager {
 
 	private static final long serialVersionUID = 376931974939202432L;
 
-	public enum FEATYPE {local,entity, unigram, bigram, prefix, contextual, inbetween};
+	public enum FEATYPE {local,entity, unigram, bigram, prefix, contextual, inbetween, joint};
 	
 	public BFFeatureManager(GlobalNetworkParam param_g) {
 		super(param_g);
@@ -39,6 +39,9 @@ public class BFFeatureManager extends FeatureManager {
 			
 		if(children_k.length==2)
 			addDepFeatures(featureList, network, children_k, sent);
+		
+		if(children_k.length==2)
+			addJointFeatures(featureList, network,nodeArr, children_k, sent);
 		
 		
 		/*********Pairwise features********/
@@ -113,8 +116,6 @@ public class BFFeatureManager extends FeatureManager {
 		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextT-prevE-currE",rt+":"+prevEntity+":"+currEn));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-currT-prevE-currE",lt+":"+currTag+":"+prevEntity+":"+currEn));
 	}
-
-	
 
 	private void addDepFeatures(ArrayList<Integer> featureList, Network network, int[] children_k, Sentence sent){
 		
@@ -313,5 +314,29 @@ public class BFFeatureManager extends FeatureManager {
 			
 	}
 	
-	
+	private void addJointFeatures(ArrayList<Integer> featureList, Network network, int[] paArr, int[] children_k, Sentence sent){
+		int[] headArr = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[1]));
+		int[] moArr = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[0]));
+		int headIdx = headArr[1]; 
+		int modifierIdx = headArr[0];
+		
+		if(headIdx>(sent.length()-1)) return;
+		
+		int entityId = moArr[1];
+		
+		String headWord = sent.get(headIdx).getName();
+		String headTag = sent.get(headIdx).getTag();
+		String currWord = sent.get(modifierIdx).getName();
+		String currTag = sent.get(modifierIdx).getTag();
+		String entity = Entity.get(entityId).getForm();
+		featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "DPE-WH", entity+":"+currWord+","+headWord));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "DPE-WTHT", entity+":"+currTag+","+headTag));
+		
+		if(paArr[4]!=NODE_TYPES.ROOT.ordinal()){
+			int nextEntityId = paArr[1];
+			String nextE = Entity.get(nextEntityId).getForm();
+			featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "DP2E-WH", nextE+":"+entity+":"+currWord+","+headWord));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "DP2E-WTHT", nextE+":"+entity+":"+currTag+","+headTag));
+		}
+	}
 }
