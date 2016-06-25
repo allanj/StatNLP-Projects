@@ -53,9 +53,6 @@ public class BFMain {
 		/***********DEBUG*****************/
 //		DPConfig.ecrftrain = "data/semeval10t1/ecrf.smalltest.txt";
 //		testFile="data/semeval10t1/ecrf.smalltest.txt";
-//		DPConfig.writeWeight = true;
-//		DPConfig.weightPath = "data/semeval10t1/ecrfWeight.txt";
-//		DPConfig.readWeight = false;
 //		numThreads = 8;
 //		trainNumber = 50;
 //		testNumber = 50;
