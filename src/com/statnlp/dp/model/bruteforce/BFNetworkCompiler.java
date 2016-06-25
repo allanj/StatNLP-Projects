@@ -85,18 +85,19 @@ public class BFNetworkCompiler extends NetworkCompiler{
 		String prev = "O";
 		res.add("O");
 		for(int i=1;i< leaves.length;i++){
-			String current = leaves[i];
-			if(current.equals(prev)){
-				if(prev.equals("O"))
-					res.add("O");
-				else 
-					res.add("I-"+current);
-			}else{
-				if(current.equals("O"))
-					res.add("O");
-				else res.add("B-"+current);
-			}
-			prev = current;
+			res.add(leaves[i]);
+//			String current = leaves[i];
+//			if(current.equals(prev)){
+//				if(prev.equals("O"))
+//					res.add("O");
+//				else 
+//					res.add("I-"+current);
+//			}else{
+//				if(current.equals("O"))
+//					res.add("O");
+//				else res.add("B-"+current);
+//			}
+//			prev = current;
 		}
 		//String[] predEntities = new String[res.size()];
 		result.setPredEntities(res);
@@ -167,16 +168,16 @@ public class BFNetworkCompiler extends NetworkCompiler{
 				
 				for(long child: children){
 					if(child==-1) continue;
-					int[] childArr = NetworkIDMapper.toHybridNodeArray(child);
-					String childEntity = Entity.get(childArr[1]).getForm();
-					if(childEntity.startsWith("B") && paEntity.startsWith("I") && !childEntity.substring(2).equals(paEntity.substring(2))) continue;
-					if(childEntity.startsWith("I-") && paEntity.startsWith("I-") && !childEntity.substring(2).equals(paEntity.substring(2))) continue;
-					//if(entities[childArr[1]].startsWith("I-") && entities[l].startsWith("B-") && entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
-					if(childEntity.equals("O") && paEntity.startsWith("I-")) continue;
-					
 					if(i==1) 
 						lcrfNetwork.addEdge(node, new long[]{child});
 					else{
+						int[] childArr = NetworkIDMapper.toHybridNodeArray(child);
+						String childEntity = Entity.get(childArr[1]).getForm();
+						if(childEntity.startsWith("B") && paEntity.startsWith("I") && !childEntity.substring(2).equals(paEntity.substring(2))) continue;
+						if(childEntity.startsWith("I-") && paEntity.startsWith("I-") && !childEntity.substring(2).equals(paEntity.substring(2))) continue;
+						//if(entities[childArr[1]].startsWith("I-") && entities[l].startsWith("B-") && entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
+						if(childEntity.equals("O") && paEntity.startsWith("I-")) continue;
+						
 						for(int headIdx = 0; headIdx < this._size;headIdx++){
 							if(headIdx==(i-1)) continue;
 							long depInLinear = toNodeDepInLinear(i-1, headIdx);
