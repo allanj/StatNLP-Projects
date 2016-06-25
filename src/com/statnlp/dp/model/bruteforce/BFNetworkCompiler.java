@@ -115,7 +115,7 @@ public class BFNetworkCompiler extends NetworkCompiler{
 		for(int i=1;i<lcrfNetwork.getInstance().size();i++){
 			
 			String entity = bfInst.getInput().get(i).getEntity();
-			if(entity.length()>1) entity = entity.substring(2);
+			//if(entity.length()>1) entity = entity.substring(2);
 			long node = toNode_linear(i, Entity.get(entity).getId());
 			if(i==bfInst.getInput().get(i).getHeadIndex()){
 				throw new RuntimeException(" current index and the head index cannot be the same");
@@ -162,9 +162,18 @@ public class BFNetworkCompiler extends NetworkCompiler{
 				long node = toNode_linear(i, l);
 				currentNodes[l] = node;
 				lcrfNetwork.addNode(node);
+				String paEntity = Entity.get(l).getForm();
+				
 				
 				for(long child: children){
 					if(child==-1) continue;
+					int[] childArr = NetworkIDMapper.toHybridNodeArray(child);
+					String childEntity = Entity.get(childArr[1]).getForm();
+					if(childEntity.startsWith("B") && paEntity.startsWith("I") && !childEntity.substring(2).equals(paEntity.substring(2))) continue;
+					if(childEntity.startsWith("I-") && paEntity.startsWith("I-") && !childEntity.substring(2).equals(paEntity.substring(2))) continue;
+					//if(entities[childArr[1]].startsWith("I-") && entities[l].startsWith("B-") && entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
+					if(childEntity.equals("O") && paEntity.startsWith("I-")) continue;
+					
 					if(i==1) 
 						lcrfNetwork.addEdge(node, new long[]{child});
 					else{
