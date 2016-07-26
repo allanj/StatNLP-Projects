@@ -30,6 +30,7 @@ public class EMain {
 	public static String[] selectedEntities = {"person","organization","gpe","MISC"};
 	public static HashSet<String> dataTypeSet;
 	public static HashMap<String, Integer> entityMap;
+	public static boolean topkinput = false;
 	
 	public static void initializeEntityMap(){
 		entityMap = new HashMap<String, Integer>();
@@ -69,6 +70,8 @@ public class EMain {
 		testFile = isDev? DPConfig.ecrfdev:DPConfig.ecrftest;
 		if(isPipe){
 			testFile = isDev?DPConfig.dp2ner_dp_dev_input:DPConfig.dp2ner_dp_test_input;
+			if(topkinput)
+				testFile = isDev?DPConfig.dp2ner_dp_dev_input:DPConfig.dp2ner_dp_topK_test_input;
 			nerOut = DPConfig.data_prefix+middle+".pp.dp2ner.ner.eval.txt";
 			nerRes = DPConfig.data_prefix+middle+".pp.dp2ner.ner.res.txt";
 		}
@@ -80,11 +83,13 @@ public class EMain {
 		List<ECRFInstance> trainInstances = null;
 		List<ECRFInstance> testInstances = null;
 		/***********DEBUG*****************/
-//		DPConfig.ecrftrain = "data/semeval10t1/ecrf.small.txt";
+//		DPConfig.ecrftrain = "data/semeval10t1/output/ecrf.train.part.txt";
 //		testFile="data/semeval10t1/ecrf.smalltest.txt";
 //		DPConfig.writeWeight = true;
+//		DPConfig.weightPath = "data/semeval10t1/ecrfWeight.txt";
 //		DPConfig.readWeight = false;
 //		testFile = DPConfig.ecrftrain;
+//		testFile = "data/semeval10t1/ecrf.test.part.txt";
 		/***************************/
 		if(dataTypeSet.contains(DPConfig.dataType)){
 			trainInstances = EReader.readCNN(DPConfig.ecrftrain, true, trainNumber, entityMap);
@@ -94,7 +99,6 @@ public class EMain {
 			testInstances = isPipe?EReader.readDP2NERPipe(testFile, testNumber,entityMap)
 					:EReader.readData(testFile,false,testNumber,entityMap);
 		}
-		
 //		Formatter.ner2Text(trainInstances, "data/testRandom2.txt");
 //		System.exit(0);
 		
@@ -138,6 +142,7 @@ public class EMain {
 					case "-windows":DPConfig.windows = true; break;
 					case "-comb": DPConfig.comb = true; break;
 					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
+					case "-topkinput": topkinput = true; break;
 					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 				}
 			}

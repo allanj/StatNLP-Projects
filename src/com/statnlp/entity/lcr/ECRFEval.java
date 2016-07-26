@@ -21,15 +21,53 @@ public class ECRFEval {
 	 */
 	public static void evalNER(Instance[] testInsts, String nerOut) throws IOException{
 		PrintWriter pw = RAWF.writer(nerOut);
+		int lastGlobalId = Integer.MIN_VALUE;
+		double max = Double.NEGATIVE_INFINITY;
+		int bestId = -1;
+		ECRFInstance bestInst = null;
 		for(int index=0;index<testInsts.length;index++){
 			ECRFInstance eInst = (ECRFInstance)testInsts[index];
-			ArrayList<String> predEntities = eInst.getPrediction();
-			ArrayList<String> trueEntities = eInst.getOutput();
-			Sentence sent = eInst.getInput();
-			for(int i=0;i<sent.length();i++){
-				pw.write(sent.get(i).getName()+" "+sent.get(i).getTag()+" "+trueEntities.get(i)+" "+predEntities.get(i)+"\n");
+			int globalId = eInst.getGlobalId();
+			if(globalId!=-1){ // means the output is from the top K prediction.
+				if(globalId==lastGlobalId){
+					bestId = max > eInst.getPredictionScore()? bestId:eInst.getInstanceId();
+					max = max > eInst.getPredictionScore()? max:eInst.getPredictionScore();
+					bestInst = max > eInst.getPredictionScore()? bestInst:eInst;
+				}else{
+					if(lastGlobalId != Integer.MIN_VALUE){
+						ArrayList<String> predEntities = bestInst.getPrediction();
+						ArrayList<String> trueEntities = bestInst.getOutput();
+						Sentence sent = bestInst.getInput();
+						for(int i=0;i<sent.length();i++){
+							pw.write(sent.get(i).getName()+" "+sent.get(i).getTag()+" "+trueEntities.get(i)+" "+predEntities.get(i)+"\n");
+						}
+						pw.write("\n");
+					}
+					bestId = eInst.getInstanceId();
+					max = eInst.getPredictionScore();
+					bestInst = eInst;
+					lastGlobalId = globalId;
+				}
+				if(index==testInsts.length-1){
+					ArrayList<String> predEntities = bestInst.getPrediction();
+					ArrayList<String> trueEntities = bestInst.getOutput();
+					Sentence sent = bestInst.getInput();
+					for(int i=0;i<sent.length();i++){
+						pw.write(sent.get(i).getName()+" "+sent.get(i).getTag()+" "+trueEntities.get(i)+" "+predEntities.get(i)+"\n");
+					}
+					pw.write("\n");
+				}
+			}else{
+				bestInst = eInst;
+				ArrayList<String> predEntities = bestInst.getPrediction();
+				ArrayList<String> trueEntities = bestInst.getOutput();
+				Sentence sent = bestInst.getInput();
+				for(int i=0;i<sent.length();i++){
+					pw.write(sent.get(i).getName()+" "+sent.get(i).getTag()+" "+trueEntities.get(i)+" "+predEntities.get(i)+"\n");
+				}
+				pw.write("\n");
 			}
-			pw.write("\n");
+			
 		}
 		pw.close();
 		evalNER(nerOut);

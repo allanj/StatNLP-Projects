@@ -14,10 +14,18 @@ public class ECRFInstance extends Instance {
 	protected ArrayList<String> entities;
 	protected ArrayList<String> predictons;
 	
+	protected int globalId = -1;
+	protected double predictionScore;
+	
 	public ECRFInstance(int instanceId, double weight, Sentence sent) {
 		super(instanceId, weight);
 		this.sentence = sent;
-		// TODO Auto-generated constructor stub
+	}
+	
+	public ECRFInstance(int globalId, int instanceId, double weight, Sentence sent) {
+		super(instanceId, weight);
+		this.sentence = sent;
+		this.globalId = globalId;
 	}
 
 	@Override
@@ -28,7 +36,7 @@ public class ECRFInstance extends Instance {
 
 	@Override
 	public ECRFInstance duplicate() {
-		ECRFInstance inst = new ECRFInstance(this._instanceId, this._weight,this.sentence);
+		ECRFInstance inst = new ECRFInstance(this.globalId, this._instanceId, this._weight,this.sentence);
 		if(entities!=null)
 			inst.entities = (ArrayList<String>)entities.clone();
 		else inst.entities = null;
@@ -52,7 +60,6 @@ public class ECRFInstance extends Instance {
 
 	@Override
 	public Sentence getInput() {
-		
 		return this.sentence;
 	}
 
@@ -76,7 +83,6 @@ public class ECRFInstance extends Instance {
 
 	@Override
 	public boolean hasPrediction() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -85,5 +91,11 @@ public class ECRFInstance extends Instance {
 	public void setPrediction(Object o) {
 		this.predictons = (ArrayList<String>)o;
 	}
+	
+	public int getGlobalId(){
+		return this.globalId;
+	}
 
+	public void setPredictionScore(double score){this.predictionScore = score;}
+	public double getPredictionScore(){return this.predictionScore;}
 }

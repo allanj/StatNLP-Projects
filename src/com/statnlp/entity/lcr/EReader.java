@@ -60,22 +60,32 @@ public class EReader {
 		BufferedReader br = RAWF.reader(path);
 		String line = null;
 		List<ECRFInstance> insts = new ArrayList<ECRFInstance>();
-		int index =1;
+		int index = 1;
 		ArrayList<WordToken> words = new ArrayList<WordToken>();
 		ArrayList<String> es = new ArrayList<String>();
+		double instanceWeight = 1.0;
+		int globalId = -1;
 		while((line = br.readLine())!=null){
 			if(line.startsWith("#")) continue;
 			if(line.equals("")){
 				WordToken[] wordsArr = new WordToken[words.size()];
 				words.toArray(wordsArr);
 				Sentence sent = new Sentence(wordsArr);
-				ECRFInstance inst = new ECRFInstance(index++,1.0,sent);
+				ECRFInstance inst = new ECRFInstance(globalId, index++,instanceWeight,sent);
 				inst.entities = es;
 				inst.setUnlabeled();
 				insts.add(inst);
 				words = new ArrayList<WordToken>();
 				es = new ArrayList<String>();
+				instanceWeight = 1.0;
+				globalId = -1;
 				if(number!=-1 && insts.size()==number) break;
+				continue;
+			}
+			if(line.startsWith("[InstanceId+Weight]")){
+				String[] values = line.split(":");
+				instanceWeight = Double.valueOf(values[2]);
+				globalId = Integer.valueOf(values[1]);
 				continue;
 			}
 			String[] values = line.split(" ");

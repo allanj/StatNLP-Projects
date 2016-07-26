@@ -9,6 +9,7 @@ import com.statnlp.hybridnetworks.FeatureArray;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
+import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
 
 public class ECRFNetworkCompiler extends NetworkCompiler{
@@ -66,19 +67,6 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 		//System.err.println(rootIdx+" final score:"+network.getMax(rootIdx));
 		for(int i=0;i<lcrfInstance.size();i++){
 			int child_k = lcrfNetwork.getMaxPath(rootIdx)[0];
-			/*****************debug allan 27/03/2016. 00.21am*******************/
-//			System.err.println(rootIdx+" score:"+network.getMax(rootIdx));
-//			int[][] childrenList_k = network.getChildren(rootIdx);
-//			for(int children_k_index = 0; children_k_index < childrenList_k.length; children_k_index++){
-//				int[] candi_children_k = childrenList_k[children_k_index];
-//				if(Arrays.equals(lcrfNetwork.getMaxPath(rootIdx), candi_children_k)){
-//					FeatureArray fa = network.getLocalParam().extract(network, rootIdx, candi_children_k, children_k_index);
-//					System.err.println(fa.toString() + " score:"+fa.getScore(network.getLocalParam()));
-//					
-//					break;
-//				}
-//			}
-			/**************************************/
 			long child = lcrfNetwork.getNode(child_k);
 			rootIdx = child_k;
 			int tagID = NetworkIDMapper.toHybridNodeArray(child)[1];
@@ -86,9 +74,11 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 		}
 
 		result.setPrediction(prediction);
+		result.setPredictionScore(lcrfNetwork.getMax());
 		
 		return result;
 	}
+	
 
 	public ECRFNetwork compileLabeledInstances(int networkId, ECRFInstance inst, LocalNetworkParam param){
 		ECRFNetwork lcrfNetwork = new ECRFNetwork(networkId, inst,param);
@@ -108,6 +98,10 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 		lcrfNetwork.addEdge(root, children);
 		
 		lcrfNetwork.finalizeNetwork();
+		
+//		if(!genericUnlabeledNetwork.contains(lcrfNetwork)){
+//			System.err.println("wrong");
+//		}
 		return lcrfNetwork;
 	}
 	
@@ -138,7 +132,7 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 					int[] childArr = NetworkIDMapper.toHybridNodeArray(child);
 					if(entities[childArr[1]].startsWith("B-") && entities[l].startsWith("I-") && !entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
 					if(entities[childArr[1]].startsWith("I-") && entities[l].startsWith("I-") && !entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
-					if(entities[childArr[1]].startsWith("I-") && entities[l].startsWith("B-") && entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
+					//if(entities[childArr[1]].startsWith("I-") && entities[l].startsWith("B-") && entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
 					if(entities[childArr[1]].equals("O") && entities[l].startsWith("I-")) continue;
 					lcrfNetwork.addEdge(node, new long[]{child});
 				}
