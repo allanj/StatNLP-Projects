@@ -86,13 +86,13 @@ public class DIVMain {
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
-//		trainingPath = "data/semeval10t1/small.txt";
+		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 10;
-//		testNumber = 10;
-//		numIteration = 40;
-//		numThreads = 8;
-//		testingPath = trainingPath;
+		trainNumber = 1;
+		testNumber = 1;
+		numIteration = 40;
+		numThreads = 1;
+		testingPath = trainingPath;
 //		DPConfig.readWeight = false;
 //		DPConfig.writeWeight = false;
 		/************/

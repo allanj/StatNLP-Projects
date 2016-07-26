@@ -131,15 +131,15 @@ public class ModelViewer extends VisualizationViewerEngine {
 			
 			if(completeness.equals("incom")) y+=500;
 			if(type.equals("ONE") || type.equals("pae:ONE")){
-				x-=50;
+				y-=50;
 			}else if(type.equals("OE")|| type.equals("pae:OE")){
-				x-=100;
+				y-=100;
 			}else if(type.equals("person")|| type.equals("pae:person")){
-				x-=150;
+				y-=150;
 			}else if(type.equals("gpe")|| type.equals("pae:gpe")){
-				x-=200;
+				y-=200;
 			}else if(type.equals("organization")|| type.equals("pae:organization")){
-				x-=250;
+				y-=250;
 			}
 			
 			//System.err.println(Arrays.toString(ids)+" coordinate:"+x+","+y);

@@ -92,8 +92,10 @@ public class LDPMain {
 		}else{
 			trainingInsts = LDPReader.readInstance(trainingPath, true,trainNumber,entities,trans);
 			//testingInsts = isPipe? LDPReader.readFromPipeline(testFile,testNumber,trans): DependencyReader.readInstance(testFile, false,testNumber,entities,trans);
+//			System.err.println("Number of Labels:"+DepLabel.LABELS.size());
 			testingInsts = LDPReader.readInstance(testFile, false,testNumber,entities,trans);
 		}
+		
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
 		NetworkConfig._CACHE_FEATURES_DURING_TRAINING = true;

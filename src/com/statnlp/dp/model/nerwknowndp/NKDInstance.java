@@ -166,7 +166,7 @@ public class NKDInstance extends DependInstance {
 		int l = Integer.valueOf(info[0]);
 		int r = Integer.valueOf(info[1]);
 		String type = info[4];
-		if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE) && !type.equals(GO)){
+		if(!type.startsWith(PARENT_IS) && !type.equals(OE) && !type.equals(ONE)){
 			es[l] = E_B_PREFIX+type;
 			for(int i=l+1;i<=r;i++){
 				es[i]=E_I_PREFIX+type;

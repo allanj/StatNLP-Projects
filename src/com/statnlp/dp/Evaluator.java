@@ -11,6 +11,7 @@ import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.hybridnetworks.NetworkConfig;
 
+import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.UnnamedDependency;
 
 public class Evaluator {
@@ -50,6 +51,35 @@ public class Evaluator {
 		System.out.println("*************************");
 	}
 	
+	/**
+	 * Output the topK dependency structures, together with weight as well
+	 * @param testInsts
+	 * @param dpOut
+	 * @throws IOException
+	 */
+	public static void outputTopKDep(Instance[] testInsts, String depOut) throws IOException{
+		PrintWriter pw = RAWF.writer(depOut);
+		for(Instance org_inst: testInsts){
+			DependInstance inst = (DependInstance)org_inst;
+			Sentence sent = inst.getInput();
+			Tree[] topK = inst.getTopKPrediction();
+			ArrayList<UnnamedDependency> corrDependencies = inst.toDependencies(inst.getOutput());
+			int[] trueHeads = Transformer.getHeads(corrDependencies, inst.getInput());
+			for(Tree prediction: topK){
+				if(prediction==null) break;
+				pw.write("[InstanceId+Weight]:"+inst.getInstanceId()+":"+prediction.score()+"\n");
+				ArrayList<UnnamedDependency> predDependencies = inst.toDependencies(prediction);
+				int[] predHeads = Transformer.getHeads(predDependencies, inst.getInput());
+				for(int i=1;i<predHeads.length;i++){
+					pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+trueHeads[i]+" "+predHeads[i]+"\n");
+				}
+				pw.write("\n");
+			}
+			
+		}
+		pw.close();
+	}
+	
 	public static void evalLabelledDP(Instance[] testInsts, String depLabOut) throws IOException{
 		int dp_corr=0;
 		int dp_total=0;
@@ -63,10 +93,6 @@ public class Evaluator {
 			int[] trueHeads = Transformer.getHeads(corrDependencies, inst.getInput());
 			String[] predLabs = Transformer.getDepLabel(predDependencies, sent);
 			String[] trueLabs = Transformer.getDepLabel(corrDependencies, sent);
-//			System.out.println(Arrays.toString(trueHeads));
-//			System.out.println(Arrays.toString(predHeads));
-//			System.out.println(Arrays.toString(trueLabs));
-//			System.out.println(Arrays.toString(predLabs));
 			for(int i=1;i<predHeads.length;i++){
 				if(predHeads[i]==trueHeads[i] && predLabs[i].equals(trueLabs[i]))
 					dp_corr++;
@@ -82,6 +108,7 @@ public class Evaluator {
 		System.out.println("[Labeled Dependency] LAS: "+dp_corr*1.0/dp_total);
 		System.out.println("****");
 	}
+	
 	
 	/**
 	 * 

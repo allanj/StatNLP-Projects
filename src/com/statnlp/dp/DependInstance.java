@@ -18,6 +18,7 @@ public class DependInstance extends ModelInstance {
 	protected Sentence sentence;
 	protected Tree output; //output is the span tree;
 	protected Tree prediction; //prediction is also the dependency spanning tree
+	protected Tree[] topKPrediction;
 	protected ArrayList<UnnamedDependency> dependencies; //only for the output
 	protected Tree dependencyRoot;
 	public int[] unValidNum;
@@ -136,6 +137,14 @@ public class DependInstance extends ModelInstance {
 		Tree df = (Tree)o;
 		this.prediction = df;
 
+	}
+	
+	public void setTopKPrediction(Tree[] roots){
+		this.topKPrediction = roots;
+	}
+	
+	public Tree[] getTopKPrediction(){
+		return this.topKPrediction;
 	}
 	
 	

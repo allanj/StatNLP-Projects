@@ -6,8 +6,7 @@ import java.util.Iterator;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
-import com.statnlp.dp.DependInstance;
-import com.statnlp.dp.DependencyNetwork;
+import com.statnlp.dp.model.nerwknowndp.NKDNetwork;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
@@ -25,7 +24,7 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 	private static final long serialVersionUID = -5080640847287255079L;
 
 	private long[] _nodes;
-	private final int maxSentLen = 50;
+	private final int maxSentLen = 128;
 	private int[][][] _children;
 	private HashMap<String, Integer> typeMap;
 	private String[] types;
@@ -56,7 +55,7 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 
 	@Override
 	public Network compile(int networkId, Instance inst, LocalNetworkParam param) {
-		DependInstance di = (DependInstance)inst;
+		H2DInstance di = (H2DInstance)inst;
 		if(di.isLabeled()){
 			//System.err.println("[Info] Compiling Labeled Network...");
 			return this.compileLabledInstance(networkId, di, param);
@@ -66,13 +65,13 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 		}
 	}
 
-	public DependencyNetwork compileLabledInstance(int networkId, DependInstance inst, LocalNetworkParam param){
-		DependencyNetwork network = new DependencyNetwork(networkId,inst,param);
+	public H2DNetwork compileLabledInstance(int networkId, H2DInstance inst, LocalNetworkParam param){
+		H2DNetwork network = new H2DNetwork(networkId,inst,param);
 		Sentence sent = inst.getInput();
 		Tree tree = inst.getOutput();
 		this.compile(network, sent, tree);
 		if(DEBUG){
-			DependencyNetwork unlabeled = compileUnLabledInstance(networkId, inst, param);
+			H2DNetwork unlabeled = compileUnLabledInstance(networkId, inst, param);
 			if(!unlabeled.contains(network)){
 				System.err.println(sent.toString());
 				throw new NetworkException("Labeled network is not contained in the unlabeled version");
@@ -81,7 +80,7 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 		return network;
 	}
 	
-	private void compile(DependencyNetwork network, Sentence sent, Tree output){
+	private void compile(H2DNetwork network, Sentence sent, Tree output){
 		output.setSpans();
 		long rootNode = this.toNode_generalRoot(sent.length());
 		network.addNode(rootNode);
@@ -103,7 +102,7 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 		
 	}
 	
-	private void addToNetwork(DependencyNetwork network, Tree parent){
+	private void addToNetwork(H2DNetwork network, Tree parent){
 		if(parent.isLeaf()) return; //means headindex==modifier index
 		CoreLabel cl = (CoreLabel)(parent.label());
 		String[] info = cl.value().split(",");
@@ -143,13 +142,11 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 		addToNetwork(network, children[1]);
 	}
 	
-	public DependencyNetwork compileUnLabledInstance(int networkId, DependInstance inst, LocalNetworkParam param){
-		if(this._nodes==null){
-			this.compileUnlabeled();
-		}
+	public H2DNetwork compileUnLabledInstance(int networkId, H2DInstance inst, LocalNetworkParam param){
+		H2DNetwork construct = this.compileUnlabeled(inst);
 		long root = this.toNode_generalRoot(inst.getInput().length());
 		int rootIdx = Arrays.binarySearch(this._nodes, root);
-		DependencyNetwork network = new DependencyNetwork(networkId,inst,this._nodes,this._children, param,rootIdx+1 );
+		H2DNetwork network = new H2DNetwork(networkId,inst,this._nodes,this._children, param,rootIdx+1 );
 		//viewer.visualizeNetwork(network, null, "UnLabeled Network");
 		//System.err.println("[Info] Compile Unlabeled instance, length: "+inst.getInput().length());
 		//System.err.println("My root:"+Arrays.toString(NetworkIDMapper.toHybridNodeArray(root)));
@@ -161,17 +158,15 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 		return network;
 	}
 	
-	public synchronized void compileUnlabeled(){
-		if(this._nodes!=null){
-			return;
-		}
-		DependencyNetwork network = new DependencyNetwork();
+	public H2DNetwork compileUnlabeled(H2DInstance inst){
+		int[] heads = inst.getHead();
+		H2DNetwork network = new H2DNetwork();
 		//add the root word and other nodes
 		//all are complete nodes.
 		long rootE = this.toNode(0, 0, 1, 1, ONE);
 		network.addNode(rootE);
 		
-		for(int rightIndex = 1; rightIndex<=this.maxSentLen-1;rightIndex++){
+		for(int rightIndex = 1; rightIndex<=inst.size()-1;rightIndex++){
 			//eIndex: 1,2,3,4,5,..n
 			for(String e: types){
 				if(e.equals(OE)) continue;
@@ -194,6 +189,8 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 						if(leftIndex==0 && direction==0) continue;
 						if(complete==0){
 							//incomplete span decompose to two complete spans
+							if(direction==1 && heads[rightIndex]!=leftIndex) continue;
+							if(direction==0 && heads[leftIndex]!=rightIndex) continue;
 							for(int m=leftIndex;m<rightIndex;m++){
 								for(int t=0;t<types.length;t++){
 									long parent = this.toNode(leftIndex, rightIndex, direction, complete, types[t]);
@@ -227,6 +224,7 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 						
 						if(complete==1 && direction==0){
 							for(int m=leftIndex;m<rightIndex;m++){
+								if(heads[m]!=rightIndex) continue;
 								for(int t=0;t<types.length;t++){
 									long parent = this.toNode(leftIndex, rightIndex, direction, complete, types[t]);
 									long leftChild = -1;
@@ -242,9 +240,9 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 										for(int t1=0;t1<types.length;t1++){
 											for(int t2=0;t2<types.length;t2++){
 												if(!types[t1].equals(OE) && types[t1].equals(types[t2])) continue;
-												if(types[t1].equals(ONE) && isEntity(types[t2])) continue;
-												if(isEntity(types[t1]) && isEntity(types[t2])) continue;
-												if(isEntity(types[t1]) && types[t2].equals(ONE)) continue;
+												//if(types[t1].equals(ONE) && isEntity(types[t2])) continue;
+												//if(isEntity(types[t1]) && isEntity(types[t2])) continue;
+												//if(isEntity(types[t1]) && types[t2].equals(ONE)) continue;
 												leftChild = this.toNode(leftIndex, m, 0, 1, types[t1]);
 												rightChild = this.toNode(m, rightIndex, 0, 0, types[t2]);
 												if(network.contains(leftChild) && network.contains(rightChild)){
@@ -262,6 +260,7 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 							boolean[] rootAdded = new boolean[types.length];
 							for(int x=0;x<rootAdded.length;x++) rootAdded[x]=false;
 							for(int m=leftIndex+1;m<=rightIndex;m++){
+								if(heads[m]!=leftIndex) continue;
 								for(int t=0;t<types.length;t++){
 									long parent  = this.toNode(leftIndex, rightIndex, direction, complete, types[t]);
 									long leftChild = -1;
@@ -277,9 +276,9 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 										for(int t1=0;t1<types.length;t1++){
 											for(int t2=0;t2<types.length;t2++){
 												if(!types[t1].equals(OE) && types[t1].equals(types[t2])) continue;
-												if(types[t1].equals(ONE) && isEntity(types[t2])) continue;
-												if(isEntity(types[t1]) && isEntity(types[t2])) continue;
-												if(isEntity(types[t1]) && types[t2].equals(ONE)) continue;
+												//if(types[t1].equals(ONE) && isEntity(types[t2])) continue;
+												//if(isEntity(types[t1]) && isEntity(types[t2])) continue;
+												//if(isEntity(types[t1]) && types[t2].equals(ONE)) continue;
 												
 												leftChild = this.toNode(leftIndex, m, 1, 0, types[t1]);
 												rightChild = this.toNode(m, rightIndex, 1, 1, types[t2]);
@@ -312,6 +311,8 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 		
 		//printNodes(this._nodes);
 		System.err.println(network.countNodes()+" nodes..");
+		//System.err.println(network.toString());
+		return network;
 		//viewer.visualizeNetwork(network, null, "unLabeled Model");
 		//printNetwork(network, null);
 		//System.exit(0);
@@ -320,8 +321,8 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 	
 	@Override
 	public Instance decompile(Network network) {
-		DependencyNetwork dependNetwork = (DependencyNetwork)network;
-		DependInstance inst = (DependInstance)(dependNetwork.getInstance());
+		H2DNetwork dependNetwork = (H2DNetwork)network;
+		H2DInstance inst = (H2DInstance)(dependNetwork.getInstance());
 		inst = inst.duplicate();
 		if(dependNetwork.getMax()==Double.NEGATIVE_INFINITY) return inst;
 		//viewer.visualizeNetwork(dependNetwork, null, "Testing Labeled Model:"+network.getInstance().getInstanceId());
@@ -332,7 +333,7 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 		return inst;
 	}
 	
-	private Tree toTree(DependencyNetwork network,DependInstance inst){
+	private Tree toTree(H2DNetwork network,H2DInstance inst){
 		
 		Tree root = new LabeledScoredTreeNode();
 		CoreLabel rootLabel = new CoreLabel();
@@ -342,11 +343,12 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 		return root.getChild(0);
 	}
 	
-	private void toTreeHelper(DependencyNetwork network, int node_k, Tree parentNode){
+	private void toTreeHelper(H2DNetwork network, int node_k, Tree parentNode){
 		int[] children_k = network.getMaxPath(node_k);
 //		System.err.println("node_k:"+node_k);
 //		System.err.println("Parent Node:"+parentNode.toString());
 //		System.err.println("Children length:"+children_k.length);
+//		System.err.println(node_k+" final score:"+network.getMax(node_k));
 		for(int k=0;k<children_k.length;k++){
 			long child = network.getNode(children_k[k]);
 			int[] ids_child = NetworkIDMapper.toHybridNodeArray(child);
@@ -373,53 +375,7 @@ public class H2DNetworkCompiler extends NetworkCompiler {
 	}
 	
 	 
-	public void printNetwork(DependencyNetwork network, Sentence sent){
-		int len = -1;
-		if(sent==null) len = this.maxSentLen;
-		else len = sent.length();
-		long root = this.toNode_generalRoot(len);
-		long[] nodes = network.getAllNodes();
-		System.err.println("Number of nodes: "+nodes.length);
-		int rootIndex = Arrays.binarySearch(nodes, root);
-//		System.err.println("root node: "+Arrays.toString(NetworkIDMapper.toHybridNodeArray(root))+" , at index:"+rootIndex);
-		int level = 0;
-		printAll(rootIndex,network,level);
-		
-	}
-	
-	private void printAll(int index, DependencyNetwork network, int level){
-		long current = network.getNode(index);
-		for(int i=0;i<level;i++)
-			System.err.print("\t");
-		int[] arr = NetworkIDMapper.toHybridNodeArray(current);
-		int leftIndex = arr[0]-arr[1];
-		String direction = arr[3]==0? "left":"right";
-		String complete = arr[2]==0? "incomplete":"complete";
-		String type = null;
-		if(arr[4]==types.length)
-			type = "null";
-		else type=types[arr[4]];
-		System.err.println("current node: "+leftIndex+","+arr[0]+","+direction+","+complete+","+type+" , at index:"+index);
-		int[][] children = network.getChildren(index);
-		for(int i=0;i<children.length;i++){
-			int[] twochilds = children[i];
-			for(int j=0;j<twochilds.length;j++)
-				printAll(twochilds[j],network,level+1);
-		}
-	}
-	
-	@SuppressWarnings("unused")
-	private void printNodes(long[] nodes){
-		System.err.println("Print all the nodes:...");
-		for(long node: nodes){
-			int[] arr = NetworkIDMapper.toHybridNodeArray(node);
-			int leftIndex = arr[0]-arr[1];
-			String direction = arr[3]==0? "left":"right";
-			String complete = arr[2]==0? "incomplete":"complete";
-			String type = types[arr[4]];
-			System.err.println("current node: "+leftIndex+","+arr[0]+","+direction+","+complete+","+type);
-		}
-	}
+
 	
 	//Node composition
 	//Span Len (eIndex-bIndex), eIndex, direction(0--left,1--right), complete (0--incomplete,1), node Type

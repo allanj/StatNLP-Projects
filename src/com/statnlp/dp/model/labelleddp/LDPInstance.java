@@ -30,7 +30,6 @@ public class LDPInstance extends ModelInstance {
 	
 	protected  String OE = DPConfig.OE;
 	protected  String ONE = DPConfig.ONE;
-	protected  String GO = DPConfig.GO;
 	protected  String O_TYPE = DPConfig.O_TYPE;
 	protected  String E_B_PREFIX = DPConfig.E_B_PREFIX;
 	protected  String E_I_PREFIX = DPConfig.E_I_PREFIX;

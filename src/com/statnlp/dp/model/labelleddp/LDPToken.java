@@ -34,7 +34,7 @@ public class LDPToken extends WordToken {
 	}
 	
 	
-	public DepLabel getDepLabel(){return this.depLabel;}
+	public String getDepLabel(){return this.depLabel.getForm();}
 	public void setDepLabel(DepLabel depLabel){this.depLabel = depLabel;}
 
 }

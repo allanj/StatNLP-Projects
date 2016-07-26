@@ -140,20 +140,20 @@ public class H2DFeatureManager extends FeatureManager {
 				String child_type = childrenType[c];
 				if(child_type.equals(ONE)) child_type = O_TYPE;
 				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "EW", child_type+":"+word));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ET", child_type+":"+tag));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ELW", child_type+":"+prevWord));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ELT", child_type+":"+prevTag));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ERW", child_type+":"+nextWord));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ERT", child_type+":"+nextTag));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ELT-T",child_type+":"+prevTag+","+tag));
+//				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ET", child_type+":"+tag));
+//				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ELW", child_type+":"+prevWord));
+//				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ELT", child_type+":"+prevTag));
+//				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ERW", child_type+":"+nextWord));
+//				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ERT", child_type+":"+nextTag));
+//				featureList.add(this._param_g.toFeature(network, FEATYPE.local.name(), "ELT-T",child_type+":"+prevTag+","+tag));
 
 				/****Add some prefix features******/
 				for(int plen = 1;plen<=6;plen++){
 					if(word.length()>=plen){
 						String suff = word.substring(word.length()-plen, word.length());
 						String pref = word.substring(0,plen);
-						featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-SUFF-"+plen, child_type+":"+suff));
-						featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-PREF-"+plen, child_type+":"+pref));
+//						featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-SUFF-"+plen, child_type+":"+suff));
+//						featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-PREF-"+plen, child_type+":"+pref));
 					}
 				}
 			}

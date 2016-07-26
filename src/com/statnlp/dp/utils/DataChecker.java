@@ -277,6 +277,12 @@ public class DataChecker {
 	 * @return
 	 */
 	private static boolean notIncomplete(Sentence sent, int start, int end){
+//		if(end>start+1){
+//			for(int x=start;x<end;x++){
+//				if(sent.get(x).getHeadIndex()>=start || sent.get(x).getHeadIndex()<end)
+//					System.err.println(sent.get(x).getDepLabel());
+//			}
+//		}
 		return (end>start+1)  && !(sent.get(start).getHeadIndex()==end-1 || sent.get(end-1).getHeadIndex()==start);
 	}
 

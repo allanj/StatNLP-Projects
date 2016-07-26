@@ -7,6 +7,7 @@ import com.statnlp.commons.types.Sentence;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
+import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
 
 import edu.stanford.nlp.ling.CoreLabel;
@@ -245,7 +246,6 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 		this._children = network.getAllChildren();
 		
 		System.err.println(network.countNodes()+" nodes..");
-//		printNetwork(network, null);
 	}
 	
 	
@@ -268,14 +268,41 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 		rootLabel.setValue("0,"+(inst.getInput().length()-1)+",1,1");
 		root.setLabel(rootLabel);
 		this.toTreeHelper(network, network.countNodes()-1, root);
+		
+		if(NetworkConfig._topKValue>1){
+			Tree[] topK = new Tree[NetworkConfig._topKValue];
+			double total = 0.0;
+			int numK = 0;
+			for(int kth=0;kth<NetworkConfig._topKValue;kth++){
+				//System.err.println(kth+"-best:");
+				Tree kthRoot = new LabeledScoredTreeNode();
+				double score = Math.exp(network.getMaxTopK(network.countNodes()-1, kth));
+				if(network.getMaxTopK(network.countNodes()-1, kth)== Double.NEGATIVE_INFINITY){
+					break;
+				}
+				total += score;
+				kthRoot.setScore(score);
+				//System.err.println(kth+"-best:"+network.getMaxTopK(network.countNodes()-1, kth));
+				CoreLabel kthRootLabel = new CoreLabel();
+				kthRootLabel.setValue("0,"+(inst.getInput().length()-1)+",1,1");
+				kthRoot.setLabel(kthRootLabel);
+				this.toTreeHelperTopK(network, network.countNodes()-1, kthRoot, kth);
+				topK[kth] = kthRoot;
+				numK++;
+				//System.err.println(kthRoot.pennString());
+			}
+			
+			for(int kth=0;kth<numK;kth++){
+				topK[kth].setScore(topK[kth].score()/total);
+				//System.err.println(kth+"-best:"+topK[kth].score());
+			}
+			inst.setTopKPrediction(topK);
+		}
 		return root;
 	}
 	
 	private void toTreeHelper(DependencyNetwork network, int node_k, Tree parentNode){
 		int[] children_k = network.getMaxPath(node_k);
-//		System.err.println("node_k:"+node_k);
-//		System.err.println("Parent Node:"+parentNode.toString());
-//		System.err.println("Children length:"+children_k.length);
 		for(int k=0;k<children_k.length;k++){
 			long child = network.getNode(children_k[k]);
 			int[] ids_child = NetworkIDMapper.toHybridNodeArray(child);
@@ -293,6 +320,28 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 			this.toTreeHelper(network, children_k[k], childNode);
 		}
 		
+	}
+	
+	private void toTreeHelperTopK(DependencyNetwork network, int node_k, Tree parentNode, int kth){
+		//System.err.println(node_k+" with "+(kth+1)+"th "+Arrays.toString(network.getNodeArray(node_k))+":"+network.getMaxTopK(node_k, kth));
+		int[] children_k = network.getMaxTopKPath(node_k, kth);
+		int[] children_k_bestlist = network.getMaxTopKBestListPath(node_k, kth);
+		for(int k=0;k<children_k.length;k++){
+			long child = network.getNode(children_k[k]);
+			int[] ids_child = NetworkIDMapper.toHybridNodeArray(child);
+			Tree childNode = new LabeledScoredTreeNode();
+			CoreLabel childLabel = new CoreLabel();
+			int leftIndex = ids_child[0]-ids_child[1];
+			StringBuilder sb = new StringBuilder();
+			sb.append(leftIndex);  sb.append(",");
+			sb.append(ids_child[0]);  sb.append(",");
+			sb.append(ids_child[3]); sb.append(",");
+			sb.append(ids_child[2]);
+			childLabel.setValue(sb.toString());
+			childNode.setLabel(childLabel);
+			parentNode.addChild(childNode);
+			this.toTreeHelperTopK(network, children_k[k], childNode, children_k_bestlist[k]);
+		}
 	}
 	
 	

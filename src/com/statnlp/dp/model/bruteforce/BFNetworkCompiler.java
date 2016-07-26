@@ -99,7 +99,6 @@ public class BFNetworkCompiler extends NetworkCompiler{
 //			}
 //			prev = current;
 		}
-		//String[] predEntities = new String[res.size()];
 		result.setPredEntities(res);
 		result.setPredHeads(heads);
 		return result;

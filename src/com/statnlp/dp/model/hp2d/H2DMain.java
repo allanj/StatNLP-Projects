@@ -7,8 +7,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import com.statnlp.commons.types.Instance;
-import com.statnlp.dp.DependInstance;
-import com.statnlp.dp.DependencyReader;
 import com.statnlp.dp.Evaluator;
 import com.statnlp.dp.Transformer;
 import com.statnlp.dp.model.ModelViewer;
@@ -39,6 +37,7 @@ public class H2DMain {
 	public static String devPath;
 	public static boolean isDev = true;
 	public static String[] selectedEntities = {"person","organization","gpe","MISC"};
+//	public static String[] selectedEntities = {"person"};
 	public static HashSet<String> dataTypeSet;
 	public static HashMap<String, Integer> typeMap;
 	
@@ -80,14 +79,14 @@ public class H2DMain {
 		/******Debug********/
 //		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-		trainNumber = 1;
-//		testNumber = 5;
-//		numIteration = 20;
+		trainNumber = 10;
+		testNumber = 10;
+		numIteration = 300;
 //		numThreads = 8;
-//		testingPath = trainingPath;
-		DPConfig.readWeight = true;
-		DPConfig.writeWeight = false;
-		DPConfig.weightPath = "data/semeval10t1/ecrf2dWeight.txt";
+		testingPath = trainingPath;
+//		DPConfig.readWeight = true;
+//		DPConfig.writeWeight = false;
+//		DPConfig.weightPath = "data/semeval10t1/ecrf2dWeight.txt";
 		/************/
 		
 		
@@ -98,14 +97,14 @@ public class H2DMain {
 		System.err.println("[Info] dpRes: "+dpRes);
 		System.err.println("[Info] ner eval: "+nerEval);
 		System.err.println("[Info] joint Res: "+jointRes);
-		DependInstance[] trainingInsts = null;
-		DependInstance[] testingInsts = null;
+		H2DInstance[] trainingInsts = null;
+		H2DInstance[] testingInsts = null;
 		if(dataTypeSet.contains(DPConfig.dataType)){
-			trainingInsts = DependencyReader.readCNN(trainingPath, true,trainNumber,tran);
-			testingInsts = DependencyReader.readCNN(decodePath, false,testNumber,tran);
+			trainingInsts = H2DReader.readCNN(trainingPath, true,trainNumber,tran);
+			testingInsts = H2DReader.readCNN(decodePath, false,testNumber,tran);
 		}else{
-			trainingInsts = DependencyReader.readInstance(trainingPath, true,trainNumber,selectedEntities,tran, false);
-			testingInsts = DependencyReader.readInstance(decodePath, false,testNumber,selectedEntities,tran, false);
+			trainingInsts = H2DReader.readInstance(trainingPath, true,trainNumber,selectedEntities,tran, false);
+			testingInsts = H2DReader.readInstance(decodePath, false,testNumber,selectedEntities,tran, false);
 		}
 //		Formatter.semevalToText(trinInsts, "data/"+DPConfig.dataType+"/proj/en.train.txt");
 //		Formatter.semevalToText(devInsts, "data/"+DPConfig.dataType+"/proj/en.devel.txt");

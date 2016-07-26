@@ -12,7 +12,6 @@ import com.statnlp.dp.Transformer;
 import com.statnlp.dp.model.ModelViewer;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DPConfig.MODEL;
-import com.statnlp.dp.utils.Formatter;
 import com.statnlp.dp.utils.Init;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.FeatureManager;
@@ -42,6 +41,9 @@ public class VarMain {
 	public static String[] selectedEntities = {"person","organization","gpe","MISC"};
 	public static HashSet<String> dataTypeSet;
 	public static HashMap<String, Integer> typeMap;
+	public static HashMap<String, Integer> entityMap;
+	
+	public static String[] linearEntities; 
 	
 	public static String[] initializeUniqueModelTypeMap(String[] selectedEntities){
 		typeMap = new HashMap<String, Integer>();
@@ -64,6 +66,23 @@ public class VarMain {
 				entities[typeMap.get(entity)] = entity;
 		}
 		return entities;
+	}
+	
+	public static void initializeEntityMap(){
+		entityMap = new HashMap<String, Integer>();
+		int index = 0;
+		entityMap.put("O", index++);  
+		for(int i=0;i<selectedEntities.length;i++){
+			entityMap.put(selectedEntities[i], index++);
+//			entityMap.put("B-"+selectedEntities[i], index++);
+//			entityMap.put("I-"+selectedEntities[i], index++);
+		}
+		linearEntities = new String[entityMap.size()];
+		Iterator<String> iter = entityMap.keySet().iterator();
+		while(iter.hasNext()){
+			String entity = iter.next();
+			linearEntities[entityMap.get(entity)] = entity;
+		}
 	}
 	
 	
@@ -97,7 +116,7 @@ public class VarMain {
 		/************/
 		
 		
-		Transformer tran = new VarTransformer();
+		VarTransformer tran = new VarTransformer();
 		String decodePath = isDev?devPath:testingPath;
 		System.err.println("[Info] train path: "+trainingPath);
 		System.err.println("[Info] testFile: "+decodePath);
@@ -132,16 +151,16 @@ public class VarMain {
 		
 		ModelViewer viewer = new ModelViewer(4,entities);
 		FeatureManager dfm = new VarFeatureManager_leafcopy(new GlobalNetworkParam(),entities);
-		VarNetworkCompiler dnc = new VarNetworkCompiler(typeMap, viewer);
+		VarNetworkCompiler dnc = new VarNetworkCompiler(typeMap, entityMap, linearEntities, tran);
 		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);
 		model.train(trainingInsts, numIteration); 
 		//DIVFeatureManager.pw.close();
 		/****************Evaluation Part**************/
 		System.err.println("*****Evaluation*****");
 		Instance[] predInsts = model.decode(testingInsts);
-		Evaluator.evalDP(predInsts, dpRes);
-		Evaluator.evalNER(predInsts, nerEval);
-		Evaluator.writeJointResult(predInsts, jointRes, modelType);
+		VarEvaluator.evalDP(predInsts, dpRes);
+		VarEvaluator.evalNER(predInsts, nerEval);
+		VarEvaluator.writeJointResult(predInsts, jointRes, modelType);
 	}
 	
 	public static void processArgs(String[] args){

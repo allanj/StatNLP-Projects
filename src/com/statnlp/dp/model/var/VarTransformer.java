@@ -391,5 +391,9 @@ public class VarTransformer extends Transformer {
 	}
 
 	
+	
+	public int[] toDep(Tree root){
+		return null;
+	}
 
 }

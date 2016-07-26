@@ -73,10 +73,10 @@ public class LNERMain {
 			dpOut = DPConfig.data_prefix+middle+".pp.ner2dp.dp.res.txt";
 		}
 		/**********Debug info******************/
-//		trainNumber = 20;
+		trainNumber = 20;
 //		trainingPath = "data/semeval10t1/small.txt";
-//		testNumber = 20;
-//		testFile = trainingPath;
+		testNumber = 20;
+		testFile = trainingPath;
 		/**************************/
 		
 		System.err.println("[Info] DEBUG MODE: "+DPConfig.DEBUG);

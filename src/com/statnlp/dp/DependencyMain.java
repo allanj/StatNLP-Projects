@@ -28,9 +28,9 @@ public class DependencyMain {
 	public static int numIteration = 300;
 	public static int numThreads = 5;
 	public static String testFile;
-	public static boolean isPipe = true;
+	public static boolean isPipe = false;
 	public static String trainingPath;
-	public static boolean isDev;
+	public static boolean isDev = false;
 	public static HashSet<String> dataTypeSet;
 	
 	
@@ -55,27 +55,35 @@ public class DependencyMain {
 	
 		entities = initializeTypeMap();
 		dataTypeSet = Init.iniOntoNotesData();
-		processArgs(args);
-		testFile = DPConfig.testingPath;
 		trainingPath = DPConfig.trainingPath;
-		DPConfig.writeWeight = true;
+		testFile = DPConfig.testingPath;
+		
+		processArgs(args);
+		DPConfig.writeWeight = false;
 		
 		
 		
 		String middle = isDev? ".dev":".test";
 		String modelType = "only";
 		String dpOut = DPConfig.data_prefix+modelType+middle+DPConfig.dp_res_suffix;
+		String topKDepOut = DPConfig.data_prefix+modelType+middle+DPConfig.dp_topk_res_suffix;
 		testFile = isDev? DPConfig.devPath:DPConfig.testingPath;
 		
 		if(isPipe) {
 			testFile = isDev?DPConfig.ner2dp_ner_dev_input: DPConfig.ner2dp_ner_test_input;
 			dpOut = DPConfig.data_prefix+middle+".pp.ner2dp.dp.res.txt";
 		}
+		/****Debug info****/
+//		trainingPath = "data/semeval10t1/small.txt";
+//		testFile = "data/semeval10t1/small.txt";
+		/****/
 		System.err.println("[Info] DEBUG MODE: "+DPConfig.DEBUG);
 		
 		System.err.println("[Info] train path: "+trainingPath);
 		System.err.println("[Info] testFile: "+testFile);
 		System.err.println("[Info] nerOut: "+dpOut);
+		
+		
 		
 		DependencyTransformer trans = new DependencyTransformer();
 		DependInstance[] trainingInsts = null;
@@ -95,8 +103,13 @@ public class DependencyMain {
 		NetworkConfig._numThreads = numThreads;
 		//0.1 is the best after tunning the parameters
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = 0.1;
-		System.err.println("[Info] Regularization Parameter: "+NetworkConfig.L2_REGULARIZATION_CONSTANT);
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
+		System.err.println("[Info] Regularization Parameter: "+NetworkConfig.L2_REGULARIZATION_CONSTANT);
+		NetworkConfig._MAX_MARGINAL = false;
+		NetworkConfig._topKValue = 10;
+		
+		
+		
 		DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(), isPipe);
 		DependencyNetworkCompiler dnc = new DependencyNetworkCompiler();
 		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);
@@ -105,12 +118,14 @@ public class DependencyMain {
 		/****************Evaluation Part**************/
 		Instance[] predInsts = model.decode(testingInsts);
 		Evaluator.evalDP(predInsts, dpOut);
+		if(NetworkConfig._topKValue>1)
+			Evaluator.outputTopKDep(predInsts, topKDepOut);
 		
 	}
 	
 	
 	public static void processArgs(String[] args){
-		String usage = "\t usage: java -jar dp.jar -trainNum -1 -testNum -1 -thread 5 -iter 100 -train path -test path -pipe true";
+		String usage = "\t usage: java -jar dp.jar -trainNum -1 -testNum -1 -thread 5 -iter 100 -train path -test path -pipe false";
 		if(args[0].equals("-h") || args[0].equals("help") || args[0].equals("-help") ){
 			System.err.println("Version: Only Dependency Parsing task TASK: ");
 			System.err.println(usage);
@@ -123,8 +138,8 @@ public class DependencyMain {
 					case "-iter": numIteration = Integer.valueOf(args[i+1]); break;
 					case "-thread": numThreads = Integer.valueOf(args[i+1]); break;
 					case "-pipe": isPipe = args[i+1].equals("true")?true:false; break;
-					case "-train":trainingPath = args[i+1];break;
-					case "-test": testFile = args[i+1];break;
+					case "-train":DPConfig.trainingPath = args[i+1];break;
+					case "-test": DPConfig.testingPath = args[i+1];break;
 					case "-debug": DPConfig.DEBUG = args[i+1].equals("true")? true:false; break;
 					case "-reg": DPConfig.L2 = Double.valueOf(args[i+1]); break;
 					case "-dev":isDev = args[i+1].equals("true")?true:false; break;

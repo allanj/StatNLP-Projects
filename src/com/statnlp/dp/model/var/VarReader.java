@@ -10,7 +10,6 @@ import java.util.List;
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
-import com.statnlp.dp.Transformer;
 import com.statnlp.dp.commons.Entity;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DataChecker;
@@ -31,20 +30,20 @@ public class VarReader {
 	
 	public static String[] others = DPConfig.others;
 	
-	public static VarInstance[] readInstance(String path, boolean isLabeled, int number,String[] entities, Transformer transformer){
+	public static VarInstance[] readInstance(String path, boolean isLabeled, int number,String[] entities, VarTransformer transformer){
 		return readInstance(path,isLabeled,number,entities, 10000, transformer, false,null);
 	}
 	
-	public static VarInstance[] readInstance(String path, boolean isLabeled, int number,String[] entities, Transformer transformer, boolean splitEntity){
+	public static VarInstance[] readInstance(String path, boolean isLabeled, int number,String[] entities, VarTransformer transformer, boolean splitEntity){
 		return readInstance(path,isLabeled,number,entities, 10000, transformer, splitEntity,null);
 	}
 	
-	public static VarInstance[] readInstance(String path, boolean isLabeled, int number,String[] entities, Transformer transformer, boolean splitEntity, HashMap<String, Integer> typeMap){
+	public static VarInstance[] readInstance(String path, boolean isLabeled, int number,String[] entities, VarTransformer transformer, boolean splitEntity, HashMap<String, Integer> typeMap){
 		return readInstance(path,isLabeled,number,entities, 10000, transformer, splitEntity,typeMap);
 	}
 	
 
-	public static VarInstance[] readInstance(String path, boolean isLabeled, int number,String[] entities, int maxLength, Transformer transformer, boolean splitEntity, HashMap<String, Integer> typeMap){
+	public static VarInstance[] readInstance(String path, boolean isLabeled, int number,String[] entities, int maxLength, VarTransformer transformer, boolean splitEntity, HashMap<String, Integer> typeMap){
 		ArrayList<VarInstance> data = new ArrayList<VarInstance>();
 		int maxSpanLen = -1;
 		int maxLen = -1;
@@ -60,7 +59,6 @@ public class VarReader {
 			words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
 			ArrayList<UnnamedDependency> dependencies = new ArrayList<UnnamedDependency>();
 			String prev_Entity = "";
-			int conNum = 0;
 			while((line = br.readLine())!=null){
 				if(line.startsWith("#")) continue;
 				if(line.equals("")){
@@ -73,17 +71,14 @@ public class VarReader {
 						dependencies = new ArrayList<UnnamedDependency>();
 						words = new ArrayList<WordToken>();
 						words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
-						conNum = 0;
 						continue;
 					}
 					Tree dependencyTree = transformer.toDependencyTree(dependencies, sent);
 					ArrayList<Entity> checkInvalid = DataChecker.checkAllIncomplete(sent);
 					if(dependencyTree.size()==sent.length() && sent.length()< maxLength ){
 						sent.setRecognized();
-						VarInstance inst = new VarInstance(index++,1.0,sent,dependencies,dependencyTree,transformer.toSpanTree(dependencyTree, sent));
+						VarInstance inst = new VarInstance(index++,1.0,sent,dependencies, transformer.toDep(dependencyTree));
 						
-						if(entities!=null && typeMap!=null) inst.setHaveEntity(typeMap);
-						inst.continousNum = conNum;
 						for(UnnamedDependency ud: dependencies){
 							CoreLabel mo = (CoreLabel)ud.dependent();
 							CoreLabel he = (CoreLabel)ud.governor();
@@ -105,7 +100,6 @@ public class VarReader {
 					}
 					words = new ArrayList<WordToken>();
 					words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
-					conNum = 0;
 					dependencies = new ArrayList<UnnamedDependency>();
 					if(number!= -1 && data.size()==number) break;
 					continue;
@@ -120,13 +114,6 @@ public class VarReader {
 				}else{
 					boolean added = false;
 					String previousLastEn =  words.get(words.size()-1).getEntity();
-					if(entity.startsWith("(") && !previousLastEn.equals(O_TYPE)){
-						if(entity.contains(previousLastEn.substring(2))) conNum++;
-						else if(previousLastEn.substring(2).equals(MISC)){
-							if((miscSet.contains(entity.substring(1)) || miscSet.contains(entity.substring(1,entity.length()-1))))
-									conNum++;
-						}
-					}
 					for(int i=0;i<entities.length;i++){
 						if(entity.contains(entities[i]) && entity.startsWith("(")){
 							//merge the continuous case
@@ -179,11 +166,11 @@ public class VarReader {
 		return dataArr;
 	}
 	
-	public static VarInstance[] readCNN(String path, boolean isLabeled, int number, Transformer transformer){
+	public static VarInstance[] readCNN(String path, boolean isLabeled, int number, VarTransformer transformer){
 		return readCNN(path, isLabeled, number, transformer, null);
 	}
 	
-	public static VarInstance[] readCNN(String path, boolean isLabeled, int number, Transformer transformer, HashMap<String, Integer> typeMap){
+	public static VarInstance[] readCNN(String path, boolean isLabeled, int number, VarTransformer transformer, HashMap<String, Integer> typeMap){
 		ArrayList<VarInstance> data = new ArrayList<VarInstance>();
 		int maxLen = -1;
 		try {
@@ -209,7 +196,7 @@ public class VarReader {
 					}
 					Tree dependencyTree = transformer.toDependencyTree(dependencies, sent);
 					if(dependencyTree.size()==sent.length()){
-						VarInstance inst = new VarInstance(index++,1.0,sent,dependencies,dependencyTree,transformer.toSpanTree(dependencyTree, sent));
+						VarInstance inst = new VarInstance(index++,1.0,sent,dependencies, transformer.toDep(dependencyTree));
 						maxLen = Math.max(maxLen, inst.getInput().length());
 						if(isLabeled) {
 							sent.setRecognized();

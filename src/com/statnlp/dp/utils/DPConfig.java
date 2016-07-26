@@ -5,6 +5,7 @@ public class DPConfig {
 	public static String dataType = "semeval10t1";
 	
 	public static String trainingPath = "data/"+dataType+"/en.train.txt";
+//	public static String trainingPath = "data/"+dataType+"/small.txt";
 	public static String devPath = "data/"+dataType+"/en.devel.txt";
 	public static String testingPath = "data/"+dataType+"/en.test.txt";
 	
@@ -18,6 +19,7 @@ public class DPConfig {
 	public static String ner2dp_ner_test_input = "data/"+dataType+"/pptest/ecrf.test.ner.res.txt";
 	public static String dp2ner_dp_dev_input = "data/"+dataType+"/pptest/only.dev.dp.res.txt";
 	public static String dp2ner_dp_test_input = "data/"+dataType+"/pptest/only.test.dp.res.txt";
+	public static String dp2ner_dp_topK_test_input = "data/"+dataType+"/pptest/only.test.dp.topk.res.txt";
 	
 	public static void changeDataType(){
 		trainingPath = "data/"+dataType+"/en.train.txt";
@@ -34,6 +36,7 @@ public class DPConfig {
 		ner2dp_ner_test_input = "data/"+dataType+"/pptest/ecrf.test.ner.res.txt";
 		dp2ner_dp_dev_input = "data/"+dataType+"/pptest/only.dev.dp.res.txt";
 		dp2ner_dp_test_input = "data/"+dataType+"/pptest/only.test.dp.res.txt";
+		dp2ner_dp_topK_test_input = "data/"+dataType+"/pptest/only.test.dp.topk.res.txt";
 	}
 	
 	public static void changeTrainingPath(){
@@ -44,8 +47,11 @@ public class DPConfig {
 	
 	public static String ner_res_suffix = ".ner.res.txt";
 	public static String dp_res_suffix = ".dp.res.txt";
+	public static String dp_topk_res_suffix = ".dp.topk.res.txt";
+	public static String dp_lab_res_suffix = ".depLab.res.txt";
 	
 	public static String ner_eval_suffix =".ner.eval.txt"; 
+	public static String jointlinear_eval_suffix =".jointlinearner.eval.txt"; 
 	
 	public static String joint_res_suffix = ".joint.res.txt";
 	
@@ -69,7 +75,7 @@ public class DPConfig {
 	public static String ONE = "ONE";
 	public static String NONE = "NONE";
 	
-	public static enum MODEL { ecrf,HYPEREDGE, DIVIDED, DIVCOPY, SIMPLE, LEAF};
+	public static enum MODEL { ecrf,HYPEREDGE, DIVIDED, DIVCOPY, LAB, HYBRID};
 	
 	public static boolean DEBUG = false;
 	
@@ -80,13 +86,14 @@ public class DPConfig {
 	public static boolean writeWeight = false;
 	
 	public static boolean readWeight = false;
-	public static String weightPath = "data/semeval10t1/ecrfWeight.txt";
+	public static String weightPath = "data/semeval10t1/dpWeight.txt";
 	
 	public static String modelRule = "data/semeval10t1/rule.txt";
 	public static String currentModel;
 	
 	
 	/******************For another simple model****************/
-	public static String GO = "GO";
 	public static String EMPTY = "EMPTY";
+	
+	public static enum WEIGHT_TYPE {local};
 }

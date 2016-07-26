@@ -17,6 +17,7 @@ import com.statnlp.dp.utils.Init;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
+import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkModel;
 
@@ -127,6 +128,7 @@ public class D2DMain {
 		NetworkConfig._numThreads = numThreads;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //DPConfig.L2;
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
+		NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY = true;
 		
 		
 		ModelViewer viewer = new ModelViewer(4,entities);
