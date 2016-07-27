@@ -92,16 +92,14 @@ public class DependencyReader {
 							he.setNER(sent.get(he.sentIndex()).getEntity());
 						}
 						maxLen = Math.max(maxLen, inst.getInput().length());
-						if(checkInvalid.size()==0){
-							if(isLabeled) {
-								sent.setRecognized();
-								inst.setLabeled();
-								data.add(inst);
-							}
-							else {
-								inst.setUnlabeled();
-								data.add(inst);
-							}
+						if(isLabeled) {
+							sent.setRecognized();
+							inst.setLabeled();
+							data.add(inst);
+						}
+						else {
+							inst.setUnlabeled();
+							data.add(inst);
 						}
 						
 					}
