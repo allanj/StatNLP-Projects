@@ -267,6 +267,7 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 		CoreLabel rootLabel = new CoreLabel();
 		rootLabel.setValue("0,"+(inst.getInput().length()-1)+",1,1");
 		root.setLabel(rootLabel);
+		root.setScore(network.getMax());
 		this.toTreeHelper(network, network.countNodes()-1, root);
 		
 		if(NetworkConfig._topKValue>1){
@@ -282,14 +283,13 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 				}
 				total += score;
 				kthRoot.setScore(score);
-				//System.err.println(kth+"-best:"+network.getMaxTopK(network.countNodes()-1, kth));
 				CoreLabel kthRootLabel = new CoreLabel();
 				kthRootLabel.setValue("0,"+(inst.getInput().length()-1)+",1,1");
 				kthRoot.setLabel(kthRootLabel);
 				this.toTreeHelperTopK(network, network.countNodes()-1, kthRoot, kth);
 				topK[kth] = kthRoot;
 				numK++;
-				//System.err.println(kthRoot.pennString());
+//				System.err.println(kthRoot.pennString());
 			}
 			
 			for(int kth=0;kth<numK;kth++){

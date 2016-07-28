@@ -3,6 +3,7 @@ package com.statnlp.dp;
 import java.util.ArrayList;
 
 import com.statnlp.commons.types.Sentence;
+import com.statnlp.entity.lcr.ECRFFeatureManager.FEATYPE;
 import com.statnlp.hybridnetworks.FeatureArray;
 import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -242,25 +243,40 @@ public class DependencyFeatureManager extends FeatureManager {
 			
 			
 			if(isPipe){
-				String headEntity = sent.get(headIndex).getEntity();
-				String modifierEntity = sent.get(modifierIndex).getEntity();
-				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EHW",headEntity+":"+headWord));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EHT",headEntity+":"+headTag));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EMW",modifierEntity+":"+modifierWord));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EMT",modifierEntity+":"+modifierTag));
-				
-				
-				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EEHWMW",headEntity+","+headWord+","+modifierEntity+","+modifierWord));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EEHTMT",headEntity+","+headTag+","+modifierEntity+","+modifierTag));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EEHWMW-dist",headEntity+","+headWord+","+modifierEntity+","+modifierWord+attDist));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EEHTMT-dist",headEntity+","+headTag+","+modifierEntity+","+modifierTag+attDist));
-				
-				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EHW-dist",headEntity+":"+headWord+attDist));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EHT-dist",headEntity+":"+headTag+attDist));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EMW-dist",modifierEntity+":"+modifierWord+attDist));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EMT-dist",modifierEntity+":"+modifierTag+attDist));
-	
+//				String headEntity = sent.get(headIndex).getEntity();
+//				String modifierEntity = sent.get(modifierIndex).getEntity();
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EHW",headEntity+":"+headWord));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EHT",headEntity+":"+headTag));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EMW",modifierEntity+":"+modifierWord));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EMT",modifierEntity+":"+modifierTag));
+//				
+//				
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EEHWMW",headEntity+","+headWord+","+modifierEntity+","+modifierWord));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EEHTMT",headEntity+","+headTag+","+modifierEntity+","+modifierTag));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EEHWMW-dist",headEntity+","+headWord+","+modifierEntity+","+modifierWord+attDist));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EEHTMT-dist",headEntity+","+headTag+","+modifierEntity+","+modifierTag+attDist));
+//				
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EHW-dist",headEntity+":"+headWord+attDist));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EHT-dist",headEntity+":"+headTag+attDist));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EMW-dist",modifierEntity+":"+modifierWord+attDist));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EMT-dist",modifierEntity+":"+modifierTag+attDist));
 
+				for(int m=leftIndex; m<=rightIndex;m++){
+					String currEn = sent.get(m).getEntity();
+					String currWord = sent.get(m).getName();
+					String currTag = sent.get(m).getTag();
+					String lw = m>1? sent.get(m-1).getName():"STR";
+					String lt = m>1? sent.get(m-1).getTag():"STR";
+					String rw = m<sent.length()-1? sent.get(m+1).getName():"END";
+					String rt = m<sent.length()-1? sent.get(m+1).getTag():"END";
+					featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "EW",  currEn+":"+currWord));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "ET",	currEn+":"+currTag));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "ELW",	currEn+":"+lw));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "ELT",	currEn+":"+lt));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "ERW",	currEn+":"+rw));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "ERT",	currEn+":"+rt));
+					featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "ELT-T",	currEn+":"+lt+","+currTag));
+				}
 			}
 		}
 		

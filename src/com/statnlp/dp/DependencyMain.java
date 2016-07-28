@@ -32,7 +32,7 @@ public class DependencyMain {
 	public static String trainingPath;
 	public static boolean isDev = false;
 	public static HashSet<String> dataTypeSet;
-	
+	public static boolean topKinput = false;
 	
 	
 	public static String[] initializeTypeMap(){
@@ -71,6 +71,8 @@ public class DependencyMain {
 		
 		if(isPipe) {
 			testFile = isDev?DPConfig.ner2dp_ner_dev_input: DPConfig.ner2dp_ner_test_input;
+			if(topKinput)
+				testFile = isDev?DPConfig.ner2dp_ner_dev_input:DPConfig.ner2dp_ner_topK_test_input;
 			dpOut = DPConfig.data_prefix+middle+".pp.ner2dp.dp.res.txt";
 		}
 		/****Debug info****/
@@ -81,7 +83,8 @@ public class DependencyMain {
 		
 		System.err.println("[Info] train path: "+trainingPath);
 		System.err.println("[Info] testFile: "+testFile);
-		System.err.println("[Info] nerOut: "+dpOut);
+		System.err.println("[Info] depOut: "+dpOut);
+		System.err.println("[Info] topKDepOut: "+topKDepOut);
 		
 		
 		
@@ -93,8 +96,7 @@ public class DependencyMain {
 			testingInsts = DependencyReader.readCNN(testFile, false,testNumber,trans);
 		}else{
 			trainingInsts = DependencyReader.readInstance(trainingPath, true,trainNumber,entities,trans);
-			//testingInsts = isPipe? DependencyReader.readFromPipeline(testFile,testNumber,trans): DependencyReader.readInstance(testFile, false,testNumber,entities,trans);
-			testingInsts = DependencyReader.readInstance(testFile, false,testNumber,entities,trans);
+			testingInsts = isPipe? DependencyReader.readFromPipeline(testFile,testNumber,trans, topKinput): DependencyReader.readInstance(testFile, false,testNumber,entities,trans);
 		}
 		
 		
@@ -106,7 +108,7 @@ public class DependencyMain {
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
 		System.err.println("[Info] Regularization Parameter: "+NetworkConfig.L2_REGULARIZATION_CONSTANT);
 		NetworkConfig._MAX_MARGINAL = false;
-		NetworkConfig._topKValue = 10;
+//		NetworkConfig._topKValue = 3;
 		
 		
 		
@@ -147,6 +149,8 @@ public class DependencyMain {
 					case "-comb": DPConfig.comb = true; break;
 					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
 					case "-wpath":DPConfig.weightPath=args[i+1]; DPConfig.writeWeight = true; break;
+					case "-topk":NetworkConfig._topKValue = Integer.valueOf(args[i+1]); break;
+					case "-topkinput": topKinput = true; break;
 					default: System.err.println("Invalid arguments, please check usage."); System.err.println(usage);System.exit(0);
 				}
 			}

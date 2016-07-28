@@ -18,6 +18,7 @@ public class Evaluator {
 
 	public static boolean DEBUG = false;
 
+	
 	/**
 	 * Evaluate the dependency
 	 * @param testInsts
@@ -27,21 +28,69 @@ public class Evaluator {
 	public static void evalDP(Instance[] testInsts, String dpOut) throws IOException{
 		int dp_corr=0;
 		int dp_total=0;
+		int lastGlobalId = Integer.MIN_VALUE;
+		double max = Double.NEGATIVE_INFINITY;
+		int bestId = -1;
 		PrintWriter pw = RAWF.writer(dpOut);
-		for(Instance org_inst: testInsts){
-			ModelInstance inst = (ModelInstance)org_inst;
+		DependInstance bestInst = null;
+		for(int index=0; index<testInsts.length; index++){
+			DependInstance inst = (DependInstance)(testInsts[index]);
+			int globalId = inst.getGlobalId();
+			Tree prediction = inst.getPrediction();
 			Sentence sent = inst.getInput();
-			ArrayList<UnnamedDependency> predDependencies = inst.toDependencies(inst.getPrediction());
-			ArrayList<UnnamedDependency> corrDependencies = inst.toDependencies(inst.getOutput());
-			int[] predHeads = Transformer.getHeads(predDependencies, inst.getInput());
-			int[] trueHeads = Transformer.getHeads(corrDependencies, inst.getInput());
-			for(int i=1;i<predHeads.length;i++){
-				if(predHeads[i]==trueHeads[i])
-					dp_corr++;
-				dp_total++;
-				pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+trueHeads[i]+" "+predHeads[i]+"\n");
+			if(globalId!=-1){
+				if(globalId==lastGlobalId){
+					bestId = max > prediction.score()? bestId:inst.getInstanceId();
+					max = max > prediction.score()? max:prediction.score();
+					bestInst = max > prediction.score()?  bestInst:inst;
+				}else{
+					if(lastGlobalId != Integer.MIN_VALUE){
+						ArrayList<UnnamedDependency> predDependencies = bestInst.toDependencies(bestInst.getPrediction());
+						ArrayList<UnnamedDependency> corrDependencies = bestInst.toDependencies(bestInst.getOutput());
+						int[] predHeads = Transformer.getHeads(predDependencies, bestInst.getInput());
+						int[] trueHeads = Transformer.getHeads(corrDependencies, bestInst.getInput());
+						for(int i=1;i<predHeads.length;i++){
+							if(predHeads[i]==trueHeads[i])
+								dp_corr++;
+							dp_total++;
+							pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+trueHeads[i]+" "+predHeads[i]+"\n");
+						}
+						pw.write("\n");
+					}
+					bestId = inst.getInstanceId();
+					max = inst.getPrediction().score();
+					bestInst = inst;
+					lastGlobalId = globalId;
+				}
+				if(index==testInsts.length-1){
+					ArrayList<UnnamedDependency> predDependencies = bestInst.toDependencies(bestInst.getPrediction());
+					ArrayList<UnnamedDependency> corrDependencies = bestInst.toDependencies(bestInst.getOutput());
+					int[] predHeads = Transformer.getHeads(predDependencies, bestInst.getInput());
+					int[] trueHeads = Transformer.getHeads(corrDependencies, bestInst.getInput());
+					for(int i=1;i<predHeads.length;i++){
+						if(predHeads[i]==trueHeads[i])
+							dp_corr++;
+						dp_total++;
+						pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+trueHeads[i]+" "+predHeads[i]+"\n");
+					}
+					pw.write("\n");
+				}
+				
+			}else{
+				
+				ArrayList<UnnamedDependency> predDependencies = inst.toDependencies(prediction);
+				ArrayList<UnnamedDependency> corrDependencies = inst.toDependencies(inst.getOutput());
+				int[] predHeads = Transformer.getHeads(predDependencies, inst.getInput());
+				int[] trueHeads = Transformer.getHeads(corrDependencies, inst.getInput());
+				for(int i=1;i<predHeads.length;i++){
+					if(predHeads[i]==trueHeads[i])
+						dp_corr++;
+					dp_total++;
+					pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+trueHeads[i]+" "+predHeads[i]+"\n");
+				}
+				pw.write("\n");
 			}
-			pw.write("\n");
+			
 		}
 		pw.close();
 		System.out.println("**Evaluating Dependency Result**");

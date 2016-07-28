@@ -26,6 +26,7 @@ public class DependInstance extends ModelInstance {
 	public int[] entityNum;
 	public int continousNum;
 	
+	protected int globalId = -1;
 	
 	protected boolean haveEntity = false;
 	
@@ -53,6 +54,15 @@ public class DependInstance extends ModelInstance {
 		this.dependencies = dependencies;
 		this.dependencyRoot = dependencyRoot.deepCopy();
 		this.output = output;
+	}
+	
+	public DependInstance(int globalId, int instanceId, double weight, Sentence sentence, ArrayList<UnnamedDependency> dependencies, Tree dependencyRoot, Tree output) {
+		super(instanceId, weight);
+		this.sentence = sentence;
+		this.dependencies = dependencies;
+		this.dependencyRoot = dependencyRoot.deepCopy();
+		this.output = output;
+		this.globalId = globalId;
 	}
 	
 	public void setHaveEntity(HashMap<String, Integer> typeMap){
@@ -91,6 +101,8 @@ public class DependInstance extends ModelInstance {
 		if(dependencyRoot==null)
 			di.dependencyRoot = null;
 		else di.dependencyRoot = dependencyRoot.deepCopy();
+		di.globalId = this.globalId;
+		
 		return di;
 	}
 
@@ -272,6 +284,6 @@ public class DependInstance extends ModelInstance {
 		return DPConfig.currentModel.equals(MODEL.HYPEREDGE.name());
 	}
 	
-	
+	public int getGlobalId(){return this.globalId;}
 
 }

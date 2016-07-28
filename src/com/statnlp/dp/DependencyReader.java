@@ -258,5 +258,94 @@ public class DependencyReader {
 	}
 
 
+	
+	/***
+	 * The data format should (index	word	entity	headIndex)
+	 * This one needed to be modified Later
+	 * @param path
+	 * @param isLabeled
+	 * @param number
+	 * @return
+	 */
+	public static DependInstance[] readFromPipeline(String path, int number, Transformer transformer, boolean topKinput){
+		ArrayList<DependInstance> data = new ArrayList<DependInstance>();
+		int maxLen = -1;
+		try {
+			BufferedReader br = RAWF.reader(path);
+			String line = null;
+			int index = 1;
+			ArrayList<WordToken> words = new ArrayList<WordToken>();
+			words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
+			ArrayList<UnnamedDependency> dependencies = new ArrayList<UnnamedDependency>();
+			double instanceWeight = 1.0;
+			int globalId = -1;
+			HashSet<Integer> globalSize = new HashSet<Integer>();
+			while((line = br.readLine())!=null){
+				if(line.startsWith("#")) continue;
+				if(line.equals("")){
+					WordToken[] wordsArr = new WordToken[words.size()];
+					words.toArray(wordsArr);
+					Sentence sent = new Sentence(wordsArr);
+					boolean projectiveness=  DataChecker.checkProjective(dependencies);
+//					System.err.println("Instance "+(index+1)+", projective:"+projectiveness); index++;
+					if(!projectiveness) {
+						dependencies = new ArrayList<UnnamedDependency>();
+						words = new ArrayList<WordToken>();
+						words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
+						continue;
+					}
+					Tree dependencyTree = transformer.toDependencyTree(dependencies, sent);
+					if(dependencyTree.size()==sent.length()){
+						if(number!=-1 && topKinput){
+							globalSize.add(globalId);
+							if(globalSize.size()>number) break;
+						}
+						DependInstance inst = new DependInstance(globalId, index++,instanceWeight,sent,dependencies,dependencyTree,transformer.toSpanTree(dependencyTree, sent));
+						maxLen = Math.max(maxLen, inst.getInput().length());
+						inst.setUnlabeled();
+						data.add(inst);
+					}
+//					System.err.println("Reading: "+inst.getDependencies().toString());
+					words = new ArrayList<WordToken>();
+					words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE));
+					dependencies = new ArrayList<UnnamedDependency>();
+					if(!topKinput && number!= -1 && data.size()==number) break;
+					continue;
+				}
+				if(line.startsWith("[InstanceId+Weight]")){
+					String[] values = line.split(":");
+					instanceWeight = Double.valueOf(values[2]);
+					globalId = Integer.valueOf(values[1]);
+					continue;
+				}
+				String[] values = line.split(" ");
+				int headIndex = Integer.valueOf(values[5]);
+				String predEntity = values[4];
+				//Remind that here should add the predict entity
+				
+				//make the predict entity the true entity
+				
+				
+				words.add(new WordToken(values[1],values[2],headIndex,predEntity));
+				CoreLabel headLabel = new CoreLabel();
+				CoreLabel modifierLabel = new CoreLabel();
+				
+				headLabel.setSentIndex(headIndex);
+				headLabel.setValue("index:"+headIndex);
+				modifierLabel.setSentIndex(words.size()-1);
+				modifierLabel.setValue("index:"+modifierLabel.sentIndex());
+				dependencies.add(new UnnamedDependency(headLabel, modifierLabel));
+				
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		List<DependInstance> myData = data;
+		DependInstance[] dataArr = new DependInstance[myData.size()];
+		System.err.println("[Pipeline] Testing instance, total:"+ dataArr.length+" Instance. ");
+		myData.toArray(dataArr);
+		return dataArr;
+	}
 
 }

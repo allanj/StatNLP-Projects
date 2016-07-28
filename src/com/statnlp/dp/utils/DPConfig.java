@@ -20,6 +20,7 @@ public class DPConfig {
 	public static String dp2ner_dp_dev_input = "data/"+dataType+"/pptest/only.dev.dp.res.txt";
 	public static String dp2ner_dp_test_input = "data/"+dataType+"/pptest/only.test.dp.res.txt";
 	public static String dp2ner_dp_topK_test_input = "data/"+dataType+"/pptest/only.test.dp.topk.res.txt";
+	public static String ner2dp_ner_topK_test_input = "data/"+dataType+"/pptest/ecrf.test.ner.topk.res.txt";
 	
 	public static void changeDataType(){
 		trainingPath = "data/"+dataType+"/en.train.txt";
@@ -46,6 +47,7 @@ public class DPConfig {
 	}
 	
 	public static String ner_res_suffix = ".ner.res.txt";
+	public static String ner_topk_res_suffix = ".ner.topk.res.txt";
 	public static String dp_res_suffix = ".dp.res.txt";
 	public static String dp_topk_res_suffix = ".dp.topk.res.txt";
 	public static String dp_lab_res_suffix = ".depLab.res.txt";
