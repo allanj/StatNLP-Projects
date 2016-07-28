@@ -45,6 +45,7 @@ public class Evaluator {
 					bestInst = max > prediction.score()?  bestInst:inst;
 				}else{
 					if(lastGlobalId != Integer.MIN_VALUE){
+						Sentence bestSent = bestInst.getInput();
 						ArrayList<UnnamedDependency> predDependencies = bestInst.toDependencies(bestInst.getPrediction());
 						ArrayList<UnnamedDependency> corrDependencies = bestInst.toDependencies(bestInst.getOutput());
 						int[] predHeads = Transformer.getHeads(predDependencies, bestInst.getInput());
@@ -53,7 +54,7 @@ public class Evaluator {
 							if(predHeads[i]==trueHeads[i])
 								dp_corr++;
 							dp_total++;
-							pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+trueHeads[i]+" "+predHeads[i]+"\n");
+							pw.write(i+" "+bestSent.get(i).getName()+" "+bestSent.get(i).getTag()+" "+bestSent.get(i).getEntity()+" "+trueHeads[i]+" "+predHeads[i]+"\n");
 						}
 						pw.write("\n");
 					}
@@ -63,6 +64,7 @@ public class Evaluator {
 					lastGlobalId = globalId;
 				}
 				if(index==testInsts.length-1){
+					Sentence bestSent = bestInst.getInput();
 					ArrayList<UnnamedDependency> predDependencies = bestInst.toDependencies(bestInst.getPrediction());
 					ArrayList<UnnamedDependency> corrDependencies = bestInst.toDependencies(bestInst.getOutput());
 					int[] predHeads = Transformer.getHeads(predDependencies, bestInst.getInput());
@@ -71,7 +73,7 @@ public class Evaluator {
 						if(predHeads[i]==trueHeads[i])
 							dp_corr++;
 						dp_total++;
-						pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+trueHeads[i]+" "+predHeads[i]+"\n");
+						pw.write(i+" "+bestSent.get(i).getName()+" "+bestSent.get(i).getTag()+" "+bestSent.get(i).getEntity()+" "+trueHeads[i]+" "+predHeads[i]+"\n");
 					}
 					pw.write("\n");
 				}
