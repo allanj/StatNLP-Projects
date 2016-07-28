@@ -14,6 +14,9 @@ public class ECRFInstance extends Instance {
 	protected ArrayList<String> entities;
 	protected ArrayList<String> predictons;
 	
+	protected String[][] topKPredictions;
+	protected double[] topKScore;
+	
 	protected int globalId = -1;
 	protected double predictionScore;
 	
@@ -43,6 +46,18 @@ public class ECRFInstance extends Instance {
 		if(predictons!=null)
 			inst.predictons =(ArrayList<String>)predictons.clone();
 		else inst.predictons = null;
+		
+		
+		if(topKPredictions!=null)
+			inst.topKPredictions = topKPredictions.clone();
+		else inst.topKPredictions = null;
+		inst.topKPredictions = this.topKPredictions;
+		
+		if(topKScore!=null)
+			inst.topKScore = topKScore.clone();
+		else inst.topKScore = null;
+		inst.topKScore = this.topKScore;
+		
 		return inst;
 	}
 
@@ -98,4 +113,10 @@ public class ECRFInstance extends Instance {
 
 	public void setPredictionScore(double score){this.predictionScore = score;}
 	public double getPredictionScore(){return this.predictionScore;}
+	
+	public void setTopKPrediction(String[][] topKPrediction){this.topKPredictions = topKPrediction;}
+	public void setTopKPredictionScore(double[] topkScore){this.topKScore = topkScore;}
+	
+	public String[][] getTopKPrediction(){return this.topKPredictions;}
+	public double[] getTopKScore(){return this.topKScore;}
 }

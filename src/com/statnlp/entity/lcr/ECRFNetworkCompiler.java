@@ -72,9 +72,41 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 			int tagID = NetworkIDMapper.toHybridNodeArray(child)[1];
 			prediction.add(0, entities[tagID]);
 		}
-
+		
 		result.setPrediction(prediction);
 		result.setPredictionScore(lcrfNetwork.getMax());
+		
+		if(NetworkConfig._topKValue>1){
+			int sentRootIdx = Arrays.binarySearch(lcrfNetwork.getAllNodes(),root);
+			ArrayList<String> tmpPrediction = new ArrayList<String>();
+			String[][] topKPrediction = new String[NetworkConfig._topKValue][];
+			double[] topKScore = new double[NetworkConfig._topKValue];
+			Arrays.fill(topKScore, Double.NEGATIVE_INFINITY);
+			for(int kth=0;kth<NetworkConfig._topKValue;kth++){
+				int subk = kth;
+				if(network.getMaxTopK(network.countNodes()-1, kth)== Double.NEGATIVE_INFINITY){
+					break;
+				}
+				rootIdx = sentRootIdx;
+				tmpPrediction = new ArrayList<String>();
+				topKScore[kth] = lcrfNetwork.getMaxTopK(rootIdx, kth);
+				for(int i=0;i<lcrfInstance.size();i++){
+					int child_k = lcrfNetwork.getMaxTopKPath(rootIdx, subk)[0];
+					int child_k_best_order = lcrfNetwork.getMaxTopKBestListPath(rootIdx, subk)[0];
+					long child = lcrfNetwork.getNode(child_k);
+					rootIdx = child_k;
+					subk = child_k_best_order;
+					int tagID = NetworkIDMapper.toHybridNodeArray(child)[1];
+					tmpPrediction.add(0, entities[tagID]);
+				}
+				String[] tmpArr = new String[lcrfInstance.size()];
+				tmpPrediction.toArray(tmpArr);
+				topKPrediction[kth] = tmpArr;
+			}
+			result.setTopKPrediction(topKPrediction);
+			result.setTopKPredictionScore(topKScore);
+		}
+		
 		
 		return result;
 	}

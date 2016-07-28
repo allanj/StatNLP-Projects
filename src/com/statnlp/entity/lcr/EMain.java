@@ -107,7 +107,6 @@ public class EMain {
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2;
 		NetworkConfig._numThreads = numThreads;
 		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
-		NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY = false;
 		
 		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(),entities,isPipe);
 		ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(entityMap, entities);
