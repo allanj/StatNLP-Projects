@@ -893,9 +893,9 @@ public abstract class Network implements Serializable, HyperGraph{
 			return;
 		}
 		//since inside and outside are in log space
-		double alpha = this._inside[k];
-		double beta = this._outside[k];
-		double total = sum;
+//		double alpha = this._inside[k];
+//		double beta = this._outside[k];
+//		double total = sum;
 		
 		this._marginal[k] = this._inside[k] + this._outside[k] - sum;
 	}

@@ -62,6 +62,11 @@ public class NetworkConfig {
 	
 	
 	
-	public static boolean _MAX_MARGINAL = false; 
+	public static boolean _MAX_MARGINAL = false;
+	public static int _topKValue = 1;
+	
+	public static int NEURAL_SERVER_PORT = 9546;
+	public static String NEURAL_SERVER_ADDR = "tcp://172.18.240.32:" + NEURAL_SERVER_PORT;
+	public static boolean USE_NEURAL_FEATURES = false;
 	
 }

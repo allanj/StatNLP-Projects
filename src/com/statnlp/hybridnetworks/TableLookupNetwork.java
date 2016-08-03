@@ -91,7 +91,6 @@ public abstract class TableLookupNetwork extends Network{
 	public boolean contains(TableLookupNetwork network){
 //		if (true)
 //		return true;
-		
 		if(this.countNodes() < network.countNodes()){
 			System.err.println("size of this is less than the size of network."+this.countNodes()+"\t"+network.countNodes());
 			return false;
@@ -116,6 +115,8 @@ public abstract class TableLookupNetwork extends Network{
 							}
 						}
 						if(!child_found){
+							System.err.println("network ID:"+network.getInstance().getInstanceId());
+							System.err.println("instance:"+network.getInstance().getInput().toString());
 							System.err.println("supposingly smaller:"+Arrays.toString(child1_nodes)+"\t"+children1.length);
 							for(int t = 0; t<children2.length; t++){
 								System.err.println("supposingly larger :"+Arrays.toString(this.toNodes(children2[t]))+"\t"+children2.length);

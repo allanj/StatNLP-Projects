@@ -17,6 +17,7 @@
 package com.statnlp.hybridnetworks;
 
 import com.statnlp.commons.types.Instance;
+import com.statnlp.dp.model.bruteforce.BFNetwork;
 
 public class LocalNetworkDecoderThread extends Thread{
 	
@@ -66,10 +67,16 @@ public class LocalNetworkDecoderThread extends Thread{
 		Network network = this._compiler.compile(-1, instance, this._param);
 		//make sure we disable the cache..
 		this._param.disableCache();
+		/***********Code added by Allan*****need to be recovered later*************/
+//		BFNetwork network = (BFNetwork)orgnetwork;
+//		network.removeSomeNodes();
+		/***************************/
 		if(NetworkConfig._MAX_MARGINAL)
 			network.marginal();
 		network.max();
-//		System.err.println("max="+network.getMax());
+		if(NetworkConfig._topKValue>1)
+			network.topK();
+		//System.err.println("1-best score="+network.getMax());
 		return this._compiler.decompile(network);
 	}
 	

@@ -16,7 +16,6 @@
  */
 package com.statnlp.hybridnetworks;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -24,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -37,6 +35,7 @@ import java.util.concurrent.Future;
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.dp.utils.DPConfig;
+import com.statnlp.neural.NNCRFGlobalNetworkParam;
 
 public abstract class NetworkModel implements Serializable{
 	
@@ -57,6 +56,9 @@ public abstract class NetworkModel implements Serializable{
 	private transient LocalNetworkLearnerThread[] _learners;
 	//the local decoder.
 	private transient LocalNetworkDecoderThread[] _decoders;
+	
+	//
+	private NNCRFGlobalNetworkParam nnController;
 	
 	public NetworkModel(FeatureManager fm, NetworkCompiler compiler){
 		this._fm = fm;
@@ -141,6 +143,7 @@ public abstract class NetworkModel implements Serializable{
 		
 		//finalize the features.
 		this._fm.getParam_G().lockIt();
+		nnController = this._fm.getParam_G()._nnController;
 		
 		if(NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY && NetworkConfig._CACHE_FEATURES_DURING_TRAINING){
 			touch(insts, true); // Touch again to cache the features, both in labeled and unlabeled
@@ -159,51 +162,7 @@ public abstract class NetworkModel implements Serializable{
 		List<Callable<Void>> callables = Arrays.asList(this._learners);
 		
 		double obj_old = Double.NEGATIVE_INFINITY;
-		
-		//now read the weight
-				HashMap<String, Double> f2weight = null;
-				HashSet<String> ftypes = new HashSet<String>();
-				for(DPConfig.WEIGHT_TYPE t: DPConfig.WEIGHT_TYPE.values()){
-					ftypes.add(t.name());
-				}
-				if(DPConfig.readWeight){
-					try {
-						f2weight = new HashMap<String, Double>();
-						//HashSet<String> obtained = new HashSet<String>();
-						BufferedReader br = RAWF.reader(DPConfig.weightPath);
-						String line = null;
-						while((line = br.readLine())!=null){
-							String[] values = line.split("<MYSEP>");
-							f2weight.put(values[0], Double.parseDouble(values[1]));
-						}
-						br.close();
-						System.err.println("[Info] Total number of ecrf weight:"+f2weight.size());
-						int totalObtained = 0;
-						for(int tf=0;tf<this._fm._param_g._feature2rep.length;tf++){
-							String nowf = Arrays.toString(this._fm._param_g._feature2rep[tf]);
-							if(!f2weight.containsKey(nowf)){
-								System.err.println(nowf);
-								//this._fm.getParam_G().setWeight(tf, 0.0);
-							}else{
-								if(ftypes.contains(this._fm._param_g._feature2rep[tf][0])){
-									this._fm.getParam_G().overRideWeight(tf, f2weight.get(nowf));
-									totalObtained++;
-								}
-									
-								//f2weight.remove(nowf);
-							}
-						}
-						System.err.println("[Info] Total feature weight obtained from dep:"+totalObtained);
-						//Iterator<String> iter = f2weight.keySet().iterator();
-						//while(iter.hasNext()){
-						//	System.err.println(iter.next());
-						//}
-						
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
+//		
 		
 		//run the EM-style algorithm now...
 		long startTime = System.currentTimeMillis();
@@ -223,6 +182,10 @@ public abstract class NetworkModel implements Serializable{
 					if(NetworkConfig.USE_BATCH_SGD) learner.setInstanceIdSet(batchInstIds);
 				}
 				long time = System.currentTimeMillis();
+				if (NetworkConfig.USE_NEURAL_FEATURES) {
+					nnController.forwardNetwork();
+				}
+				
 				List<Future<Void>> results = pool.invokeAll(callables);
 				for(Future<Void> result: results){
 					try{
@@ -245,36 +208,17 @@ public abstract class NetworkModel implements Serializable{
 					break;
 				}
 				//everytime before start, read the weight because we fixed the weight:
-				if(DPConfig.readWeight){
-					for(int tf=0;tf<this._fm._param_g._feature2rep.length;tf++){
-						String nowf = Arrays.toString(this._fm._param_g._feature2rep[tf]);
-						if(!f2weight.containsKey(nowf) && ftypes.contains(this._fm._param_g._feature2rep[tf][0])){
-							
-						}else{
-							if(ftypes.contains(this._fm._param_g._feature2rep[tf][0]))
-								this._fm.getParam_G().overRideWeight(tf, f2weight.get(nowf));
-						}
-					}
-				}
 			}
+			
 			//use the best weights 
 			if(NetworkConfig.USE_STRUCTURED_SVM){
 				this._fm.getParam_G().setBestWeights();
 			}
-			
-			if(DPConfig.writeWeight){
-				try {
-					PrintWriter pw = RAWF.writer(DPConfig.weightPath);
-					for(int tf=0;tf<this._fm._param_g._feature2rep.length;tf++){
-						//System.err.println(Arrays.toString(this._fm._param_g._feature2rep[tf])+"  feature weight:"+this._fm.getParam_G().getWeight(tf));
-						pw.write(Arrays.toString(this._fm._param_g._feature2rep[tf])+"<MYSEP>"+this._fm.getParam_G().getWeight(tf)+"\n");
-					}
-					pw.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			if (NetworkConfig.USE_NEURAL_FEATURES) {
+				nnController.forwardNetwork();
 			}
+			
+			
 		} finally {
 			pool.shutdown();
 		}
