@@ -29,11 +29,11 @@ import java.util.Random;
 
 import com.statnlp.commons.ml.opt.LBFGS;
 import com.statnlp.commons.ml.opt.LBFGS.ExceptionWithIflag;
+import com.statnlp.neural.NNCRFGlobalNetworkParam;
+import com.statnlp.neural.RemoteNN;
 import com.statnlp.commons.ml.opt.MathsVector;
 import com.statnlp.commons.ml.opt.Optimizer;
 import com.statnlp.commons.ml.opt.OptimizerFactory;
-import com.statnlp.neural.NNCRFGlobalNetworkParam;
-import com.statnlp.neural.RemoteNN;
 
 //TODO: other optimization and regularization methods. Such as the L1 regularization.
 
@@ -61,8 +61,6 @@ public class GlobalNetworkParam implements Serializable{
 	protected transient double _obj;
 	/** A variable for batch SGD optimization, if applicable */
 	protected transient int _batchSize;
-	/** A variable to store current value of the objective function */
-	protected transient double _bestObj;
 	
 	protected transient int _version;
 	
@@ -78,7 +76,7 @@ public class GlobalNetworkParam implements Serializable{
 	protected String[][] _feature2rep;//three-dimensional array representation of the feature.
 	/** The weights parameter */
 	protected double[] _weights;
-	/** Store the best weights when using the sgd */
+	/** Store the best weights when using the batch sgd */
 	protected double[] _bestWeight;
 	/** A flag whether the model is discriminative */
 	protected boolean _isDiscriminative;
@@ -100,7 +98,9 @@ public class GlobalNetworkParam implements Serializable{
 	/** The total number of instances for the coefficient the batch SGD regularization term*/
 	protected int totalNumInsts;
 	
+	/** Neural CRF socket server controller  */
 	protected NNCRFGlobalNetworkParam _nnController;	
+	/** The weights that some of them will be replaced by neural net if NNCRF is enabled. */
 	private double[] concatWeights, concatCounts;
 	
 	public GlobalNetworkParam(){
@@ -114,21 +114,20 @@ public class GlobalNetworkParam implements Serializable{
 		this._fixedFeaturesSize = 0;
 		this._obj_old = Double.NEGATIVE_INFINITY;
 		this._obj = Double.NEGATIVE_INFINITY;
-		this._bestObj = Double.NEGATIVE_INFINITY;
 		this._isDiscriminative = !NetworkConfig.TRAIN_MODE_IS_GENERATIVE;
 		if(this.isDiscriminative()){
-			this._batchSize = NetworkConfig.batchSize;
+			this._batchSize = NetworkConfig.BATCH_SIZE;
 			this._kappa = NetworkConfig.L2_REGULARIZATION_CONSTANT;
 		}
 		this._featureIntMap = new HashMap<String, HashMap<String, HashMap<String, Integer>>>();
 		this._type2inputMap = new HashMap<String, ArrayList<String>>();
 		this._optFactory = optimizerFactory;
-		if (!NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION && NetworkConfig._numThreads > 1){
+		if (NetworkConfig.PARALLEL_FEATURE_EXTRACTION && NetworkConfig.NUM_THREADS > 1){
 			this._subFeatureIntMaps = new ArrayList<HashMap<String, HashMap<String, HashMap<String, Integer>>>>();
-			for (int i = 0; i < NetworkConfig._numThreads; i++){
+			for (int i = 0; i < NetworkConfig.NUM_THREADS; i++){
 				this._subFeatureIntMaps.add(new HashMap<String, HashMap<String, HashMap<String, Integer>>>());
 			}
-			this._subSize = new int[NetworkConfig._numThreads];
+			this._subSize = new int[NetworkConfig.NUM_THREADS];
 		}
 	}
 	
@@ -211,10 +210,6 @@ public class GlobalNetworkParam implements Serializable{
 	
 	private double getCount(int f){
 		return this._counts[f];
-	}
-	
-	public double[] getCounts(){
-		return this._counts;
 	}
 	
 	public double getWeight(int f){
@@ -335,7 +330,7 @@ public class GlobalNetworkParam implements Serializable{
 			}
 		}
 		this._version = 0;
-		this._opt = this._optFactory.create(this._weights.length);
+		this._opt = this._optFactory.create(this._weights.length, getFeatureIntMap());
 		this._locked = true;
 		
 		System.err.println(this._size+" features.");
@@ -392,7 +387,7 @@ public class GlobalNetworkParam implements Serializable{
 			}
 		}
 		this._version = 0;
-		this._opt = this._optFactory.create(this._weights.length);
+		this._opt = this._optFactory.create(this._weights.length, getFeatureIntMap());
 		this._locked = true;
 		
 		System.err.println(this._size+" features.");
@@ -429,12 +424,12 @@ public class GlobalNetworkParam implements Serializable{
 		int threadId = network != null ? network.getThreadId() : -1;
 		boolean shouldNotCreateNewFeature = false;
 		try{
-			shouldNotCreateNewFeature = (NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY && network.getInstance().getInstanceId() < 0);
+			shouldNotCreateNewFeature = (NetworkConfig.BUILD_FEATURES_FROM_LABELED_ONLY && network.getInstance().getInstanceId() < 0);
 		} catch (NullPointerException e){
 			throw new NetworkException("Missing network on some toFeature calls while trying to extract only from labeled networks.");
 		}
 		HashMap<String, HashMap<String, HashMap<String, Integer>>> featureIntMap = null;
-		if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION || NetworkConfig._numThreads == 1 || this.isLocked()){
+		if(!NetworkConfig.PARALLEL_FEATURE_EXTRACTION || NetworkConfig.NUM_THREADS == 1 || this.isLocked()){
 			featureIntMap = this._featureIntMap;
 		} else {
 			if(threadId == -1){
@@ -471,7 +466,7 @@ public class GlobalNetworkParam implements Serializable{
 		
 		HashMap<String, Integer> inputToIdx = outputToInputToIdx.get(output);
 		if(!inputToIdx.containsKey(input)){
-			if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION || NetworkConfig._numThreads == 1){
+			if(!NetworkConfig.PARALLEL_FEATURE_EXTRACTION || NetworkConfig.NUM_THREADS == 1){
 				inputToIdx.put(input, this._size++);
 			} else {
 				inputToIdx.put(input, this._subSize[threadId]++);
@@ -497,6 +492,10 @@ public class GlobalNetworkParam implements Serializable{
 		this._obj_old = this._obj;
 		
 		return done;
+	}
+	
+	public double[] getCounts(){
+		return this._counts;
 	}
 	
 	/**
@@ -566,7 +565,7 @@ public class GlobalNetworkParam implements Serializable{
 				}
 			}
 		}
-		boolean done = Math.abs(this._obj-this._obj_old) < NetworkConfig.objtol;
+		boolean done = Math.abs(this._obj-this._obj_old) < NetworkConfig.OBJTOL;
 		
 		this._version ++;
 		
@@ -594,7 +593,7 @@ public class GlobalNetworkParam implements Serializable{
 	 * Update the parameters using discriminative algorithm (e.g., CRF).
 	 * If the optimization seems to be done, it will return true.
 	 * @return true if the difference between previous objective value and
-	 * 		   current objective value is less than {@link NetworkConfig#objtol}
+	 * 		   current objective value is less than {@link NetworkConfig#OBJTOL}
 	 * 		   or the optimizer deems the optimization is finished, or
 	 * 		   the decrease is less than 0.01% for three iterations, false otherwise.
 	 */
@@ -625,15 +624,13 @@ public class GlobalNetworkParam implements Serializable{
     	} catch(ExceptionWithIflag e){
     		throw new NetworkException("Exception with Iflag:"+e.getMessage());
     	}
-		
-    	if(!NetworkConfig.USE_STRUCTURED_SVM){
+    	if(this._opt.name().contains("LBFGS Optimizer")){
 	    	double diff = this.getObj()-this.getObj_old();
-	    	if(diff >= 0 && diff < NetworkConfig.objtol){
+	    	if(diff >= 0 && diff < NetworkConfig.OBJTOL){
 	    		done = true;
 	    	}
-	    	//double diffRatio = Math.abs(diff/this.getObj_old());
-	    	double diffRatio = Math.abs(diff);
-	    	if(diffRatio < 1e-3){
+	    	double diffRatio = Math.abs(diff/this.getObj_old());
+	    	if(diff >= 0 && diffRatio < 1e-4){
 	    		this.smallChangeCount += 1;
 	    	} else {
 	    		this.smallChangeCount = 0;
@@ -642,7 +639,7 @@ public class GlobalNetworkParam implements Serializable{
 	    		done = true;
 	    	}
     	}
-    	if(done && !NetworkConfig.USE_STRUCTURED_SVM){
+    	if(done && this._opt.name().contains("LBFGS Optimizer")){
     		// If we stop early, we need to copy solution_cache,
     		// as noted in the Javadoc for solution_cache in LBFGS class.
     		// This is because the _weights will contain the next value to be evaluated, 
@@ -652,13 +649,6 @@ public class GlobalNetworkParam implements Serializable{
     		for(int i=0; i<this._weights.length; i++){
         		this._weights[i] = LBFGS.solution_cache[i];
         	}
-    	}
-    	if(NetworkConfig.USE_STRUCTURED_SVM){
-    		if(this._obj > this._bestObj){
-    			this._bestObj = this._obj;
-    			this._bestWeight = this._weights.clone();
-    		}
-    		//System.err.println("best obj:"+this._bestObj);
     	}
     	
     	if (NetworkConfig.USE_NEURAL_FEATURES) {
@@ -680,7 +670,7 @@ public class GlobalNetworkParam implements Serializable{
 	protected synchronized void resetCountsAndObj(){
 		
 		double coef = 1.0;
-		if(NetworkConfig.USE_BATCH_SGD){
+		if(NetworkConfig.USE_BATCH_TRAINING){
 			coef = this._batchSize*1.0/this.totalNumInsts;
 			if(coef>1) coef = 1.0;
 		}
@@ -695,8 +685,8 @@ public class GlobalNetworkParam implements Serializable{
 				this._counts[k] += 2 * coef * this._kappa * this._weights[k];
 			}
 		}
-		
 		if (NetworkConfig.USE_NEURAL_FEATURES) {
+			//reset the internal feature weights here.
 			double[] internalNNWeights = this._nnController.getInternalNeuralWeights();
 			double[] internalNNCounts = this._nnController.getInternalNeuralGradients();
 			for(int k = 0 ; k<internalNNWeights.length; k++) {
@@ -730,10 +720,6 @@ public class GlobalNetworkParam implements Serializable{
 	
 	public void setInstsNum(int number){
 		this.totalNumInsts = number;
-	}
-	
-	public void setBestWeights(){
-		this._weights = this._bestWeight;
 	}
 	
 	public boolean checkEqual(GlobalNetworkParam p){

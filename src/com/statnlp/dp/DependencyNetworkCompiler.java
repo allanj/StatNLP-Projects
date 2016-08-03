@@ -277,7 +277,7 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 			for(int kth=0;kth<NetworkConfig._topKValue;kth++){
 				//System.err.println(kth+"-best:");
 				Tree kthRoot = new LabeledScoredTreeNode();
-				double score = Math.exp(network.getMaxTopK(network.countNodes()-1, kth));
+				double score = network.getMaxTopK(network.countNodes()-1, kth);
 				if(network.getMaxTopK(network.countNodes()-1, kth)== Double.NEGATIVE_INFINITY){
 					break;
 				}

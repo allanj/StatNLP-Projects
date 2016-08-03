@@ -77,8 +77,8 @@ public class LCRFMain {
 		List<LCRFInstance> testInstances = readData("data/test.txt",false,testNum);
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
-		NetworkConfig._CACHE_FEATURES_DURING_TRAINING = true;
-		NetworkConfig._numThreads = numThreads;
+		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
+		NetworkConfig.NUM_THREADS = numThreads;
 		
 		LCRFFeatureManager fa = new LCRFFeatureManager(new GlobalNetworkParam());
 		LCRFNetworkCompiler compiler = new LCRFNetworkCompiler(allLabels);

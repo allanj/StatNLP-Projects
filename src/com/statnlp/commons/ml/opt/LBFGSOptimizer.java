@@ -22,16 +22,31 @@ public class LBFGSOptimizer implements Optimizer{
 
 	private int _n;
 	private int _m = 4;
-	private int[] _iprint = {0,0};
-	private int[] _iflag = {0};
-	private double _eps = 10e-10;
-	private double _xtol = 10e-16;
 	private double _f;
 	private double[] _diag;
 	private double[] _x;
 	private double[] _g;
 	private boolean _diagco = false;
+	private int[] _iprint = {0,0};
+	private int[] _iflag = {0};
+	private double _eps = 10e-10;
+	private double _xtol = 10e-16;
 	
+	/**
+	 * Creates an LBFGS Optimizer with default epsilon (10e-10) and tolerance (10e-16)
+	 */
+	public LBFGSOptimizer() {}
+	
+	/**
+	 * Creates an LBFGS Optimizer with the specified epsilon and tolerance
+	 * @param eps The epsilon
+	 * @param xtol The tolerance
+	 */
+	public LBFGSOptimizer(double eps, double xtol) {
+		this._eps = eps;
+		this._xtol = xtol;
+	}
+
 	@Override
 	public void setObjective(double f){
 		this._f = f;
@@ -73,6 +88,10 @@ public class LBFGSOptimizer implements Optimizer{
 	public boolean optimize() throws ExceptionWithIflag{
     	LBFGS.lbfgs(this._n, this._m, this._x, this._f, this._g, this._diagco, this._diag, this._iprint, this._eps, this._xtol, this._iflag);
     	return _iflag[0] == 0;
+	}
+	
+	public String name(){
+		return "LBFGS Optimizer";
 	}
     
 }

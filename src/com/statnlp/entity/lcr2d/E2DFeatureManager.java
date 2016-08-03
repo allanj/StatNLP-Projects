@@ -45,9 +45,9 @@ public class E2DFeatureManager extends FeatureManager {
 			
 		int eId = nodeArr[2];
 		String att = nodeArr[1]==0? "LA":"RA";
-//		int[] child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[0]));
-//		int childEId = child[2];
-//		int childPos = child[0]-1;
+		int[] child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[0]));
+		int childEId = child[2];
+		int childPos = child[0]-1;
 		
 		String lw = pos>0? sent.get(pos-1).getName():"STR";
 		String lt = pos>0? sent.get(pos-1).getTag():"STR";
@@ -56,8 +56,8 @@ public class E2DFeatureManager extends FeatureManager {
 		
 		String currWord = inst.getInput().get(pos).getName();
 		String currTag = inst.getInput().get(pos).getTag();
-//		String childWord = childPos>=0? inst.getInput().get(childPos).getName():"STR";
-//		String childTag = childPos>=0? inst.getInput().get(childPos).getTag():"STR";
+		String childWord = childPos>=0? inst.getInput().get(childPos).getName():"STR";
+		String childTag = childPos>=0? inst.getInput().get(childPos).getTag():"STR";
 		
 		
 		
@@ -71,7 +71,6 @@ public class E2DFeatureManager extends FeatureManager {
 		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ERW",	currEn+":"+rw));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ERT",	currEn+":"+rt));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELT-T",	currEn+":"+lt+","+currTag));
-		
 		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "EW-dir",  	currEn+":"+currWord+":"+att));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ET-dir",	currEn+":"+currTag+":"+att));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELW-dir",	currEn+":"+lw+":"+att));
@@ -83,27 +82,32 @@ public class E2DFeatureManager extends FeatureManager {
 		for(int plen = 1;plen<=6;plen++){
 			if(currWord.length()>=plen){
 				String suff = currWord.substring(currWord.length()-plen, currWord.length());
-				featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-SUFF-"+plen, currEn+":"+suff));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-SUFF-"+plen+"-dir", currEn+":"+suff+":"+att));
 				String pref = currWord.substring(0,plen);
+				featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-SUFF-"+plen, currEn+":"+suff));
 				featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-PREF-"+plen, currEn+":"+pref));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-SUFF-"+plen+"-dir", currEn+":"+suff+":"+att));
 				featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-PREF-"+plen+"-dir", currEn+":"+pref+":"+att));
 			}
 		}
 		
 		
-//		String prevEntity = entities[childEId];
+		String prevEntity = entities[childEId];
 //		String prevEntity = entities[childEId].equals("O")?entities[childEId]:entities[childEId].substring(2);
-
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E",prevEntity+":"+currEn));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE",currWord+":"+prevEntity+":"+currEn));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevW-prevE-currE",lw+":"+prevEntity+":"+currEn));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextW-prevE-currE",rw+":"+prevEntity+":"+currEn));
-//		
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE",currTag+":"+prevEntity+":"+currEn));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-prevE-currE",lt+":"+prevEntity+":"+currEn));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextT-prevE-currE",rt+":"+prevEntity+":"+currEn));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-currT-prevE-currE",lt+":"+currTag+":"+prevEntity+":"+currEn));			
+		if(pos!=childPos){
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E",prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE",currWord+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevW-prevE-currE",lw+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextW-prevE-currE",rw+":"+prevEntity+":"+currEn));
+			
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE",currTag+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-prevE-currE",lt+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextT-prevE-currE",rt+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-currT-prevE-currE",lt+":"+currTag+":"+prevEntity+":"+currEn));	
+		}else{
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E-sameword",prevEntity+":"+currEn+":"+currWord));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E-sametag",prevEntity+":"+currEn+":"+currTag));
+		}
+				
 
 		
 		

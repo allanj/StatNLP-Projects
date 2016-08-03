@@ -143,11 +143,11 @@ public class VarMain {
 //		System.exit(0);
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
-		NetworkConfig._CACHE_FEATURES_DURING_TRAINING = true;
-		NetworkConfig._numThreads = numThreads;
+		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
+		NetworkConfig.NUM_THREADS = numThreads;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //DPConfig.L2;
-		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
-		NetworkConfig._MAX_MARGINAL = false;
+		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
+		NetworkConfig.MAX_MARGINAL_DECODING = false;
 		
 		ModelViewer viewer = new ModelViewer(4,entities);
 		FeatureManager dfm = new VarFeatureManager_leafcopy(new GlobalNetworkParam(),entities);

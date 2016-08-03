@@ -23,7 +23,7 @@ public class SemiCRFMain {
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException, ClassNotFoundException, NoSuchFieldException, SecurityException, InterruptedException, IllegalArgumentException, IllegalAccessException{
 		
-		DPConfig.windows = false;
+		DPConfig.windows = true;
 		
 		String train_filename;
 		String test_filename;
@@ -35,7 +35,7 @@ public class SemiCRFMain {
 		test_filename = DPConfig.ecrftest;
 //		train_filename = "data/semi/semi.train.txt";
 //		test_filename = "data/semi/semi.test.txt";
-		trainInstances = readCoNLLData(train_filename, true,-1);
+		trainInstances = readCoNLLData(train_filename, true,500);
 		testInstances = readCoNLLData(test_filename, false,-1);
 		
 		String resEval = "data/semi/semi.eval.txt";
@@ -55,11 +55,10 @@ public class SemiCRFMain {
 		}
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
-		NetworkConfig._CACHE_FEATURES_DURING_TRAINING = true;
+		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = 0.01;
-		NetworkConfig.objtol = 1e-2;
-		NetworkConfig._numThreads = 38;
-		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
+		NetworkConfig.NUM_THREADS = 10;
+		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = false;
 		
 		int numIterations = 5000;
 		

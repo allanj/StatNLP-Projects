@@ -9,6 +9,7 @@ public class WordToken extends InputToken{
 	private String aTag;
 	private int headIndex; //for debug
 	private String entity;
+	private String depLabel;
 	
 	public WordToken(String name) {
 		super(name);
@@ -42,6 +43,15 @@ public class WordToken extends InputToken{
 		this.aTag = tag.substring(0, 1);
 	}
 	
+	public WordToken(String name, String tag, int headIndex, String entity, String depLabel) {
+		super(name);
+		this.tag = tag;
+		this.headIndex = headIndex;
+		this.entity = entity;
+		this.aTag = tag.substring(0, 1);
+		this.depLabel = depLabel;
+	}
+	
 	
 	public String getTag(){
 		return this.tag;
@@ -67,6 +77,16 @@ public class WordToken extends InputToken{
 		return this.entity;
 	}
 	
+	
+	
+	public String getDepLabel() {
+		return depLabel;
+	}
+
+	public void setDepLabel(String depLabel) {
+		this.depLabel = depLabel;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if(o instanceof WordToken){

@@ -57,6 +57,8 @@ public class DependencyFeatureManager extends FeatureManager {
 		String modifierTag = null;
 		
 		
+		
+		
 		//if incomplete span or complete but with spanlen is 2
 		if(completeness==0){
 			
@@ -241,43 +243,22 @@ public class DependencyFeatureManager extends FeatureManager {
 				featureList.add(this._param_g.toFeature(network,FEATYPE.inbetween.name(), "inbetween-4", leftA+","+sent.get(i).getATag()+","+rightA));
 			}
 			
-			
 			if(isPipe){
-//				String headEntity = sent.get(headIndex).getEntity();
-//				String modifierEntity = sent.get(modifierIndex).getEntity();
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EHW",headEntity+":"+headWord));
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EHT",headEntity+":"+headTag));
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EMW",modifierEntity+":"+modifierWord));
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EMT",modifierEntity+":"+modifierTag));
+				String leftE = sent.get(leftIndex).getEntity().substring(0, 1);
+				String llE = leftIndex>1? sent.get(leftIndex-1).getEntity().substring(0, 1):"STR";
+				String rightE = sent.get(rightIndex).getEntity().substring(0, 1);
+				String rrE = rightIndex<sent.length()-1? sent.get(rightIndex+1).getEntity().substring(0, 1):"END";
+				
+				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "dep-all",  leftE+":"+llE+":"+rightE+":"+rrE));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "dep",	leftE+":"+rightE));
+				
+//				String he = sent.get(headIndex).getEntity();
+//				String me = sent.get(modifierIndex).getEntity();
 //				
-//				
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EEHWMW",headEntity+","+headWord+","+modifierEntity+","+modifierWord));
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EEHTMT",headEntity+","+headTag+","+modifierEntity+","+modifierTag));
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EEHWMW-dist",headEntity+","+headWord+","+modifierEntity+","+modifierWord+attDist));
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EEHTMT-dist",headEntity+","+headTag+","+modifierEntity+","+modifierTag+attDist));
-//				
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EHW-dist",headEntity+":"+headWord+attDist));
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EHT-dist",headEntity+":"+headTag+attDist));
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EMW-dist",modifierEntity+":"+modifierWord+attDist));
-//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(),"PP-EMT-dist",modifierEntity+":"+modifierTag+attDist));
-
-				for(int m=leftIndex; m<=rightIndex;m++){
-					String currEn = sent.get(m).getEntity();
-					String currWord = sent.get(m).getName();
-					String currTag = sent.get(m).getTag();
-					String lw = m>1? sent.get(m-1).getName():"STR";
-					String lt = m>1? sent.get(m-1).getTag():"STR";
-					String rw = m<sent.length()-1? sent.get(m+1).getName():"END";
-					String rt = m<sent.length()-1? sent.get(m+1).getTag():"END";
-					featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "EW",  currEn+":"+currWord));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "ET",	currEn+":"+currTag));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "ELW",	currEn+":"+lw));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "ELT",	currEn+":"+lt));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "ERW",	currEn+":"+rw));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "ERT",	currEn+":"+rt));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "ELT-T",	currEn+":"+lt+","+currTag));
-				}
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "pipe",	he+":"+me+att));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.pipe.name(), "pipe-w",	he+"&"+headWord+":"+me+"&"+modifierWord+att));
 			}
+			
 		}
 		
 		

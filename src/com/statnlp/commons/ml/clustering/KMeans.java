@@ -1,5 +1,5 @@
 /** Statistical Natural Language Processing System
-    Copyright (C) 2014-2015  Lu, Wei
+    Copyright (C) 2014-2016  Lu, Wei
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ package com.statnlp.commons.ml.clustering;
 
 import java.util.Arrays;
 import java.util.Random;
+
+import com.statnlp.commons.types.DataPoint;
 
 /**
  * @author wei_lu

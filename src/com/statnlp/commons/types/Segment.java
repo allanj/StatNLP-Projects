@@ -1,5 +1,5 @@
 /** Statistical Natural Language Processing System
-    Copyright (C) 2014  Lu, Wei
+    Copyright (C) 2014-2016  Lu, Wei
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,11 @@ package com.statnlp.commons.types;
 
 import java.io.Serializable;
 
+/**
+ * Defines a segment described by begin index and end index.
+ * @author Lu Wei <luwei@statnlp.com>
+ *
+ */
 public class Segment implements Serializable, Comparable<Segment>{
 	
 	private static final long serialVersionUID = 7669804479975787795L;
@@ -29,18 +34,36 @@ public class Segment implements Serializable, Comparable<Segment>{
 		this._eIndex = eIndex;
 	}
 	
+	/**
+	 * Returns the begin index of this segment
+	 * @return
+	 */
 	public int getBIndex(){
 		return this._bIndex;
 	}
 	
+	/**
+	 * Returns the end index of this segment
+	 * @return
+	 */
 	public int getEIndex(){
 		return this._eIndex;
 	}
 	
+	/**
+	 * Returns the length of this segment
+	 * @return
+	 */
 	public int length(){
 		return this._eIndex - this._bIndex;
 	}
 	
+	/**
+	 * Returns whether this segment is completely contained within another segment, or
+	 * whether this segment completely contains another segment.
+	 * @param seg
+	 * @return
+	 */
 	public boolean nestedWith(Segment seg){
 		if(this._bIndex >= seg._bIndex && this._eIndex <= seg._eIndex){
 			return true;
@@ -51,6 +74,11 @@ public class Segment implements Serializable, Comparable<Segment>{
 		return false;
 	}
 	
+	/**
+	 * Returns whether this segment overlaps with the specified segment.
+	 * @param seg
+	 * @return
+	 */
 	public boolean overlapsWith(Segment seg){
 		if(this._bIndex<=seg._bIndex && this._eIndex>seg._bIndex){
 			return true;
@@ -67,6 +95,11 @@ public class Segment implements Serializable, Comparable<Segment>{
 		return false;
 	}
 	
+	/**
+	 * Returns whether this segment is completely disjoint with the specified segment.
+	 * @param seg
+	 * @return
+	 */
 	public boolean noOverlapWith(Segment seg){
 		if(this._eIndex<=seg._bIndex){
 			return true;

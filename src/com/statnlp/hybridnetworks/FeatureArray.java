@@ -17,7 +17,6 @@
 package com.statnlp.hybridnetworks;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 public class FeatureArray implements Serializable{
 	
@@ -26,19 +25,27 @@ public class FeatureArray implements Serializable{
 	private double _score;
 	private int[] _fs;
 	private boolean _isLocal = false;
-	private FeatureArray _next;
 	
-	public static FeatureArray EMPTY = new FeatureArray(new int[0]);
-	public static FeatureArray NEGATIVE_INFINITY = new FeatureArray(-10000); // TODO why this instead of Double.NEGATIVE_INFINITY?
-//	public static FeatureArray NEGATIVE_INFINITY = new FeatureArray(Double.NEGATIVE_INFINITY);
+	public static final FeatureArray EMPTY = new FeatureArray(new int[0]);
+	public static final FeatureArray NEGATIVE_INFINITY = new FeatureArray(Double.NEGATIVE_INFINITY);
 	
-	public String viewCurrent(){
-		return Arrays.toString(this._fs);
-	}
-
+	/**
+	 * Merges the features in <code>fs</code> and in <code>next</code>
+	 * @deprecated This one is inefficient. Use {@link #FeatureArray(int[])} instead.
+	 * @param fs
+	 * @param next
+	 */
 	public FeatureArray(int[] fs, FeatureArray next) {
 		this._fs = fs;
-		this._next = next;
+		if(next != null && next._fs != null){
+			this._fs = new int[fs.length+next._fs.length];
+			for(int i=0; i<fs.length; i++){
+				this._fs[i] = fs[i];
+			}
+			for(int i=0; i<next._fs.length; i++){
+				this._fs[i+fs.length] = next._fs[i];
+			}
+		}
 	}
 	
 	/**
@@ -47,10 +54,10 @@ public class FeatureArray implements Serializable{
 	 */
 	public FeatureArray(int[] fs) {
 		this._fs = fs;
-		this._next = null;
+		this._isLocal = false;
 	}
 	
-	public FeatureArray(double score) {
+	private FeatureArray(double score) {
 		this._score = score;
 	}
 	
@@ -63,7 +70,7 @@ public class FeatureArray implements Serializable{
 		}
 		
 		int length = this._fs.length;
-		if(NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY){
+		if(NetworkConfig.BUILD_FEATURES_FROM_LABELED_ONLY){
 			for(int fs: this._fs){
 				if(fs == -1){
 					length--;
@@ -74,11 +81,11 @@ public class FeatureArray implements Serializable{
 		int[] fs_local = new int[length];
 		int localIdx = 0;
 		for(int k = 0; k<this._fs.length; k++, localIdx++){
-			if(this._fs[k] == -1 && NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY){
+			if(this._fs[k] == -1 && NetworkConfig.BUILD_FEATURES_FROM_LABELED_ONLY){
 				localIdx--;
 				continue;
 			}
-			if(NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION || NetworkConfig._numThreads == 1 || param._isFinalized){
+			if(!NetworkConfig.PARALLEL_FEATURE_EXTRACTION || NetworkConfig.NUM_THREADS == 1 || param._isFinalized){
 				fs_local[localIdx] = param.toLocalFeature(this._fs[k]);
 			} else {
 				fs_local[localIdx] = this._fs[k];
@@ -88,22 +95,13 @@ public class FeatureArray implements Serializable{
 			}
 		}
 		
-		FeatureArray fa;
-		if(this._next!=null){
-			fa = new FeatureArray(fs_local, this._next.toLocal(param));
-		} else {
-			fa = new FeatureArray(fs_local);
-		}
+		FeatureArray fa = new FeatureArray(fs_local);
 		fa._isLocal = true;
 		return fa;
 	}
 	
 	public int[] getCurrent(){
 		return this._fs;
-	}
-	
-	public FeatureArray getNext(){
-		return this._next;
 	}
 	
 	public void update(LocalNetworkParam param, double count){
@@ -118,11 +116,6 @@ public class FeatureArray implements Serializable{
 		for(int f_local : fs_local){
 			param.addCount(f_local, count);
 		}
-		
-		if(this._next!=null){
-			this._next.update(param, count);
-		}
-		
 	}
 	
 	/**
@@ -145,10 +138,6 @@ public class FeatureArray implements Serializable{
 		
 		this._score = this.computeScore(param, this.getCurrent());
 		
-		if(this._next!=null){
-			this._score += this._next.getScore(param);
-		}
-		
 		return this._score;
 	}
 	
@@ -169,9 +158,6 @@ public class FeatureArray implements Serializable{
 	//returns the number of elements in the feature array
 	public int size(){
 		int size = this._fs.length;
-		if(this._next!=null){
-			size += this._next.size();
-		}
 		return size;
 	}
 	
@@ -194,9 +180,6 @@ public class FeatureArray implements Serializable{
 		for(int i = 0; i<this._fs.length; i++){
 			code ^= this._fs[i];
 		}
-		if(this._next != null){
-			code = code ^ this._next.hashCode();
-		}
 		return code;
 	}
 	
@@ -209,14 +192,7 @@ public class FeatureArray implements Serializable{
 					return false;
 				}
 			}
-			if(this._next == null){
-				if(fa._next!=null){
-					return false;
-				}
-				return true;
-			} else {
-				return this._next.equals(fa._next);
-			}
+			return true;
 		}
 		return false;
 	}

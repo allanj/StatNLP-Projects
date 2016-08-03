@@ -69,11 +69,10 @@ public class BFMain {
 //		System.exit(0);
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
-		NetworkConfig._CACHE_FEATURES_DURING_TRAINING = true;
+		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2;
-		NetworkConfig._numThreads = numThreads;
-		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
-		NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY = false;
+		NetworkConfig.NUM_THREADS = numThreads;
+		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = false;
 		
 		BFFeatureManager fa = new BFFeatureManager(new GlobalNetworkParam());
 		BFNetworkCompiler compiler = new BFNetworkCompiler();

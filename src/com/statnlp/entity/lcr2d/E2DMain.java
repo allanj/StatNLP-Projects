@@ -12,6 +12,7 @@ import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.Init;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
+import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkModel;
 
@@ -83,7 +84,11 @@ public class E2DMain {
 		/***********DEBUG*****************/
 //		DPConfig.ecrftrain = "data/semeval10t1/ecrf.small.txt";
 //		testFile="data/semeval10t1/ecrf.small.txt";
+		trainNumber = 500;
+		testNumber= -1;
+		numIteration=300;
 //		DPConfig.writeWeight = true;
+//		DPConfig.weightPath = "data/semeval10t1/ecrf2dWeight.txt";
 //		DPConfig.readWeight = false;
 //		testFile = DPConfig.ecrftrain;
 		/***************************/
@@ -100,14 +105,15 @@ public class E2DMain {
 //		System.exit(0);
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
-		NetworkConfig._CACHE_FEATURES_DURING_TRAINING = true;
+		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2;
-		NetworkConfig._numThreads = numThreads;
-		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
-		NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY = false;
+		NetworkConfig.NUM_THREADS = numThreads;
+		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = false;
+		NetworkConfig.MAX_MARGINAL_DECODING = false;
 		
+		EntityViewer eViewer = new EntityViewer(entities);
 		E2DFeatureManager fa = new E2DFeatureManager(new GlobalNetworkParam(),entities,isPipe);
-		E2DNetworkCompiler compiler = new E2DNetworkCompiler(entityMap, entities);
+		E2DNetworkCompiler compiler = new E2DNetworkCompiler(entityMap, entities,eViewer);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		E2DInstance[] ecrfs = trainInstances.toArray(new E2DInstance[trainInstances.size()]);
 		model.train(ecrfs, numIteration);

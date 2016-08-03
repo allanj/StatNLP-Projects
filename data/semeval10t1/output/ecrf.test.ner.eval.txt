@@ -18,7 +18,7 @@ Deforest NNP I-person I-person
 . . O O
 
 Well UH O O
-Dick NNP B-person B-gpe
+Dick NNP B-person B-person
 , , O O
 US NNP B-gpe B-gpe
 officials NNS O O
@@ -96,7 +96,7 @@ were VBD O O
 injured VBN O O
 . . O O
 
-Defense NNP B-MISC O
+Defense NNP B-MISC B-MISC
 Secretary NNP O O
 William NNP B-person B-person
 Cohen NNP I-person I-person
@@ -238,7 +238,7 @@ in IN O O
 The DT O O
 `` `` O O
 The DT O O
-Hunted NNP O O
+Hunted NNP O B-organization
 , , O O
 '' '' O O
 and CC O O
@@ -259,13 +259,13 @@ just RB O O
 teamed VBD O O
 on IN O O
 `` `` O O
-Rules NNPS O O
-of IN O O
-Engagement NNP O O
+Rules NNPS O B-MISC
+of IN O I-MISC
+Engagement NNP O I-MISC
 . . O O
 '' '' O O
 
-Jones NNP B-person O
+Jones NNP B-person B-gpe
 would MD O O
 play VB O O
 a DT O O
@@ -293,8 +293,8 @@ Chapter NN B-MISC O
 of IN I-MISC O
 the DT I-MISC O
 federal JJ I-MISC O
-Bankruptcy NNP I-MISC B-organization
-Code NNP I-MISC I-organization
+Bankruptcy NNP I-MISC B-MISC
+Code NNP I-MISC I-MISC
 , , O O
 said VBD O O
 it PRP O O
@@ -357,17 +357,17 @@ will MD O O
 be VB O O
 succeeded VBN O O
 by IN O O
-Geoffrie NNP B-person B-organization
-D. NNP I-person I-organization
-Lurie NNP I-person I-organization
-of IN O I-organization
-GDL NNP B-organization I-organization
+Geoffrie NNP B-person B-person
+D. NNP I-person I-person
+Lurie NNP I-person I-person
+of IN O O
+GDL NNP B-organization B-organization
 Management NNP I-organization I-organization
 Inc. NNP I-organization I-organization
 , , O O
 which WDT O O
 is VBZ O O
-Eagle NNP B-organization O
+Eagle NNP B-organization B-gpe
 's POS O O
 crisis NN O O
 manager NN O O
@@ -400,7 +400,7 @@ board NN O O
 member NN O O
 . . O O
 
-Eagle NNP B-organization O
+Eagle NNP B-organization B-organization
 also RB O O
 said VBD O O
 it PRP O O
@@ -463,7 +463,7 @@ million CD O O
 in IN O O
 payments NNS O O
 to TO O O
-Eagle NNP B-organization O
+Eagle NNP B-organization B-gpe
 's POS O O
 unsecured JJ O O
 creditors NNS O O
@@ -484,7 +484,7 @@ on IN O O
 the DT O O
 dollar NN O O
 , , O O
-Eagle NNP B-organization B-gpe
+Eagle NNP B-organization B-person
 said VBD O O
 . . O O
 
@@ -496,7 +496,7 @@ the DT O O
 period NN O O
 under IN O O
 which WDT O O
-Eagle NNP B-organization O
+Eagle NNP B-organization B-MISC
 has VBZ O O
 the DT O O
 exclusive JJ O O
@@ -513,7 +513,7 @@ would MD O O
 extinguish VB O O
 all DT O O
 of IN O O
-Eagle NNP B-organization B-organization
+Eagle NNP B-organization B-gpe
 's POS O O
 existing VBG O O
 capital NN O O
@@ -536,13 +536,13 @@ petition NN O O
 , , O O
 filed VBN O O
 in IN O O
-U.S. NNP B-organization B-gpe
-Bankruptcy NNP I-organization I-gpe
-Court NNP I-organization O
+U.S. NNP B-organization B-organization
+Bankruptcy NNP I-organization I-organization
+Court NNP I-organization I-organization
 in IN O O
 Manhattan NNP B-gpe B-gpe
 , , O O
-Eagle NNP B-organization B-gpe
+Eagle NNP B-organization B-person
 said VBD O O
 its PRP$ O O
 problems NNS O O
@@ -557,8 +557,8 @@ its PRP$ O O
 then-senior JJ O O
 lender NN O O
 , , O O
-Bankers NNPS B-organization O
-Trust NNP I-organization B-organization
+Bankers NNPS B-organization B-organization
+Trust NNP I-organization I-organization
 Co. NNP I-organization I-organization
 , , O O
 reduced VBD O O
@@ -571,7 +571,7 @@ In IN O O
 September NNP O O
 1988 CD O O
 , , O O
-Eagle NNP B-organization B-gpe
+Eagle NNP B-organization B-organization
 acquired VBD O O
 Biny NNP B-organization B-organization
 Clothing NNP I-organization I-organization
@@ -590,12 +590,12 @@ Bonds NNP B-organization B-gpe
 name NN O O
 . . O O
 
-Eagle NNP B-organization O
+Eagle NNP B-organization B-gpe
 's POS O O
 management NN O O
 retired VBD O O
 and CC O O
-Biny NNP B-organization B-person
+Biny NNP B-organization B-gpe
 's POS O O
 management NN O O
 took VBD O O
@@ -609,15 +609,15 @@ At IN O O
 the DT O O
 time NN O O
 , , O O
-Eagle NNP B-organization O
+Eagle NNP B-organization B-organization
 reached VBD O O
 a DT O O
 new JJ O O
 credit NN O O
 agreement NN O O
 with IN O O
-Bankers NNPS B-organization B-MISC
-Trust NNP I-organization I-MISC
+Bankers NNPS B-organization B-person
+Trust NNP I-organization I-person
 and CC O O
 with IN O O
 Bank NNP B-organization B-organization
@@ -643,7 +643,7 @@ First NNP B-organization B-organization
 Century NNP I-organization I-organization
 Partners NNPS I-organization I-organization
 and CC O O
-Biny NNP B-organization O
+Biny NNP B-organization B-person
 management NN O O
 for IN O O
 $ $ O O
@@ -709,8 +709,8 @@ judge NN O O
 has VBZ O O
 ruled VBN O O
 that IN O O
-Terry NNP B-person B-organization
-Nichols NNP I-person I-organization
+Terry NNP B-person B-person
+Nichols NNP I-person I-person
 will MD O O
 indeed RB O O
 stand VB O O
@@ -728,8 +728,8 @@ murder NN O O
 . . O O
 
 The DT O O
-Oklahoma NNP B-gpe B-MISC
-City NNP I-gpe I-MISC
+Oklahoma NNP B-gpe B-gpe
+City NNP I-gpe I-gpe
 bombing NN O O
 conspirator NN O O
 is VBZ O O
@@ -780,9 +780,9 @@ evidence NN O O
 Yesterday NN O O
 a DT O O
 silent JJ O O
-Dee NNP B-person B-MISC
-Ana NNP I-person I-MISC
-Laney NNP I-person I-MISC
+Dee NNP B-person B-person
+Ana NNP I-person I-person
+Laney NNP I-person I-person
 waited VBD O O
 as IN O O
 the DT O O
@@ -847,9 +847,9 @@ few JJ O O
 hours NNS O O
 after IN O O
 the DT O O
-Sheriff NNP B-MISC B-organization
+Sheriff NNP B-MISC B-MISC
 's POS I-MISC O
-Department NNP I-MISC O
+Department NNP I-MISC B-organization
 did VBD O O
 . . O O
 
@@ -1014,8 +1014,8 @@ faction NN O O
 and CC O O
 the DT O O
 opposition NN O O
-Northern NNP B-MISC B-person
-Alliance NNP I-MISC I-person
+Northern NNP B-MISC B-MISC
+Alliance NNP I-MISC I-MISC
 have VBP O O
 agreed VBN O O
 to TO O O
@@ -1033,9 +1033,9 @@ UN NNP B-MISC B-MISC
 special JJ O O
 envoy NN O O
 for IN O O
-Afghanistan NNP B-gpe B-MISC
-Franchesco NNP B-person I-MISC
-Bendrel NNP I-person I-MISC
+Afghanistan NNP B-gpe B-gpe
+Franchesco NNP B-person B-person
+Bendrel NNP I-person I-person
 says VBZ O O
 the DT O O
 world NN O O
@@ -1115,8 +1115,8 @@ negotiations NNS O O
 
 Britain NNP B-gpe B-gpe
 's POS O O
-Millennium NNP B-MISC B-person
-Dome NNP I-MISC I-person
+Millennium NNP B-MISC B-MISC
+Dome NNP I-MISC I-MISC
 will MD O O
 close VB O O
 down RP O O
@@ -1134,8 +1134,8 @@ Officials NNS O O
 at IN O O
 London NNP B-gpe B-gpe
 's POS O O
-Millennium NNP B-MISC B-person
-Dome NNP I-MISC I-person
+Millennium NNP B-MISC B-MISC
+Dome NNP I-MISC I-MISC
 say VBP O O
 the DT O O
 structure NN O O
@@ -1148,7 +1148,7 @@ final JJ O O
 New NNP O B-gpe
 Year NNP O I-gpe
 's POS O O
-Eve NNP O O
+Eve NNP O B-organization
 party NN O O
 . . O O
 
@@ -1181,10 +1181,10 @@ its PRP$ O O
 grand JJ O O
 opening NN O O
 last JJ O O
-New NNP O B-gpe
-Year NNP O I-gpe
+New NNP O O
+Year NNP O O
 's POS O O
-Eve NNP O O
+Eve NNP O B-organization
 . . O O
 
 Construction NN O O
@@ -1243,7 +1243,7 @@ the DT O O
 expansion NN O O
 team NN O O
 says VBZ O O
-Jordan NNP B-person O
+Jordan NNP B-person B-person
 could MD O O
 run VB O O
 operations NNS O O
@@ -1285,8 +1285,8 @@ According VBG O O
 to TO O O
 `` `` O O
 the DT B-MISC O
-Washington NNP I-MISC B-gpe
-Post NNP I-MISC I-gpe
+Washington NNP I-MISC B-MISC
+Post NNP I-MISC I-MISC
 , , O O
 '' '' O O
 the DT O O
@@ -1380,7 +1380,7 @@ the DT O O
 Washington NNP B-MISC B-organization
 Wizards NNPS I-MISC I-organization
 , , O O
-Jordan NNP B-person B-gpe
+Jordan NNP B-person B-person
 said VBD O O
 he PRP O O
 expected VBD O O
@@ -1405,7 +1405,7 @@ minutes NNS O O
 team NN O O
 owner NN O O
 told VBD O O
-Jordan NNP B-person O
+Jordan NNP B-person B-gpe
 his PRP$ O O
 services NNS O O
 were VBD O O
@@ -1557,9 +1557,9 @@ BBC NNP B-MISC B-MISC
 World NNP I-MISC I-MISC
 Service NNP I-MISC I-MISC
 , , O O
-PRI NNP B-MISC B-gpe
-and CC O O
-WGBH NNP B-MISC B-gpe
+PRI NNP B-MISC B-MISC
+and CC O I-MISC
+WGBH NNP B-MISC I-MISC
 in IN O O
 Boston NNP B-gpe B-gpe
 . . O O
@@ -1657,8 +1657,8 @@ President NNP O O
 Clinton NNP B-person B-person
 leaves VBZ O O
 for IN O O
-Northern NNP B-gpe B-MISC
-Ireland NNP I-gpe I-MISC
+Northern NNP B-gpe B-gpe
+Ireland NNP I-gpe I-gpe
 shortly RB O O
 on IN O O
 a DT O O
@@ -1822,7 +1822,7 @@ in IN O O
 late JJ O O
 1987 CD O O
 , , O O
-D&B NNP B-organization B-gpe
+D&B NNP B-organization B-person
 said VBD O O
 . . O O
 
@@ -1959,7 +1959,7 @@ in IN O O
 this DT O O
 sector NN O O
 , , O O
-D&B NNP B-organization B-gpe
+D&B NNP B-organization B-person
 said VBD O O
 . . O O
 
@@ -1973,8 +1973,8 @@ of IN O O
 suicide NN O O
 bombings NNS O O
 in IN O O
-Saudi NNP B-gpe B-person
-Arabia NNP I-gpe I-person
+Saudi NNP B-gpe B-gpe
+Arabia NNP I-gpe I-gpe
 , , O O
 the DT O O
 death NN O O
@@ -2009,8 +2009,8 @@ bear VBP O O
 the DT O O
 trademark NN O O
 of IN O O
-al NNP B-MISC B-organization
-Qaeda NNP I-MISC I-organization
+al NNP B-MISC B-MISC
+Qaeda NNP I-MISC I-MISC
 . . O O
 
 They PRP O O
@@ -2034,8 +2034,8 @@ Riyadh NNP B-gpe B-gpe
 . . O O
 
 The DT O O
-State NNP B-MISC B-MISC
-Department NNP I-MISC I-MISC
+State NNP B-MISC B-organization
+Department NNP I-MISC I-organization
 is VBZ O O
 ordering VBG O O
 all DT O O
@@ -2055,8 +2055,8 @@ team NN O O
 is VBZ O O
 heading VBG O O
 to TO O O
-Saudi NNP B-gpe B-person
-Arabia NNP I-gpe I-person
+Saudi NNP B-gpe B-gpe
+Arabia NNP I-gpe I-gpe
 to TO O O
 help VB O O
 investigate VB O O
@@ -2204,8 +2204,8 @@ Republican JJ B-MISC B-MISC
 chairman NN O O
 of IN O O
 the DT O O
-Canvassing NNP B-MISC B-organization
-Board NNP I-MISC I-organization
+Canvassing NNP B-MISC B-MISC
+Board NNP I-MISC I-MISC
 announced VBD O O
 in IN O O
 advance NN O O
@@ -2298,7 +2298,7 @@ the DT O O
 ballots NNS O O
 . . O O
 
-Republicans NNPS B-MISC O
+Republicans NNPS B-MISC B-MISC
 said VBD O O
 , , O O
 No DT O O
@@ -2312,7 +2312,7 @@ Fremd NNP I-person I-person
 ABC NNP B-MISC B-MISC
 News NNP I-MISC I-MISC
 , , O O
-Jacksonville NNP B-gpe B-gpe
+Jacksonville NNP B-gpe B-person
 . . O O
 
 WorldCom NNP B-MISC O
@@ -2439,7 +2439,7 @@ dispute NN O O
 Even RB O O
 if IN O O
 the DT O O
-Bush NNP B-person B-MISC
+Bush NNP B-person B-person
 campaign NN O O
 prevails VBZ O O
 before IN O O
@@ -2519,7 +2519,7 @@ central JJ O O
 constitutional JJ O O
 argument NN O O
 the DT O O
-Bush NNP B-person B-MISC
+Bush NNP B-person B-person
 campaign NN O O
 has VBZ O O
 been VBN O O
@@ -2539,7 +2539,7 @@ now RB O O
 they PRP O O
 violate VBP O O
 the DT O O
-Constitution NNP O B-gpe
+Constitution NNP O B-organization
 . . O O
 
 The DT O O
@@ -2588,13 +2588,13 @@ a DT O O
 victory NN O O
 for IN O O
 the DT O O
-Gore NNP B-person O
+Gore NNP B-person B-person
 campaign NN O O
 . . O O
 
 For IN O O
 the DT O O
-Bush NNP B-person B-MISC
+Bush NNP B-person B-person
 campaign NN O O
 , , O O
 a DT O O
@@ -2613,7 +2613,7 @@ role NN O O
 in IN O O
 overseeing VBG O O
 the DT O O
-Florida NNP B-gpe B-MISC
+Florida NNP B-gpe B-gpe
 system NN O O
 and CC O O
 the DT O O
@@ -2647,7 +2647,7 @@ Court NNP I-MISC I-MISC
 again RB O O
 ? . O O
 
-John NNP O B-gpe
+John NNP O B-person
 , , O O
 if IN O O
 the DT O O
@@ -2707,7 +2707,7 @@ urged VBN O O
 Yugoslav JJ B-MISC B-MISC
 authorities NNS O O
 and CC O O
-ethnic-Albanian JJ B-MISC O
+ethnic-Albanian JJ B-MISC B-MISC
 militants NNS O O
 to TO O O
 keep VB O O
@@ -2729,7 +2729,7 @@ began VBD O O
 last JJ O O
 week NN O O
 with IN O O
-ethnic-Albanian JJ B-MISC O
+ethnic-Albanian JJ B-MISC B-MISC
 rebels NNS O O
 attacking VBG O O
 Serb JJ B-MISC O
@@ -2877,7 +2877,7 @@ one CD O O
 of IN O O
 the DT O O
 two CD O O
-Libyan JJ B-MISC O
+Libyan JJ B-MISC B-MISC
 agents NNS O O
 accused VBN O O
 in IN O O
@@ -2894,7 +2894,7 @@ our PRP$ O O
 Middle NNP B-MISC B-MISC
 East NNP I-MISC I-MISC
 bureau NN O O
-Libyan JJ B-MISC O
+Libyan JJ B-MISC B-MISC
 dissidents NNS O O
 are VBP O O
 hailing VBG O O
@@ -2960,10 +2960,10 @@ Libyan JJ B-MISC B-MISC
 dissident NN O O
 exiled VBN O O
 in IN O O
-Egypt NNP B-gpe B-gpe
-Mohammed NNP B-person B-person
-Fias NNP I-person I-person
-Jabrel NNP I-person I-person
+Egypt NNP B-gpe B-organization
+Mohammed NNP B-person I-organization
+Fias NNP I-person I-organization
+Jabrel NNP I-person I-organization
 says VBZ O O
 he PRP O O
 is VBZ O O
@@ -3010,10 +3010,10 @@ which WDT O O
 is VBZ O O
 of IN O O
 the DT O O
-League NNP O B-organization
-of IN O I-organization
-Col. NNP O I-organization
-Gaddafi NNP B-person I-organization
+League NNP O O
+of IN O O
+Col. NNP O B-MISC
+Gaddafi NNP B-person I-MISC
 . . O O
 
 He PRP O O
@@ -3092,8 +3092,8 @@ Bob NNP I-person I-person
 VOA NNP B-MISC B-MISC
 News NNP I-MISC I-MISC
 , , O O
-Middle-East NNP B-MISC B-person
-Bureau NNP I-MISC I-person
+Middle-East NNP B-MISC B-MISC
+Bureau NNP I-MISC I-MISC
 . . O O
 
 Raw-steel NN O O
@@ -3119,11 +3119,11 @@ previous JJ O O
 week NN O O
 , , O O
 the DT O O
-American NNP B-organization B-MISC
-Iron NNP I-organization I-MISC
-and CC I-organization O
-Steel NNP I-organization B-person
-Institute NNP I-organization I-person
+American NNP B-organization B-organization
+Iron NNP I-organization I-organization
+and CC I-organization I-organization
+Steel NNP I-organization I-organization
+Institute NNP I-organization I-organization
 said VBD O O
 . . O O
 
@@ -3228,9 +3228,9 @@ rights NNS O O
 The DT O O
 decision NN O O
 , , O O
-Webster NNP B-person B-gpe
-vs. FW O O
-Reproductive NNP B-organization B-organization
+Webster NNP B-person B-organization
+vs. FW O I-organization
+Reproductive NNP B-organization I-organization
 Health NNP I-organization I-organization
 Services NNPS I-organization I-organization
 , , O O
@@ -3315,7 +3315,7 @@ rights NNS O O
 protected VBN O O
 by IN O O
 the DT B-MISC O
-Constitution NNP I-MISC B-gpe
+Constitution NNP I-MISC B-organization
 . . O O
 
 Last JJ O O
@@ -3326,8 +3326,8 @@ federal JJ O O
 appeals NNS O O
 court NN O O
 in IN O O
-St. NNP B-gpe B-organization
-Louis NNP I-gpe I-organization
+St. NNP B-gpe B-gpe
+Louis NNP I-gpe I-gpe
 said VBD O O
 the DT O O
 preamble NN O O
@@ -3448,7 +3448,7 @@ children NNS O O
 Under IN O O
 a DT O O
 1981 CD O O
-Missouri NNP B-gpe B-gpe
+Missouri NNP B-gpe B-MISC
 law NN O O
 , , O O
 persons NNS O O
@@ -3501,11 +3501,11 @@ child NN O O
 , , O O
 the DT O O
 two CD O O
-St. NNP B-organization B-MISC
-Louis NNP I-organization I-MISC
-County NNP I-organization I-MISC
-Circuit NNP I-organization I-MISC
-Court NNP I-organization I-MISC
+St. NNP B-organization B-organization
+Louis NNP I-organization I-organization
+County NNP I-organization I-organization
+Circuit NNP I-organization I-organization
+Court NNP I-organization I-organization
 judges NNS O O
 in IN O O
 August NNP O O
@@ -3543,7 +3543,7 @@ the DT O O
 Supreme NNP B-organization B-organization
 Court NNP I-organization I-organization
 's POS O O
-Webster NNP B-person O
+Webster NNP B-person B-person
 ruling NN O O
 . . O O
 
@@ -3589,8 +3589,8 @@ Mark NNP B-person B-person
 Belz NNP I-person I-person
 , , O O
 a DT O O
-St. NNP B-gpe B-MISC
-Louis NNP I-gpe I-MISC
+St. NNP B-gpe B-organization
+Louis NNP I-gpe I-organization
 lawyer NN O O
 who WP O O
 represented VBD O O
@@ -3599,8 +3599,8 @@ O'Brien NNP B-person I-person
 and CC O O
 the DT O O
 other JJ O O
-St. NNP B-gpe O
-Louis NNP I-gpe O
+St. NNP B-gpe B-organization
+Louis NNP I-gpe I-organization
 protesters NNS O O
 . . O O
 
@@ -3629,11 +3629,11 @@ Mandina NNP I-person I-person
 , , O O
 president NN O O
 of IN O O
-Kansas NNP B-organization B-gpe
-City NNP I-organization I-gpe
-Lawyers NNPS I-organization O
+Kansas NNP B-organization B-organization
+City NNP I-organization I-organization
+Lawyers NNPS I-organization I-organization
 for IN I-organization O
-Life NNP I-organization B-gpe
+Life NNP I-organization B-organization
 , , O O
 says VBZ O O
 that IN O O
@@ -3724,8 +3724,8 @@ possible JJ O O
 consequences NNS O O
 of IN O O
 the DT O O
-Supreme NNP B-organization B-MISC
-Court NNP I-organization I-MISC
+Supreme NNP B-organization B-organization
+Court NNP I-organization I-organization
 ruling NN O O
 appear VBP O O
 even RB O O
@@ -3817,8 +3817,8 @@ suspension NN O O
 . . O O
 
 A DT O O
-Boone NNP B-gpe B-MISC
-County NNP I-gpe I-MISC
+Boone NNP B-gpe B-organization
+County NNP I-gpe I-organization
 judge NN O O
 rejected VBD O O
 the DT O O
@@ -3887,8 +3887,8 @@ their PRP$ O O
 reporters NNS O O
 had VBD O O
 with IN O O
-Scott NNP B-person B-MISC
-Peterson NNP I-person I-MISC
+Scott NNP B-person B-person
+Peterson NNP I-person I-person
 . . O O
 
 Peterson NNP B-person B-person
@@ -3935,7 +3935,7 @@ as IN O O
 evidence NN O O
 . . O O
 
-Peterson NNP B-person B-organization
+Peterson NNP B-person B-gpe
 's POS O O
 phones NNS O O
 were VBD O O
@@ -3959,11 +3959,11 @@ help NN O O
 in IN O O
 ending VBG O O
 the DT O O
-Mideast NNP B-MISC O
+Mideast NNP B-MISC B-MISC
 violence NN O O
 . . O O
 
-Arafat NNP B-person O
+Arafat NNP B-person B-person
 plans VBZ O O
 to TO O O
 meet VB O O
@@ -4005,9 +4005,9 @@ In IN O O
 a DT O O
 blow NN O O
 to TO O O
-France NNP B-gpe O
+France NNP B-gpe B-gpe
 's POS O O
-Rafale NNP B-MISC O
+Rafale NNP B-MISC B-MISC
 jet NN O O
 fighter NN O O
 , , O O
@@ -4028,8 +4028,8 @@ buy VB O O
 McDonnell NNP B-organization B-organization
 Douglas NNP I-organization I-organization
 Corp. NNP I-organization I-organization
-F-18 NN B-MISC O
-Hornets NNPS I-MISC O
+F-18 NN B-MISC I-organization
+Hornets NNPS I-MISC I-organization
 to TO O O
 defend VB O O
 its PRP$ O O
@@ -4046,23 +4046,23 @@ sharpen VB O O
 the DT O O
 debate NN O O
 within IN O O
-France NNP B-gpe O
+France NNP B-gpe B-gpe
 's POS O O
 military JJ O O
 establishment NN O O
 over IN O O
 the DT O O
-Rafale NNP B-MISC O
+Rafale NNP B-MISC B-organization
 , , O O
 which WDT O O
 is VBZ O O
 made VBN O O
 by IN O O
-Avions NNP B-organization B-MISC
-Marcel NNP I-organization I-MISC
-Dassault-Breguet NNP I-organization I-MISC
-Aviation NNP I-organization I-MISC
-SA NNP I-organization I-MISC
+Avions NNP B-organization B-organization
+Marcel NNP I-organization I-organization
+Dassault-Breguet NNP I-organization I-organization
+Aviation NNP I-organization I-organization
+SA NNP I-organization I-organization
 . . O O
 
 In IN O O
@@ -4075,8 +4075,8 @@ navy NN O O
 official JJ O O
 weekly JJ O O
 magazine NN O O
-Cols NNP B-organization B-person
-Bleus NNP I-organization I-person
+Cols NNP B-organization B-organization
+Bleus NNP I-organization I-organization
 , , O O
 the DT O O
 navy NN O O
@@ -4095,7 +4095,7 @@ intends VBZ O O
 to TO O O
 buy VB O O
 86 CD O O
-Rafales NNPS B-MISC O
+Rafales NNPS B-MISC B-MISC
 as IN O O
 scheduled VBN O O
 in IN O O
@@ -4120,8 +4120,8 @@ least JJS O O
 more JJR O O
 . . O O
 
-Adm. NNP O B-person
-Goupil NNP B-person I-person
+Adm. NNP O O
+Goupil NNP B-person B-person
 said VBD O O
 the DT O O
 navy NN O O
@@ -4171,8 +4171,8 @@ the DT O O
 Rafale NNP B-MISC O
 . . O O
 
-Adm. NNP O B-person
-Goupil NNP B-person I-person
+Adm. NNP O O
+Goupil NNP B-person B-person
 said VBD O O
 that IN O O
 when WRB O O
@@ -4237,8 +4237,8 @@ operational JJ O O
 grounds NNS O O
 . . O O
 
-Adm. NNP O B-person
-Goupil NNP B-person I-person
+Adm. NNP O O
+Goupil NNP B-person B-person
 's POS O O
 comments NNS O O
 are VBP O O
@@ -4273,9 +4273,9 @@ founder NN O O
 's POS O O
 son NN O O
 , , O O
-Chairman NNP O B-organization
-Serge NNP B-person I-organization
-Dassault NNP I-person I-organization
+Chairman NNP O B-person
+Serge NNP B-person I-person
+Dassault NNP I-person I-person
 , , O O
 who WP O O
 has VBZ O O
@@ -4294,7 +4294,7 @@ is VBZ O O
 the DT O O
 result NN O O
 of IN O O
-France NNP B-gpe O
+France NNP B-gpe B-gpe
 's POS O O
 inability NN O O
 jointly RB O O
@@ -4345,7 +4345,7 @@ head NN O O
 is VBZ O O
 that IN O O
 the DT O O
-Crusaders NNPS B-MISC O
+Crusaders NNPS B-MISC B-MISC
 are VBP O O
 literally RB O O
 falling VBG O O
@@ -4365,7 +4365,7 @@ Goupil NNP B-person I-person
 , , O O
 a DT O O
 former JJ O O
-Crusader NNP B-MISC O
+Crusader NNP B-MISC B-MISC
 squadron NN O O
 leader NN O O
 , , O O
@@ -4377,10 +4377,10 @@ other JJ O O
 country NN O O
 to TO O O
 use VB O O
-Crusaders NNPS B-MISC O
+Crusaders NNPS B-MISC B-MISC
 , , O O
 the DT O O
-Philippines NNPS B-gpe O
+Philippines NNPS B-gpe B-MISC
 , , O O
 retired VBD O O
 its PRP$ O O
@@ -4407,8 +4407,8 @@ planes NNS O O
 here RB O O
 . . O O
 
-Adm. NNP O B-person
-Goupil NNP B-person I-person
+Adm. NNP O O
+Goupil NNP B-person B-person
 rejected VBD O O
 Dassault NN B-organization O
 's POS O O
@@ -4416,7 +4416,7 @@ proposal NN O O
 to TO O O
 renovate VB O O
 the DT O O
-Crusaders NNPS B-MISC O
+Crusaders NNPS B-MISC B-MISC
 , , O O
 saying VBG O O
 the DT O O
@@ -4434,7 +4434,7 @@ he PRP O O
 said VBD O O
 , , O O
 the DT O O
-Crusaders NNPS B-MISC O
+Crusaders NNPS B-MISC B-MISC
 represent VBP O O
 an DT O O
 obsolete JJ O O
@@ -4445,7 +4445,7 @@ for IN O O
 the DT O O
 aircraft NN O O
 carriers NNS O O
-France NNP B-gpe O
+France NNP B-gpe B-gpe
 has VBZ O O
 sent VBN O O
 to TO O O
@@ -4476,8 +4476,8 @@ of IN O O
 being VBG O O
 spies NNS O O
 for IN O O
-Fidel NNP B-person B-MISC
-Castro NNP I-person I-MISC
+Fidel NNP B-person B-person
+Castro NNP I-person I-person
 got VBD O O
 underway JJ O O
 . . O O
@@ -4510,7 +4510,7 @@ Florida NNP B-gpe I-gpe
 
 In IN O O
 Havana NNP B-gpe B-gpe
-Cuban JJ B-MISC O
+Cuban JJ B-MISC B-MISC
 television NN O O
 took VBD O O
 little JJ O O
@@ -4534,20 +4534,20 @@ certain JJ O O
 little JJ O O
 boy NN O O
 named VBN O O
-Elian NNP B-person B-gpe
+Elian NNP B-person B-MISC
 . . O O
 
 Last JJ O O
 night NN O O
-Cubans NNPS B-MISC O
+Cubans NNPS B-MISC B-MISC
 retreated VBD O O
 to TO O O
 never-before RB O O
 seen VBN O O
 footage NN O O
 of IN O O
-Elian NNP B-person B-MISC
-Gonzalez NNP I-person I-MISC
+Elian NNP B-person B-person
+Gonzalez NNP I-person I-person
 's POS O O
 first JJ O O
 encounter NN O O
@@ -4590,7 +4590,7 @@ in IN O O
 the DT O O
 home NN O O
 of IN O O
-Miami NNP B-gpe B-gpe
+Miami NNP B-gpe B-organization
 relatives NNS O O
 who WP O O
 tried VBD O O
@@ -4607,7 +4607,7 @@ that DT O O
 day NN O O
 last JJ O O
 summer NN O O
-Elian NNP B-person B-gpe
+Elian NNP B-person B-person
 was VBD O O
 indeed RB O O
 as RB O O
@@ -4644,7 +4644,7 @@ children NNS O O
 book NN O O
 written VBN O O
 by IN O O
-Cuban JJ B-MISC O
+Cuban JJ B-MISC B-MISC
 independence NN O O
 hero NN O O
 Jose NNP B-person B-person
@@ -4652,7 +4652,7 @@ Marti NNP I-person I-person
 . . O O
 
 As IN O O
-Elian NNP B-person B-gpe
+Elian NNP B-person B-MISC
 looks VBZ O O
 up RP O O
 speechlessly RB O O
@@ -4682,7 +4682,7 @@ life NN O O
 At IN O O
 one CD O O
 point NN O O
-Castro NNP B-person O
+Castro NNP B-person B-person
 leans VBZ O O
 over RB O O
 and CC O O
@@ -4727,7 +4727,7 @@ spotlight NN O O
 
 By IN O O
 contrast NN O O
-Castro NNP B-person B-gpe
+Castro NNP B-person B-MISC
 has VBZ O O
 strictly RB O O
 limited VBN O O
@@ -4783,8 +4783,8 @@ September NNP O O
 from IN O O
 August NNP O O
 , , O O
-Statistics NNPS B-organization O
-Canada NNP I-organization B-gpe
+Statistics NNPS B-organization B-person
+Canada NNP I-organization I-person
 , , O O
 a DT O O
 federal JJ O O
@@ -4917,7 +4917,7 @@ is VBZ O O
 not RB O O
 your PRP$ O O
 ordinary JJ O O
-Christmas NNP O B-gpe
+Christmas NNP O B-MISC
 light NN O O
 display NN O O
 . . O O
@@ -4946,7 +4946,7 @@ one CD O O
 man NN O O
 's POS O O
 personal JJ O O
-Christmas NNP O B-gpe
+Christmas NNP O B-MISC
 decoration NN O O
 . . O O
 
@@ -4954,7 +4954,7 @@ It PRP O O
 's VBZ O O
 his PRP$ O O
 annual JJ O O
-Christmas NNP O B-gpe
+Christmas NNP O B-MISC
 display NN O O
 , , O O
 and CC O O
@@ -4999,11 +4999,11 @@ is VBZ O O
 definitely RB O O
 a DT O O
 high-tech JJ O O
-Christmas NNP O B-gpe
+Christmas NNP O B-MISC
 display NN O O
 . . O O
 
-Doof NNP B-person B-gpe
+Doof NNP B-person B-person
 , , O O
 who WP O O
 is VBZ O O
@@ -5088,7 +5088,7 @@ and CC O O
 brighter JJR O O
 , , O O
 and CC O O
-Doof NNP B-person B-gpe
+Doof NNP B-person B-person
 says VBZ O O
 this DT O O
 one NN O O
@@ -5114,7 +5114,7 @@ working VBG O O
 on IN O O
 it PRP O O
 last JJ O O
-March NNP O B-MISC
+March NNP O O
 . . O O
 
 He PRP O O
@@ -5145,7 +5145,7 @@ his PRP$ O O
 home NN O O
 . . O O
 
-Doof NNP B-person O
+Doof NNP B-person B-person
 says VBZ O O
 he PRP O O
 goes VBZ O O
@@ -5159,13 +5159,13 @@ reason NN O O
 
 This DT O O
 is VBZ O O
-Christmas NNP O B-gpe
+Christmas NNP O B-MISC
 . . O O
 
 It PRP O O
 's VBZ O O
 my PRP$ O O
-Christmas NNP O O
+Christmas NNP O B-gpe
 present NN O O
 to TO O O
 everybody NN O O
@@ -5174,7 +5174,7 @@ everybody NN O O
 It PRP O O
 's VBZ O O
 my PRP$ O O
-Christmas NNP O O
+Christmas NNP O B-gpe
 present NN O O
 to TO O O
 myself PRP O O
@@ -5207,8 +5207,8 @@ Denise NNP B-person B-person
 Dillon NNP I-person I-person
 , , O O
 `` `` O O
-Headline NNP O B-MISC
-News NNP O I-MISC
+Headline NNP O O
+News NNP O O
 . . O O
 '' '' O O
 
@@ -5238,10 +5238,10 @@ and CC O O
 Gaming NN O O
 company NN O O
 said VBD O O
-Merrill NNP B-organization B-person
-Lynch NNP I-organization I-person
-Capital NNP I-organization I-person
-Markets NNP I-organization I-person
+Merrill NNP B-organization B-organization
+Lynch NNP I-organization I-organization
+Capital NNP I-organization I-organization
+Markets NNP I-organization I-organization
 will MD O O
 lead VB O O
 the DT O O
@@ -5279,8 +5279,8 @@ park NN O O
 
 This DT O O
 is VBZ O O
-The DT B-MISC O
-World NNP I-MISC O
+The DT B-MISC B-MISC
+World NNP I-MISC I-MISC
 . . O O
 
 I PRP O O
@@ -5298,7 +5298,7 @@ today NN O O
 became VBD O O
 the DT O O
 first JJ O O
-Chinese JJ B-MISC O
+Chinese JJ B-MISC B-MISC
 language NN O O
 author NN O O
 to TO O O
@@ -5335,37 +5335,37 @@ in IN O O
 He PRP O O
 settled VBD O O
 in IN O O
-France NNP B-gpe O
+France NNP B-gpe B-gpe
 becoming VBG O O
 a DT O O
-French JJ B-MISC O
+French JJ B-MISC B-MISC
 citizen NN O O
 two CD O O
 years NNS O O
 ago RB O O
 . . O O
 
-Gregory NNP B-person B-organization
-Lee NNP I-person I-organization
+Gregory NNP B-person B-person
+Lee NNP I-person I-person
 is VBZ O O
 a DT O O
 professor NN O O
 of IN O O
-Chinese NNP B-MISC B-gpe
+Chinese NNP B-MISC B-MISC
 and CC O O
-Chinese JJ B-MISC O
+Chinese JJ B-MISC B-MISC
 literature NN O O
 at IN O O
 the DT O O
-University NNP B-MISC B-gpe
-of IN I-MISC O
-Lyons NNP I-MISC O
+University NNP B-MISC B-organization
+of IN I-MISC I-organization
+Lyons NNP I-MISC I-organization
 in IN O O
-France NNP B-gpe O
+France NNP B-gpe B-gpe
 . . O O
 
-Professor NNP O B-person
-Lee NNP B-person I-person
+Professor NNP O O
+Lee NNP B-person O
 , , O O
 I PRP O O
 gather VBP O O
@@ -5398,7 +5398,7 @@ great JJ O O
 cohort NN O O
 of IN O O
 contemporary JJ O O
-Chinese JJ B-MISC O
+Chinese JJ B-MISC B-MISC
 writers NNS O O
 that WDT O O
 are VBP O O
@@ -5406,7 +5406,7 @@ well RB O O
 known VBN O O
 in IN O O
 the DT O O
-West NNP B-MISC B-gpe
+West NNP B-MISC O
 today NN O O
 . . O O
 
@@ -5450,7 +5450,7 @@ it PRP O O
 is VBZ O O
 very RB O O
 much RB O O
-French JJ B-MISC O
+French JJ B-MISC B-MISC
 literature NN O O
 that WDT O O
 has VBZ O O
@@ -5469,7 +5469,7 @@ much RB O O
 so RB O O
 that IN O O
 conservative JJ O O
-Chinese JJ B-MISC O
+Chinese JJ B-MISC B-MISC
 critics NNS O O
 would MD O O
 accuse VB O O
@@ -5482,7 +5482,7 @@ Western JJ B-MISC B-MISC
 models NNS O O
 . . O O
 
-Sartre NNP B-person O
+Sartre NNP B-person B-organization
 is VBZ O O
 a DT O O
 big JJ O O
@@ -5503,7 +5503,7 @@ would MD O O
 say VB O O
 so RB O O
 that IN O O
-Sartre NNP B-person B-gpe
+Sartre NNP B-person B-organization
 has VBZ O O
 been VBN O O
 a DT O O
@@ -5597,7 +5597,7 @@ influences NNS O O
 may MD O O
 be VB O O
 more RBR O O
-French JJ B-MISC O
+French JJ B-MISC B-MISC
 literary JJ O O
 then IN O O
 they PRP O O
@@ -5641,8 +5641,8 @@ was VBD O O
 actually RB O O
 called VBN O O
 ` '' O O
-Bus NNP O B-MISC
-Stop NNP O I-MISC
+Bus NNP O O
+Stop NNP O O
 ' '' O O
 , , O O
 which WDT O O
@@ -5672,7 +5672,7 @@ concerned VBD O O
 a DT O O
 number NN O O
 of IN O O
-Chinese JJ B-MISC O
+Chinese JJ B-MISC B-MISC
 people NNS O O
 from IN O O
 different JJ O O
@@ -5765,7 +5765,7 @@ great JJ O O
 day NN O O
 for IN O O
 modern JJ O O
-Chinese JJ B-MISC O
+Chinese JJ B-MISC B-MISC
 literature NN O O
 and CC O O
 it PRP O O
@@ -5785,15 +5785,15 @@ to TO O O
 years NNS O O
 . . O O
 
-Gregory NNP B-person B-organization
-Lee NNP I-person I-organization
+Gregory NNP B-person B-person
+Lee NNP I-person I-person
 is VBZ O O
 a DT O O
 professor NN O O
 of IN O O
-Chinese NNP B-MISC B-gpe
+Chinese NNP B-MISC B-MISC
 and CC O O
-Chinese JJ B-MISC O
+Chinese JJ B-MISC B-MISC
 literature NN O O
 at IN O O
 the DT O O
@@ -5801,7 +5801,7 @@ University NNP B-MISC B-organization
 of IN I-MISC I-organization
 Lyons NNP I-MISC I-organization
 , , O O
-France NNP B-gpe O
+France NNP B-gpe B-MISC
 . . O O
 
 He PRP O O
@@ -5812,7 +5812,7 @@ from IN O O
 his PRP$ O O
 home NN O O
 in IN O O
-Provence NNP B-gpe O
+Provence NNP B-gpe B-gpe
 . . O O
 
 Professor NNP O O
@@ -5848,11 +5848,11 @@ Aziz NNP I-person I-person
 and CC O O
 Syria NNP B-gpe B-gpe
 's POS O O
-Foreign NNP O B-organization
-Minister NNP O I-organization
-Farooq NNP B-person I-organization
-Al NNP I-person I-organization
-Shah NNP I-person I-organization
+Foreign NNP O O
+Minister NNP O O
+Farooq NNP B-person B-person
+Al NNP I-person I-person
+Shah NNP I-person I-person
 held VBD O O
 talks NNS O O
 Saturday NNP O O
@@ -5915,7 +5915,7 @@ President NNP O O
 Clinton NNP B-person B-person
 met VBD O O
 with IN O O
-Mideast NNP B-MISC B-gpe
+Mideast NNP B-MISC B-MISC
 negotiators NNS O O
 yesterday NN O O
 at IN O O
@@ -6106,9 +6106,9 @@ Saatchi NNP B-organization B-gpe
 largest JJS O O
 shareholder NN O O
 , , O O
-Southeastern NNP B-organization B-person
-Asset NNP I-organization I-person
-Management NNP I-organization I-person
+Southeastern NNP B-organization B-organization
+Asset NNP I-organization I-organization
+Management NNP I-organization I-organization
 , , O O
 said VBD O O
 it PRP O O
@@ -6136,12 +6136,12 @@ chief JJ O O
 executive JJ O O
 officer NN O O
 of IN O O
-Saatchi NNP B-organization B-organization
+Saatchi NNP B-organization B-gpe
 's POS O O
 big JJ O O
-Backer NNP B-organization B-MISC
-Spielvogel NNP I-organization I-MISC
-Bates NNP I-organization I-MISC
+Backer NNP B-organization B-person
+Spielvogel NNP I-organization I-person
+Bates NNP I-organization I-person
 advertising NN O O
 unit NN O O
 , , O O
@@ -6162,8 +6162,8 @@ but CC O O
 was VBD O O
 rebuffed VBN O O
 by IN O O
-Charles NNP B-person B-organization
-Saatchi NNP I-person I-organization
+Charles NNP B-person B-person
+Saatchi NNP I-person I-person
 . . O O
 
 Mr. NNP O O
@@ -6243,7 +6243,7 @@ the DT O O
 other JJ O O
 heads NNS O O
 of IN O O
-Saatchi NNP B-organization B-organization
+Saatchi NNP B-organization B-gpe
 's POS O O
 big JJ O O
 U.S.-based JJ B-gpe O
@@ -6279,7 +6279,7 @@ executive NN O O
 denied VBD O O
 speculation NN O O
 that IN O O
-Saatchi NNP B-organization B-gpe
+Saatchi NNP B-organization B-person
 was VBD O O
 bringing VBG O O
 in RP O O
@@ -6326,7 +6326,7 @@ Louis-Dreyfus NNP I-person I-person
 , , O O
 who WP O O
 joins VBZ O O
-Saatchi NNP B-organization B-person
+Saatchi NNP B-organization B-gpe
 and CC O O
 becomes VBZ O O
 a DT O O
@@ -6370,7 +6370,7 @@ charged VBN O O
 largely RB O O
 with IN O O
 repairing VBG O O
-Saatchi NNP B-organization O
+Saatchi NNP B-organization B-gpe
 's POS O O
 poor JJ O O
 financial JJ O O
@@ -6408,7 +6408,7 @@ is VBZ O O
 n't RB O O
 the DT O O
 reason NN O O
-Dreyfus NNP B-person O
+Dreyfus NNP B-person B-person
 has VBZ O O
 been VBN O O
 brought VBN O O
@@ -6503,8 +6503,8 @@ Executives NNS O O
 at IN O O
 Backer NNP B-organization B-organization
 Spielvogel NNP I-organization I-organization
-client NN O O
-Avis NNP B-organization B-organization
+client NN O I-organization
+Avis NNP B-organization I-organization
 Inc. NNP I-organization I-organization
 , , O O
 as RB O O
@@ -6532,8 +6532,8 @@ Securities NNP I-organization I-organization
 Inc. NNP I-organization I-organization
 , , O O
 a DT O O
-Backer NNP B-organization B-MISC
-Spielvogel NNP I-organization I-MISC
+Backer NNP B-organization B-person
+Spielvogel NNP I-organization I-person
 client NN O O
 that WDT O O
 is VBZ O O
@@ -6566,8 +6566,8 @@ or CC O O
 a DT O O
 buy-out NN O O
 of IN O O
-Backer NNP B-organization B-MISC
-Spielvogel NNP I-organization I-MISC
+Backer NNP B-organization B-organization
+Spielvogel NNP I-organization I-organization
 alone RB O O
 , , O O
 led VBN O O
@@ -6601,14 +6601,14 @@ million CD O O
 account NN O O
 to TO O O
 the DT O O
-Los NNP B-gpe B-MISC
-Angeles NNP I-gpe I-MISC
+Los NNP B-gpe B-gpe
+Angeles NNP I-gpe I-gpe
 office NN O O
 of IN O O
 Omnicom NNP B-organization B-organization
 Group NNP I-organization I-organization
 's POS O O
-BBDO NNP B-organization B-gpe
+BBDO NNP B-organization B-organization
 agency NN O O
 . . O O
 
@@ -6620,15 +6620,15 @@ handled VBN O O
 by IN O O
 Davis NNP B-organization B-gpe
 , , I-organization O
-Ball NNP I-organization B-gpe
-& CC I-organization O
-Colombatto NNP I-organization B-organization
+Ball NNP I-organization B-organization
+& CC I-organization I-organization
+Colombatto NNP I-organization I-organization
 Advertising NNP I-organization I-organization
 Inc. NNP I-organization I-organization
 , , O O
 a DT O O
-Los NNP B-gpe B-MISC
-Angeles NNP I-gpe I-MISC
+Los NNP B-gpe B-gpe
+Angeles NNP I-gpe I-gpe
 agency NN O O
 . . O O
 
@@ -6649,11 +6649,11 @@ the DT O O
 Boston NNP B-gpe B-gpe
 office NN O O
 of IN O O
-Hill NNP B-organization B-gpe
+Hill NNP B-organization B-organization
 , , I-organization O
-Holliday NNP I-organization O
+Holliday NNP I-organization B-organization
 , , I-organization O
-Connors NNP I-organization B-gpe
+Connors NNP I-organization B-organization
 , , I-organization O
 Cosmopulos NNP I-organization B-gpe
 . . O O
@@ -6687,14 +6687,14 @@ charged VBN O O
 that IN O O
 they PRP O O
 bribed VBD O O
-Jamaican JJ B-MISC O
+Jamaican JJ B-MISC B-MISC
 officials NNS O O
 to TO O O
 win VB O O
 the DT O O
-Jamaica NNP B-organization B-MISC
-Tourist NNP I-organization I-MISC
-Board NNP I-organization I-MISC
+Jamaica NNP B-organization B-organization
+Tourist NNP I-organization I-organization
+Board NNP I-organization I-organization
 ad NN O O
 account NN O O
 in IN O O
@@ -6731,7 +6731,7 @@ Anthony NNP I-person I-person
 Abrahams NNP I-person I-person
 , , O O
 former JJ O O
-Jamaican JJ B-MISC O
+Jamaican JJ B-MISC B-MISC
 tourism NN O O
 minister NN O O
 , , O O
@@ -6741,7 +6741,7 @@ businessman NN O O
 Arnold NNP B-person B-person
 Foote NNP I-person I-person
 Jr NNP I-person I-person
-. . I-person O
+. . I-person I-person
 
 KOREAN JJ B-MISC O
 AGENCY NN O O
@@ -6750,8 +6750,8 @@ AGENCY NN O O
 The DT O O
 Samsung NNP B-organization B-organization
 Group NNP I-organization I-organization
-and CC O O
-Bozell NNP B-organization B-organization
+and CC O I-organization
+Bozell NNP B-organization I-organization
 Inc. NNP I-organization I-organization
 agreed VBD O O
 to TO O O
@@ -6801,10 +6801,10 @@ Bozell NNP B-organization B-gpe
 Samsung NNP B-organization O
 already RB O O
 owns VBZ O O
-Korea NNP B-organization B-person
-First NNP I-organization I-person
-Advertising NNP I-organization I-person
-Co. NNP I-organization I-person
+Korea NNP B-organization B-organization
+First NNP I-organization I-organization
+Advertising NNP I-organization I-organization
+Co. NNP I-organization I-organization
 , , O O
 that DT O O
 country NN O O
@@ -6813,21 +6813,21 @@ largest JJS O O
 agency NN O O
 . . O O
 
-Bozell NNP B-organization O
+Bozell NNP B-organization B-organization
 joins VBZ O O
-Backer NNP B-organization B-person
-Spielvogel NNP I-organization I-person
-Bates NNP I-organization I-person
+Backer NNP B-organization B-organization
+Spielvogel NNP I-organization I-organization
+Bates NNP I-organization I-organization
 and CC O O
-Ogilvy NNP B-organization B-person
-Group NNP I-organization I-person
+Ogilvy NNP B-organization B-organization
+Group NNP I-organization I-organization
 as IN O O
 U.S. NNP B-gpe B-gpe
 agencies NNS O O
 with IN O O
 interests NNS O O
 in IN O O
-Korean JJ B-MISC O
+Korean JJ B-MISC B-MISC
 agencies NNS O O
 . . O O
 
@@ -6884,7 +6884,7 @@ not RB O O
 believed VBN O O
 to TO O O
 be VB O O
-Yemenis NNPS B-MISC O
+Yemenis NNPS B-MISC B-MISC
 , , O O
 are VBP O O
 linked VBN O O
@@ -6919,8 +6919,8 @@ report NN O O
 tonight NN O O
 , , O O
 but CC O O
-Ambassador NNP O B-person
-Barbara NNP B-person I-person
+Ambassador NNP O O
+Barbara NNP B-person B-person
 Bodine NNP I-person I-person
 would MD O O
 only RB O O
@@ -7037,8 +7037,8 @@ of IN O O
 the DT O O
 crew NN O O
 , , O O
-Lieutenant NNP O B-person
-Ann NNP B-person I-person
+Lieutenant NNP O O
+Ann NNP B-person B-person
 Chamberlain NNP I-person I-person
 . . O O
 
@@ -7153,7 +7153,7 @@ clue NN O O
 about IN O O
 whether IN O O
 the DT O O
-Earth NNP B-MISC B-gpe
+Earth NNP B-MISC B-organization
 is VBZ O O
 warming VBG O O
 perilously RB O O
@@ -7172,7 +7172,7 @@ supporting VBG O O
 theories NNS O O
 that IN O O
 the DT O O
-Earth NNP B-MISC B-gpe
+Earth NNP B-MISC B-organization
 has VBZ O O
 warmed VBN O O
 considerably RB O O
@@ -7358,7 +7358,7 @@ fuels NNS B-MISC O
 will MD O O
 cause VB O O
 the DT O O
-Earth NNP B-MISC B-gpe
+Earth NNP B-MISC B-organization
 to TO O O
 warm VB O O
 up RP O O
@@ -7404,7 +7404,7 @@ dioxide NN I-MISC O
 Instead RB O O
 , , O O
 the DT O O
-Dunde NNP B-MISC O
+Dunde NNP B-MISC B-gpe
 ice-core NN O O
 record NN O O
 shows VBZ O O
@@ -7704,7 +7704,7 @@ back RB O O
 there RB O O
 in IN O O
 the DT O O
-States NNP B-gpe B-gpe
+States NNP B-gpe B-organization
 , , O O
 I PRP O O
 think VBP O O
@@ -7822,15 +7822,15 @@ Rabin NNP I-person I-person
 , , O O
 widow NN O O
 of IN O O
-Yitzhak NNP B-person B-MISC
-Rabin NNP I-person I-MISC
+Yitzhak NNP B-person B-person
+Rabin NNP I-person I-person
 . . O O
 
 She PRP O O
 died VBD O O
 yesterday NN O O
 of IN O O
-cancer NN O O
+cancer NN O B-MISC
 at IN O O
 the DT O O
 age NN O O
@@ -7893,7 +7893,7 @@ and CC O O
 abroad RB O O
 that IN O O
 the DT O O
-Fed NNP B-organization B-gpe
+Fed NNP B-organization B-organization
 was VBD O O
 prepared VBN O O
 to TO O O
@@ -7943,7 +7943,7 @@ on IN O O
 Wall NNP O O
 Street NNP O O
 while IN O O
-Assistant NNP O O
+Assistant NNP O B-MISC
 Secretary NNP O O
 David NNP B-person B-person
 Mullins NNP I-person I-person
@@ -7978,11 +7978,11 @@ addition NN O O
 officials NNS O O
 at IN O O
 the DT O O
-Fed NNP B-organization B-MISC
+Fed NNP B-organization B-organization
 and CC O O
 in IN O O
 the DT O O
-Bush NNP B-person B-MISC
+Bush NNP B-person B-person
 administration NN O O
 decided VBD O O
 that IN O O
@@ -8052,9 +8052,9 @@ on IN O O
 anonymity NN O O
 . . O O
 
-Fed NNP B-organization B-person
-Chairman NNP O I-person
-Greenspan NNP B-person I-person
+Fed NNP B-organization B-organization
+Chairman NNP O I-organization
+Greenspan NNP B-person I-organization
 was VBD O O
 surprised VBN O O
 by IN O O
@@ -8079,7 +8079,7 @@ comment NN O O
 
 Nevertheless RB O O
 , , O O
-Fed NNP B-organization B-gpe
+Fed NNP B-organization B-organization
 officials NNS O O
 acknowledged VBD O O
 the DT O O
@@ -8127,7 +8127,7 @@ afloat RB O O
 . . O O
 
 The DT O O
-Fed NNP B-organization O
+Fed NNP B-organization B-organization
 provides VBZ O O
 money NN O O
 to TO O O
@@ -8164,7 +8164,7 @@ ABC NNP B-organization B-MISC
 's POS O O
 `` `` O O
 This DT O O
-Week NNP O B-gpe
+Week NNP O B-MISC
 . . O O
 '' '' O O
 
@@ -8182,7 +8182,7 @@ the DT O O
 chairman NN O O
 of IN O O
 the DT O O
-SEC NNP B-organization B-MISC
+SEC NNP B-organization B-organization
 and CC O O
 others NNS O O
 have VBP O O
@@ -8236,7 +8236,7 @@ the DT O O
 Treasury NNP B-organization B-organization
 , , O O
 Secretary NNP O O
-Brady NNP B-person B-person
+Brady NNP B-person O
 issued VBD O O
 a DT O O
 statement NN O O
@@ -8375,9 +8375,9 @@ likely JJ O O
 
 Nevertheless RB O O
 , , O O
-Fed NNP B-organization B-person
-Chairman NNP O I-person
-Greenspan NNP B-person I-person
+Fed NNP B-organization B-organization
+Chairman NNP O I-organization
+Greenspan NNP B-person I-organization
 and CC O O
 Vice NNP O B-person
 Chairman NNP O I-person
@@ -8456,7 +8456,7 @@ the DT O O
 Treasury NNP B-organization B-organization
 and CC O O
 the DT O O
-Fed NNP B-organization O
+Fed NNP B-organization B-organization
 planned VBD O O
 to TO O O
 keep VB O O
@@ -8512,7 +8512,7 @@ lower JJR O O
 
 In IN O O
 the DT O O
-Bush NNP B-person B-MISC
+Bush NNP B-person B-person
 administration NN O O
 , , O O
 the DT O O
@@ -8529,9 +8529,9 @@ Undersecretary NNP O B-person
 Robert NNP B-person I-person
 Glauber NNP I-person I-person
 and CC O O
-Assistant NNP O B-person
-Secretary NNP O I-person
-Mullins NNP B-person I-person
+Assistant NNP O O
+Secretary NNP O O
+Mullins NNP B-person B-person
 . . O O
 
 The DT O O
@@ -8542,8 +8542,8 @@ together RB O O
 on IN O O
 the DT O O
 so-called JJ O O
-Brady NNP B-organization B-person
-Commission NNP I-organization I-person
+Brady NNP B-organization B-organization
+Commission NNP I-organization I-organization
 , , O O
 headed VBN O O
 by IN O O
@@ -8587,9 +8587,9 @@ Brady NNP B-person B-person
 was VBD O O
 at IN O O
 the DT O O
-White NNP B-organization B-MISC
-House NNP I-organization I-MISC
-Friday NNP O O
+White NNP B-organization B-organization
+House NNP I-organization I-organization
+Friday NNP O I-organization
 afternoon NN O O
 when WRB O O
 the DT O O
@@ -8635,8 +8635,8 @@ phoned VBD O O
 Mr. NNP O O
 Greenspan NNP B-person B-person
 , , O O
-SEC NNP B-organization B-person
-Chairman NNP O I-person
+SEC NNP B-organization B-organization
+Chairman NNP O O
 Richard NNP B-person B-person
 Breeden NNP I-person I-person
 and CC O O
@@ -8726,9 +8726,9 @@ panic NN O O
 . . O O
 
 Treasury NNP B-organization B-organization
-Undersecretary NNP O I-organization
-David NNP B-person I-organization
-Mulford NNP I-person I-organization
+Undersecretary NNP O O
+David NNP B-person B-person
+Mulford NNP I-person I-person
 , , O O
 for IN O O
 instance NN O O
@@ -8768,9 +8768,9 @@ of IN O O
 last JJ O O
 night NN O O
 , , O O
-Fed NNP B-organization B-person
-Chairman NNP O I-person
-Greenspan NNP B-person I-person
+Fed NNP B-organization B-organization
+Chairman NNP O I-organization
+Greenspan NNP B-person I-organization
 had VBD O O
 n't RB O O
 canceled VBN O O
@@ -8779,9 +8779,9 @@ plans NNS O O
 to TO O O
 address VB O O
 the DT O O
-American NNP B-organization B-organization
-Bankers NNPS I-organization I-organization
-Association NNP I-organization I-organization
+American NNP B-organization B-MISC
+Bankers NNPS I-organization I-MISC
+Association NNP I-organization I-MISC
 convention NN O O
 in IN O O
 Washington NNP B-gpe B-gpe
@@ -8911,7 +8911,7 @@ from IN O O
 the DT O O
 Department NNP B-MISC O
 of IN I-MISC O
-Defense NNP I-MISC B-gpe
+Defense NNP I-MISC B-MISC
 and CC O O
 the DT O O
 FBI NNP B-MISC B-MISC
@@ -8946,7 +8946,7 @@ to TO O O
 lift VB O O
 the DT O O
 `` `` O O
-Cole NNP B-MISC O
+Cole NNP B-MISC B-MISC
 '' '' O O
 out IN O O
 of IN O O
@@ -8997,8 +8997,8 @@ beginning VBG O O
 , , O O
 a DT O O
 top JJ O O
-Justice NNP B-MISC O
-Department NNP I-MISC O
+Justice NNP B-MISC B-MISC
+Department NNP I-MISC I-MISC
 official NN O O
 in IN O O
 Washington NNP B-gpe B-gpe
@@ -9079,11 +9079,11 @@ has VBZ O O
 now RB O O
 activated VBN O O
 the DT O O
-Strategic NNP B-MISC B-organization
-Information NNP I-MISC I-organization
-and CC I-MISC O
-Operation NNP I-MISC B-person
-Center NNP I-MISC I-person
+Strategic NNP B-MISC B-MISC
+Information NNP I-MISC I-MISC
+and CC I-MISC I-MISC
+Operation NNP I-MISC I-MISC
+Center NNP I-MISC I-MISC
 in IN O O
 Washington NNP B-gpe B-gpe
 , , O O
@@ -9199,8 +9199,8 @@ Academy NNP I-MISC I-MISC
 football NN O O
 game NN O O
 against IN O O
-Notre NNP B-MISC B-person
-Dame NNP I-MISC I-person
+Notre NNP B-MISC B-MISC
+Dame NNP I-MISC I-MISC
 . . O O
 
 A DT O O
@@ -9239,7 +9239,7 @@ At IN O O
 a DT O O
 checkpoint NN O O
 near IN O O
-Ramallah NNP B-gpe O
+Ramallah NNP B-gpe B-gpe
 , , O O
 Israeli JJ B-MISC B-MISC
 troops NNS O O
@@ -9383,7 +9383,7 @@ to TO O O
 both CC O O
 Muslims NNPS B-MISC B-MISC
 and CC O O
-Jews NNPS B-MISC O
+Jews NNPS B-MISC B-MISC
 . . O O
 
 The DT O O
@@ -9502,8 +9502,8 @@ and CC O O
 distribution NN O O
 network NN O O
 , , O O
-Compania NNP B-organization B-person
-Nacional NNP I-organization I-person
+Compania NNP B-organization B-organization
+Nacional NNP I-organization I-organization
 de IN I-organization O
 Subsistencias NNP I-organization B-organization
 Populares NNP I-organization I-organization
@@ -9512,11 +9512,11 @@ or CC O O
 Conasupo NNP B-organization B-gpe
 . . O O
 
-Conasupo NNP B-organization B-organization
-Director NNP O I-organization
-Ignacio NNP B-person I-organization
-Ovalle NNP I-person I-organization
-Fernandez NNP I-person I-organization
+Conasupo NNP B-organization B-person
+Director NNP O I-person
+Ignacio NNP B-person I-person
+Ovalle NNP I-person I-person
+Fernandez NNP I-person I-person
 said VBD O O
 the DT O O
 agency NN O O
@@ -9567,7 +9567,7 @@ Mr. NNP O O
 Ovalle NNP B-person B-person
 also RB O O
 said VBD O O
-Conasupo NNP B-organization B-person
+Conasupo NNP B-organization B-organization
 will MD O O
 cut VB O O
 back JJ O O
@@ -9627,7 +9627,7 @@ Private-sector JJ O O
 leaders NNS O O
 praised VBD O O
 the DT O O
-Conasupo NNP B-organization B-gpe
+Conasupo NNP B-organization B-organization
 restructuring NN O O
 . . O O
 
@@ -9641,7 +9641,7 @@ would MD O O
 cut VB O O
 deeply RB O O
 into IN O O
-Conasupo NNP B-organization B-gpe
+Conasupo NNP B-organization B-organization
 government NN O O
 subsidy NN O O
 , , O O
@@ -9687,7 +9687,7 @@ not RB O O
 . . O O
 
 But CC O O
-Manville NNP B-organization B-person
+Manville NNP B-organization B-gpe
 's POS O O
 ownership NN O O
 is VBZ O O
@@ -9741,7 +9741,7 @@ owns VBZ O O
 80 CD O O
 % NN O O
 of IN O O
-Manville NNP B-organization O
+Manville NNP B-organization B-gpe
 's POS O O
 stock NN O O
 on IN O O
@@ -9881,8 +9881,8 @@ Halis NNP I-person I-person
 , , O O
 who WP O O
 runs VBZ O O
-Sabre NNP B-organization B-person
-Associates NNP I-organization I-person
+Sabre NNP B-organization B-organization
+Associates NNP I-organization I-organization
 , , O O
 an DT O O
 investment NN O O
@@ -10014,7 +10014,7 @@ as IN O O
 20 CD O O
 % NN O O
 of IN O O
-Manville NNP B-organization O
+Manville NNP B-organization B-gpe
 's POS O O
 annual JJ O O
 net JJ O O
@@ -10154,7 +10154,7 @@ be VB O O
 eager JJ O O
 to TO O O
 unload VB O O
-Manville NNP B-organization O
+Manville NNP B-organization B-MISC
 stock NN O O
 . . O O
 
@@ -10256,7 +10256,7 @@ option NN O O
 would MD O O
 be VB O O
 for IN O O
-Manville NNP B-organization O
+Manville NNP B-organization B-MISC
 to TO O O
 buy VB O O
 out RP O O
@@ -10303,7 +10303,7 @@ both CC O O
 the DT O O
 trust NN O O
 and CC O O
-Manville NNP B-organization B-person
+Manville NNP B-organization B-gpe
 are VBP O O
 seeking VBG O O
 to TO O O
@@ -10320,7 +10320,7 @@ era NN O O
 , , O O
 tarred VBD O O
 the DT O O
-Manville NNP B-organization O
+Manville NNP B-organization B-MISC
 name NN O O
 . . O O
 
@@ -10450,7 +10450,7 @@ nonetheless RB O O
 , , O O
 high RB O O
 on IN O O
-Manville NNP B-organization O
+Manville NNP B-organization B-gpe
 's POS O O
 management NN O O
 . . O O
@@ -10468,8 +10468,8 @@ business NN O O
 , , O O
 '' '' O O
 says VBZ O O
-Salomon NNP B-organization B-organization
-Brothers NNP I-organization I-organization
+Salomon NNP B-organization B-person
+Brothers NNP I-organization I-person
 analyst NN O O
 Stephen NNP B-person B-person
 Dobi NNP I-person I-person
@@ -10490,7 +10490,7 @@ million CD O O
 in IN O O
 cash NN O O
 -- : O O
-Manville NNP B-organization O
+Manville NNP B-organization B-person
 is VBZ O O
 indeed RB O O
 actively RB O O
@@ -10558,7 +10558,7 @@ in IN O O
 friendly JJ O O
 hands NNS O O
 , , O O
-Manville NNP B-organization B-gpe
+Manville NNP B-organization B-person
 is VBZ O O
 the DT O O
 rare JJ O O
@@ -10585,7 +10585,7 @@ NYSE NNP B-organization B-gpe
 ; : O O
 Symbol NN O O
 : : O O
-MVL NNP B-organization O
+MVL NNP B-organization B-person
 ) ) O O
 
 Business NN O O
@@ -10702,7 +10702,7 @@ yesterday NN O O
 A DT O O
 few JJ O O
 `` `` O O
-Cole NNP B-MISC O
+Cole NNP B-MISC B-MISC
 '' '' O O
 crew NN O O
 members NNS O O
@@ -10799,8 +10799,8 @@ former JJ O O
 Israeli JJ B-MISC B-MISC
 Prime NNP O O
 Minister NNP O O
-Shimon NNP B-person B-organization
-Peres NNPS I-person I-organization
+Shimon NNP B-person B-person
+Peres NNPS I-person B-MISC
 are VBP O O
 slated VBN O O
 to TO O O
@@ -10847,7 +10847,7 @@ the DT O O
 idea NN O O
 and CC O O
 told VBD O O
-Barak NNP B-person O
+Barak NNP B-person B-person
 he PRP O O
 supported VBD O O
 it PRP O O
@@ -10862,7 +10862,7 @@ President NNP O O
 Bush NNP B-person B-person
 wants VBZ O O
 the DT O O
-Pentagon NNP B-organization B-gpe
+Pentagon NNP B-organization B-organization
 to TO O O
 get VB O O
 special JJ O O
@@ -10889,9 +10889,9 @@ approved VBN O O
 by IN O O
 both DT O O
 the DT O O
-House NNP B-organization B-gpe
+House NNP B-organization B-organization
 and CC O O
-Senate NNP B-organization B-gpe
+Senate NNP B-organization B-organization
 , , O O
 Mr. NNP O O
 Cheney NNP B-person B-person
@@ -10901,13 +10901,13 @@ only JJ O O
 permission NN O O
 from IN O O
 the DT O O
-White NNP B-organization B-MISC
-House NNP I-organization I-MISC
-Office NNP I-organization I-MISC
-of IN I-organization I-MISC
-Management NNP I-organization I-MISC
-and CC I-organization I-MISC
-Budget NNP I-organization I-MISC
+White NNP B-organization B-organization
+House NNP I-organization I-organization
+Office NNP I-organization I-organization
+of IN I-organization I-organization
+Management NNP I-organization I-organization
+and CC I-organization O
+Budget NNP I-organization B-gpe
 to TO O O
 move VB O O
 the DT O O
@@ -10915,7 +10915,7 @@ money NN O O
 , , O O
 according VBG O O
 to TO O O
-Senate NNP B-organization O
+Senate NNP B-organization B-organization
 budget NN O O
 analysts NNS O O
 . . O O
@@ -10924,7 +10924,7 @@ That DT O O
 would MD O O
 give VB O O
 the DT O O
-Pentagon NNP B-organization B-gpe
+Pentagon NNP B-organization B-organization
 flexibility NN O O
 that IN O O
 no DT O O
@@ -10957,11 +10957,11 @@ programs NNS O O
 , , O O
 '' '' O O
 said VBD O O
-Chairman NNP O B-organization
-James NNP B-person I-organization
-Sasser NNP I-person I-organization
-( ( O I-organization
-D. NNP B-MISC I-organization
+Chairman NNP O B-person
+James NNP B-person I-person
+Sasser NNP I-person I-person
+( ( O I-person
+D. NNP B-MISC I-person
 , , O O
 Tenn NNP B-gpe B-gpe
 . . I-gpe O
@@ -10982,7 +10982,7 @@ request NN O O
 . . O O
 
 A DT O O
-Pentagon NNP B-organization B-MISC
+Pentagon NNP B-organization B-organization
 official NN O O
 said VBD O O
 the DT O O
@@ -11080,7 +11080,7 @@ law NN O O
 % NN O O
 of IN O O
 the DT O O
-Pentagon NNP B-organization B-gpe
+Pentagon NNP B-organization B-organization
 's POS O O
 money NN O O
 and CC O O
@@ -11128,7 +11128,7 @@ in IN O O
 a DT O O
 massacre NN O O
 by IN O O
-Colombian JJ B-MISC O
+Colombian JJ B-MISC B-MISC
 Marxist JJ I-MISC B-MISC
 guerillas NNS O O
 . . O O
@@ -11145,8 +11145,8 @@ paramilitaries NNS O O
 , , O O
 but CC O O
 as IN O O
-Jeremy NNP B-person B-MISC
-Mcdermott NNP I-person I-MISC
+Jeremy NNP B-person B-person
+Mcdermott NNP I-person I-person
 reports VBZ O O
 , , O O
 the DT O O
@@ -11176,10 +11176,10 @@ the DT O O
 Revolutionary NNP B-MISC B-MISC
 Armed NNP I-MISC I-MISC
 Forces NNPS I-MISC I-MISC
-of IN I-MISC O
-Columbia NNP I-MISC B-gpe
+of IN I-MISC I-MISC
+Columbia NNP I-MISC I-MISC
 or CC O O
-Falk NNP B-MISC B-person
+Falk NNP B-MISC B-gpe
 swept VBD O O
 into IN O O
 several JJ O O
@@ -11290,7 +11290,7 @@ USS NNP B-MISC B-MISC
 Cole NNP I-MISC I-MISC
 in IN O O
 the DT O O
-Yemeni NNP B-MISC B-gpe
+Yemeni NNP B-MISC B-MISC
 port NN O O
 of IN O O
 Aden NNP B-gpe B-gpe
@@ -11316,7 +11316,7 @@ crewmembers NNS O O
 on IN O O
 board NN O O
 the DT O O
-Cole NNP B-MISC O
+Cole NNP B-MISC B-MISC
 last JJ O O
 thursday NN O O
 . . O O
@@ -11325,7 +11325,7 @@ Also RB O O
 today NN O O
 at IN O O
 the DT O O
-Cole NNP B-MISC B-organization
+Cole NNP B-MISC B-MISC
 's POS O O
 homeport NN O O
 in IN O O
@@ -11345,7 +11345,7 @@ who WP O O
 died VBD O O
 aboard IN O O
 the DT O O
-Cole NNP B-MISC B-organization
+Cole NNP B-MISC B-MISC
 . . O O
 
 The DT O O
@@ -11545,12 +11545,12 @@ by IN O O
 the DT O O
 Navy NNP B-MISC B-MISC
 hymn NN O O
-Pantaps NNP O O
+Pantaps NNP O B-MISC
 . . O O
 
-EAST NNP B-gpe B-person
-GERMANY'S NNP I-gpe I-person
-KRENZ NNP B-person I-person
+EAST NNP B-gpe B-MISC
+GERMANY'S NNP I-gpe I-MISC
+KRENZ NNP B-person I-MISC
 WARNED VBD O O
 against IN O O
 further JJ O O
@@ -11593,12 +11593,12 @@ confrontation NN O O
 He PRP O O
 also RB O O
 reaffirmed VBD O O
-East NNP B-gpe B-person
-Germany NNP I-gpe I-person
+East NNP B-gpe B-gpe
+Germany NNP I-gpe I-gpe
 's POS O O
 allegiance NN O O
 to TO O O
-Communist NNP B-MISC O
+Communist NNP B-MISC B-MISC
 orthodoxy NN O O
 . . O O
 
@@ -11630,10 +11630,10 @@ members NNS O O
 of IN O O
 the DT O O
 500-seat JJ O O
-Parliament NNP B-organization O
+Parliament NNP B-organization B-organization
 voted VBD O O
 against IN O O
-Krenz NNP B-person B-gpe
+Krenz NNP B-person B-person
 , , O O
 a DT O O
 move NN O O
@@ -11677,15 +11677,15 @@ judge NN O O
 agreed VBD O O
 to TO O O
 allow VB O O
-Poindexter NNP B-person O
+Poindexter NNP B-person B-person
 to TO O O
 subpoena VB O O
 the DT O O
 personal JJ O O
 papers NNS O O
 of IN O O
-ex-President NNP O B-person
-Reagan NNP B-person I-person
+ex-President NNP O O
+Reagan NNP B-person B-person
 , , O O
 ruling VBG O O
 that IN O O
@@ -11727,12 +11727,12 @@ to TO O O
 seek VB O O
 documents NNS O O
 from IN O O
-Bush NNP B-person B-gpe
+Bush NNP B-person B-person
 . . O O
 
-San NNP B-MISC B-organization
-Francisco NNP I-MISC I-organization
-Bay NNP I-MISC I-organization
+San NNP B-MISC B-MISC
+Francisco NNP I-MISC I-MISC
+Bay NNP I-MISC I-MISC
 area NN O O
 officials NNS O O
 said VBD O O
@@ -11759,7 +11759,7 @@ to TO O O
 . . O O
 
 The DT O O
-House NNP B-organization B-gpe
+House NNP B-organization B-organization
 , , O O
 meanwhile RB O O
 , , O O
@@ -11777,8 +11777,8 @@ the DT O O
 temblor NN O O
 and CC O O
 from IN O O
-Hurricane NNP B-MISC B-person
-Hugo NNP I-MISC I-person
+Hurricane NNP B-MISC B-MISC
+Hugo NNP I-MISC I-MISC
 as IN O O
 state NN O O
 legislators NNS O O
@@ -11801,7 +11801,7 @@ effort NN O O
 to TO O O
 show VB O O
 the DT O O
-PLO NNP B-organization B-gpe
+PLO NNP B-organization B-organization
 continues VBZ O O
 to TO O O
 practice VB O O
@@ -11811,8 +11811,8 @@ terrorism NN O O
 Israel NNP B-gpe B-gpe
 provided VBD O O
 the DT O O
-State NNP B-organization O
-Department NNP I-organization O
+State NNP B-organization B-organization
+Department NNP I-organization I-organization
 with IN O O
 a DT O O
 list NN O O
@@ -11826,7 +11826,7 @@ to TO O O
 forces NNS O O
 controlled VBN O O
 by IN O O
-Arafat NNP B-person B-gpe
+Arafat NNP B-person B-person
 , , O O
 but CC O O
 the DT O O
@@ -11863,11 +11863,11 @@ defrauding VBG O O
 followers NNS O O
 of IN O O
 his PRP$ O O
-PTL NNP B-organization O
+PTL NNP B-organization B-gpe
 ministry NN O O
 . . O O
 
-Bakker NNP B-person B-gpe
+Bakker NNP B-person B-person
 , , O O
 who WP O O
 was VBD O O
@@ -11942,14 +11942,14 @@ voters NNS O O
 In IN O O
 Warsaw NNP B-gpe B-gpe
 , , O O
-Shevardnadze NNP B-person O
+Shevardnadze NNP B-person B-person
 held VBD O O
 his PRP$ O O
 first JJ O O
 talks NNS O O
 with IN O O
 the DT O O
-Solidarity-led JJ B-organization O
+Solidarity-led JJ B-organization B-organization
 government NN O O
 and CC O O
 vowed VBD O O
@@ -11959,7 +11959,7 @@ fuel NN O O
 supplies NNS O O
 . . O O
 
-Poland NNP B-gpe B-person
+Poland NNP B-gpe B-gpe
 's POS O O
 premier NN O O
 is VBZ O O
@@ -11971,15 +11971,15 @@ month NN O O
 . . O O
 
 The DT O O
-Arab NNP B-organization B-MISC
-League NNP I-organization I-MISC
+Arab NNP B-organization B-organization
+League NNP I-organization I-organization
 pledged VBD O O
 an DT O O
 accord NN O O
 for IN O O
 a DT O O
 complete JJ O O
-Syrian JJ B-MISC O
+Syrian JJ B-MISC B-MISC
 troop NN O O
 pullout NN O O
 from IN O O
@@ -11994,9 +11994,9 @@ to TO O O
 the DT O O
 headquarters NN O O
 of IN O O
-Christian NNP B-MISC B-gpe
+Christian NNP B-MISC B-MISC
 leader NN O O
-Aoun NNP B-person O
+Aoun NNP B-person B-person
 to TO O O
 support VB O O
 his PRP$ O O
@@ -12021,7 +12021,7 @@ withdrawal NN O O
 timetable NN O O
 . . O O
 
-Pro-Iranian NNP B-MISC B-MISC
+Pro-Iranian NNP B-MISC B-organization
 kidnappers NNS O O
 renewed VBD O O
 an DT O O
@@ -12036,8 +12036,8 @@ for IN O O
 at IN O O
 least JJS O O
 15 CD O O
-Shiite NNP B-MISC B-person
-Moslem NNP I-MISC I-person
+Shiite NNP B-MISC O
+Moslem NNP I-MISC O
 comrades NNS O O
 jailed VBN O O
 in IN O O
@@ -12157,7 +12157,7 @@ the DT O O
 blasts NNS O O
 . . O O
 
-NATO NNP B-organization O
+NATO NNP B-organization B-organization
 defense NN O O
 ministers NNS O O
 opened VBD O O
@@ -12165,7 +12165,7 @@ a DT O O
 two-day JJ O O
 meeting NN O O
 in IN O O
-Portugal NNP B-gpe O
+Portugal NNP B-gpe B-gpe
 to TO O O
 assess VB O O
 the DT O O
@@ -12202,13 +12202,13 @@ are VBP O O
 reduced VBN O O
 in IN O O
 the DT O O
-East NNP B-MISC B-gpe
-bloc NN I-MISC O
+East NNP B-MISC B-MISC
+bloc NN I-MISC I-MISC
 . . O O
 
 The DT O O
-Justice NNP B-organization B-MISC
-Department NNP I-organization I-MISC
+Justice NNP B-organization B-organization
+Department NNP I-organization I-organization
 scrambled VBD O O
 to TO O O
 play VB O O
@@ -12257,9 +12257,9 @@ week NN O O
 
 Died VBD O O
 : : O O
-S. NNP B-person B-organization
-Clark NNP I-person I-organization
-Beise NNP I-person I-organization
+S. NNP B-person B-person
+Clark NNP I-person I-person
+Beise NNP I-person I-person
 , , O O
 91 CD O O
 , , O O
@@ -12280,7 +12280,7 @@ in IN O O
 Hillsboro NNP B-gpe B-gpe
 , , I-gpe O
 Calif NNP I-gpe B-gpe
-. . O O
+. . O I-gpe
 
 Also RB O O
 ahead RB O O
@@ -12404,7 +12404,7 @@ Thursday NNP O O
 However RB O O
 , , O O
 the DT O O
-Pentagon NNP B-MISC B-gpe
+Pentagon NNP B-MISC B-organization
 is VBZ O O
 downplaying VBG O O
 the DT O O
@@ -12494,7 +12494,7 @@ Regardless RB O O
 the DT O O
 statement NN O O
 praised VBD O O
-Iraqis NNPS B-MISC O
+Iraqis NNPS B-MISC B-MISC
 who WP O O
 have VBP O O
 fought VBN O O
@@ -12549,7 +12549,7 @@ n't RB O O
 disclosed VBN O O
 . . O O
 
-Weyerhaeuser NNP B-organization O
+Weyerhaeuser NNP B-organization B-person
 said VBD O O
 its PRP$ O O
 paneling NN O O
@@ -12572,8 +12572,8 @@ Hancock NNP B-gpe B-gpe
 Vt NNP B-gpe B-gpe
 . . I-gpe O
 
-Central NNP B-MISC B-organization
-Command NNP I-MISC I-organization
+Central NNP B-MISC B-MISC
+Command NNP I-MISC I-MISC
 says VBZ O O
 it PRP O O
 is VBZ O O
@@ -12609,11 +12609,11 @@ A DT O O
 member NN O O
 of IN O O
 the DT O O
-International NNP B-MISC B-organization
-Committee NNP I-MISC I-organization
-of IN I-MISC I-organization
-Red NNP I-MISC I-organization
-Cross NNP I-MISC I-organization
+International NNP B-MISC B-MISC
+Committee NNP I-MISC I-MISC
+of IN I-MISC I-MISC
+Red NNP I-MISC I-MISC
+Cross NNP I-MISC I-MISC
 visited VBD O O
 the DT O O
 local JJ O O
@@ -12657,11 +12657,11 @@ danced VBD O O
 to TO O O
 in IN O O
 the DT O O
-West JJ B-MISC O
-African JJ I-MISC B-MISC
+West JJ B-MISC B-MISC
+African JJ I-MISC I-MISC
 nation NN O O
 of IN O O
-Senegal NNP B-gpe O
+Senegal NNP B-gpe B-gpe
 . . O O
 
 The DT B-MISC O
@@ -12684,15 +12684,15 @@ the DT O O
 lyrics NNS O O
 of IN O O
 the DT O O
-Sugar NNP B-MISC B-organization
-Hill NNP I-MISC I-organization
-Gang NNP I-MISC I-organization
+Sugar NNP B-MISC B-MISC
+Hill NNP I-MISC I-MISC
+Gang NNP I-MISC I-MISC
 's POS O O
 notorious JJ O O
 rap NN O O
 classic NN O O
 , , O O
-Rapper NNP O O
+Rapper NNP O B-gpe
 's POS O O
 Delight NNP O B-gpe
 . . O O
@@ -12756,9 +12756,9 @@ half NN O O
 of IN O O
 the DT O O
 duo NN O O
-Positive NNP B-MISC B-person
-Black NNP I-MISC I-person
-Soul NNP I-MISC I-person
+Positive NNP B-MISC B-MISC
+Black NNP I-MISC I-MISC
+Soul NNP I-MISC I-MISC
 or CC O O
 PBS NNP B-MISC B-gpe
 . . O O
@@ -12774,26 +12774,26 @@ hip-hop NN O O
 scene NN O O
 , , O O
 the DT O O
-Sugar NNP B-MISC O
-Hill NNP I-MISC B-person
-Gang NNP I-MISC I-person
-of IN O O
-Senegal NNP B-gpe O
+Sugar NNP B-MISC B-MISC
+Hill NNP I-MISC I-MISC
+Gang NNP I-MISC I-MISC
+of IN O I-MISC
+Senegal NNP B-gpe I-MISC
 if IN O O
 you PRP O O
 will MD O O
 . . O O
 
-Positive NNP B-MISC B-organization
-Black NNP I-MISC I-organization
-Soul NNP I-MISC I-organization
+Positive NNP B-MISC B-MISC
+Black NNP I-MISC I-MISC
+Soul NNP I-MISC I-MISC
 sings VBZ O O
 in IN O O
-Senegal NNP B-gpe O
+Senegal NNP B-gpe B-gpe
 's POS O O
 main JJ O O
 language NN O O
-Wolof NNP B-MISC O
+Wolof NNP B-MISC B-gpe
 but CC O O
 if IN O O
 the DT O O
@@ -12806,7 +12806,7 @@ straight RB O O
 out IN O O
 of IN O O
 the DT O O
-Bronx NNP B-gpe B-gpe
+Bronx NNP B-gpe B-organization
 , , O O
 well UH O O
 , , O O
@@ -12846,9 +12846,9 @@ right JJ O O
 . . O O
 
 But CC O O
-Positive NNP B-MISC B-person
-Black NNP I-MISC I-person
-Soul NNP I-MISC I-person
+Positive NNP B-MISC B-MISC
+Black NNP I-MISC I-MISC
+Soul NNP I-MISC I-MISC
 's POS O O
 music NN O O
 is VBZ O O
@@ -12860,9 +12860,9 @@ music NN O O
 . . O O
 
 When WRB O O
-Awadi NNP B-person B-person
-and CC O O
-Barry NNP B-person B-gpe
+Awadi NNP B-person B-MISC
+and CC O I-MISC
+Barry NNP B-person I-MISC
 performed VBD O O
 , , O O
 they PRP O O
@@ -12886,7 +12886,7 @@ that IN O O
 they PRP O O
 are VBP O O
 from IN O O
-Senegal NNP B-gpe O
+Senegal NNP B-gpe B-gpe
 . . O O
 
 This DT O O
@@ -12909,13 +12909,13 @@ want VBP O O
 to TO O O
 stay VB O O
 in IN O O
-Senegal NNP B-gpe O
+Senegal NNP B-gpe B-gpe
 to TO O O
 live VB O O
 and CC O O
 work VB O O
 says VBZ O O
-PBS NNP B-MISC O
+PBS NNP B-MISC B-MISC
 singer NN O O
 Tidia NNP B-person B-person
 Awadi NNP I-person I-person
@@ -12972,7 +12972,7 @@ their PRP$ O O
 tracks NNS O O
 . . O O
 
-Western JJ B-MISC B-MISC
+Western JJ B-MISC O
 hip-hop NN O O
 lyrics NNS O O
 often RB O O
@@ -13004,8 +13004,8 @@ the DT O O
 grim JJ O O
 lyrics NNS O O
 to TO O O
-Leboho NNP O B-person
-Inwa NNP O I-person
+Leboho NNP O B-gpe
+Inwa NNP O I-gpe
 , , O O
 the DT O O
 executioner NN O O
@@ -13013,7 +13013,7 @@ is VBZ O O
 black JJ O O
 . . O O
 
-PBS NNP B-MISC O
+PBS NNP B-MISC B-person
 raps VBP O O
 that IN O O
 Africans NNPS B-MISC B-MISC
@@ -13038,7 +13038,7 @@ on IN O O
 the DT O O
 streets NNS O O
 of IN O O
-Brooklyn NNP B-gpe B-organization
+Brooklyn NNP B-gpe B-gpe
 but CC O O
 his PRP$ O O
 critique NN O O
@@ -13132,9 +13132,9 @@ Again RB O O
 Amidu NNP B-person B-person
 Barry NNP I-person I-person
 from IN O O
-Postive NNP B-MISC B-organization
-Black NNP I-MISC I-organization
-Soul NNP I-MISC I-organization
+Postive NNP B-MISC B-MISC
+Black NNP I-MISC I-MISC
+Soul NNP I-MISC I-MISC
 . . O O
 
 When WRB O O
@@ -13167,7 +13167,7 @@ let VBD O O
 's PRP O O
 say VB O O
 in IN O O
-Senegal NNP B-gpe O
+Senegal NNP B-gpe B-gpe
 . . O O
 
 Two CD O O
@@ -13217,19 +13217,19 @@ recording NN O O
 . . O O
 
 The DT O O
-Hop NNP O B-gpe
+Hop NNP O B-organization
 is VBZ O O
 a DT O O
 compilation NN O O
 featuring VBG O O
-Dakar NNP B-gpe O
+Dakar NNP B-gpe B-person
 's POS O O
 biggest JJS O O
 rap NN O O
 stars NNS O O
 from IN O O
-Bidu NNP B-MISC B-person
-Bubes NNP I-MISC I-person
+Bidu NNP B-MISC B-MISC
+Bubes NNP I-MISC I-MISC
 to TO O O
 the DT O O
 current JJ O O
@@ -13237,8 +13237,8 @@ kings NNS O O
 of IN O O
 Senegalese JJ B-MISC O
 hip-hop NN O O
-Daura NNP B-MISC B-person
-G NNP I-MISC I-person
+Daura NNP B-MISC B-MISC
+G NNP I-MISC I-MISC
 . . O O
 
 That DT O O
@@ -13251,8 +13251,8 @@ translation NN O O
 . . O O
 
 For IN O O
-The DT B-MISC B-MISC
-World NNP I-MISC I-MISC
+The DT B-MISC O
+World NNP I-MISC O
 , , O O
 I PRP O O
 am VBP O O
@@ -13296,14 +13296,14 @@ jet NN O O
 trainers NNS O O
 for IN O O
 the DT O O
-U.S. NNP B-gpe B-MISC
-Air NNP B-organization I-MISC
-Force NNP I-organization I-MISC
+U.S. NNP B-gpe B-organization
+Air NNP B-organization I-organization
+Force NNP I-organization I-organization
 . . O O
 
 The DT O O
-Air NNP B-organization B-MISC
-Force NNP I-organization I-MISC
+Air NNP B-organization B-organization
+Force NNP I-organization I-organization
 is VBZ O O
 looking VBG O O
 to TO O O
@@ -13354,8 +13354,8 @@ Corp. NNP I-organization I-organization
 , , O O
 which WDT O O
 the DT O O
-Air NNP B-organization B-MISC
-Force NNP I-organization I-MISC
+Air NNP B-organization B-organization
+Force NNP I-organization I-organization
 uses VBZ O O
 to TO O O
 train VB O O
@@ -13366,8 +13366,8 @@ pilots NNS O O
 Lockheed NNP B-organization B-person
 said VBD O O
 the DT O O
-U.S. NNP B-gpe B-MISC
-Navy NNP B-organization I-MISC
+U.S. NNP B-gpe B-gpe
+Navy NNP B-organization B-MISC
 may MD O O
 also RB O O
 buy VB O O
@@ -13399,10 +13399,10 @@ agreement NN O O
 with IN O O
 Lockheed NNP B-organization B-gpe
 , , O O
-Aermacchi NNP B-organization B-gpe
+Aermacchi NNP B-organization B-person
 will MD O O
 license VB O O
-Lockheed NNP B-organization O
+Lockheed NNP B-organization B-gpe
 to TO O O
 build VB O O
 the DT O O
@@ -13439,15 +13439,15 @@ Ga. NNP B-gpe B-gpe
 plant NN O O
 should MD O O
 the DT O O
-Air NNP B-organization B-MISC
-Force NNP I-organization I-MISC
+Air NNP B-organization B-organization
+Force NNP I-organization I-organization
 order VB O O
 the DT O O
 craft NN O O
 . . O O
 
 A DT O O
-Lockheed NNP B-organization O
+Lockheed NNP B-organization B-MISC
 spokesman NN O O
 in IN O O
 Burbank NNP B-gpe B-gpe
@@ -13515,10 +13515,10 @@ highlights VBZ O O
 shortcomings NNS O O
 of IN O O
 the DT O O
-Trans-Alaska NNP O B-MISC
-Pipeline NNP O I-MISC
-Liability NNP O I-MISC
-Fund NNP O I-MISC
+Trans-Alaska NNP O B-organization
+Pipeline NNP O I-organization
+Liability NNP O I-organization
+Fund NNP O I-organization
 , , O O
 which WDT O O
 gets VBZ O O
@@ -13547,9 +13547,9 @@ July NNP O O
 , , O O
 the DT O O
 tanker NN O O
-S.S. NNP B-MISC O
-Glacier NNP I-MISC B-person
-Bay NNP I-MISC I-person
+S.S. NNP B-MISC B-MISC
+Glacier NNP I-MISC I-MISC
+Bay NNP I-MISC I-MISC
 struck VBD O O
 a DT O O
 rock NN O O
@@ -13562,8 +13562,8 @@ of IN O O
 oil NN B-MISC O
 into IN O O
 the DT O O
-Cook NNP B-MISC B-organization
-Inlet NNP I-MISC I-organization
+Cook NNP B-MISC B-MISC
+Inlet NNP I-MISC I-MISC
 . . O O
 
 Commercial JJ O O
@@ -13592,11 +13592,11 @@ million CD O O
 
 Defendants NNS O O
 include VBP O O
-British NNP B-organization B-MISC
-Petroleum NNP I-organization I-MISC
-America NNP I-organization I-MISC
-; : O O
-Trinidad NNP B-organization B-organization
+British NNP B-organization B-organization
+Petroleum NNP I-organization I-organization
+America NNP I-organization I-organization
+; : O I-organization
+Trinidad NNP B-organization I-organization
 Corp. NNP I-organization I-organization
 , , O O
 the DT O O
@@ -13684,8 +13684,8 @@ liability NN O O
 It PRP O O
 claims VBZ O O
 the DT O O
-Coast NNP B-organization B-MISC
-Guard NNP I-organization I-MISC
+Coast NNP B-organization B-organization
+Guard NNP I-organization I-organization
 failed VBD O O
 to TO O O
 chart VB O O
@@ -13769,11 +13769,11 @@ says VBZ O O
 a DT O O
 spokesman NN O O
 for IN O O
-Rep. NNP O B-person
-George NNP B-person I-person
+Rep. NNP O O
+George NNP B-person B-person
 Miller NNP I-person I-person
-( ( O O
-D. NNP B-MISC B-gpe
+( ( O I-person
+D. NNP B-MISC I-person
 , , O O
 Calif. NNP B-gpe B-gpe
 ) ) O O
@@ -13801,7 +13801,7 @@ the DT O O
 worst JJS O O
 kind NN O O
 of IN O O
-Catch-22 NN O O
+Catch-22 NN O B-MISC
 . . O O
 '' '' O O
 
@@ -13894,7 +13894,7 @@ York NNP I-organization I-organization
 County NNP I-organization I-organization
 Lawyers NNP I-organization I-organization
 ' POS I-organization O
-Association NNP I-organization O
+Association NNP I-organization B-MISC
 committee NN O O
 that WDT O O
 sponsors VBZ O O
@@ -13962,7 +13962,7 @@ classes NNS O O
 . . O O
 
 The DT O O
-Hildebrandt NNP B-organization O
+Hildebrandt NNP B-organization B-MISC
 course NN O O
 enables VBZ O O
 students NNS O O
@@ -14015,9 +14015,9 @@ the DT O O
 Baltimore NNP B-gpe O
 firm NN O O
 of IN O O
-Weinberg NNP B-organization B-gpe
-& CC I-organization O
-Green NNP I-organization B-gpe
+Weinberg NNP B-organization B-organization
+& CC I-organization I-organization
+Green NNP I-organization I-organization
 , , O O
 new JJ O O
 corporate JJ O O
@@ -14064,8 +14064,8 @@ the DT O O
 firm NN O O
 . . O O
 
-Los NNP B-gpe B-person
-Angeles NNP I-gpe I-person
+Los NNP B-gpe B-gpe
+Angeles NNP I-gpe I-gpe
 Creates VBZ O O
 A DT O O
 Courthouse NN O O
@@ -14075,8 +14075,8 @@ Kids NNS O O
 THE DT O O
 CHILDREN NNS O O
 of IN O O
-Los NNP B-gpe B-person
-Angeles NNP I-gpe I-person
+Los NNP B-gpe B-gpe
+Angeles NNP I-gpe I-gpe
 will MD O O
 soon RB O O
 have VB O O
@@ -14249,9 +14249,9 @@ murals NNS O O
 
 Cases NNS O O
 in IN O O
-Los NNP B-gpe B-organization
-Angeles NNP I-gpe I-organization
-County NNP I-gpe I-organization
+Los NNP B-gpe B-gpe
+Angeles NNP I-gpe I-gpe
+County NNP I-gpe I-gpe
 involving VBG O O
 dependent JJ O O
 children NNS O O
@@ -14260,9 +14260,9 @@ usually RB O O
 heard VBN O O
 in IN O O
 the DT O O
-Criminal NNP B-MISC B-organization
-Courts NNPS I-MISC I-organization
-Building NNP I-MISC I-organization
+Criminal NNP B-MISC B-MISC
+Courts NNPS I-MISC I-MISC
+Building NNP I-MISC I-MISC
 . . O O
 
 `` `` O O
@@ -14292,9 +14292,9 @@ About IN O O
 45,000 CD O O
 children NNS O O
 in IN O O
-Los NNP B-gpe B-organization
-Angeles NNP I-gpe I-organization
-County NNP I-gpe I-organization
+Los NNP B-gpe B-gpe
+Angeles NNP I-gpe I-gpe
+County NNP I-gpe I-gpe
 are VBP O O
 under IN O O
 court NN O O
@@ -14492,7 +14492,7 @@ off RP O O
 any DT O O
 repeat NN O O
 of IN O O
-Black NNP B-MISC B-gpe
+Black NNP B-MISC O
 Monday NNP I-MISC O
 today NN O O
 following VBG O O
@@ -14504,9 +14504,9 @@ stock NN O O
 prices NNS O O
 . . O O
 
-Fed NNP B-organization B-person
-Chairman NNP O I-person
-Greenspan NNP B-person I-person
+Fed NNP B-organization B-organization
+Chairman NNP O I-organization
+Greenspan NNP B-person I-organization
 signaled VBD O O
 that IN O O
 the DT O O
@@ -14609,7 +14609,7 @@ dollar NN O O
 fell VBD O O
 . . O O
 
-Japanese JJ B-MISC O
+Japanese JJ B-MISC B-MISC
 stocks NNS O O
 dropped VBD O O
 early RB O O
@@ -14737,7 +14737,7 @@ was VBD O O
 removed VBN O O
 from IN O O
 the DT O O
-Senate NNP B-organization O
+Senate NNP B-organization B-organization
 's POS O O
 deficit NN O O
 reduction NN O O
@@ -14769,7 +14769,7 @@ final JJ O O
 deficit NN O O
 bill NN O O
 when WRB O O
-House-Senate NNP B-organization O
+House-Senate NNP B-organization B-organization
 conferees NNS O O
 meet VBP O O
 later RBR O O
@@ -14777,8 +14777,8 @@ this DT O O
 week NN O O
 . . O O
 
-General NNP B-organization O
-Motors NNPS I-organization O
+General NNP B-organization B-organization
+Motors NNPS I-organization I-organization
 signaled VBD O O
 that IN O O
 up IN O O
@@ -14836,7 +14836,7 @@ sales NNS O O
 
 Warner NNP B-organization B-person
 and CC O O
-Sony NNP B-organization B-person
+Sony NNP B-organization B-gpe
 are VBP O O
 entangled VBN O O
 in IN O O
@@ -14849,8 +14849,8 @@ producers NNS O O
 Peter NNP B-person B-person
 Gruber NNP I-person I-person
 and CC O O
-Jon NNP B-person B-person
-Peters NNP I-person I-person
+Jon NNP B-person B-gpe
+Peters NNP I-person I-gpe
 . . O O
 
 The DT O O
@@ -14858,7 +14858,7 @@ fight NN O O
 could MD O O
 set VB O O
 back RP O O
-Sony NNP B-organization O
+Sony NNP B-organization B-organization
 's POS O O
 plans NNS O O
 to TO O O
@@ -14869,7 +14869,7 @@ movie NN O O
 business NN O O
 . . O O
 
-Hooker NNP B-organization O
+Hooker NNP B-organization B-person
 's POS O O
 U.S. NNP B-gpe B-gpe
 unit NN O O
@@ -14898,11 +14898,11 @@ offer NN O O
 does VBZ O O
 n't RB O O
 include VB O O
-Bonwit NNP B-organization B-person
-Teller NNP I-organization I-person
+Bonwit NNP B-organization B-organization
+Teller NNP I-organization I-organization
 or CC O O
-B. NNP B-organization B-person
-Altman NNP I-organization I-person
+B. NNP B-organization B-organization
+Altman NNP I-organization I-organization
 . . O O
 
 The DT O O
@@ -14915,8 +14915,8 @@ affect VB O O
 airlines NNS O O
 . . O O
 
-America NNP B-organization B-MISC
-West NNP I-organization I-MISC
+America NNP B-organization B-organization
+West NNP I-organization I-organization
 said VBD O O
 Friday NNP O O
 it PRP O O
@@ -14957,12 +14957,12 @@ official NN O O
 said VBD O O
 . . O O
 
-British NNP B-organization B-person
-Aerospace NNP I-organization I-person
+British NNP B-organization B-organization
+Aerospace NNP I-organization I-organization
 and CC O O
-France NNP B-gpe O
+France NNP B-gpe B-gpe
 's POS O O
-Thomson-CSF NNP B-organization B-gpe
+Thomson-CSF NNP B-organization B-person
 are VBP O O
 nearing VBG O O
 a DT O O
@@ -14973,8 +14973,8 @@ guided-missile JJ O O
 divisions NNS O O
 . . O O
 
-New NNP O B-organization
-U.S. NNP B-gpe I-organization
+New NNP O O
+U.S. NNP B-gpe B-gpe
 steel-import JJ O O
 quotas NNS O O
 will MD O O
@@ -15068,8 +15068,8 @@ up IN O O
 
 Commodities NNS O O
 : : O O
-Dow NNP B-organization O
-Jones NNP I-organization O
+Dow NNP B-organization B-person
+Jones NNP I-organization I-person
 futures NNS O O
 index NN O O
 129.87 CD O O
@@ -15100,7 +15100,7 @@ off IN O O
 0.0343 CD O O
 . . O O
 
-OPEC NNP B-organization B-person
+OPEC NNP B-organization B-gpe
 's POS O O
 ability NN O O
 to TO O O
@@ -15152,7 +15152,7 @@ out RB O O
 But CC O O
 industry NN O O
 and CC O O
-OPEC NNP B-organization B-gpe
+OPEC NNP B-organization B-organization
 officials NNS O O
 agree VBP O O
 that IN O O
@@ -15180,7 +15180,7 @@ months NNS O O
 from IN O O
 now RB O O
 if IN O O
-OPEC NNP B-organization B-gpe
+OPEC NNP B-organization B-organization
 does VBZ O O
 n't RB O O
 soon RB O O
@@ -15208,7 +15208,7 @@ oil NN O O
 ministers NNS O O
 to TO O O
 get VB O O
-OPEC NNP B-organization O
+OPEC NNP B-organization B-gpe
 to TO O O
 approve VB O O
 a DT O O
@@ -15246,7 +15246,7 @@ year NN O O
 rising VBG O O
 demand NN O O
 for IN O O
-OPEC NNP B-organization B-gpe
+OPEC NNP B-organization B-MISC
 oil NN O O
 and CC O O
 production NN O O
@@ -15287,7 +15287,7 @@ may MD O O
 happen VB O O
 . . O O
 
-OPEC NNP B-organization B-gpe
+OPEC NNP B-organization B-organization
 is VBZ O O
 currently RB O O
 producing VBG O O
@@ -15325,8 +15325,8 @@ here RB O O
 sponsored VBN O O
 by IN O O
 the DT O O
-Oil NNP B-organization O
-Daily NNP I-organization B-person
+Oil NNP B-organization B-organization
+Daily NNP I-organization I-organization
 and CC O O
 the DT O O
 International NNP B-organization B-organization
@@ -15341,7 +15341,7 @@ rate NN O O
 a DT O O
 majority NN O O
 of IN O O
-OPEC NNP B-organization B-gpe
+OPEC NNP B-organization B-organization
 's POS O O
 13 CD O O
 members NNS O O
@@ -15417,7 +15417,7 @@ Friday NNP O O
 
 He PRP O O
 puts VBZ O O
-OPEC NNP B-organization O
+OPEC NNP B-organization B-gpe
 's POS O O
 current JJ O O
 capacity NN O O
@@ -15452,7 +15452,7 @@ minister NN O O
 , , O O
 recently RB O O
 estimated VBD O O
-OPEC NNP B-organization O
+OPEC NNP B-organization B-organization
 capacity NN O O
 at IN O O
 25 CD O O
@@ -15498,8 +15498,8 @@ reserves NNS O O
 , , O O
 such JJ O O
 as IN O O
-Saudi NNP B-gpe B-person
-Arabia NNP I-gpe I-person
+Saudi NNP B-gpe B-gpe
+Arabia NNP I-gpe I-gpe
 and CC O O
 Iraq NNP B-gpe B-gpe
 , , O O
@@ -15552,7 +15552,7 @@ that IN O O
 they PRP O O
 expect VBP O O
 future JJ O O
-OPEC NNP B-organization O
+OPEC NNP B-organization B-organization
 quotas NNS O O
 to TO O O
 be VB O O
@@ -15643,7 +15643,7 @@ Al-Chalabi NNP B-person B-person
 At IN O O
 an DT O O
 inconclusive JJ O O
-Geneva NNP B-gpe B-gpe
+Geneva NNP B-gpe B-MISC
 meeting NN O O
 late RB O O
 last JJ O O
@@ -15734,7 +15734,7 @@ Geneva NNP B-gpe B-gpe
 Previously RB O O
 , , O O
 no DT O O
-OPEC NNP B-organization B-MISC
+OPEC NNP B-organization B-organization
 member NN O O
 had VBD O O
 been VBN O O
@@ -15816,9 +15816,9 @@ Kuwait NNP B-gpe B-gpe
 
 And CC O O
 the DT O O
-United NNP B-gpe B-MISC
-Arab NNP I-gpe I-MISC
-Emirates NNPS I-gpe I-MISC
+United NNP B-gpe B-organization
+Arab NNP I-gpe I-organization
+Emirates NNPS I-gpe I-organization
 , , O O
 a DT O O
 chronic JJ O O
@@ -15888,12 +15888,12 @@ million CD O O
 barrels NNS O O
 to TO O O
 provide VB O O
-Kuwait NNP B-gpe B-person
+Kuwait NNP B-gpe B-gpe
 and CC O O
 the DT O O
-United NNP B-gpe B-MISC
-Arab NNP I-gpe I-MISC
-Emirates NNP I-gpe I-MISC
+United NNP B-gpe B-organization
+Arab NNP I-gpe I-organization
+Emirates NNP I-gpe I-organization
 much RB O O
 higher JJR O O
 official JJ O O
@@ -15920,9 +15920,9 @@ problem NN O O
 , , O O
 although IN O O
 the DT O O
-United NNP B-gpe B-MISC
-Arab NNP I-gpe I-MISC
-Emirates NNPS I-gpe O
+United NNP B-gpe B-organization
+Arab NNP I-gpe I-organization
+Emirates NNPS I-gpe I-organization
 is VBZ O O
 still RB O O
 an DT O O
@@ -15945,7 +15945,7 @@ possible JJ O O
 obstacle NN O O
 , , O O
 some DT O O
-OPEC NNP B-organization B-gpe
+OPEC NNP B-organization B-organization
 sources NNS O O
 said VBD O O
 . . O O
@@ -15997,7 +15997,7 @@ Saudi JJ B-MISC O
 percentage NN O O
 of IN O O
 the DT O O
-OPEC NNP B-organization B-MISC
+OPEC NNP B-organization B-organization
 total NN O O
 intact JJ O O
 , , O O
@@ -16028,8 +16028,8 @@ however RB O O
 , , O O
 call VBP O O
 on IN O O
-Saudi NNP B-gpe B-person
-Arabia NNP I-gpe I-person
+Saudi NNP B-gpe B-gpe
+Arabia NNP I-gpe I-gpe
 to TO O O
 `` `` O O
 give VB O O
@@ -16078,7 +16078,7 @@ its PRP$ O O
 percentage NN O O
 share NN O O
 of IN O O
-OPEC NNP B-organization O
+OPEC NNP B-organization B-organization
 production NN O O
 under IN O O
 any DT O O
@@ -16091,8 +16091,8 @@ Under IN O O
 any DT O O
 circumstances NNS O O
 , , O O
-Saudi NNP B-gpe B-person
-Arabia NNP I-gpe I-person
+Saudi NNP B-gpe B-gpe
+Arabia NNP I-gpe I-gpe
 should MD O O
 get VB O O
 more JJR O O
@@ -16107,9 +16107,9 @@ said VBD O O
 . . O O
 
 When WRB O O
-Michael NNP B-person B-organization
-S. NNP I-person I-organization
-Perry NNP I-person I-organization
+Michael NNP B-person B-person
+S. NNP I-person I-person
+Perry NNP I-person I-person
 took VBD O O
 the DT O O
 podium NN O O
@@ -16137,8 +16137,8 @@ Perry NNP B-person B-person
 , , O O
 who WP O O
 runs VBZ O O
-Unilever NNP B-organization B-person
-Group NNP I-organization I-person
+Unilever NNP B-organization B-organization
+Group NNP I-organization I-organization
 's POS O O
 world-wide JJ O O
 personal-care JJ O O
@@ -16196,7 +16196,7 @@ First JJ B-organization O
 Unilever NNP I-organization B-gpe
 , , O O
 the DT O O
-Anglo-Dutch NNP B-MISC B-MISC
+Anglo-Dutch NNP B-MISC O
 packaged-goods NNS O O
 giant JJ O O
 , , O O
@@ -16209,10 +16209,10 @@ acquire VB O O
 brands NNS O O
 such JJ O O
 as IN O O
-Faberge NNP B-organization O
+Faberge NNP B-organization B-gpe
 and CC O O
-Elizabeth NNP B-organization B-person
-Arden NNP I-organization I-person
+Elizabeth NNP B-organization B-organization
+Arden NNP I-organization I-organization
 . . O O
 
 It PRP O O
@@ -16230,9 +16230,9 @@ counters NNS O O
 . . O O
 
 Then RB O O
-Procter NNP B-organization O
-& CC I-organization O
-Gamble NNP I-organization B-organization
+Procter NNP B-organization B-organization
+& CC I-organization I-organization
+Gamble NNP I-organization I-organization
 Co. NNP I-organization I-organization
 agreed VBD O O
 to TO O O
@@ -16299,7 +16299,7 @@ doing VBG O O
 the DT O O
 acquiring VBG O O
 : : O O
-P&G NNP B-organization B-gpe
+P&G NNP B-organization B-person
 and CC O O
 Unilever NNP B-organization B-gpe
 bring VBP O O
@@ -16348,10 +16348,10 @@ best RBS O O
 known VBN O O
 for IN O O
 selling VBG O O
-Promise NNP B-MISC O
+Promise NNP B-MISC B-MISC
 margarine NN I-MISC O
 and CC O O
-Tide NNP B-MISC B-gpe
+Tide NNP B-MISC B-MISC
 detergent NN I-MISC O
 will MD O O
 succeed VB O O
@@ -16572,9 +16572,9 @@ traditional JJ O O
 cosmetics NNS O O
 houses NNS O O
 , , O O
-Unilever NNP B-organization B-gpe
+Unilever NNP B-organization B-person
 and CC O O
-P&G NNP B-organization B-person
+P&G NNP B-organization B-gpe
 are VBP O O
 the DT O O
 habitats NNS O O
@@ -16599,7 +16599,7 @@ market NN O O
 research NN O O
 . . O O
 
-P&G NNP B-organization O
+P&G NNP B-organization B-gpe
 , , O O
 in IN O O
 particular JJ O O
@@ -16651,7 +16651,7 @@ the DT O O
 field NN O O
 . . O O
 
-P&G NNP B-organization B-person
+P&G NNP B-organization B-gpe
 already RB O O
 has VBZ O O
 shown VBN O O
@@ -16679,18 +16679,18 @@ business NN O O
 . . O O
 
 Consider VB O O
-Oil NNP B-MISC O
-of IN I-MISC O
-Olay NNP I-MISC B-organization
+Oil NNP B-MISC B-organization
+of IN I-MISC I-organization
+Olay NNP I-MISC I-organization
 , , O O
 which WDT O O
-P&G NNP B-organization O
+P&G NNP B-organization B-organization
 acquired VBD O O
 as IN O O
 part NN O O
 of IN O O
-Richardson-Vicks NNP B-organization B-person
-International NNP I-organization I-person
+Richardson-Vicks NNP B-organization B-organization
+International NNP I-organization I-organization
 in IN O O
 1985 CD O O
 . . O O
@@ -16771,7 +16771,7 @@ also RB O O
 redesigned VBD O O
 Oil NNP B-MISC O
 of IN I-MISC O
-Olay NNP I-MISC O
+Olay NNP I-MISC B-MISC
 's POS O O
 packaging NN O O
 , , O O
@@ -16833,7 +16833,7 @@ Goliaths NNS O O
 like IN O O
 Unilever NNP B-organization B-gpe
 and CC O O
-P&G NNP B-organization B-person
+P&G NNP B-organization B-gpe
 have VBP O O
 enormous JJ O O
 financial JJ O O
@@ -16940,13 +16940,13 @@ acquiring VBG O O
 Schering-Plough NNP B-organization B-organization
 Corp. NNP I-organization I-organization
 's POS O O
-Maybelline NNP B-organization O
+Maybelline NNP B-organization B-MISC
 unit NN O O
 are VBP O O
 widespread JJ O O
 . . O O
 
-Unilever NNP B-organization O
+Unilever NNP B-organization B-person
 wo MD O O
 n't RB O O
 comment VB O O
@@ -17089,7 +17089,7 @@ mass-distribution JJ O O
 outlets NNS O O
 such JJ O O
 as IN O O
-drug NN O O
+drug NN O B-MISC
 stores NNS O O
 and CC O O
 supermarkets NNS O O
@@ -17152,8 +17152,8 @@ fall NN O O
 for IN O O
 example NN O O
 , , O O
-L'Oreal NNP B-organization B-person
-Group NNP I-organization I-person
+L'Oreal NNP B-organization B-organization
+Group NNP I-organization I-organization
 , , O O
 ordinarily RB O O
 a DT O O
@@ -17203,7 +17203,7 @@ old-line NN O O
 cosmetics NNS O O
 houses NNS O O
 , , O O
-Unilever NNP B-organization B-gpe
+Unilever NNP B-organization B-person
 and CC O O
 P&G NNP B-organization B-gpe
 both DT O O
@@ -17221,7 +17221,7 @@ new JJ O O
 products NNS O O
 . . O O
 
-P&G NNP B-organization O
+P&G NNP B-organization B-gpe
 , , O O
 in IN O O
 fact NN O O
@@ -17248,7 +17248,7 @@ competition NN O O
 Sales NNS O O
 of IN O O
 its PRP$ O O
-Tide NNP B-MISC O
+Tide NNP B-MISC B-MISC
 detergent NN I-MISC O
 soared VBD O O
 earlier RBR O O
@@ -17259,7 +17259,7 @@ for IN O O
 example NN O O
 , , O O
 after IN O O
-P&G NNP B-organization B-gpe
+P&G NNP B-organization B-organization
 introduced VBD O O
 a DT O O
 version NN O O
@@ -17328,7 +17328,7 @@ the DT O O
 U.S. NNP B-gpe B-gpe
 licensee NN O O
 of IN O O
-L'Oreal NNP B-organization O
+L'Oreal NNP B-organization B-gpe
 . . O O
 
 `` `` O O
@@ -17375,13 +17375,13 @@ Industry NN O O
 consultants NNS O O
 say VBP O O
 only RB O O
-Schering-Plough NNP B-organization O
+Schering-Plough NNP B-organization B-organization
 , , O O
 which WDT O O
 makes VBZ O O
 the DT O O
 mass-market JJ O O
-Maybelline NNP B-organization B-gpe
+Maybelline NNP B-organization O
 , , O O
 has VBZ O O
 maintained VBN O O
@@ -17411,7 +17411,7 @@ brand NN O O
 languished VBD O O
 . . O O
 
-Unilever NNP B-organization O
+Unilever NNP B-organization B-person
 already RB O O
 has VBZ O O
 experienced VBN O O
@@ -17421,7 +17421,7 @@ disappointment NN O O
 
 The DT O O
 mass-market JJ O O
-Aziza NNP B-MISC B-gpe
+Aziza NNP B-MISC B-MISC
 brand NN O O
 , , O O
 which WDT O O
@@ -17494,8 +17494,8 @@ filed VBD O O
 for IN O O
 Chapter NN B-MISC O
 7 CD I-MISC O
-Bankruptcy NNP I-MISC B-MISC
-Code NNP I-MISC I-MISC
+Bankruptcy NNP I-MISC B-organization
+Code NNP I-MISC I-organization
 protection NN O O
 , , O O
 saying VBG O O
@@ -17543,19 +17543,19 @@ several JJ O O
 months NNS O O
 . . O O
 
-Ms. NNP O B-person
-Garratt NNP B-person I-person
+Ms. NNP O O
+Garratt NNP B-person B-person
 was VBD O O
 the DT O O
 subject NN O O
 of IN O O
-a DT O O
-Wall NNP B-organization O
-Street NNP I-organization O
-Journal NNP I-organization O
+a DT O B-organization
+Wall NNP B-organization I-organization
+Street NNP I-organization I-organization
+Journal NNP I-organization I-organization
 article NN O O
 in IN O O
-March NNP O B-gpe
+March NNP O O
 . . O O
 
 The DT O O
@@ -17568,8 +17568,8 @@ Bartholow NNP I-person I-person
 , , O O
 said VBD O O
 that IN O O
-Ms. NNP O B-MISC
-Garratt NNP B-person I-MISC
+Ms. NNP O O
+Garratt NNP B-person B-person
 was VBD O O
 forced VBN O O
 to TO O O
@@ -17587,7 +17587,7 @@ last JJ O O
 month NN O O
 . . O O
 
-Jerell NNP B-organization O
+Jerell NNP B-organization B-gpe
 paid VBD O O
 Ms. NNP O O
 Garratt NNP B-person O
@@ -17597,10 +17597,10 @@ the DT O O
 line NN O O
 known VBN O O
 as IN O O
-Multiples NNPS B-MISC O
+Multiples NNPS B-MISC B-MISC
 by IN I-MISC O
-Sandra NNP I-MISC B-person
-Garratt NNP I-MISC I-person
+Sandra NNP I-MISC B-MISC
+Garratt NNP I-MISC I-MISC
 , , O O
 which WDT O O
 are VBP O O
@@ -17611,8 +17611,8 @@ department NN O O
 stores NNS O O
 . . O O
 
-Ms. NNP O B-person
-Garratt NNP B-person I-person
+Ms. NNP O O
+Garratt NNP B-person B-person
 sued VBD O O
 the DT O O
 Dallas NNP B-gpe B-gpe
@@ -17649,7 +17649,7 @@ still RB O O
 pending VBG O O
 . . O O
 
-Jerell NNP B-organization O
+Jerell NNP B-organization B-gpe
 could MD O O
 n't RB O O
 immediately RB O O
@@ -17659,8 +17659,8 @@ for IN O O
 comment NN O O
 . . O O
 
-Ms. NNP O B-person
-Garratt NNP B-person I-person
+Ms. NNP O O
+Garratt NNP B-person O
 's POS O O
 assets NNS O O
 and CC O O
@@ -17710,7 +17710,7 @@ papers NNS O O
 I PRP O O
 am VBP O O
 the DT O O
-Mimi NNP B-person B-gpe
+Mimi NNP B-person B-MISC
 . . O O
 '' '' O O
 
@@ -17745,7 +17745,7 @@ JFK NNP B-person B-gpe
 I PRP O O
 am VBP O O
 the DT O O
-Anderson NNP B-person B-gpe
+Anderson NNP B-person B-MISC
 . . O O
 
 I PRP O O
@@ -17818,7 +17818,7 @@ The DT O O
 truth NN O O
 about IN O O
 our PRP$ O O
-Camelot NNP B-MISC O
+Camelot NNP B-MISC B-gpe
 obsessed VBN O O
 society NN O O
 is VBZ O O
@@ -17833,7 +17833,7 @@ has VBZ O O
 slept VBN O O
 with IN O O
 the DT O O
-JFK NNP B-person B-gpe
+JFK NNP B-person B-organization
 . . O O
 
 Only RB O O
@@ -17877,8 +17877,8 @@ CNN NNP B-MISC B-MISC
 . . O O
 
 `` `` O O
-Larry NNP O B-person
-King NNP O I-person
+Larry NNP O O
+King NNP O O
 Live RB O O
 '' '' O O
 is VBZ O O
@@ -17888,7 +17888,7 @@ next RB O O
 A DT O O
 return NN O O
 to TO O O
-Soviet-era JJ B-MISC O
+Soviet-era JJ B-MISC B-MISC
 symbolism NN O O
 in IN O O
 Russia NNP B-gpe B-gpe
@@ -17987,8 +17987,8 @@ lyrics NNS O O
 The DT O O
 city NN O O
 of IN O O
-Los NNP B-gpe B-person
-Angeles NNP I-gpe I-person
+Los NNP B-gpe B-gpe
+Angeles NNP I-gpe I-gpe
 has VBZ O O
 announced VBN O O
 that IN O O
@@ -18038,7 +18038,7 @@ submit VB O O
 bids NNS O O
 by IN O O
 the DT O O
-December NNP O O
+December NNP O B-MISC
 15th NN O O
 deadline NN O O
 are VBP O O
@@ -18055,8 +18055,8 @@ Houston NNP B-gpe B-gpe
 New NNP B-gpe B-gpe
 York NNP I-gpe I-gpe
 , , O O
-San NNP B-gpe B-person
-Francisco NNP I-gpe I-person
+San NNP B-gpe B-gpe
+Francisco NNP I-gpe I-gpe
 and CC O O
 Tampa NNP B-gpe B-gpe
 , , O O
@@ -18064,9 +18064,9 @@ Florida NNP B-gpe B-gpe
 . . O O
 
 The DT O O
-US NNP B-MISC B-organization
-Olympic NNP I-MISC I-organization
-Committee NNP I-MISC I-organization
+US NNP B-MISC B-MISC
+Olympic NNP I-MISC I-MISC
+Committee NNP I-MISC I-MISC
 will MD O O
 make VB O O
 its PRP$ O O
@@ -18076,9 +18076,9 @@ late JJ O O
 2002 CD O O
 and CC O O
 the DT O O
-International NNP B-MISC B-organization
-Olympic NNP I-MISC I-organization
-Committee NNP I-MISC I-organization
+International NNP B-MISC B-MISC
+Olympic NNP I-MISC I-MISC
+Committee NNP I-MISC I-MISC
 will MD O O
 select VB O O
 the DT O O
@@ -18128,7 +18128,7 @@ listed VBN O O
 with IN O O
 the DT O O
 symbol NN O O
-PGM NNP B-organization O
+PGM NNP B-organization B-gpe
 . . O O
 
 The DT O O
@@ -18157,8 +18157,8 @@ Hibernia NNP B-organization B-organization
 Corp. NNP I-organization I-organization
 , , O O
 a DT O O
-New NNP B-gpe B-gpe
-Orleans NNP I-gpe I-gpe
+New NNP B-gpe B-organization
+Orleans NNP I-gpe I-organization
 bank NN O O
 holding VBG O O
 company NN O O
@@ -18166,8 +18166,8 @@ company NN O O
 will MD O O
 join VB O O
 the DT O O
-Big NNP B-organization B-organization
-Board NNP I-organization I-organization
+Big NNP B-organization O
+Board NNP I-organization O
 Thursday NNP O O
 under IN O O
 HIB NNP B-organization B-gpe
@@ -18186,7 +18186,7 @@ Exabyte NNP B-organization B-organization
 Corp. NNP I-organization I-organization
 , , O O
 a DT O O
-Boulder NNP B-gpe O
+Boulder NNP B-gpe B-gpe
 , , O O
 Colo. NNP B-gpe B-gpe
 , , O O
@@ -18205,20 +18205,20 @@ disk NN O O
 drives NNS O O
 , , O O
 started VBD O O
-OTC NNP O O
+OTC NNP O B-gpe
 trading VBG O O
 with IN O O
 the DT O O
 symbol NN O O
-EXBT NNP B-organization O
+EXBT NNP B-organization B-MISC
 . . O O
 
-Rally NNP B-organization O
+Rally NNP B-organization B-organization
 's POS I-organization O
 Inc. NN I-organization O
 , , O O
 a DT O O
-Louisville NNP B-gpe O
+Louisville NNP B-gpe B-gpe
 , , O O
 Ky. NNP B-gpe B-gpe
 , , O O
@@ -18235,7 +18235,7 @@ Sierra NNP B-organization B-organization
 Tucson NNP I-organization I-organization
 Cos. NNP I-organization I-organization
 , , O O
-Tucson NNP B-gpe B-gpe
+Tucson NNP B-gpe B-organization
 , , O O
 Ariz. NNP B-gpe B-gpe
 , , O O
@@ -18468,8 +18468,8 @@ with IN O O
 us PRP O O
 . . O O
 
-Mrs. NNP O B-person
-Robinson NNP B-person I-person
+Mrs. NNP O O
+Robinson NNP B-person B-person
 , , O O
 the DT O O
 head NN O O
@@ -18515,8 +18515,8 @@ three CD O O
 vehicle NN O O
 convoy NN O O
 transporting VBG O O
-Mrs. NNP O B-person
-Robinson NNP B-person I-person
+Mrs. NNP O O
+Robinson NNP B-person B-person
 and CC O O
 her PRP$ O O
 staff NN O O
@@ -18559,8 +18559,8 @@ the DT O O
 incident NN O O
 . . O O
 
-Mrs. NNP O B-person
-Robinson NNP B-person I-person
+Mrs. NNP O O
+Robinson NNP B-person B-person
 is VBZ O O
 on IN O O
 a DT O O
@@ -18627,8 +18627,8 @@ attack NN O O
 . . O O
 
 The DT O O
-Israeli JJ B-MISC B-MISC
-Army NNP I-MISC I-MISC
+Israeli JJ B-MISC O
+Army NNP I-MISC O
 said VBD O O
 that IN O O
 the DT O O
@@ -18637,8 +18637,8 @@ gunmen NNS O O
 had VBD O O
 fired VBN O O
 at IN O O
-Mrs. NNP O B-person
-Robinson NNP B-person I-person
+Mrs. NNP O O
+Robinson NNP B-person B-person
 's POS O O
 car NN O O
 . . O O
@@ -18723,7 +18723,7 @@ they PRP O O
 will MD O O
 never RB O O
 leave VB O O
-Hebron NNP B-gpe O
+Hebron NNP B-gpe B-gpe
 despite IN O O
 almost RB O O
 daily JJ O O
@@ -18749,8 +18749,8 @@ Jerusalem NNP B-gpe B-gpe
 
 And CC O O
 on IN O O
-Capitol NNP B-MISC B-gpe
-Hill NNP I-MISC I-gpe
+Capitol NNP B-MISC B-MISC
+Hill NNP I-MISC I-MISC
 tonight NN O O
 , , O O
 no DT O O
@@ -18763,11 +18763,11 @@ in IN O O
 Congress NNP B-MISC B-organization
 have VBP O O
 mellowed VBN O O
-Republican JJ B-MISC O
-Majority NNP O B-organization
-Whip NNP O I-organization
-Tom NNP B-person I-organization
-DeLay NNP I-person I-organization
+Republican JJ B-MISC B-MISC
+Majority NNP O O
+Whip NNP O O
+Tom NNP B-person B-person
+DeLay NNP I-person I-person
 . . O O
 
 He PRP O O
@@ -18836,8 +18836,8 @@ by IN O O
 states NNS O O
 . . O O
 
-U.S. NNP B-organization B-gpe
-Memories NNPS I-organization O
+U.S. NNP B-organization B-organization
+Memories NNPS I-organization I-organization
 said VBD O O
 it PRP O O
 will MD O O
@@ -18942,8 +18942,8 @@ U.S. NNP B-organization B-gpe
 Memories NNPS I-organization O
 investors NNS O O
 include VBP O O
-Advanced NNP B-organization B-person
-Micro NNP I-organization I-person
+Advanced NNP B-organization B-organization
+Micro NNP I-organization I-organization
 Devices NNPS I-organization I-organization
 Inc. NNP I-organization I-organization
 , , O O
@@ -18951,8 +18951,8 @@ Digital NNP B-organization B-organization
 Equipment NNP I-organization I-organization
 Corp. NNP I-organization I-organization
 , , O O
-Hewlett-Packard NNP B-organization B-person
-Co. NNP I-organization I-person
+Hewlett-Packard NNP B-organization B-organization
+Co. NNP I-organization I-organization
 , , O O
 International NNP B-organization B-organization
 Business NNP I-organization I-organization
@@ -19015,7 +19015,7 @@ security NN O O
 forces NNS O O
 in IN O O
 the DT O O
-Mideast NNP B-MISC B-gpe
+Mideast NNP B-MISC B-MISC
 does VBZ O O
 not RB O O
 seem VB O O
@@ -19095,7 +19095,7 @@ They PRP O O
 were VBD O O
 leaders NNS O O
 of IN O O
-Arafat NNP B-person O
+Arafat NNP B-person B-gpe
 's POS O O
 Fatah NNP B-MISC B-MISC
 movement NN O O
@@ -19144,9 +19144,9 @@ disclosed VBN O O
 The DT O O
 agreement NN O O
 marks VBZ O O
-Bausch NNP B-organization B-gpe
-& CC I-organization O
-Lomb NNP I-organization B-person
+Bausch NNP B-organization B-organization
+& CC I-organization I-organization
+Lomb NNP I-organization I-organization
 's POS O O
 first JJ O O
 venture NN O O
@@ -19252,8 +19252,8 @@ Here RB O O
 's VBZ O O
 ABC NNP B-MISC B-MISC
 's POS O O
-Gillian NNP B-person B-MISC
-Findlay NNP I-person I-MISC
+Gillian NNP B-person B-person
+Findlay NNP I-person I-person
 . . O O
 
 Out IN O O
@@ -19341,7 +19341,7 @@ even RB O O
 bicycles NNS O O
 . . O O
 
-Mohammed NNP B-person B-person
+Mohammed NNP B-person B-gpe
 's POS O O
 parents NNS O O
 told VBD O O
@@ -19530,7 +19530,7 @@ career NN O O
 to TO O O
 return VB O O
 to TO O O
-Ramallah NNP B-gpe B-person
+Ramallah NNP B-gpe B-gpe
 and CC O O
 help VB O O
 build VB O O
@@ -19680,7 +19680,7 @@ Findlay NNP I-person I-person
 ABC NNP B-MISC B-MISC
 News NNP I-MISC I-MISC
 , , O O
-Ramallah NNP B-gpe B-gpe
+Ramallah NNP B-gpe B-person
 . . O O
 
 President NNP O O
@@ -19756,10 +19756,10 @@ Co. NNP I-organization I-organization
 filed VBD O O
 with IN O O
 the DT O O
-Michigan NNP B-organization B-MISC
-Public NNP I-organization I-MISC
-Service NNP I-organization I-MISC
-Commission NNP I-organization I-MISC
+Michigan NNP B-organization B-organization
+Public NNP I-organization I-organization
+Service NNP I-organization I-organization
+Commission NNP I-organization I-organization
 a DT O O
 contract NN O O
 to TO O O
@@ -19781,8 +19781,8 @@ the DT O O
 plant NN O O
 . . O O
 
-Consumers NNPS B-organization O
-Power NNP I-organization B-person
+Consumers NNPS B-organization B-person
+Power NNP I-organization I-person
 and CC O O
 Bechtel NNP B-organization B-organization
 Power NNP I-organization I-organization
@@ -19825,7 +19825,7 @@ military JJ O O
 bases NNS O O
 in IN O O
 the DT O O
-Baltics NNP B-MISC B-gpe
+Baltics NNP B-MISC B-organization
 . . O O
 
 The DT O O
@@ -19919,9 +19919,9 @@ shares NNS O O
 in IN O O
 Jaguar NNP B-organization B-organization
 PLC NNP I-organization I-organization
-. . O O
+. . O I-organization
 
-Jaguar NNP B-organization O
+Jaguar NNP B-organization B-person
 , , O O
 the DT O O
 London NNP B-organization B-organization
@@ -19929,11 +19929,11 @@ Stock NNP I-organization I-organization
 Exchange NNP I-organization I-organization
 and CC O O
 the DT O O
-U.S. NNP B-organization B-gpe
-Securities NNP I-organization I-gpe
-and CC I-organization O
-Exchange NNP I-organization B-person
-Commission NNP I-organization I-person
+U.S. NNP B-organization B-organization
+Securities NNP I-organization I-organization
+and CC I-organization I-organization
+Exchange NNP I-organization I-organization
+Commission NNP I-organization I-organization
 are VBP O O
 being VBG O O
 notified VBN O O
@@ -19947,10 +19947,10 @@ said VBD O O
 . . O O
 
 The DT O O
-U.S. NNP B-organization B-MISC
-Federal NNP I-organization I-MISC
-Trade NNP I-organization I-MISC
-Commission NNP I-organization I-MISC
+U.S. NNP B-organization B-organization
+Federal NNP I-organization I-organization
+Trade NNP I-organization I-organization
+Commission NNP I-organization I-organization
 advised VBD O O
 Ford NNP B-organization O
 last JJ O O
@@ -20005,8 +20005,8 @@ maximum NN O O
 allowed VBN O O
 under IN O O
 current JJ O O
-United NNP B-gpe B-MISC
-Kingdom NNP I-gpe I-MISC
+United NNP B-gpe B-organization
+Kingdom NNP I-gpe I-organization
 government NN O O
 restrictions NNS O O
 . . O O
@@ -20027,7 +20027,7 @@ venture NN O O
 with IN O O
 Jaguar NNP B-organization O
 before IN O O
-Ford NNP B-organization B-gpe
+Ford NNP B-organization B-person
 began VBD O O
 buying VBG O O
 shares NNS O O
@@ -20058,9 +20058,9 @@ two CD O O
 bodies NNS O O
 recovered VBN O O
 near IN O O
-San NNP B-MISC B-organization
-Francisco NNP I-MISC I-organization
-Bay NNP I-MISC I-organization
+San NNP B-MISC B-MISC
+Francisco NNP I-MISC I-MISC
+Bay NNP I-MISC I-MISC
 yesterday NN O O
 was VBD O O
 unable JJ O O
@@ -20095,7 +20095,7 @@ child NN O O
 Peterson NNP B-person B-person
 disappeared VBD O O
 on IN O O
-Christmas NNP O O
+Christmas NNP O B-MISC
 eve NN O O
 of IN O O
 last JJ O O
@@ -20119,14 +20119,14 @@ for IN O O
 us PRP O O
 . . O O
 
-Paul NNP B-person O
+Paul NNP B-person B-person
 ? . O O
 
 That DT O O
 was VBD O O
 on IN O O
-Christmas NNP O B-person
-Eve NNP O I-person
+Christmas NNP O B-MISC
+Eve NNP O I-MISC
 . . O O
 
 Her PRP$ O O
@@ -20144,7 +20144,7 @@ was VBD O O
 fishing VBG O O
 in IN O O
 the DT O O
-Berkeley NNP B-gpe B-gpe
+Berkeley NNP B-gpe B-organization
 marina NN O O
 . . O O
 
@@ -20175,7 +20175,7 @@ man NN O O
 hiking VBG O O
 near IN O O
 the DT O O
-Berkeley NNP B-gpe B-MISC
+Berkeley NNP B-gpe B-organization
 marina NN O O
 found VBD O O
 a DT O O
@@ -20538,7 +20538,7 @@ much RB O O
 . . O O
 
 As IN O O
-Paul NNP B-person O
+Paul NNP B-person B-gpe
 just RB O O
 reported VBD O O
 , , O O
@@ -20583,8 +20583,8 @@ Vickers NNP B-organization B-organization
 PLC NNP I-organization I-organization
 , , O O
 a DT O O
-United NNP B-gpe B-MISC
-Kingdom NNP I-gpe I-MISC
+United NNP B-gpe B-organization
+Kingdom NNP I-gpe I-organization
 defense NN O O
 and CC O O
 engineering NN O O
@@ -20635,12 +20635,12 @@ of IN O O
 Mr. NNP O O
 Brierley NNP B-person B-person
 's POS O O
-Hong NNP B-gpe O
-Kong-based JJ I-gpe O
-Industrial NNP B-organization O
-Equity NNP I-organization O
-( ( I-organization O
-Pacific NNP I-organization B-organization
+Hong NNP B-gpe B-organization
+Kong-based JJ I-gpe I-organization
+Industrial NNP B-organization I-organization
+Equity NNP I-organization I-organization
+( ( I-organization I-organization
+Pacific NNP I-organization I-organization
 ) ) I-organization I-organization
 Ltd. NNP I-organization I-organization
 , , O O
@@ -20673,7 +20673,7 @@ months NNS O O
 . . O O
 
 In IN O O
-May NNP O B-gpe
+May NNP O O
 , , O O
 Mr. NNP O O
 Brierley NNP B-person B-person
@@ -20700,8 +20700,8 @@ year NN O O
 . . O O
 
 `` `` O O
-Ron NNP B-person B-MISC
-Brierley NNP I-person I-MISC
+Ron NNP B-person B-person
+Brierley NNP I-person I-person
 clearly RB O O
 views VBZ O O
 our PRP$ O O
@@ -20713,7 +20713,7 @@ investment NN O O
 , , O O
 '' '' O O
 a DT O O
-Vickers NNP B-organization O
+Vickers NNP B-organization B-organization
 spokesman NN O O
 said VBD O O
 . . O O
@@ -20745,7 +20745,7 @@ the DT O O
 company NN O O
 . . O O
 
-Vickers NNP B-organization O
+Vickers NNP B-organization B-person
 makes VBZ O O
 tanks NNS O O
 for IN O O
@@ -20772,12 +20772,12 @@ an DT O O
 attorney NN O O
 with IN O O
 the DT O O
-Brady NNP B-MISC B-organization
-Center NNP I-MISC I-organization
-to TO I-MISC O
-Prevent NNP I-MISC O
-Gun NNP I-MISC B-person
-Violence NNP I-MISC I-person
+Brady NNP B-MISC B-MISC
+Center NNP I-MISC I-MISC
+to TO I-MISC I-MISC
+Prevent NNP I-MISC I-MISC
+Gun NNP I-MISC I-MISC
+Violence NNP I-MISC I-MISC
 who WP O O
 filed VBD O O
 the DT O O
@@ -20806,8 +20806,8 @@ Let VB O O
 talk VB O O
 about IN O O
 what WP O O
-Ms. NNP O B-person
-Johnson NNP B-person I-person
+Ms. NNP O O
+Johnson NNP B-person B-person
 wrote VBD O O
 in IN O O
 the DT O O
@@ -20984,7 +20984,7 @@ the DT O O
 pieces NNS O O
 of IN O O
 the DT O O
-IBM NNP B-organization B-gpe
+IBM NNP B-organization B-MISC
 strategy NN O O
 to TO O O
 fall VB O O
@@ -20996,7 +20996,7 @@ though IN O O
 the DT O O
 specific JJ O O
 products NNS O O
-IBM NNP B-organization O
+IBM NNP B-organization B-person
 unveiled VBD O O
 will MD O O
 generally RB O O
@@ -21026,7 +21026,7 @@ that IN O O
 in IN O O
 the DT O O
 past NN O O
-IBM NNP B-organization B-gpe
+IBM NNP B-organization B-MISC
 has VBZ O O
 developed VBN O O
 broad JJ O O
@@ -21081,7 +21081,7 @@ He PRP O O
 said VBD O O
 he PRP O O
 expects VBZ O O
-IBM NNP B-organization O
+IBM NNP B-organization B-gpe
 to TO O O
 unveil VB O O
 similar JJ O O
@@ -21317,7 +21317,7 @@ uprising NN O O
 ousted VBD O O
 long JJ O O
 time NN O O
-Yugoslav JJ B-MISC O
+Yugoslav JJ B-MISC B-MISC
 President NNP O O
 Slobodan NNP B-person B-person
 Milosevic NNP I-person I-person
@@ -21395,12 +21395,12 @@ demonstration NN O O
 coordinated VBN O O
 by IN O O
 the DT O O
-National NNP B-MISC O
-Youth NNP I-MISC B-person
-and CC I-MISC O
-Student NNP I-MISC B-organization
-Peace NNP I-MISC I-organization
-Coalition NNP I-MISC I-organization
+National NNP B-MISC B-MISC
+Youth NNP I-MISC I-MISC
+and CC I-MISC I-MISC
+Student NNP I-MISC I-MISC
+Peace NNP I-MISC I-MISC
+Coalition NNP I-MISC I-MISC
 . . O O
 
 Record NN O O
@@ -21416,8 +21416,8 @@ now RB O O
 to TO O O
 freeze VB O O
 over RP O O
-Lake NNP B-MISC B-person
-Superior NNP I-MISC I-person
+Lake NNP B-MISC B-MISC
+Superior NNP I-MISC I-MISC
 surface NN O O
 . . O O
 
@@ -21447,8 +21447,8 @@ largest JJS O O
 of IN O O
 the DT O O
 five CD O O
-Great NNP B-MISC B-organization
-Lakes NNPS I-MISC I-organization
+Great NNP B-MISC B-MISC
+Lakes NNPS I-MISC I-MISC
 . . O O
 
 It PRP O O
@@ -21478,7 +21478,7 @@ the DT O O
 year NN O O
 . . O O
 
-AAA NNP B-MISC O
+AAA NNP B-MISC B-organization
 estimates VBZ O O
 61 CD O O
 million CD O O
@@ -21542,9 +21542,9 @@ season NN O O
 officials NNS O O
 from IN O O
 the DT O O
-National NNP B-MISC O
-Retail NNP I-MISC B-person
-Federation NNP I-MISC I-person
+National NNP B-MISC B-MISC
+Retail NNP I-MISC I-MISC
+Federation NNP I-MISC I-MISC
 say VBP O O
 most JJS O O
 merchants NNS O O
@@ -21577,7 +21577,7 @@ in IN O O
 pushing VBG O O
 for IN O O
 a DT O O
-Mideast NNP B-MISC O
+Mideast NNP B-MISC B-MISC
 peace NN O O
 agreement NN O O
 . . O O
@@ -21618,8 +21618,8 @@ How WRB O O
 interestingly RB O O
 clever JJ O O
 of IN O O
-Robert NNP B-person B-organization
-Goldberg NNP I-person I-organization
+Robert NNP B-person B-person
+Goldberg NNP I-person I-person
 to TO O O
 use VB O O
 the DT O O
@@ -21909,8 +21909,8 @@ WorldCom NNP B-MISC O
 then RB O O
 known VBN O O
 as IN O O
-MCI NNP B-MISC B-organization
-WorldCom NNP I-MISC I-organization
+MCI NNP B-MISC B-MISC
+WorldCom NNP I-MISC I-MISC
 automatically RB O O
 shifted VBD O O
 customers NNS O O
@@ -21928,9 +21928,9 @@ rate NN O O
 plan NN O O
 . . O O
 
-MCI NNP B-MISC B-person
+MCI NNP B-MISC B-organization
 and CC O O
-Worldcom NNP B-MISC O
+Worldcom NNP B-MISC B-gpe
 merged VBD O O
 in IN O O
 1998 CD O O
@@ -21975,7 +21975,7 @@ in IN O O
 his PRP$ O O
 hometown NN O O
 of IN O O
-Edgefield NNP B-gpe B-gpe
+Edgefield NNP B-gpe B-organization
 , , O O
 South NNP B-gpe B-gpe
 Carolina NNP I-gpe I-gpe
@@ -22077,9 +22077,9 @@ are VBP O O
 listening VBG O O
 to TO O O
 the DT O O
-Voice NNP B-MISC O
-of IN I-MISC O
-America NNP I-MISC B-gpe
+Voice NNP B-MISC B-MISC
+of IN I-MISC I-MISC
+America NNP I-MISC I-MISC
 . . O O
 
 Monkey NN O O
@@ -22098,7 +22098,7 @@ typical JJ O O
 of IN O O
 Parkinson NNP O B-gpe
 's POS O O
-Disease NNP O O
+Disease NNP O B-organization
 by IN O O
 placing VBG O O
 repair NN O O
@@ -22106,7 +22106,7 @@ proteins NNS O O
 inside IN O O
 a DT O O
 disabled JJ O O
-AIDS NNP O B-gpe
+AIDS NNP O B-MISC
 virus NN O O
 . . O O
 
@@ -22130,7 +22130,7 @@ an DT O O
 effort NN O O
 to TO O O
 end VB O O
-Parkinson NNP O B-person
+Parkinson NNP O B-gpe
 's POS O O
 deterioration NN O O
 . . O O
@@ -22250,12 +22250,12 @@ leader NN O O
 Jeffery NNP B-person B-person
 Codover NNP I-person I-person
 of IN O O
-Rush NNP B-MISC B-organization
-Presbyterian NNP I-MISC I-organization
-St. NNP I-MISC I-organization
-Lukes NNPS I-MISC I-organization
-Medical NNP I-MISC I-organization
-Center NNP I-MISC I-organization
+Rush NNP B-MISC B-MISC
+Presbyterian NNP I-MISC I-MISC
+St. NNP I-MISC I-MISC
+Lukes NNPS I-MISC I-MISC
+Medical NNP I-MISC I-MISC
+Center NNP I-MISC I-MISC
 in IN O O
 Chicago NNP B-gpe B-gpe
 . . O O
@@ -22269,7 +22269,7 @@ team NN O O
 used VBD O O
 is VBZ O O
 called VBN O O
-GDNF NNP O B-gpe
+GDNF NNP O B-person
 . . O O
 
 Previous JJ O O
@@ -22277,7 +22277,7 @@ studies NNS O O
 have VBP O O
 shown VBN O O
 that IN O O
-GDNF NNP O B-gpe
+GDNF NNP O B-person
 keeps VBZ O O
 dopamine NN O O
 cells NNS O O
@@ -22336,7 +22336,7 @@ a DT O O
 gene NN O O
 to TO O O
 make VB O O
-GDNF NNP O O
+GDNF NNP O B-gpe
 right RB O O
 into IN O O
 the DT O O
@@ -22350,12 +22350,12 @@ transport VB O O
 the DT O O
 gene NN O O
 , , O O
-Louisiane NNP B-MISC B-person
-University NNP I-MISC I-person
+Louisiane NNP B-MISC B-MISC
+University NNP I-MISC I-MISC
 researchers NNS O O
 devised VBD O O
 an DT O O
-HIV NNP O B-gpe
+HIV NNP O B-MISC
 virus NN O O
 stripped VBN O O
 of IN O O
@@ -22377,13 +22377,13 @@ aging VBG O O
 animals NNS O O
 with IN O O
 early JJ O O
-Parkinson NNP O B-organization
+Parkinson NNP O B-gpe
 's POS O O
 it PRP O O
 conveyed VBD O O
 the DT O O
 attached VBN O O
-GDNF NNP O O
+GDNF NNP O B-person
 gene NN O O
 efficiently RB O O
 , , O O
@@ -22402,7 +22402,7 @@ site NN O O
 When WRB O O
 we PRP O O
 delivered VBD O O
-GDNF NNP O O
+GDNF NNP O B-gpe
 via IN O O
 gene NN O O
 therapy NN O O
@@ -22435,7 +22435,7 @@ relate VBP O O
 to TO O O
 Parkinson NNP O B-gpe
 's POS O O
-Disease NNP O O
+Disease NNP O B-MISC
 . . O O
 
 The DT O O
@@ -22491,7 +22491,7 @@ trials NNS O O
 in IN O O
 Parkinson NNP O B-gpe
 's POS O O
-Disease NNP O O
+Disease NNP O B-gpe
 are VBP O O
 directed VBN O O
 towards IN O O
@@ -22540,9 +22540,9 @@ benefits NNS O O
 In IN O O
 Stockholm NNP B-gpe B-gpe
 , , O O
-Sweden NNP B-gpe B-organization
-Carolinska NNP B-MISC I-organization
-Institute NNP I-MISC I-organization
+Sweden NNP B-gpe B-MISC
+Carolinska NNP B-MISC I-MISC
+Institute NNP I-MISC I-MISC
 neuroscientist NN O O
 Lars NNP B-person B-person
 Olson NNP I-person I-person
@@ -22560,7 +22560,7 @@ would MD O O
 be VB O O
 the DT O O
 best JJS O O
-Parkinson NNP O B-person
+Parkinson NNP O B-gpe
 's POS O O
 treatment NN O O
 yet RB O O
@@ -22658,8 +22658,8 @@ for IN O O
 instance NN O O
 . . O O
 
-Jeffery NNP B-person B-organization
-Cooover NNP I-person I-organization
+Jeffery NNP B-person B-person
+Cooover NNP I-person I-person
 says VBZ O O
 he PRP O O
 is VBZ O O

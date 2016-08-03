@@ -5,6 +5,8 @@ import com.statnlp.hybridnetworks.TableLookupNetwork;
 
 public class E2DNetwork extends TableLookupNetwork{
 
+	private static final long serialVersionUID = 301603038046736006L;
+	
 	int _numNodes = -1;
 	
 	public E2DNetwork(){

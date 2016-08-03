@@ -109,4 +109,25 @@ public class ECRFEval {
 		
 		pw.close();
 	}
+	
+	public static void outputTopKNER(Instance[] predictions, String nerResult) throws IOException{
+		PrintWriter pw = RAWF.writer(nerResult);
+		for(int index=0;index<predictions.length;index++){
+			Instance inst = predictions[index];
+			ECRFInstance eInst = (ECRFInstance)inst;
+			String[][] predEntities = eInst.getTopKPrediction();
+			ArrayList<String> trueEntities = eInst.getOutput();
+			Sentence sent = eInst.getInput();
+			for(int k=0;k<predEntities.length;k++){
+				if(predEntities[k]==null) break;
+				pw.write("[InstanceId+Weight]:"+eInst.getInstanceId()+":"+eInst.getTopKScore()[k]+"\n");
+				for(int i=0;i<sent.length();i++){
+					int headIndex = sent.get(i).getHeadIndex()+1;
+					pw.write((i+1)+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+trueEntities.get(i)+" "+predEntities[k][i]+" "+headIndex+"\n");
+				}
+				pw.write("\n");
+			}
+		}
+		pw.close();
+	}
 }

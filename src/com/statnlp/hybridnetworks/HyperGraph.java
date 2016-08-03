@@ -84,4 +84,11 @@ public interface HyperGraph extends Serializable{
 	 */
 	public boolean contains(long node);
 	
+	/**
+	 * Return the node index in this network of the given node
+	 * @param node
+	 * @return
+	 */
+	public int getNodeIndex(long node);
+	
 }

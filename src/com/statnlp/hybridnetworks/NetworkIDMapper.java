@@ -23,25 +23,7 @@ public class NetworkIDMapper implements Serializable{
 	
 	private static final long serialVersionUID = -7101734566617861789L;
 
-	public static int[] _CAPACITY_FOREST = new int[]{NetworkConfig._FOREST_MAX_HEIGHT+1, NetworkConfig._FOREST_MAX_WIDTH+1};
-	
-	//for both sides, the max height and max width are both 10000, and the max depth is 100
-	public static int[] _CAPACITY_NETWORK = new int[]{_CAPACITY_FOREST[0],_CAPACITY_FOREST[1],
-													  _CAPACITY_FOREST[0],_CAPACITY_FOREST[1],
-													  NetworkConfig._NETWORK_MAX_DEPTH};
-	
-	public static void main(String args[]){
-		int[] capacity = new int[]{1000,1000,1000,1000,1000,1000};
-		int[] v = new int[]{1,2,3,4,10,6};
-		NetworkIDMapper.setCapacity(capacity);
-		long u = NetworkIDMapper.toHybridNodeID(v);
-		if(u>Long.MAX_VALUE){
-			System.err.println(u+">"+Long.MAX_VALUE);
-		}
-		int[] w = NetworkIDMapper.toHybridNodeArray(u);
-		System.err.println(u);
-		System.err.println(Arrays.toString(w));
-	}
+	public static int[] _CAPACITY_NETWORK = NetworkConfig.DEFAULT_CAPACITY_NETWORK;
 	
 	public static void setCapacity(int[] capacity){
 		_CAPACITY_NETWORK = capacity;
@@ -89,12 +71,6 @@ public class NetworkIDMapper implements Serializable{
 			}
 			v = v* _CAPACITY_NETWORK[k] + array[k];
 		}
-		return v;
-	}
-	
-	public static long toHybridNodeID(long srcId, long tgtId, int patternId){
-		long v = srcId * _CAPACITY_NETWORK[2] * _CAPACITY_NETWORK[3] + tgtId;
-		v = v* _CAPACITY_NETWORK[4] + patternId;
 		return v;
 	}
 	

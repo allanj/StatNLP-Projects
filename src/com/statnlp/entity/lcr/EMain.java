@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.statnlp.commons.types.Instance;
+import com.statnlp.dp.Evaluator;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.Init;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
@@ -25,6 +26,7 @@ public class EMain {
 	public static String testFile = "";
 	public static boolean isPipe = false;
 	public static String nerOut;
+	public static String topKNEROut;
 	public static String nerRes;
 	public static boolean isDev;
 	public static String[] selectedEntities = {"person","organization","gpe","MISC"};
@@ -66,6 +68,7 @@ public class EMain {
 		
 		String middle = isDev? ".dev":".test";
 		nerOut = DPConfig.data_prefix+modelType+middle+DPConfig.ner_eval_suffix;
+		topKNEROut = DPConfig.data_prefix + modelType + middle + DPConfig.ner_topk_res_suffix;
 		nerRes = DPConfig.data_prefix+modelType+middle+DPConfig.ner_res_suffix;
 		testFile = isDev? DPConfig.ecrfdev:DPConfig.ecrftest;
 		if(isPipe){
@@ -98,15 +101,18 @@ public class EMain {
 			trainInstances = EReader.readData(DPConfig.ecrftrain,true,trainNumber, entityMap);
 			testInstances = isPipe?EReader.readDP2NERPipe(testFile, testNumber,entityMap)
 					:EReader.readData(testFile,false,testNumber,entityMap);
+			
+//			testInstances = EReader.readData(testFile,false,testNumber,entityMap);
 		}
 //		Formatter.ner2Text(trainInstances, "data/testRandom2.txt");
 //		System.exit(0);
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
-		NetworkConfig._CACHE_FEATURES_DURING_TRAINING = true;
+		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2;
-		NetworkConfig._numThreads = numThreads;
-		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
+		NetworkConfig.NUM_THREADS = numThreads;
+		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
+		NetworkConfig.USE_NEURAL_FEATURES = true;
 		
 		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(),entities,isPipe);
 		ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(entityMap, entities);
@@ -116,6 +122,8 @@ public class EMain {
 		Instance[] predictions = model.decode(testInstances.toArray(new ECRFInstance[testInstances.size()]));
 		ECRFEval.evalNER(predictions, nerOut);
 		ECRFEval.writeNERResult(predictions, nerRes, true);
+		if(NetworkConfig._topKValue>1)
+			ECRFEval.outputTopKNER(predictions, topKNEROut);
 	}
 
 	
@@ -142,6 +150,7 @@ public class EMain {
 					case "-comb": DPConfig.comb = true; break;
 					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
 					case "-topkinput": topkinput = true; break;
+					case "-topk": NetworkConfig._topKValue = Integer.valueOf(args[i+1]); break;
 					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 				}
 			}

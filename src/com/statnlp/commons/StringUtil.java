@@ -1,5 +1,5 @@
 /** Statistical Natural Language Processing System
-    Copyright (C) 2014  Lu, Wei
+    Copyright (C) 2014-2016  Lu, Wei
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,12 +19,6 @@ package com.statnlp.commons;
 import java.util.StringTokenizer;
 
 public class StringUtil {
-	
-	public static void main(String args[]){
-		String input = "<sentence><cons lex=\"adenovirus_(Ad)_infection\" sem=\"G#other_name\"><cons lex=\"adenovirus\" sem=\"G#virus\">Adenovirus</cons> (Ad)-infection</cons>and <cons lex=\"E1A_transfection\" sem=\"G#other_name\"><cons lex=\"E1A\" sem=\"G#protein_molecule\">E1A</cons> transfection</cons> were used to model changes in susceptibility to <cons lex=\"NK_cell_killing\" sem=\"G#other_name\">NK cell killing</cons> caused by transient vs stable <cons lex=\"E1A_expression\" sem=\"G#other_name\"><cons lex=\"E1A\" sem=\"G#protein_molecule\">E1A</cons> expression</cons> in <cons lex=\"human_cell\" sem=\"G#cell_type\">human cells</cons>.</sentence>";
-		String output = stripXMLTags(input);
-		System.err.println(output);
-	}
 	
 	public static int numTokens(String input){
 		StringTokenizer st = new StringTokenizer(input);

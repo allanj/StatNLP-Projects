@@ -65,18 +65,18 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 		long root = toNode_root(lcrfInstance.size());
 		int rootIdx = Arrays.binarySearch(lcrfNetwork.getAllNodes(),root);
 		//System.err.println(rootIdx+" final score:"+network.getMax(rootIdx));
-		for(int i=0;i<lcrfInstance.size();i++){
-			int child_k = lcrfNetwork.getMaxPath(rootIdx)[0];
-			long child = lcrfNetwork.getNode(child_k);
-			rootIdx = child_k;
-			int tagID = NetworkIDMapper.toHybridNodeArray(child)[1];
-			prediction.add(0, entities[tagID]);
-		}
-		
-		result.setPrediction(prediction);
-		result.setPredictionScore(lcrfNetwork.getMax());
-		
-		if(NetworkConfig._topKValue>1){
+		if(NetworkConfig._topKValue==1){
+			for(int i=0;i<lcrfInstance.size();i++){
+				int child_k = lcrfNetwork.getMaxPath(rootIdx)[0];
+				long child = lcrfNetwork.getNode(child_k);
+				rootIdx = child_k;
+				int tagID = NetworkIDMapper.toHybridNodeArray(child)[1];
+				prediction.add(0, entities[tagID]);
+			}
+			
+			result.setPrediction(prediction);
+			result.setPredictionScore(lcrfNetwork.getMax());
+		}else{
 			int sentRootIdx = Arrays.binarySearch(lcrfNetwork.getAllNodes(),root);
 			ArrayList<String> tmpPrediction = new ArrayList<String>();
 			String[][] topKPrediction = new String[NetworkConfig._topKValue][];
@@ -106,6 +106,8 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 			result.setTopKPrediction(topKPrediction);
 			result.setTopKPredictionScore(topKScore);
 		}
+		
+		
 		
 		
 		return result;

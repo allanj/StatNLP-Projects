@@ -172,7 +172,7 @@ public class Evaluator {
 		for(int index=0;index<testInsts.length;index++){
 			ModelInstance inst = (ModelInstance)testInsts[index];
 			String[] predEntities = inst.toEntities(inst.getPrediction());
-			if(NetworkConfig._MAX_MARGINAL)
+			if(NetworkConfig.MAX_MARGINAL_DECODING)
 				predEntities = inst.getPredEntities();
 			Sentence sent = inst.getInput();
 			for(int i=1;i<sent.length();i++){

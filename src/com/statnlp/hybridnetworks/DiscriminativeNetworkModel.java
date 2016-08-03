@@ -16,6 +16,7 @@
  */
 package com.statnlp.hybridnetworks;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 import com.statnlp.commons.types.Instance;
@@ -24,12 +25,12 @@ public class DiscriminativeNetworkModel extends NetworkModel {
 	
 	private static final long serialVersionUID = -9073908907104721192L;
 	
-	public static DiscriminativeNetworkModel create(FeatureManager fm, NetworkCompiler builder){
-		return new DiscriminativeNetworkModel(fm, builder);
+	public static DiscriminativeNetworkModel create(FeatureManager fm, NetworkCompiler builder, PrintStream... outstreams){
+		return new DiscriminativeNetworkModel(fm, builder, outstreams);
 	}
 	
-	public DiscriminativeNetworkModel(FeatureManager fm, NetworkCompiler builder){
-		super(fm, builder);
+	public DiscriminativeNetworkModel(FeatureManager fm, NetworkCompiler builder, PrintStream... outstreams){
+		super(fm, builder, outstreams);
 	}
 	
 	@Override
@@ -62,6 +63,7 @@ public class DiscriminativeNetworkModel extends NetworkModel {
 				inst_new.setInstanceId(-inst.getInstanceId());
 				inst_new.setWeight(-inst.getWeight());
 				inst_new.setUnlabeled();
+				inst_new.setLabeledInstance(inst);
 				insts[threadId][i*2+1] = inst_new;
 			}
 			System.out.println("Thread "+threadId+" has "+insts[threadId].length+" instances.");

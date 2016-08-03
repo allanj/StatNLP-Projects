@@ -54,6 +54,8 @@ public class LocalNetworkParam implements Serializable{
 	
 	//the cache that stores the features
 	protected FeatureArray[][][] _cache;
+	//the cache that stores the features
+	protected Double[][][] _costCache;
 	//check whether the cache is enabled.
 	protected boolean _cacheEnabled = true;
 	
@@ -74,10 +76,10 @@ public class LocalNetworkParam implements Serializable{
 		this._version = 0;
 		this._globalMode = false;
 		
-		if(!NetworkConfig._CACHE_FEATURES_DURING_TRAINING){
+		if(!NetworkConfig.CACHE_FEATURES_DURING_TRAINING){
 			this.disableCache();
 		}
-		if(NetworkConfig._numThreads==1){
+		if(NetworkConfig.NUM_THREADS == 1){
 			this._globalMode = true;
 		}
 
@@ -202,16 +204,32 @@ public class LocalNetworkParam implements Serializable{
 		this._cacheEnabled = false;
 	}
 	
+	public void enableCache(){
+		this._cacheEnabled = true;
+	}
+	
 	public boolean isCacheEnabled(){
 		return this._cacheEnabled;
 	}
 	
+	/**
+	 * Extract features from the specified network at current hyperedge, specified by its parent node
+	 * index (parent_k) and its children node indices (children_k).<br>
+	 * The children_k_index represents the index of current hyperedge in the list of hyperedges coming out of
+	 * the parent node.<br>
+	 * Note that a node with no outgoing hyperedge will still be considered here with empty children_k
+	 * @param network
+	 * @param parent_k
+	 * @param children_k
+	 * @param children_k_index
+	 * @return
+	 */
 	public FeatureArray extract(Network network, int parent_k, int[] children_k, int children_k_index){
 		// Do not cache in the first touch when parallel touch and extract only from labeled is enabled,
 		// since the local feature indices will change
-		boolean shouldCache = this.isCacheEnabled() && (NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION
-														|| NetworkConfig._numThreads == 1
-														|| !NetworkConfig._BUILD_FEATURES_FROM_LABELED_ONLY
+		boolean shouldCache = this.isCacheEnabled() && (!NetworkConfig.PARALLEL_FEATURE_EXTRACTION
+														|| NetworkConfig.NUM_THREADS == 1
+														|| !NetworkConfig.BUILD_FEATURES_FROM_LABELED_ONLY
 														|| this._isFinalized);
 		if(shouldCache){
 			if(this._cache == null){
@@ -240,11 +258,46 @@ public class LocalNetworkParam implements Serializable{
 		return fa;
 	}
 	
-	//finalize the param.
+	public double cost(Network network, int parent_k, int[] children_k, int children_k_index, NetworkCompiler compiler){
+		// Do not cache in the first touch when parallel touch and extract only from labeled is enabled,
+		// since the local feature indices will change
+		boolean shouldCache = this.isCacheEnabled() && (!NetworkConfig.PARALLEL_FEATURE_EXTRACTION
+														|| NetworkConfig.NUM_THREADS == 1
+														|| !NetworkConfig.BUILD_FEATURES_FROM_LABELED_ONLY
+														|| this._isFinalized);
+		if(shouldCache){
+			if(this._costCache == null){
+				this._costCache = new Double[this._numNetworks][][];
+			}
+			if(this._costCache[network.getNetworkId()] == null){
+				this._costCache[network.getNetworkId()] = new Double[network.countNodes()][];
+			}
+			if(this._costCache[network.getNetworkId()][parent_k] == null){
+				this._costCache[network.getNetworkId()][parent_k] = new Double[network.getChildren(parent_k).length];
+			}
+			if(this._costCache[network.getNetworkId()][parent_k][children_k_index] != null){
+				return this._costCache[network.getNetworkId()][parent_k][children_k_index];
+			}
+		}
+		
+		double cost = compiler.cost(network, parent_k, children_k);
+		
+		if(shouldCache){
+			this._costCache[network.getNetworkId()][parent_k][children_k_index] = cost;
+		}
+		
+		return cost;
+	}
+	
+	/**
+	 * Finalize the features extracted by copying the local features into global features.<br>
+	 * This is not required if this is in global mode, which means the features are stored into
+	 * global feature index directly.
+	 */
 	public void finalizeIt(){
 		//if it is global mode, do not have to do this at all.
 		if(this.isGlobalMode()){
-			System.err.println("Is global mode..");
+			System.err.println("Finalizing local features in global mode: not required");
 			this._isFinalized = true;
 			return;
 		}

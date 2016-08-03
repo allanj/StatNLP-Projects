@@ -16,25 +16,59 @@
  */
 package com.statnlp.commons.ml.opt;
 
-import com.statnlp.commons.ml.opt.GradientDescentOptimizer.AdaptiveMethod;
+import com.statnlp.commons.ml.opt.GradientDescentOptimizer.AdaptiveStrategy;
 
+/**
+ * The factory class to construct the respective gradient descent optimizer with specified parameters
+ * @author Aldrian Obaja <aldrianobaja.m@gmail.com>
+ *
+ */
 public class GradientDescentOptimizerFactory extends OptimizerFactory {
 	
-	private AdaptiveMethod adaptiveMethod;
+	private static final long serialVersionUID = -5188815585483903945L;
+	private AdaptiveStrategy adaptiveStrategy;
+	
 	private double learningRate;
+	
 	private double adadeltaPhi;
 	private double adadeltaEps;
+	private double adadeltaGradDecay;
+	
+	private double rmsPropDecay;
+	private double rmsPropEps;
+	
+	private double adamBeta1;
+	private double adamBeta2;
+	private double adamEps;
+	
+	GradientDescentOptimizerFactory(AdaptiveStrategy adaptiveStrategy, double learningRate) {
+		this(adaptiveStrategy, learningRate, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+	}
+	
+	GradientDescentOptimizerFactory(AdaptiveStrategy adaptiveStrategy, double learningRate, double adadeltaPhi, double adadeltaEps) {
+		this(adaptiveStrategy, learningRate, adadeltaPhi, adadeltaEps, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+	}
 
-	GradientDescentOptimizerFactory(AdaptiveMethod adaptiveMethod, double learningRate, double adadeltaPhi, double adadeltaEps) {
-		this.adaptiveMethod = adaptiveMethod;
+	GradientDescentOptimizerFactory(AdaptiveStrategy adaptiveStrategy, double learningRate, double adadeltaPhi, double adadeltaEps, double adadeltaDecay) {
+		this(adaptiveStrategy, learningRate, adadeltaPhi, adadeltaEps, adadeltaDecay, 0.0, 0.0, 0.0, 0.0, 0.0);
+	}
+
+	GradientDescentOptimizerFactory(AdaptiveStrategy adaptiveStrategy, double learningRate, double adadeltaPhi, double adadeltaEps, double adadeltaGradDecay, double rmsPropDecay, double rmsPropEps, double adamBeta1, double adamBeta2, double adamEps) {
+		this.adaptiveStrategy = adaptiveStrategy;
 		this.learningRate = learningRate;
 		this.adadeltaPhi = adadeltaPhi;
 		this.adadeltaEps = adadeltaEps;
+		this.adadeltaGradDecay = adadeltaGradDecay;
+		this.rmsPropDecay = rmsPropDecay;
+		this.rmsPropEps = rmsPropEps;
+		this.adamBeta1 = adamBeta1;
+		this.adamBeta2 = adamBeta2;
+		this.adamEps = adamEps;
 	}
 
 	@Override
 	public GradientDescentOptimizer create(int numWeights) {
-		return new GradientDescentOptimizer(adaptiveMethod, learningRate, adadeltaPhi, adadeltaEps, numWeights);
+		return new GradientDescentOptimizer(adaptiveStrategy, learningRate, adadeltaPhi, adadeltaEps, adadeltaGradDecay, rmsPropDecay, rmsPropEps, adamBeta1, adamBeta2, adamEps, numWeights);
 	}
 
 }

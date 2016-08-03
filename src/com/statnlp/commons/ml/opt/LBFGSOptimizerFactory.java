@@ -18,10 +18,16 @@ package com.statnlp.commons.ml.opt;
 
 public class LBFGSOptimizerFactory extends OptimizerFactory {
 	
+	private static final long serialVersionUID = 369521731391409616L;
+
 	LBFGSOptimizerFactory(){}
 	
 	public LBFGSOptimizer create(int numWeights){
 		return new LBFGSOptimizer();
+	}
+	
+	public LBFGSOptimizer create(int numWeights, double eps, double xtol){
+		return new LBFGSOptimizer(eps, xtol);
 	}
 
 }

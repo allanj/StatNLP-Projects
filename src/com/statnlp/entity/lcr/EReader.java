@@ -71,7 +71,7 @@ public class EReader {
 				WordToken[] wordsArr = new WordToken[words.size()];
 				words.toArray(wordsArr);
 				Sentence sent = new Sentence(wordsArr);
-				ECRFInstance inst = new ECRFInstance(globalId, index++,instanceWeight,sent);
+				ECRFInstance inst = new ECRFInstance(globalId, index++,instanceWeight,sent); //The instance weight is not used during testing phase
 				inst.entities = es;
 				inst.setUnlabeled();
 				insts.add(inst);

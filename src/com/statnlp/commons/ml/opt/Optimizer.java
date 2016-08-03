@@ -33,4 +33,6 @@ public interface Optimizer {
 	public double[] getGradients();
 	
 	public boolean optimize() throws ExceptionWithIflag;
+	
+	public String name();
 }

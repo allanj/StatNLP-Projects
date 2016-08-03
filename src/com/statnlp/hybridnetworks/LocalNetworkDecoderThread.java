@@ -17,7 +17,6 @@
 package com.statnlp.hybridnetworks;
 
 import com.statnlp.commons.types.Instance;
-import com.statnlp.dp.model.bruteforce.BFNetwork;
 
 public class LocalNetworkDecoderThread extends Thread{
 	
@@ -31,11 +30,21 @@ public class LocalNetworkDecoderThread extends Thread{
 	private Instance[] _instances_output;
 	//the builder.
 	private NetworkCompiler _compiler;
+	private boolean _cacheParam = true;
 	
 	//please make sure the threadId is 0-indexed.
 	public LocalNetworkDecoderThread(int threadId, FeatureManager fm, Instance[] instances, NetworkCompiler compiler){
+		this(threadId, fm, instances, compiler, false);
+	}
+	
+	public LocalNetworkDecoderThread(int threadId, FeatureManager fm, Instance[] instances, NetworkCompiler compiler, boolean cacheParam){
+		this(threadId, fm, instances, compiler, new LocalNetworkParam(threadId, fm, instances.length), cacheParam);
+	}
+	
+	//please make sure the threadId is 0-indexed.
+	public LocalNetworkDecoderThread(int threadId, FeatureManager fm, Instance[] instances, NetworkCompiler compiler, LocalNetworkParam param, boolean cacheParam){
 		this._threadId = threadId;
-		this._param = new LocalNetworkParam(this._threadId, fm, instances.length);
+		this._param = param;
 		fm.setLocalNetworkParams(this._threadId, this._param);
 //		if(NetworkConfig._numThreads==1){
 //			System.err.println("Set to global mode??");
@@ -45,44 +54,42 @@ public class LocalNetworkDecoderThread extends Thread{
 		this._param.setGlobalMode();//set it to global mode
 		this._instances_input = instances;
 		this._compiler = compiler;
+		this._cacheParam = cacheParam;
+	}
+	
+	public LocalNetworkParam getParam(){
+		return this._param;
 	}
 	
 	@Override
 	public void run(){
-		this.decode();
+		this.max();
 	}
 	
-	public void decode(){
+	public void max(){
 		long time = System.currentTimeMillis();
 		this._instances_output = new Instance[this._instances_input.length];
 		for(int k = 0; k<this._instances_input.length; k++){
 //			System.err.println("Thread "+this._threadId+"\t"+k);
-			this._instances_output[k] = this.decode(this._instances_input[k]);
+			this._instances_output[k] = this.max(this._instances_input[k], k);
 		}
 		time = System.currentTimeMillis() - time;
 		System.err.println("Decoding time for thread "+this._threadId+" = "+ time/1000.0 +" secs.");
 	}
 	
-	public Instance decode(Instance instance){
-		Network network = this._compiler.compile(-1, instance, this._param);
+	public Instance max(Instance instance, int networkId){
+		Network network = this._compiler.compileAndStore(networkId, instance, this._param);
 		//make sure we disable the cache..
-		this._param.disableCache();
-		/***********Code added by Allan*****need to be recovered later*************/
-//		BFNetwork network = (BFNetwork)orgnetwork;
-//		network.removeSomeNodes();
-		/***************************/
-		if(NetworkConfig._MAX_MARGINAL)
-			network.marginal();
+		if(!_cacheParam){
+			this._param.disableCache();
+		}
 		network.max();
-		if(NetworkConfig._topKValue>1)
-			network.topK();
-		//System.err.println("1-best score="+network.getMax());
+//		System.err.println("max="+network.getMax());
 		return this._compiler.decompile(network);
 	}
 	
 	public Instance[] getOutputs(){
 		return this._instances_output;
 	}
-	
 	
 }

@@ -53,7 +53,7 @@ public class SemiCRFFeatureManager extends FeatureManager {
 		ArrayList<Integer> featureList = new ArrayList<Integer>();
 		
 		int start = childPos + 1;
-		if(parentPos==0) start = childPos;
+		if(parentPos==0 || childType==NodeType.LEAF ) start = childPos;
 		for(int i=start;i<=parentPos;i++){
 			String lw = i>0? sent.get(i-1).getName():"STR";
 			String lt = i>0? sent.get(i-1).getTag():"STR";
@@ -79,6 +79,26 @@ public class SemiCRFFeatureManager extends FeatureManager {
 				}
 			}
 		}
+		
+		for(int i=start;i<parentPos;i++){
+			String lw = i>0? sent.get(i-1).getName():"STR";
+			String lt = i>0? sent.get(i-1).getTag():"STR";
+			String rw = i<sent.length()-1? sent.get(i+1).getName():"END";
+			String rt = i<sent.length()-1? sent.get(i+1).getTag():"END";
+			String currWord = sent.get(i).getName();
+			String currTag = sent.get(i).getTag();
+			String prevEntity = Label.get(parentLabelId).getForm();
+			String currEn = Label.get(parentLabelId).getForm();
+			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "E-prev-E",prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "currW-prevE-currE",currWord+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "prevW-prevE-currE",lw+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "nextW-prevE-currE",rw+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "currT-prevE-currE",currTag+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "prevT-prevE-currE",lt+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "nextT-prevE-currE",rt+":"+prevEntity+":"+currEn));
+			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "prevT-currT-prevE-currE",lt+":"+currTag+":"+prevEntity+":"+currEn));	
+		}
+		
 		
 		
 		

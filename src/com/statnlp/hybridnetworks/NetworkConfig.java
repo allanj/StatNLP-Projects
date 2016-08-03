@@ -16,57 +16,174 @@
  */
 package com.statnlp.hybridnetworks;
 
-import java.util.Random;
-
 public class NetworkConfig {
 	
-	public static Random r = new Random();
-	public static double FEATURE_INIT_WEIGHT = 0;//r.nextDouble();//Math.log(1E-10);//Math.log(1);
+	/**
+	 * The enumeration of available model type<br>
+	 * <ul>
+	 * <li>{@link #STRUCTURED_PERCEPTRON} (<tt>USE_COST=false</tt>, <tt>USE_SOFTMAX=false</tt>)</li>
+	 * <li>{@link #CRF} (<tt>USE_COST=false</tt>, <tt>USE_SOFTMAX=true</tt>)</li>
+	 * <li>{@link #SSVM} (<tt>USE_COST=true</tt>, <tt>USE_SOFTMAX=false</tt>)</li>
+	 * <li>{@link #SOFTMAX_MARGIN} (<tt>USE_COST=true</tt>, <tt>USE_SOFTMAX=true</tt>)</li>
+	 * </ul>
+	 * 
+	 * Each model has two boolean parameters: {@link #USE_COST} and {@link #USE_SOFTMAX}.<br>
+	 * <tt>USE_COST</tt> determines whether the cost function is used, while
+	 * <tt>USE_SOFTMAX</tt> determines whether the softmax function is used instead of max.
+	 */
+	public static enum ModelType {
+		STRUCTURED_PERCEPTRON(false, false),
+		CRF(false, true),
+		SSVM(true, false),
+		SOFTMAX_MARGIN(true, true),
+		;
+		
+		public final boolean USE_COST;
+		public final boolean USE_SOFTMAX;
+		
+		private ModelType(boolean useCost, boolean useSoftmax){
+			USE_COST = useCost;
+			USE_SOFTMAX = useSoftmax;
+		}
+	}
+	
+	/**
+	 * The value to initialize the weights to if {@link #RANDOM_INIT_WEIGHT} is <tt>false</tt>.
+	 */
+	public static double FEATURE_INIT_WEIGHT = 0;
+	/**
+	 * Whether to initialize the weight vector randomly or fixed to {@link #FEATURE_INIT_WEIGHT}.
+	 */
 	public static boolean RANDOM_INIT_WEIGHT = true;
+	/**
+	 * The seed for random weight vector initialization (for reproducibility)
+	 */
 	public static int RANDOM_INIT_FEATURE_SEED = 1234;
 	
-	public static boolean CACHE_FEATURES_AT_CONJUNCTIVE_CELLS = true;
-	public static int PRUNE_MIN_LENGTH = 1000;
-	public static double PRUNE_THRESHOLD = 1000;
-	public static boolean TRAIN_MODE_IS_GENERATIVE = true;
-	public static boolean CACHE_FEATURE_SCORES = false;
-	public static boolean diagco = false;
-	public static int[] iprint = {0,0};
-	public static double eps = 10e-3;
-	public static double xtol = 10e-16;
-	public static int[] iflag = {0};
+	/**
+	 * Whether generative training is used instead of discriminative
+	 */
+	public static boolean TRAIN_MODE_IS_GENERATIVE = false;
+	/**
+	 * The L2 regularization parameter
+	 */
 	public static double L2_REGULARIZATION_CONSTANT = 0.01;
-	public static int _FOREST_MAX_HEIGHT = 10000;
-	public static int _FOREST_MAX_WIDTH = 10000;
-	public static int _NETWORK_MAX_DEPTH = 901;
-	public static int _nGRAM = 1;//2;//1;
-	public static double objtol = 10e-15;//the value used for checking the objective increment for generative models.
-	public static int batchSize = 20; //batch size for batch SGD (if applicable) batch size for each thread
+	
+	/**
+	 * Network is the core of StatNLP framework.<br>
+	 * This defines the default capacity for defining the nodes of the network<br>
+	 * For more information, see {@link Network}
+	 * @see Network
+	 */
+	public static final int[] DEFAULT_CAPACITY_NETWORK = new int[]{4096, 4096, 4096, 4096, 4096};
+	
+	/**
+	 * The value used for stopping criterion of change in objective value in generative models
+	 */
+	public static double OBJTOL = 1e-14;
+	/** @deprecated Use {@link #OBJTOL} instead*/
+	public static final double objtol = OBJTOL;
+
+	public static boolean DEBUG_MODE = false;
+	
+	/**
+	 * The model type used for learning.<br>
+	 * The options are in {@link ModelType}
+	 */
+	public static ModelType MODEL_TYPE = ModelType.CRF;
+	/** Whether to use batch */
+	public static boolean USE_BATCH_TRAINING = false;
+	/**
+	 * Batch size for batch training (if {@link #USE_BATCH_TRAINING} is <tt>true</tt>) for each thread
+	 */
+	public static int BATCH_SIZE = 20;
+	/** @deprecated Use {@link #BATCH_SIZE} instead */
+	public static final int batchSize = 20;
 	public static int RANDOM_BATCH_SEED = 2345;
 	
-	public static int _SEMANTIC_FOREST_MAX_DEPTH = 20;//the max depth of the forest when creating the semantic forest.
-	public static int _SEMANTIC_PARSING_NGRAM = 1;//2;
+	/** @deprecated Use {@link #USE_BATCH_TRAINING} instead */
+	public static final boolean USE_BATCH_SGD = false;
 	
-	public static boolean DEBUG_MODE = false;//true;//false;//true;
-	public static boolean REBUILD_FOREST_EVERY_TIME = false;
-	public static boolean USE_STRUCTURED_SVM = false;
-	public static boolean USE_BATCH_SGD = false;
+	/** The weight of the cost function for SSVM and Softmax-Margin */
+	public static double MARGIN = 0.5;
+	/**
+	 * A flag whether to normalize the default cost function in cost-based models
+	 * like {@link ModelType#SSVM} and {@link ModelType#SOFTMAX_MARGIN}<br>
+	 * 
+	 * This is one of the three flags for controlling default cost function:
+	 * <ul>
+	 * <li>{@link #NORMALIZE_COST}</li>
+	 * <li>{@link #EDGE_COST}</li>
+	 * <li>{@link #NODE_COST}</li>
+	 * </ul>
+	 */
+	public static boolean NORMALIZE_COST = false;
+	/**
+	 * The cost for having node mismatch in cost-based models
+	 * like {@link ModelType#SSVM} and {@link ModelType#SOFTMAX_MARGIN}<br>
+	 * 
+	 * This is one of the three flags for controlling default cost function:
+	 * <ul>
+	 * <li>{@link #NORMALIZE_COST}</li>
+	 * <li>{@link #EDGE_COST}</li>
+	 * <li>{@link #NODE_COST}</li>
+	 * </ul>
+	 */
+	public static double NODE_COST = 1.0;
+	/**
+	 * The cost for having edge mismatch in cost-based models
+	 * like {@link ModelType#SSVM} and {@link ModelType#SOFTMAX_MARGIN}<br>
+	 * 
+	 * This is one of the three flags for controlling default cost function:
+	 * <ul>
+	 * <li>{@link #NORMALIZE_COST}</li>
+	 * <li>{@link #EDGE_COST}</li>
+	 * <li>{@link #NODE_COST}</li>
+	 * </ul>
+	 */
+	public static double EDGE_COST = 0.0;
+
+	/**
+	 * Whether features are cached during training.<br>
+	 * Without caching training might be very slow.
+	 */
+	public static boolean CACHE_FEATURES_DURING_TRAINING = true;
+	/**
+	 * Build features in parallel during the touch process 
+	 */
+	public static boolean PARALLEL_FEATURE_EXTRACTION = false;
+	/**
+	 * Build features only from labeled instances
+	 */
+	public static boolean BUILD_FEATURES_FROM_LABELED_ONLY = false;
+
+	/** @deprecated Use {@link #CACHE_FEATURES_DURING_TRAINING} instead */
+	public static final boolean _CACHE_FEATURES_DURING_TRAINING = true;
+	/** @deprecated Use {@link #PARALLEL_FEATURE_EXTRACTION} instead */
+	public static final boolean _SEQUENTIAL_FEATURE_EXTRACTION = true ;
+	/** @deprecated Use {@link #BUILD_FEATURES_FROM_LABELED_ONLY} instead */
+	public static final boolean _BUILD_FEATURES_FROM_LABELED_ONLY = false;
 	
-	public static boolean _CACHE_FEATURES_DURING_TRAINING = true;
-	public static boolean _SEQUENTIAL_FEATURE_EXTRACTION = true ;
-	public static boolean _BUILD_FEATURES_FROM_LABELED_ONLY = false;
+	/**
+	 * The number of threads to be used for parallel execution
+	 */
+	public static int NUM_THREADS = 4;
+	/** @deprecated Use {@link #NUM_THREADS} instead */
+	public static final int _numThreads = NUM_THREADS;
 	
-	public static int _numThreads = 10;
+	public static boolean MAX_MARGINAL_DECODING = false;
 	
-	public static int _maxSpanLen = 2;//the upper-bound of the length of a span.
-	
-	
-	
-	public static boolean _MAX_MARGINAL = false;
 	public static int _topKValue = 1;
 	
-	public static int NEURAL_SERVER_PORT = 9546;
-	public static String NEURAL_SERVER_ADDR = "tcp://172.18.240.32:" + NEURAL_SERVER_PORT;
+	/***
+	 * Please read carefully about the README.txt to install the NN server and also the communication package for Neural CRF
+	 */
+	/** If enable the neural CRF model, set it true.  */
 	public static boolean USE_NEURAL_FEATURES = false;
+	/**The neural network server port **/
+	public static int NEURAL_SERVER_PORT = 9546;
+	/**The neural network server IP address. Currently we are supporting torch server. ***/
+	public static String NEURAL_SERVER_ADDR = "tcp://172.18.240.32:" + NEURAL_SERVER_PORT;
+	
 	
 }

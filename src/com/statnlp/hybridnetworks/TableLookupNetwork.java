@@ -91,6 +91,7 @@ public abstract class TableLookupNetwork extends Network{
 	public boolean contains(TableLookupNetwork network){
 //		if (true)
 //		return true;
+		
 		if(this.countNodes() < network.countNodes()){
 			System.err.println("size of this is less than the size of network."+this.countNodes()+"\t"+network.countNodes());
 			return false;
@@ -115,8 +116,6 @@ public abstract class TableLookupNetwork extends Network{
 							}
 						}
 						if(!child_found){
-							System.err.println("network ID:"+network.getInstance().getInstanceId());
-							System.err.println("instance:"+network.getInstance().getInput().toString());
 							System.err.println("supposingly smaller:"+Arrays.toString(child1_nodes)+"\t"+children1.length);
 							for(int t = 0; t<children2.length; t++){
 								System.err.println("supposingly larger :"+Arrays.toString(this.toNodes(children2[t]))+"\t"+children2.length);
@@ -151,7 +150,7 @@ public abstract class TableLookupNetwork extends Network{
 //		this._nodes_tmp = new HashSet<Long>();
 		this._children_tmp = new HashMap<Long, ArrayList<long[]>>();
 	}
-	
+
 	/**
 	 * Construct a network with the specified instance and parameter
 	 * @param networkId
@@ -159,13 +158,24 @@ public abstract class TableLookupNetwork extends Network{
 	 * @param param
 	 */
 	public TableLookupNetwork(int networkId, Instance inst, LocalNetworkParam param){
-		super(networkId, inst, param);
-//		this._nodes_tmp = new HashSet<Long>();
-		this._children_tmp = new HashMap<Long, ArrayList<long[]>>();
+		this(networkId, inst, param, null);
 	}
 	
 	/**
-	 * Construct a network with the specified nodes and edges.<br>
+	 * Construct a network with the specified instance and parameter, and with the compiler that created this network
+	 * @param networkId
+	 * @param inst
+	 * @param param
+	 * @param compiler
+	 */
+	public TableLookupNetwork(int networkId, Instance inst, LocalNetworkParam param, NetworkCompiler compiler){
+		super(networkId, inst, param, compiler);
+//		this._nodes_tmp = new HashSet<Long>();
+		this._children_tmp = new HashMap<Long, ArrayList<long[]>>();
+	}
+
+	/**
+	 * Construct a network with the specified nodes and edges<br>
 	 * This is mainly used to create a subgraph of a larger graph by modifying the number of nodes
 	 * by overriding {@link #countNodes()}
 	 * @param networkId
@@ -175,7 +185,22 @@ public abstract class TableLookupNetwork extends Network{
 	 * @param param
 	 */
 	public TableLookupNetwork(int networkId, Instance inst, long[] nodes, int[][][] children, LocalNetworkParam param){
-		super(networkId, inst, param);
+		this(networkId, inst, nodes, children, param, null);
+	}
+	
+	/**
+	 * Construct a network with the specified nodes and edges, and with the compiler that created this network<br>
+	 * This is mainly used to create a subgraph of a larger graph by modifying the number of nodes
+	 * by overriding {@link #countNodes()}
+	 * @param networkId
+	 * @param inst
+	 * @param nodes
+	 * @param children
+	 * @param param
+	 * @param compiler
+	 */
+	public TableLookupNetwork(int networkId, Instance inst, long[] nodes, int[][][] children, LocalNetworkParam param, NetworkCompiler compiler){
+		super(networkId, inst, param, compiler);
 		this._nodes = nodes;
 		this._children = children;
 	}
@@ -232,6 +257,10 @@ public abstract class TableLookupNetwork extends Network{
 	 */
 	public boolean contains(long node){
 		return this._children_tmp.containsKey(node);
+	}
+	
+	public int getNodeIndex(long node){
+		return Arrays.binarySearch(this._nodes, node);
 	}
 	
 	/**
@@ -421,10 +450,6 @@ public abstract class TableLookupNetwork extends Network{
 		if(v.length==0) return false;
 		if(v[0].length==0) return true;
 		return false;
-	}
-	
-	public double totalLossUpTo(int k, int[] child_k){
-		return 0.0;
 	}
 	
 	/**

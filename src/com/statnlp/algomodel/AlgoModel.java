@@ -14,7 +14,6 @@ import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkModel;
-import com.statnlp.ie.linear.MentionExtractionAlgoModel;
 
 public abstract class AlgoModel {
 	
@@ -26,8 +25,6 @@ public abstract class AlgoModel {
 	{
 		switch (model)
 		{
-		case MENTION_EXTRACTION:
-			return new MentionExtractionAlgoModel();
 		default:
 			return null;
 		

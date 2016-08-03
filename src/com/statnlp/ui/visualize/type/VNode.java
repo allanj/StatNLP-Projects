@@ -5,10 +5,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import com.statnlp.hybridnetworks.NetworkIDMapper;
-import com.statnlp.ie.linear.IELinearConfig;
-import com.statnlp.ie.types.MentionType;
 import com.statnlp.ui.visualize.type.VisualizeGraph.Itemtype;
-
 
 import cern.colt.Arrays;
 
@@ -201,7 +198,7 @@ public class VNode{
 	public int[] getNodeIDArray()
 	{
 		int srcHeight = this.bIndex;
-		int srcWidth = IELinearConfig._MAX_SENT_LENGTH;
+		int srcWidth = 120;
 		int tgtHeight = srcHeight;
 		int tgtWidth = UNDEFINED;
 		if (this.tag_length != UNDEFINED)
@@ -247,9 +244,6 @@ public class VNode{
 		case E:
 			this.content = content;
 			break;
-		case T:
-			this.content = new MentionType(content);;
-			break;
 		case I:
 			this.content = content;
 			break;
@@ -280,8 +274,6 @@ public class VNode{
 		case E:
 			return (String)content;
 
-		case T:
-			return ((MentionType)content).getName();
 
 		case I:
 			return (String)content;

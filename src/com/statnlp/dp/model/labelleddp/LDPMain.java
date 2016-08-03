@@ -98,12 +98,12 @@ public class LDPMain {
 		
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
-		NetworkConfig._CACHE_FEATURES_DURING_TRAINING = true;
-		NetworkConfig._numThreads = numThreads;
+		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
+		NetworkConfig.NUM_THREADS = numThreads;
 		//0.1 is the best after tunning the parameters
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = 0.1;
 		System.err.println("[Info] Regularization Parameter: "+NetworkConfig.L2_REGULARIZATION_CONSTANT);
-		NetworkConfig._SEQUENTIAL_FEATURE_EXTRACTION = false;
+		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		LDPFeatureManager dfm = new LDPFeatureManager(new GlobalNetworkParam(), isPipe);
 		LDPNetworkCompiler dnc = new LDPNetworkCompiler();
 		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);

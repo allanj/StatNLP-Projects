@@ -243,6 +243,10 @@ public abstract class VisualizationViewerEngine {
 	};
 	
 	
+	public void nothing(){
+		return;
+	}
+	
 	
 	
 	

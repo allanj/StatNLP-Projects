@@ -342,7 +342,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 //		printNetwork(dependNetwork, (Sentence)dependNetwork.getInstance().getInput());
 		if(DEBUG) System.err.println("[Result] "+forest.pennString());
 		inst.setPrediction(forest);
-		if(NetworkConfig._MAX_MARGINAL)
+		if(NetworkConfig.MAX_MARGINAL_DECODING)
 			maxMarginalDecode(network, inst);
 		return inst;
 	}

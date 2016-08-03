@@ -31,7 +31,7 @@ public class TopicExperimenter {
 		String src_filename = "data/IWSLT09/train_sub/train.en";
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = true;
-		NetworkConfig._numThreads = Integer.parseInt(args[0]);
+		NetworkConfig.NUM_THREADS = Integer.parseInt(args[0]);
 		int numTopics = 5;
 		
 		TopicInstanceReader reader = new TopicInstanceReader();
