@@ -171,6 +171,7 @@ public class NetworkConfig {
 	/** @deprecated Use {@link #NUM_THREADS} instead */
 	public static final int _numThreads = NUM_THREADS;
 	
+	/** Decoding the max-marginal for each node as well. if set to true */
 	public static boolean MAX_MARGINAL_DECODING = false;
 	
 	public static int _topKValue = 1;
@@ -180,10 +181,6 @@ public class NetworkConfig {
 	 */
 	/** If enable the neural CRF model, set it true.  */
 	public static boolean USE_NEURAL_FEATURES = false;
-	/**The neural network server port **/
-	public static int NEURAL_SERVER_PORT = 9546;
-	/**The neural network server IP address. Currently we are supporting torch server. ***/
-	public static String NEURAL_SERVER_ADDR = "tcp://172.18.240.32:" + NEURAL_SERVER_PORT;
 	
 	
 }

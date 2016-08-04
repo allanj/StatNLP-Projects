@@ -1,10 +1,10 @@
 package com.statnlp.neural;
 
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.zeromq.ZMQ;
-
-import com.statnlp.hybridnetworks.NetworkConfig;
 
 public class RemoteNN {
 	private boolean DEBUG = false;
@@ -12,7 +12,7 @@ public class RemoteNN {
 	// Torch NN server information
 	private ZMQ.Context context;
 	private ZMQ.Socket requester;
-	private String serverAddress = NetworkConfig.NEURAL_SERVER_ADDR;
+	private String serverAddress = NeuralConfig.NEURAL_SERVER_PREFIX + NeuralConfig.NEURAL_SERVER_ADDRESS+":" + NeuralConfig.NEURAL_SERVER_PORT;
 	
 	// Reference to controller instance for updating weights and getting gradients
 	private NNCRFInterface controller;
@@ -27,26 +27,39 @@ public class RemoteNN {
 		this.controller = controller;
 	}
 	
-	public int initNetwork(int inputSize, int outputSize) {
+	public double[] initNetwork(List<Integer> numInputList, List<Integer> inputDimList,
+						   List<Integer> embSizeList, int outputDim,
+						   List<List<Integer>> vocab) {
 		JSONObject obj = new JSONObject();
 		obj.put("cmd", "init");
-		obj.put("inputVocabSize", inputSize);
-		obj.put("outputDim", outputSize);
+		obj.put("numInputList", numInputList);
+		obj.put("inputDimList", inputDimList);
+		obj.put("embSizeList", embSizeList);
+		obj.put("outputDim", outputDim);
+		obj.put("numLayer", NeuralConfig.NUM_LAYER);
+		obj.put("hiddenSize", NeuralConfig.HIDDEN_SIZE);
+		obj.put("activation", NeuralConfig.ACTIVATION);
+		obj.put("dropout", NeuralConfig.DROPOUT);
+		obj.put("vocab", vocab);
 
 		String request = obj.toString();
 		requester.send(request.getBytes(), 0);
 		byte[] reply = requester.recv(0);
-		JSONArray replyJSON = new JSONArray(new String(reply));
-		int numWeights = replyJSON.getInt(0);
-		if (DEBUG) {
-			System.out.println("Init returns " + replyJSON.toString());
+		JSONArray arr = new JSONArray(new String(reply));
+		double[] nnInternalWeights = new double[arr.length()];
+		for (int i = 0; i < nnInternalWeights.length; i++) {
+			nnInternalWeights[i] = arr.getDouble(i);
 		}
-		return numWeights;
+		if (DEBUG) {
+			System.out.println("Init returns " + arr.toString());
+		}
+		return nnInternalWeights;
 	}
 	
-	public void forwardNetwork() {
+	public void forwardNetwork(boolean training) {
 		JSONObject obj = new JSONObject();
 		obj.put("cmd", "fwd");
+		obj.put("training", training);
 		
 		double[] nnInternalWeights = controller.getInternalNeuralWeights();
 		JSONArray nnWeightsArr = new JSONArray();

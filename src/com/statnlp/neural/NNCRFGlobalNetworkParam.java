@@ -1,12 +1,16 @@
 package com.statnlp.neural;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 
 public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 	
+	private static final long serialVersionUID = 4984994803152483000L;
+
 	private GlobalNetworkParam param_G;
 	
 	// "input" and "output" vocab
@@ -27,8 +31,6 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 	
 	// number of NN features
 	private int _nnSize = 0;
-	
-	// number of used NN features
 	private int _usedNNSize = 0;
 	
 	// checks if i-th feature is a neural feature
@@ -38,31 +40,41 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 	private double[] grads;
 	private double[] notNNWeights, notNNCounts;
 
-	public NNCRFGlobalNetworkParam(RemoteNN nn, GlobalNetworkParam param_G) {
-		super(nn);
+	public NNCRFGlobalNetworkParam(GlobalNetworkParam param_G) {
+		super();
 		this.param_G = param_G;
 		this.neuralFeatureIntMap = param_G.getFeatureIntMap().get("neural");
 	}
 	
 	@Override
 	public void initializeInternalNeuralWeights() {
-		int size = param_G.countFeatures();
-		double[] seed = new double[size];
-		// can do random init here
-		initializeInternalNeuralWeights(seed);
-	}
-	
-	public void initializeInternalNeuralWeights(double[] seed) {
-		makeVocab();
-		_nnSize = this.nn.initNetwork(idx2strInput.size(), neuralFeatureIntMap.size());
+		// NN configuration
+		List<List<Integer>> vocab = makeVocab();
+		List<Integer> numInputList = Arrays.asList(1);
+		List<Integer> inputDimList = Arrays.asList(idx2strInput.size());
+		List<Integer> embSizeList = Arrays.asList(NeuralConfig.WORD_EMBEDDING_SIZE);
+		int outputDim = neuralFeatureIntMap.size();
+		
+		double[] nnInternalWeights = this.nn.initNetwork(numInputList, inputDimList, embSizeList, outputDim, vocab);
+		_nnSize = nnInternalWeights.length;
 		_nnWeights = new double[_nnSize];
 		_nnGrads = new double[_nnSize];
-		for(int k = 0 ; k<this._nnSize; k++){
-			int weightIdx = internalWeightIndex[k];
-			if (weightIdx != -1) {
-				this._nnWeights[k] = seed[weightIdx];
-			} else {
-				this._nnWeights[k] = 0.0;
+		setInternalNeuralWeights(nnInternalWeights);
+	}
+	
+	public void setInternalNeuralWeights(double[] seed) {
+		if (NeuralConfig.NUM_LAYER > 0 || NeuralConfig.WORD_EMBEDDING_SIZE > 0) {
+			for(int k = 0; k<this._nnSize; k++) {
+				this._nnWeights[k] = seed[k];
+			}
+		} else { // trick for reproducing
+			for(int k = 0; k<this._nnSize; k++){
+				int weightIdx = internalWeightIndex[k];
+				if (weightIdx != -1) {
+					this._nnWeights[k] = seed[weightIdx];
+				} else {
+					this._nnWeights[k] = 0.0;
+				}
 			}
 		}
 	}
@@ -80,9 +92,9 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 	public double[] getExternalNeuralGradients() {
 		double[] counts = param_G.getCounts();
 		if (grads == null) {
-			grads = new double[_nnSize];
+			grads = new double[externalWeightIndex.length];
 		}
-		for (int i = 0; i < _nnSize; i++) {
+		for (int i = 0; i < externalWeightIndex.length; i++) {
 			int idx = externalWeightIndex[i];
 			if (idx != -1) {
 				grads[i] = counts[idx];
@@ -139,7 +151,8 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 		}
 	}
 	
-	private void makeVocab() {
+	private List<List<Integer>> makeVocab() {
+		List<List<Integer>> vocab = new ArrayList<List<Integer>>();
 		for (String output : neuralFeatureIntMap.keySet()) {
 			if (!idx2strOutput.containsKey(output)) {
 				idx2strOutput.put(idx2strOutput.size(), output);
@@ -148,6 +161,8 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 				if (!str2idxInput.containsKey(input)) {
 					str2idxInput.put(input, str2idxInput.size());
 					idx2strInput.put(idx2strInput.size(), input);
+					vocab.add(new ArrayList<Integer>());
+					vocab.get(vocab.size()-1).add(idx2strInput.size()); // 1-indexing
 				}
 			}
 		}
@@ -169,6 +184,7 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 				}
 			}
 		}
+		return vocab;
 	}
 	
 	public boolean isNNFeature(int f) {

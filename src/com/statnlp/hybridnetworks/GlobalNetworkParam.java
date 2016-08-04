@@ -30,6 +30,7 @@ import java.util.Random;
 import com.statnlp.commons.ml.opt.LBFGS;
 import com.statnlp.commons.ml.opt.LBFGS.ExceptionWithIflag;
 import com.statnlp.neural.NNCRFGlobalNetworkParam;
+import com.statnlp.neural.NeuralConfig;
 import com.statnlp.neural.RemoteNN;
 import com.statnlp.commons.ml.opt.MathsVector;
 import com.statnlp.commons.ml.opt.Optimizer;
@@ -101,7 +102,7 @@ public class GlobalNetworkParam implements Serializable{
 	/** Neural CRF socket server controller  */
 	protected NNCRFGlobalNetworkParam _nnController;	
 	/** The weights that some of them will be replaced by neural net if NNCRF is enabled. */
-	private double[] concatWeights, concatCounts;
+	private transient double[] concatWeights, concatCounts;
 	
 	public GlobalNetworkParam(){
 		this(OptimizerFactory.getLBFGSFactory());
@@ -361,10 +362,13 @@ public class GlobalNetworkParam implements Serializable{
 		
 		// initialize NN params and gradParams
 		if (NetworkConfig.USE_NEURAL_FEATURES) {
-			// this is for reproducibility
-			// we set the same initial random weight for emission features
-			_nnController = new NNCRFGlobalNetworkParam(new RemoteNN(), this);
-			_nnController.initializeInternalNeuralWeights(_weights);
+			_nnController = new NNCRFGlobalNetworkParam(this);
+			_nnController.setRemoteNN(new RemoteNN());
+			_nnController.initializeInternalNeuralWeights();
+			if(NeuralConfig.NUM_LAYER == 0 && NeuralConfig.WORD_EMBEDDING_SIZE ==0){
+				_nnController.setInternalNeuralWeights(_weights);
+			}
+			
 		}
 		
 		this.resetCountsAndObj();
@@ -639,7 +643,8 @@ public class GlobalNetworkParam implements Serializable{
 	    		done = true;
 	    	}
     	}
-    	if(done && this._opt.name().contains("LBFGS Optimizer")){
+    	
+    	if(done && this._opt.name().contains("LBFGS Optimizer") && !NetworkConfig.USE_NEURAL_FEATURES){
     		// If we stop early, we need to copy solution_cache,
     		// as noted in the Javadoc for solution_cache in LBFGS class.
     		// This is because the _weights will contain the next value to be evaluated, 
@@ -718,6 +723,8 @@ public class GlobalNetworkParam implements Serializable{
 		//always add to _counts the NEGATION of the term g(x)'s gradient.
 	}
 	
+	public NNCRFGlobalNetworkParam getNNCRFController(){return this._nnController;}
+	
 	public void setInstsNum(int number){
 		this.totalNumInsts = number;
 	}
@@ -735,6 +742,7 @@ public class GlobalNetworkParam implements Serializable{
 		out.writeInt(this._size);
 		out.writeInt(this._fixedFeaturesSize);
 		out.writeBoolean(this._locked);
+		out.writeObject(this._nnController);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -745,6 +753,8 @@ public class GlobalNetworkParam implements Serializable{
 		this._size = in.readInt();
 		this._fixedFeaturesSize = in.readInt();
 		this._locked = in.readBoolean();
+		this._nnController = (NNCRFGlobalNetworkParam)in.readObject();
+		//this._nnController.setRemoteNN(new RemoteNN());
 	}
 	
 }

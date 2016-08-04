@@ -202,7 +202,7 @@ public abstract class NetworkModel implements Serializable{
 				}
 				long time = System.currentTimeMillis();
 				if (NetworkConfig.USE_NEURAL_FEATURES) {
-					nnController.forwardNetwork();
+					nnController.forwardNetwork(true);
 				}
 				List<Future<Void>> results = pool.invokeAll(callables);
 				for(Future<Void> result: results){
@@ -234,9 +234,23 @@ public abstract class NetworkModel implements Serializable{
 					print("Training completes. No significant progress (<objtol) after "+it+" iterations.", outstreams);
 					break;
 				}
+				/***debug code****/
+//				for(int w=0;w<10;w++){
+//					System.err.print(this._fm.getParam_G().getWeights()[w]+" ");
+//				}
+//				System.err.println();
+//				for(int w=0;w<10;w++){
+//					System.err.print(this._fm.getParam_G().getNNCRFController().getInternalNeuralWeights()[w]+" ");
+//				}
+//				System.err.println();
+//				for(int w=0;w<10;w++){
+//					System.err.print(this._fm.getParam_G().getNNCRFController().getExternalNeuralGradients()[w]+" ");
+//				}
+//				System.err.println();
+				/*******/
 			}
 			if (NetworkConfig.USE_NEURAL_FEATURES) {
-				nnController.forwardNetwork();
+				nnController.forwardNetwork(false);
 			}
 		} finally {
 			pool.shutdown();
