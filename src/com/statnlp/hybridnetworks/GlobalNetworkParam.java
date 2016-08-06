@@ -703,7 +703,7 @@ public class GlobalNetworkParam implements Serializable{
 				internalNNCounts[k] = 0.0;
 				if(NetworkConfig.REGULARIZE_NEURAL_FEATURES) {
 					if(this.isDiscriminative() && this._kappa > 0){
-						internalNNCounts[k] += 2 * this._kappa * internalNNWeights[k];
+						internalNNCounts[k] += 2 * coef * this._kappa * internalNNWeights[k];
 					}
 				}
 			}
@@ -721,7 +721,7 @@ public class GlobalNetworkParam implements Serializable{
 						this._obj += this._weights[k] * this._weights[k];
 					}
 				}
-				this._obj *= - this._kappa; 
+				this._obj *= - coef * this._kappa; 
 			} else {
 				this._obj += - coef * this._kappa * MathsVector.square(this._weights);
 			}
