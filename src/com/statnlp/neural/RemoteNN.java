@@ -87,6 +87,7 @@ public class RemoteNN {
 		obj.put("cmd", "bwd");
 		
 		double[] grad = controller.getExternalNeuralGradients();
+		//System.out.println(grad.length);
 		JSONArray gradArr = new JSONArray();
 		for (int i = 0; i < grad.length; i++) {
 			gradArr.put(grad[i]);

@@ -30,7 +30,6 @@ import java.util.Random;
 import com.statnlp.commons.ml.opt.LBFGS;
 import com.statnlp.commons.ml.opt.LBFGS.ExceptionWithIflag;
 import com.statnlp.neural.NNCRFGlobalNetworkParam;
-import com.statnlp.neural.NeuralConfig;
 import com.statnlp.neural.RemoteNN;
 import com.statnlp.commons.ml.opt.MathsVector;
 import com.statnlp.commons.ml.opt.Optimizer;
@@ -331,7 +330,10 @@ public class GlobalNetworkParam implements Serializable{
 			}
 		}
 		this._version = 0;
-		this._opt = this._optFactory.create(this._weights.length, getFeatureIntMap());
+		if(!NetworkConfig.USE_NEURAL_FEATURES)
+			this._opt = this._optFactory.create(this._weights.length, getFeatureIntMap());
+		else
+			this._opt =  this._optFactory.create(_nnController.getNonNeuralAndInternalNeuralSize(), getFeatureIntMap());
 		this._locked = true;
 		
 		System.err.println(this._size+" features.");
@@ -365,9 +367,9 @@ public class GlobalNetworkParam implements Serializable{
 			_nnController = new NNCRFGlobalNetworkParam(this);
 			_nnController.setRemoteNN(new RemoteNN());
 			_nnController.initializeInternalNeuralWeights();
-			if(NeuralConfig.NUM_LAYER == 0 && NeuralConfig.WORD_EMBEDDING_SIZE ==0){
-				_nnController.setInternalNeuralWeights(_weights);
-			}
+//			if(NeuralConfig.NUM_LAYER == 0 && NeuralConfig.EMBEDDING_SIZE.get(0)==0){
+//				_nnController.setInternalNeuralWeights(_weights);
+//			}
 			
 		}
 		
@@ -391,7 +393,10 @@ public class GlobalNetworkParam implements Serializable{
 			}
 		}
 		this._version = 0;
-		this._opt = this._optFactory.create(this._weights.length, getFeatureIntMap());
+		if(!NetworkConfig.USE_NEURAL_FEATURES)
+			this._opt = this._optFactory.create(this._weights.length, getFeatureIntMap());
+		else
+			this._opt =  this._optFactory.create(_nnController.getNonNeuralAndInternalNeuralSize(), getFeatureIntMap());
 		this._locked = true;
 		
 		System.err.println(this._size+" features.");
@@ -696,8 +701,10 @@ public class GlobalNetworkParam implements Serializable{
 			double[] internalNNCounts = this._nnController.getInternalNeuralGradients();
 			for(int k = 0 ; k<internalNNWeights.length; k++) {
 				internalNNCounts[k] = 0.0;
-				if(this.isDiscriminative() && this._kappa > 0){
-					internalNNCounts[k] += 2 * this._kappa * internalNNWeights[k];
+				if(NetworkConfig.REGULARIZE_NEURAL_FEATURES) {
+					if(this.isDiscriminative() && this._kappa > 0){
+						internalNNCounts[k] += 2 * this._kappa * internalNNWeights[k];
+					}
 				}
 			}
 		}
@@ -706,7 +713,9 @@ public class GlobalNetworkParam implements Serializable{
 		//for regularization
 		if(this.isDiscriminative() && this._kappa > 0){
 			if (NetworkConfig.USE_NEURAL_FEATURES) {
-				this._obj += MathsVector.square(this._nnController.getInternalNeuralWeights());
+				if(NetworkConfig.REGULARIZE_NEURAL_FEATURES) {
+					this._obj += MathsVector.square(this._nnController.getInternalNeuralWeights());
+				}
 				for (int k = 0; k < _weights.length; k++) {
 					if (!_nnController.isNNFeature(k)) {
 						this._obj += this._weights[k] * this._weights[k];

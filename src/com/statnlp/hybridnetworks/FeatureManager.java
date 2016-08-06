@@ -116,7 +116,7 @@ public abstract class FeatureManager implements Serializable{
 			nnController.backwardNetwork();
 		}
 		boolean done = this._param_g.update();
-		
+
 		if(NetworkConfig.NUM_THREADS != 1){
 			for(LocalNetworkParam param_l : this._params_l){
 				param_l.reset();

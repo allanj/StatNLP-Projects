@@ -2,6 +2,7 @@ package com.statnlp.neural;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class NeuralConfigReader {
@@ -16,7 +17,10 @@ public class NeuralConfigReader {
 			if(info[0].equals("serverPort")) {
 				NeuralConfig.NEURAL_SERVER_PORT= Integer.parseInt(info[1]);
 			} else if(info[0].equals("wordEmbedding")) {
-				NeuralConfig.WORD_EMBEDDING_SIZE = Integer.parseInt(info[1]);
+				NeuralConfig.EMBEDDING_SIZE = new ArrayList<Integer>();
+				for (int i = 1; i < info.length; i++) {
+					NeuralConfig.EMBEDDING_SIZE.add(Integer.parseInt(info[i])); 
+				}
 			} else if(info[0].equals("numLayer")) {
 				NeuralConfig.NUM_LAYER = Integer.parseInt(info[1]);
 			} else if(info[0].equals("hiddenSize")) {
