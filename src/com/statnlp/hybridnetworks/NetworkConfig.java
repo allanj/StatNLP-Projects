@@ -183,21 +183,5 @@ public class NetworkConfig {
 	public static boolean USE_NEURAL_FEATURES = false;
 	public static boolean REGULARIZE_NEURAL_FEATURES = false;
 	
-	// semantic settings
-	public static int _FOREST_MAX_HEIGHT = 10000;
-	public static int _FOREST_MAX_WIDTH = 10000;
-	public static int _NETWORK_MAX_DEPTH = 901;
-	public static int _nGRAM = 1;//2;//1;
-	
-	public static int _SEMANTIC_FOREST_MAX_DEPTH = 20;//the max depth of the forest when creating the semantic forest.
-	public static int _SEMANTIC_PARSING_NGRAM = 1;//2;
-	
-	public static boolean REBUILD_FOREST_EVERY_TIME = false;
-	
-	public static int SAVE_MODEL_AFTER_ITER = 10;
-		
-	public static int _maxSpanLen = 2;//the upper-bound of the length of a span.
-	
-	public static boolean REPLACE_ORIGINAL_EMISSION = true;
 	
 }

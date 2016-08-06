@@ -18,9 +18,6 @@ package com.statnlp.hybridnetworks;
 
 import static com.statnlp.commons.Utils.print;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -122,31 +119,7 @@ public abstract class NetworkModel implements Serializable{
 		return insts;
 	}
 	
-	private void saveModel(String prefix, int it) {
-		System.out.print("Saving model at iteration " + it);
-        long startTime = System.currentTimeMillis();
-        ObjectOutputStream oos = null;
-		try {
-			oos = new ObjectOutputStream(new FileOutputStream("model/" + prefix + "." + it + ".model"));
-			oos.writeObject(this._fm._param_g);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				oos.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-        long endTime = System.currentTimeMillis();
-        System.out.println(String.format(" ... %.3fs", (endTime-startTime)/1000.0));
-	}
-	
 	public void train(Instance[] allInstances, int maxNumIterations) throws InterruptedException{
-		train(allInstances, maxNumIterations, "");
-	}
-	
-	public void train(Instance[] allInstances, int maxNumIterations, String modelPrefix) throws InterruptedException{
 		
 		this._numThreads = NetworkConfig.NUM_THREADS;
 		
@@ -255,11 +228,6 @@ public abstract class NetworkModel implements Serializable{
 					throw new RuntimeException("Error:\n"+obj_old+"\n>\n"+obj);
 				}
 				obj_old = obj;
-
-				if (!modelPrefix.equals("") && it == maxNumIterations && it > 0 && it % NetworkConfig.SAVE_MODEL_AFTER_ITER == 0) {
-					saveModel(modelPrefix, it);
-				}
-				
 				if(lastIter){
 					print("Training completes. The specified number of iterations ("+it+") has passed.", outstreams);
 					break;
@@ -269,7 +237,6 @@ public abstract class NetworkModel implements Serializable{
 					break;
 				}
 			}
-			
 			if (NetworkConfig.USE_NEURAL_FEATURES) {
 				nnController.forwardNetwork(false);
 			}
