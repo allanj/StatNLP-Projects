@@ -182,6 +182,7 @@ public class NetworkConfig {
 	/** If enable the neural CRF model, set it true.  */
 	public static boolean USE_NEURAL_FEATURES = false;
 	public static boolean REGULARIZE_NEURAL_FEATURES = false;
+	public static boolean OPTIMIZE_NEURAL = true;
 	
 	
 }

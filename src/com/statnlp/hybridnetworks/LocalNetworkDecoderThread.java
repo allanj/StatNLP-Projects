@@ -79,7 +79,6 @@ public class LocalNetworkDecoderThread extends Thread{
 	
 	public Instance max(Instance instance, int networkId){
 		Network network = this._compiler.compileAndStore(networkId, instance, this._param);
-		//make sure we disable the cache..
 		if(!_cacheParam){
 			this._param.disableCache();
 		}
