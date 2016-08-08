@@ -7,7 +7,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
@@ -184,10 +183,10 @@ public class NERDemo {
     String xml = "<hehe><PERSON>John Donovan</PERSON> from Argghhh! has put <PERSON>out a excellent slide</PERSON> show on what was actually found and fought for in <LOCATION>Fallujah</LOCATION> .</hehe>";
     Document doc = dBuilder.parse(new InputSource(new StringReader(xml)));
     NodeList nList = doc.getElementsByTagName("LOCATION");
-    for(int i=0;i<nList.getLength();i++){
-    	Element element = (Element)(nList.item(i));
-    	System.err.println(nList.item(i).getTextContent());
-    }
+//    for(int i=0;i<nList.getLength();i++){
+//    	Element element = (Element)(nList.item(i));
+//    	System.err.println(nList.item(i).getTextContent());
+//    }
     String xml2 = "I go to school at <ORGANIZATION>Stanford University</ORGANIZATION> , which is located in <LOCATION>California</LOCATION> .";
     StringBuilder sb = new StringBuilder(xml2);
     sb.insert(0, "<BEGIN>");
