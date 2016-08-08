@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
+import com.statnlp.hybridnetworks.NetworkConfig;
 
 public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 	
@@ -186,7 +187,8 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 					HashMap<String, Integer> fieldMap = fieldMapList.get(i);
 					for (int j=0;j<elements.length;j++) {
 						if(!fieldMap.containsKey(elements[j])) {
-							fieldMap.put(elements[j], fieldMap.size());
+							int fieldIdx = NetworkConfig.IS_INDEXED_NEURAL_FEATURES? Integer.parseInt(elements[j]):fieldMap.size();
+							fieldMap.put(elements[j], fieldIdx);
 							inputDimList.set(i, inputDimList.get(i)+1);
 						}
 						entry.add(fieldMap.get(elements[j])+1); // 1-indexing
