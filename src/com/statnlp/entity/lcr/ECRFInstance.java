@@ -37,6 +37,7 @@ public class ECRFInstance extends Instance {
 		return this.sentence.length();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ECRFInstance duplicate() {
 		ECRFInstance inst = new ECRFInstance(this.globalId, this._instanceId, this._weight,this.sentence);

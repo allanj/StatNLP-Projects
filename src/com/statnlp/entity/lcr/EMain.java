@@ -7,14 +7,16 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import com.statnlp.commons.ml.opt.OptimizerFactory;
 import com.statnlp.commons.types.Instance;
-import com.statnlp.dp.Evaluator;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.Init;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
+import com.statnlp.hybridnetworks.NetworkConfig.ModelType;
 import com.statnlp.hybridnetworks.NetworkModel;
+import com.statnlp.neural.NeuralConfigReader;
 
 public class EMain {
 
@@ -33,6 +35,8 @@ public class EMain {
 	public static HashSet<String> dataTypeSet;
 	public static HashMap<String, Integer> entityMap;
 	public static boolean topkinput = false;
+	public static String MODEL = "ssvm";
+	public static double adagrad_learningRate = 0.1;
 	
 	public static void initializeEntityMap(){
 		entityMap = new HashMap<String, Integer>();
@@ -107,14 +111,20 @@ public class EMain {
 //		Formatter.ner2Text(trainInstances, "data/testRandom2.txt");
 //		System.exit(0);
 		
-		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
 		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2;
 		NetworkConfig.NUM_THREADS = numThreads;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
-		NetworkConfig.USE_NEURAL_FEATURES = true;
 		
-		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(),entities,isPipe);
+		if(NetworkConfig.USE_NEURAL_FEATURES){
+			NeuralConfigReader.readConfig("config/neural.config");
+		}
+		NetworkConfig.MODEL_TYPE = MODEL.equals("crf")? ModelType.CRF:ModelType.SSVM;
+		
+		
+		
+		
+		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(adagrad_learningRate)),entities,isPipe);
 		ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(entityMap, entities);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		ECRFInstance[] ecrfs = trainInstances.toArray(new ECRFInstance[trainInstances.size()]);
@@ -151,6 +161,12 @@ public class EMain {
 					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
 					case "-topkinput": topkinput = true; break;
 					case "-topk": NetworkConfig._topKValue = Integer.valueOf(args[i+1]); break;
+					case "-batch": NetworkConfig.USE_BATCH_TRAINING = true;
+									NetworkConfig.BATCH_SIZE = Integer.valueOf(args[i+1]); break;
+					case "-model": MODEL = args[i+1]; break;
+					case "-neural": NetworkConfig.USE_NEURAL_FEATURES = true; 
+									break;
+					case "-lr": adagrad_learningRate = Double.valueOf(args[i+1]); break;
 					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 				}
 			}

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import com.statnlp.commons.types.Instance;
-import com.statnlp.hybridnetworks.FeatureArray;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
@@ -115,7 +114,7 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 	
 
 	public ECRFNetwork compileLabeledInstances(int networkId, ECRFInstance inst, LocalNetworkParam param){
-		ECRFNetwork lcrfNetwork = new ECRFNetwork(networkId, inst,param);
+		ECRFNetwork lcrfNetwork = new ECRFNetwork(networkId, inst,param, this);
 		long leaf = toNode_leaf();
 		long[] children = new long[]{leaf};
 		lcrfNetwork.addNode(leaf);
@@ -144,7 +143,7 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 		long[] allNodes = genericUnlabeledNetwork.getAllNodes();
 		long root = toNode_root(inst.size());
 		int rootIdx = Arrays.binarySearch(allNodes, root);
-		ECRFNetwork lcrfNetwork = new ECRFNetwork(networkId, inst,allNodes,genericUnlabeledNetwork.getAllChildren() , param, rootIdx+1);
+		ECRFNetwork lcrfNetwork = new ECRFNetwork(networkId, inst,allNodes,genericUnlabeledNetwork.getAllChildren() , param, rootIdx+1, this);
 		return lcrfNetwork;
 	}
 	
@@ -185,6 +184,8 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 		genericUnlabeledNetwork =  lcrfNetwork;
 	}
 	
-	
+	public double costAt(Network network, int parent_k, int[] child_k){
+		return super.costAt(network, parent_k, child_k);
+	}
 	
 }
