@@ -14,7 +14,7 @@ import com.statnlp.hybridnetworks.NetworkIDMapper;
 
 public class SemiCRFNetworkCompiler extends NetworkCompiler {
 	
-	private final static boolean DEBUG = true;
+	private final static boolean DEBUG = false;
 	
 	private static final long serialVersionUID = 6585870230920484539L;
 	public int maxSize = 128;
@@ -41,6 +41,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		System.out.println(String.format("Max size: %s, Max segment length: %s", maxSize, maxSegmentLength));
 		System.out.println(Label.LABELS.toString());
 		this.sViewer = sViewer;
+		this.sViewer.nothing();
 		buildUnlabeled();
 	}
 
