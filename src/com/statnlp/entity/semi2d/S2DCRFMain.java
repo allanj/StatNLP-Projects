@@ -22,6 +22,12 @@ import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkModel;
 
+/**
+ * Semi CRF for named entity recognition. 
+ * But each node has two directions. 
+ * @author allanjie
+ *
+ */
 public class S2DCRFMain {
 	
 	

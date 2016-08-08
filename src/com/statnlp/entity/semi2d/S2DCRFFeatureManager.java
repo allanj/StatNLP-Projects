@@ -49,8 +49,8 @@ public class S2DCRFFeatureManager extends FeatureManager {
 		
 		int[] child_arr = network.getNodeArray(children_k[0]);
 		int childPos = child_arr[0];
-		NodeType childType = NodeType.values()[child_arr[1]];
-		int childLabelId = child_arr[2];
+//		NodeType childType = NodeType.values()[child_arr[1]];
+//		int childLabelId = child_arr[2];
 
 		FeatureArray fa = null;
 		ArrayList<Integer> featureList = new ArrayList<Integer>();
