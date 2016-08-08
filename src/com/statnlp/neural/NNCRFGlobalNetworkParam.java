@@ -50,12 +50,13 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 		
 		List<Integer> numInputList = new ArrayList<Integer>();
 		List<Integer> inputDimList = new ArrayList<Integer>();//Arrays.asList(idx2strInput.size());
+		List<String> wordList = new ArrayList<String>();
 		List<String> embList = NeuralConfig.EMBEDDING;
 		List<Integer> embSizeList = NeuralConfig.EMBEDDING_SIZE;
-		List<List<Integer>> vocab = makeVocab(numInputList, inputDimList );
+		List<List<Integer>> vocab = makeVocab(numInputList, inputDimList, wordList);
 		int outputDim = neuralFeatureIntMap.size();
 		
-		double[] nnInternalWeights = this.nn.initNetwork(numInputList, inputDimList, embList, embSizeList, outputDim, vocab);
+		double[] nnInternalWeights = this.nn.initNetwork(numInputList, inputDimList, wordList, embList, embSizeList, outputDim, vocab);
 		if(nnInternalWeights != null) {
 			_nnSize = nnInternalWeights.length;
 		} else {
@@ -165,7 +166,7 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 		}
 	}
 	
-	private List<List<Integer>> makeVocab(List<Integer> numInputList, List<Integer> inputDimList) {
+	private List<List<Integer>> makeVocab(List<Integer> numInputList, List<Integer> inputDimList, List<String> wordList) {
 		List<List<Integer>> vocab = new ArrayList<List<Integer>>();
 		
 		for (String output : neuralFeatureIntMap.keySet()) {
@@ -190,6 +191,10 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 							int fieldIdx = NetworkConfig.IS_INDEXED_NEURAL_FEATURES? Integer.parseInt(elements[j]):fieldMap.size();
 							fieldMap.put(elements[j], fieldIdx);
 							inputDimList.set(i, inputDimList.get(i)+1);
+							if (NeuralConfig.EMBEDDING.get(i).equals("glove")
+							|| NeuralConfig.EMBEDDING.get(i).equals("polyglot")) {
+								wordList.add(elements[j]);
+							}
 						}
 						entry.add(fieldMap.get(elements[j])+1); // 1-indexing
 					}
