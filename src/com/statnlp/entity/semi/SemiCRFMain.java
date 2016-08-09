@@ -8,46 +8,82 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.statnlp.commons.ml.opt.OptimizerFactory;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
-import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GenerativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
+import com.statnlp.hybridnetworks.NetworkConfig.ModelType;
+import com.statnlp.neural.NeuralConfigReader;
 import com.statnlp.hybridnetworks.NetworkModel;
 
 public class SemiCRFMain {
 	
 	
-	public static void main(String[] args) throws FileNotFoundException, IOException, ClassNotFoundException, NoSuchFieldException, SecurityException, InterruptedException, IllegalArgumentException, IllegalAccessException{
+	public static int trainNum = 1000;
+	public static int testNumber = -1;
+	public static int numThread = 8;
+	public static int numIterations = 5000;
+	public static double AdaGrad_Learning_Rate = 0.01;
+	public static double l2 = 0.01;
+	public static boolean nonMarkov = false;
+	public static String train_filename = "data/semeval10t1/ecrf.train.MISC.txt";
+	public static String test_filename = "data/semeval10t1/ecrf.test.MISC.txt";
+	public static String neuralConfig = "config/debug.config";
+//	public static String train_filename = "data/semeval10t1/ecrf.smalltest.txt";
+//	public static String test_filename = "data/semeval10t1/ecrf.smalltest.txt";
+	
+	private static void processArgs(String[] args) throws FileNotFoundException{
+		for(int i=0;i<args.length;i=i+2){
+			switch(args[i]){
+				case "-trainNum": trainNum = Integer.valueOf(args[i+1]); break;   //default: all 
+				case "-testNum": testNumber = Integer.valueOf(args[i+1]); break;    //default:all
+				case "-iter": numIterations = Integer.valueOf(args[i+1]); break;   //default:100;
+				case "-thread": numThread = Integer.valueOf(args[i+1]); break;   //default:5
+				case "-windows": SemiEval.windows = true; break;            //default: false (is using windows system to run the evaluation script)
+				case "-batch": NetworkConfig.USE_BATCH_TRAINING = true;
+								NetworkConfig.BATCH_SIZE = Integer.valueOf(args[i+1]); break;
+				case "-model": NetworkConfig.MODEL_TYPE = args[i+1].equals("crf")? ModelType.CRF:ModelType.SSVM;   break;
+				case "-neural": if(args[i+1].equals("true")){ 
+										NetworkConfig.USE_NEURAL_FEATURES = true; 
+										NetworkConfig.REGULARIZE_NEURAL_FEATURES = false;
+										NetworkConfig.OPTIMIZE_NEURAL = false;  //not optimize in CRF..
+										NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
+									}
+								break;
+				case "-neuralconfig":neuralConfig = args[i+1]; break;
+				case "-reg": l2 = Double.valueOf(args[i+1]);  break;
+				case "-lr": AdaGrad_Learning_Rate = Double.valueOf(args[i+1]); break;
+				case "-nonmarkov": if(args[i+1].equals("true")) nonMarkov = true; else nonMarkov= false; break;
+				default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
+			}
+		}
+	}
+	
+	
+	public static void main(String[] args) throws IOException, InterruptedException {
 		
-		DPConfig.windows = false;
-		
-		String train_filename;
-		String test_filename;
-		SemiCRFInstance[] trainInstances; 
-		SemiCRFInstance[] testInstances;
 		
 		//always use conll data
-		train_filename = DPConfig.ecrftrain;
-		test_filename = DPConfig.ecrftest;
 //		train_filename = "data/semi/semi.train.txt";
 //		test_filename = "data/semi/semi.test.txt";
-		trainInstances = readCoNLLData(train_filename, true,-1);
-		testInstances = readCoNLLData(test_filename, false,-1);
 		
+		processArgs(args);
 		String resEval = "data/semi/semi.eval.txt";
 		String resRes = "data/semi/semi.res.txt";
-		
-		
+		/**data is 0-indexed, network compiler is 1-indexed since we have leaf nodes.**/
+		SemiCRFInstance[] trainInstances= readCoNLLData(train_filename, true,	trainNum);
+		SemiCRFInstance[] testInstances	= readCoNLLData(test_filename, 	false,	testNumber);
+	
 		int maxSize = 0;
 		int maxSpan = 0;
 		for(SemiCRFInstance instance: trainInstances){
 			maxSize = Math.max(maxSize, instance.size());
 			for(Span span: instance.output){
-				maxSpan = Math.max(maxSpan, span.end-span.start);
+				maxSpan = Math.max(maxSpan, span.end-span.start+1);
 			}
 		}
 		for(SemiCRFInstance instance: testInstances){
@@ -56,21 +92,25 @@ public class SemiCRFMain {
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
 		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
-		NetworkConfig.L2_REGULARIZATION_CONSTANT = 0.01;
-		NetworkConfig.NUM_THREADS = 38;
+		NetworkConfig.L2_REGULARIZATION_CONSTANT = l2;
+		NetworkConfig.NUM_THREADS = numThread;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
+
+		//modify this. and read neural config
+		OptimizerFactory of = NetworkConfig.USE_NEURAL_FEATURES || NetworkConfig.MODEL_TYPE==ModelType.SSVM? 
+				OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(AdaGrad_Learning_Rate):OptimizerFactory.getLBFGSFactory();
 		
-		int numIterations = 5000;
+		if(NetworkConfig.USE_NEURAL_FEATURES) NeuralConfigReader.readConfig(neuralConfig);
 		
 		int size = trainInstances.length;
 		
 		System.err.println("Read.."+size+" instances.");
 		
 		SemiViewer sViewer = new SemiViewer();
-		SemiCRFFeatureManager fm = new SemiCRFFeatureManager(new GlobalNetworkParam());
-		
 		
 		SemiCRFNetworkCompiler compiler = new SemiCRFNetworkCompiler(maxSize, maxSpan,sViewer);
+		SemiCRFFeatureManager fm = new SemiCRFFeatureManager(new GlobalNetworkParam(of), compiler.maxSegmentLength, nonMarkov);
+		
 		
 		NetworkModel model = NetworkConfig.TRAIN_MODE_IS_GENERATIVE ? GenerativeNetworkModel.create(fm, compiler) : DiscriminativeNetworkModel.create(fm, compiler);
 		
@@ -81,10 +121,8 @@ public class SemiCRFMain {
 		SemiEval.writeNERResult(predictions, resRes);
 	}
 	
-	
-	
 	/**
-	 * Read data from file in a CoNLL format 
+	 * Read data from file in a CoNLL format 0-index.
 	 * @param fileName
 	 * @param isLabeled
 	 * @return
@@ -112,7 +150,7 @@ public class SemiCRFMain {
 				WordToken[] wtArr = new WordToken[wts.size()];
 				instance.input = new Sentence(wts.toArray(wtArr));
 				instance.output = output;
-				//System.err.println(output.toString());
+//				System.err.println(output.toString());
 				if(isLabeled){
 					instance.setLabeled(); // Important!
 				} else {

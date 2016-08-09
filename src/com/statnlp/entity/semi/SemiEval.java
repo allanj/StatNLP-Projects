@@ -7,11 +7,11 @@ import java.io.PrintWriter;
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
-import com.statnlp.dp.utils.DPConfig;
 
 public class SemiEval {
 
 	
+	public static boolean windows = false;
 	/**
 	 * 
 	 * @param testInsts
@@ -39,7 +39,7 @@ public class SemiEval {
 		try{
 			System.err.println("perl data/semeval10t1/conlleval.pl < "+outputFile);
 			ProcessBuilder pb = null;
-			if(DPConfig.windows){
+			if(windows){
 				pb = new ProcessBuilder("D:/Perl64/bin/perl","E:/Framework/data/semeval10t1/conlleval.pl"); 
 			}else{
 				pb = new ProcessBuilder("data/semeval10t1/conlleval.pl"); 

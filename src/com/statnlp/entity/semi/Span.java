@@ -11,8 +11,8 @@ public class Span implements Comparable<Span>, Serializable{
 
 	/**
 	 * 
-	 * @param start
-	 * @param end: we can make it inclusive
+	 * @param start: inclusive
+	 * @param end: inclusive
 	 * @param label
 	 */
 	public Span(int start, int end, Label label) {
