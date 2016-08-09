@@ -20,11 +20,13 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 	public ECRFNetwork genericUnlabeledNetwork;
 	private HashMap<String, Integer> entityMap;
 	private String[] entities;
+	private boolean useSSVMCost;
 	
-	public ECRFNetworkCompiler(HashMap<String, Integer> entityMap,String[] entities){
+	public ECRFNetworkCompiler(HashMap<String, Integer> entityMap,String[] entities, boolean useSSVMCost){
 		this.entityMap = entityMap;
 		this.entities = entities;
 		this._size = 150;
+		this.useSSVMCost = useSSVMCost;
 		this.compileUnlabeledInstancesGeneric();
 	}
 	
@@ -132,9 +134,9 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 		
 		lcrfNetwork.finalizeNetwork();
 		
-//		if(!genericUnlabeledNetwork.contains(lcrfNetwork)){
-//			System.err.println("wrong");
-//		}
+		if(!genericUnlabeledNetwork.contains(lcrfNetwork)){
+			System.err.println("wrong");
+		}
 		return lcrfNetwork;
 	}
 	
@@ -185,7 +187,9 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 	}
 	
 	public double costAt(Network network, int parent_k, int[] child_k){
-		return super.costAt(network, parent_k, child_k);
+		if(this.useSSVMCost)
+			return super.costAt(network, parent_k, child_k);
+		else return 0.0;
 	}
 	
 }

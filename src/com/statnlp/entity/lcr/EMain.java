@@ -37,6 +37,7 @@ public class EMain {
 	public static boolean topkinput = false;
 	public static String MODEL = "ssvm";
 	public static double adagrad_learningRate = 0.1;
+	public static boolean useSSVMCost = false;
 	
 	public static void initializeEntityMap(){
 		entityMap = new HashMap<String, Integer>();
@@ -116,16 +117,16 @@ public class EMain {
 		NetworkConfig.NUM_THREADS = numThreads;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		
+		OptimizerFactory of = OptimizerFactory.getLBFGSFactory();
+		NetworkConfig.MODEL_TYPE = MODEL.equals("crf")? ModelType.CRF:ModelType.SSVM;
 		if(NetworkConfig.USE_NEURAL_FEATURES){
 			NeuralConfigReader.readConfig("config/neural.config");
+			of = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(adagrad_learningRate);
 		}
-		NetworkConfig.MODEL_TYPE = MODEL.equals("crf")? ModelType.CRF:ModelType.SSVM;
+		if(NetworkConfig.MODEL_TYPE==ModelType.SSVM) of = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(adagrad_learningRate);
 		
-		
-		
-		
-		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(adagrad_learningRate)),entities,isPipe);
-		ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(entityMap, entities);
+		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(of),entities,isPipe);
+		ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(entityMap, entities,useSSVMCost);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		ECRFInstance[] ecrfs = trainInstances.toArray(new ECRFInstance[trainInstances.size()]);
 		model.train(ecrfs, numIteration);
@@ -164,9 +165,15 @@ public class EMain {
 					case "-batch": NetworkConfig.USE_BATCH_TRAINING = true;
 									NetworkConfig.BATCH_SIZE = Integer.valueOf(args[i+1]); break;
 					case "-model": MODEL = args[i+1]; break;
-					case "-neural": NetworkConfig.USE_NEURAL_FEATURES = true; 
-									break;
+					case "-neural": if(args[i+1].equals("true")){ 
+											NetworkConfig.USE_NEURAL_FEATURES = true; 
+											NetworkConfig.OPTIMIZE_NEURAL = false;  //not optimize in CRF..
+											NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
+										} break;
 					case "-lr": adagrad_learningRate = Double.valueOf(args[i+1]); break;
+					case "-ssvmcost": if(args[i+1].equals("true")) useSSVMCost = true;
+										else useSSVMCost = false; 
+										break;
 					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 				}
 			}
