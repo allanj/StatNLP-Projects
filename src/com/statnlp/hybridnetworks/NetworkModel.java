@@ -228,6 +228,11 @@ public abstract class NetworkModel implements Serializable{
 					throw new RuntimeException("Error:\n"+obj_old+"\n>\n"+obj);
 				}
 				obj_old = obj;
+				if (NetworkConfig.USE_NEURAL_FEATURES) {
+					if (lastIter || done) {
+						nnController.forwardNetwork(false);
+					}
+				}
 				if(lastIter){
 					print("Training completes. The specified number of iterations ("+it+") has passed.", outstreams);
 					break;
@@ -236,9 +241,6 @@ public abstract class NetworkModel implements Serializable{
 					print("Training completes. No significant progress (<objtol) after "+it+" iterations.", outstreams);
 					break;
 				}
-			}
-			if (NetworkConfig.USE_NEURAL_FEATURES) {
-				nnController.forwardNetwork(false);
 			}
 		} finally {
 			pool.shutdown();

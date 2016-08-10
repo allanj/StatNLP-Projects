@@ -40,6 +40,8 @@ public class NeuralConfigReader {
 				NeuralConfig.OPTIMIZER = info[1];
 			} else if(info[0].equals("learningRate")) {
 				NeuralConfig.LEARNING_RATE = Double.parseDouble(info[1]);
+			} else if(info[0].equals("fixEmbedding")) {
+				NeuralConfig.FIX_EMBEDDING = true;
 			} else {
 				System.err.println("Unrecognized option: " + line);
 			}

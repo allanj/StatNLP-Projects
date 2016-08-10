@@ -79,7 +79,7 @@ public class RemoteNN {
 						   int outputDim, List<List<Integer>> vocab) {
 		MessageBufferPacker packer = MessagePack.newDefaultBufferPacker();
 		try {
-			packer.packMapHeader(14);
+			packer.packMapHeader(15);
 			packer.packString("cmd").packString("init");
 			
 			packList(packer, "numInputList", numInputList);
@@ -94,6 +94,7 @@ public class RemoteNN {
 			packer.packString("dropout").packDouble(NeuralConfig.DROPOUT);
 			packer.packString("optimizer").packString(NeuralConfig.OPTIMIZER);
 			packer.packString("learningRate").packDouble(NeuralConfig.LEARNING_RATE);
+			packer.packString("fixEmbedding").packBoolean(NeuralConfig.FIX_EMBEDDING);
 			packList(packer, "vocab", vocab);
 			packer.close();
 			
