@@ -21,6 +21,7 @@ public class ECRFFeatureManager extends FeatureManager {
 	protected boolean isPipeLine; 
 	private String OUT_SEP = NeuralConfig.OUT_SEP; 
 	private String IN_SEP = NeuralConfig.IN_SEP;
+	private int prefixLength = 3;
 	
 	public ECRFFeatureManager(GlobalNetworkParam param_g, String[] entities, boolean isPipeLine) {
 		super(param_g);
@@ -74,29 +75,30 @@ public class ECRFFeatureManager extends FeatureManager {
 		String currEn = entities[eId];
 		String prevEntity = entities[childEId];
 		if(NetworkConfig.USE_NEURAL_FEATURES){
-			featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), currEn, llw+IN_SEP+lw+IN_SEP+currWord+IN_SEP+rw+IN_SEP+rrw+OUT_SEP+
-																				llt+IN_SEP+lt+IN_SEP+currTag+IN_SEP+rt+IN_SEP+rrt));
+//			featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), currEn, llw+IN_SEP+lw+IN_SEP+currWord+IN_SEP+rw+IN_SEP+rrw+OUT_SEP+
+//																				llt+IN_SEP+lt+IN_SEP+currTag+IN_SEP+rt+IN_SEP+rrt));
+			featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), currEn, llw+IN_SEP+lw+IN_SEP+currWord+IN_SEP+rw+IN_SEP+rrw));
 		}
 		
 		/** Features adapted from Jenny Rose Finkel et.al 2009. (Order follows the table)**/
 		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "EW",  	currEn+":"+currWord));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELW",	currEn+":"+lw));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ERW",	currEn+":"+rw));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ERW",	currEn+":"+rw));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ET",		currEn+":"+currTag));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELT",	currEn+":"+lt));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ERT",	currEn+":"+rt));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ERT",	currEn+":"+rt));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ES",		currEn+":"+currShape));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELS",	currEn+":"+ls));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ERS",	currEn+":"+rs));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELT-T",	currEn+":"+lt+","+currTag));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELS-S",	currEn+":"+ls+","+currShape));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ES-RS",	currEn+":"+currShape+","+rs));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELW-S",	currEn+":"+lw+","+currShape));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ES-RW",	currEn+":"+currShape+","+rw));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ERS",	currEn+":"+rs));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELT-T",	currEn+":"+lt+","+currTag));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELS-S",	currEn+":"+ls+","+currShape));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ES-RS",	currEn+":"+currShape+","+rs));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELW-S",	currEn+":"+lw+","+currShape));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ES-RW",	currEn+":"+currShape+","+rw));
 		/** 5-word window features **/
-		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-5-word",	currEn+":"+llw+","+lw+","+currWord+","+rw+","+rrw));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-5-word",	currEn+":"+llw+","+lw+","+currWord+","+rw+","+rrw));
 		/****Add some prefix features******/
-		for(int plen = 1;plen<=6;plen++){
+		for(int plen = 1;plen<=prefixLength;plen++){
 			if(currWord.length()>=plen){
 				String suff = currWord.substring(currWord.length()-plen, currWord.length());
 				featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-SUFF-"+plen, currEn+":"+suff));
@@ -106,30 +108,31 @@ public class ECRFFeatureManager extends FeatureManager {
 		}
 		/*********Pairwise features********/
 		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E",			prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE",	currWord+":"+prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevW-prevE-currE",	lw+":"+prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextW-prevE-currE",	rw+":"+prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE",	currTag+":"+prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-prevE-currE",	lt+":"+prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextT-prevE-currE",	rt+":"+prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-currT-prevE-currE",lt+":"+currTag+":"+prevEntity+":"+currEn));	
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "S-LE-E",		currShape+":"+prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "LS-LE-E",		ls+":"+prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "RS-LE-E",		rs+":"+prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "LS-S-LE-E",		ls+":"+currShape+":"+prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "LS-RS-LE-E",	ls+":"+rs+":"+prevEntity+":"+currEn));
+		
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE",	currWord+":"+prevEntity+":"+currEn));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevW-prevE-currE",	lw+":"+prevEntity+":"+currEn));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextW-prevE-currE",	rw+":"+prevEntity+":"+currEn));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE",	currTag+":"+prevEntity+":"+currEn));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-prevE-currE",	lt+":"+prevEntity+":"+currEn));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextT-prevE-currE",	rt+":"+prevEntity+":"+currEn));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-currT-prevE-currE",lt+":"+currTag+":"+prevEntity+":"+currEn));	
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "S-LE-E",		currShape+":"+prevEntity+":"+currEn));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "LS-LE-E",		ls+":"+prevEntity+":"+currEn));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "RS-LE-E",		rs+":"+prevEntity+":"+currEn));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "LS-S-LE-E",		ls+":"+currShape+":"+prevEntity+":"+currEn));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "LS-RS-LE-E",	ls+":"+rs+":"+prevEntity+":"+currEn));
 		/** (END) Features adapted from Jenny Rose Finkel et.al 2009 **/
 		
 		
-		
+//		if(true){
 		if(this.isPipeLine){
 			/** This option is for the pipeline from the dependency result to named entity recogntion.**/
 			int currHeadIndex = sent.get(pos).getHeadIndex();
 			String currHead = currHeadIndex>=0? sent.get(currHeadIndex).getName():"STR";
-			String currHeadTag = currHeadIndex>=0? sent.get(currHeadIndex).getEntity():"STR";
+			String currHeadTag = currHeadIndex>=0? sent.get(currHeadIndex).getTag():"STR";
 			//This is the features that really help the model: most important features
 			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-WH", entities[eId]+":"+currWord+","+currHead));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-WTHT", entities[eId]+":"+currTag+","+currHeadTag));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-WTHT", entities[eId]+":"+currTag+","+currHeadTag)); //the most powerful one
 			if(childPos>=0){
 				int childHeadIndex = sent.get(childPos).getHeadIndex();
 				//remove this feature, just down a bit

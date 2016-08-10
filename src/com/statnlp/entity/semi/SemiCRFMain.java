@@ -1,10 +1,14 @@
 package com.statnlp.entity.semi;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +16,7 @@ import com.statnlp.commons.ml.opt.OptimizerFactory;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
+import com.statnlp.entity.EntityChecker;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GenerativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -27,14 +32,21 @@ public class SemiCRFMain {
 	public static int testNumber = -1;
 	public static int numThread = 8;
 	public static int numIterations = 5000;
-	public static double AdaGrad_Learning_Rate = 0.01;
+	public static double AdaGrad_Learning_Rate = 0.1;
 	public static double l2 = 0.01;
 	public static boolean nonMarkov = false;
-	public static String train_filename = "data/semeval10t1/ecrf.train.MISC.txt";
-	public static String test_filename = "data/semeval10t1/ecrf.test.MISC.txt";
 	public static String neuralConfig = "config/debug.config";
+	public static boolean useAdaGrad = false;
+	public static boolean depFeature = false;
+	public static boolean useIncompleteSpan = false;
+	public static boolean useDepNet = false;
+	public static String modelFile = null;
+//	public static String train_filename = "data/cnn/ecrf.train.MISC.txt";
+//	public static String test_filename = "data/cnn/ecrf.test.MISC.txt";
 //	public static String train_filename = "data/semeval10t1/ecrf.smalltest.txt";
 //	public static String test_filename = "data/semeval10t1/ecrf.smalltest.txt";
+	public static String train_filename = "data/semeval10t1/ecrf.train.MISC.txt";
+	public static String test_filename = "data/semeval10t1/ecrf.test.MISC.txt";
 	
 	private static void processArgs(String[] args) throws FileNotFoundException{
 		for(int i=0;i<args.length;i=i+2){
@@ -57,14 +69,19 @@ public class SemiCRFMain {
 				case "-neuralconfig":neuralConfig = args[i+1]; break;
 				case "-reg": l2 = Double.valueOf(args[i+1]);  break;
 				case "-lr": AdaGrad_Learning_Rate = Double.valueOf(args[i+1]); break;
+				case "-adagrad": useAdaGrad = args[i+1].equals("true")? true:false;break;
 				case "-nonmarkov": if(args[i+1].equals("true")) nonMarkov = true; else nonMarkov= false; break;
+				case "-depf": if(args[i+1].equals("true")) depFeature = true; else depFeature= false; break;
+				case "-useincom": useIncompleteSpan = args[i+1].equals("true")? true:false;break;
+				case "-usedepnet": useDepNet = args[i+1].equals("true")? true:false;break;
+				case "-modelPath": modelFile = args[i+1]; break;
 				default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 			}
 		}
 	}
 	
 	
-	public static void main(String[] args) throws IOException, InterruptedException {
+	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
 		
 		
 		//always use conll data
@@ -101,6 +118,8 @@ public class SemiCRFMain {
 				OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(AdaGrad_Learning_Rate):OptimizerFactory.getLBFGSFactory();
 		
 		if(NetworkConfig.USE_NEURAL_FEATURES) NeuralConfigReader.readConfig(neuralConfig);
+		if(useAdaGrad) of = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(AdaGrad_Learning_Rate);
+		
 		
 		int size = trainInstances.length;
 		
@@ -108,13 +127,25 @@ public class SemiCRFMain {
 		
 		SemiViewer sViewer = new SemiViewer();
 		
-		SemiCRFNetworkCompiler compiler = new SemiCRFNetworkCompiler(maxSize, maxSpan,sViewer);
-		SemiCRFFeatureManager fm = new SemiCRFFeatureManager(new GlobalNetworkParam(of), compiler.maxSegmentLength, nonMarkov);
+		GlobalNetworkParam gnp = null;
+		if(modelFile==null || !new File(modelFile).exists()){
+			gnp = new GlobalNetworkParam(of);
+		}else{
+			ObjectInputStream in = new ObjectInputStream(new FileInputStream(modelFile));
+			gnp=(GlobalNetworkParam)in.readObject();
+			in.close();
+		}
 		
-		
+		SemiCRFNetworkCompiler compiler = new SemiCRFNetworkCompiler(maxSize, maxSpan,sViewer, useDepNet);
+		SemiCRFFeatureManager fm = new SemiCRFFeatureManager(gnp, nonMarkov, depFeature);
 		NetworkModel model = NetworkConfig.TRAIN_MODE_IS_GENERATIVE ? GenerativeNetworkModel.create(fm, compiler) : DiscriminativeNetworkModel.create(fm, compiler);
 		
-		model.train(trainInstances, numIterations);
+		if(!new File(modelFile).exists()){
+			model.train(trainInstances, numIterations);
+			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
+			out.writeObject(fm.getParam_G());
+			out.close();
+		}
 		
 		Instance[] predictions = model.decode(testInstances);
 		SemiEval.evalNER(predictions, resEval);
@@ -150,14 +181,17 @@ public class SemiCRFMain {
 				WordToken[] wtArr = new WordToken[wts.size()];
 				instance.input = new Sentence(wts.toArray(wtArr));
 				instance.output = output;
-//				System.err.println(output.toString());
 				if(isLabeled){
 					instance.setLabeled(); // Important!
 				} else {
 					instance.setUnlabeled();
 				}
-				instanceId++;
-				result.add(instance);
+				if(useIncompleteSpan && EntityChecker.checkAllIncomplete(instance.input).size()>0){
+					//do nothing. just don't add.
+				}else{
+					instanceId++;
+					result.add(instance);
+				}
 				wts = new ArrayList<WordToken>();
 				output = new ArrayList<Span>();
 				prevLabel = null;
@@ -166,10 +200,10 @@ public class SemiCRFMain {
 				if(result.size()==number)
 					break;
 			} else {
-				String[] values = line.split("\t");
+				String[] values = line.split("[\t ]");
 				int index = Integer.valueOf(values[0]) - 1; //because it is starting from 1
 				String word = values[1];
-				wts.add(new WordToken(word, values[2]));
+				wts.add(new WordToken(word, values[2], Integer.valueOf(values[4])-1, values[3]));
 				String form = values[3];
 				Label label = null;
 				if(form.startsWith("B")){

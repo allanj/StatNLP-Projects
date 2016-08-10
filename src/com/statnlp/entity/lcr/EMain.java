@@ -35,9 +35,11 @@ public class EMain {
 	public static HashSet<String> dataTypeSet;
 	public static HashMap<String, Integer> entityMap;
 	public static boolean topkinput = false;
-	public static String MODEL = "ssvm";
+	public static String MODEL = "crf";
 	public static double adagrad_learningRate = 0.1;
 	public static boolean useSSVMCost = false;
+	public static boolean useAdaGrad = false;
+	private static boolean testOnTrain = false;
 	
 	public static void initializeEntityMap(){
 		entityMap = new HashMap<String, Integer>();
@@ -124,12 +126,17 @@ public class EMain {
 			of = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(adagrad_learningRate);
 		}
 		if(NetworkConfig.MODEL_TYPE==ModelType.SSVM) of = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(adagrad_learningRate);
+		if(useAdaGrad) of = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(adagrad_learningRate);
 		
 		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(of),entities,isPipe);
 		ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(entityMap, entities,useSSVMCost);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		ECRFInstance[] ecrfs = trainInstances.toArray(new ECRFInstance[trainInstances.size()]);
 		model.train(ecrfs, numIteration);
+		if(testOnTrain){
+			for(ECRFInstance inst:trainInstances) inst.setUnlabeled();
+			testInstances = trainInstances;
+		}
 		Instance[] predictions = model.decode(testInstances.toArray(new ECRFInstance[testInstances.size()]));
 		ECRFEval.evalNER(predictions, nerOut);
 		ECRFEval.writeNERResult(predictions, nerRes, true);
@@ -174,6 +181,8 @@ public class EMain {
 					case "-ssvmcost": if(args[i+1].equals("true")) useSSVMCost = true;
 										else useSSVMCost = false; 
 										break;
+					case "-adagrad": useAdaGrad = args[i+1].equals("true")? true:false;break;
+					case "-testtrain": testOnTrain = args[i+1].equals("true")? true:false;break;
 					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 				}
 			}

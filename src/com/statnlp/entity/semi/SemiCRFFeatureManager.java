@@ -15,22 +15,44 @@ import com.statnlp.neural.NeuralConfig;
 public class SemiCRFFeatureManager extends FeatureManager {
 	
 	private static final long serialVersionUID = 6510131496948610905L;
-	
+	private boolean depFeature;
+	private int prefixSuffixLen = 3;
+	//private int twoDirInsideLen = 3;
 
 	public enum FeatureType{
-		local, pairwise,semi,neural,cheat
+		prev_word,
+		prev_word_shape,
+		prev_tag,
+		next_word,
+		next_word_shape,
+		next_word_tag,
+		segment,
+		seg_len,
+		start_word,
+		start_tag,
+		end_word,
+		end_tag,
+		words,
+		word_tags,
+		word_shapes,
+		seg_pref,
+		seg_suff,
+		transition,
+		neural,
+		dep_word,
+		dep_tag,
+		cheat
 	}
 	
 	private String OUT_SEP = NeuralConfig.OUT_SEP; 
 	private String IN_SEP = NeuralConfig.IN_SEP;
 	private boolean CHEAT = false;
 	private boolean nonMarkovFeature;
-	private int maxSegLength;
 	
-	public SemiCRFFeatureManager(GlobalNetworkParam param_g, int maxSegL, boolean nonMarkov) {
+	public SemiCRFFeatureManager(GlobalNetworkParam param_g, boolean nonMarkov, boolean depFeature) {
 		super(param_g);
-		this.maxSegLength = maxSegL;
 		this.nonMarkovFeature = nonMarkov;
+		this.depFeature = depFeature;
 	}
 	
 	@Override
@@ -51,7 +73,8 @@ public class SemiCRFFeatureManager extends FeatureManager {
 		if(parentType == NodeType.LEAF || parentType == NodeType.ROOT){
 			return FeatureArray.EMPTY;
 		}
-		
+//		System.out.println("isLabeled: "+network.getInstance().isLabeled()+" parent:"+parentPos+" "+parentLabelId);
+//		System.out.println("instance size:"+sent.length());
 		int[] child_arr = network.getNodeArray(children_k[0]);
 		int childPos = child_arr[0] + 1 - 1;
 		NodeType childType = NodeType.values()[child_arr[2]];
@@ -67,136 +90,111 @@ public class SemiCRFFeatureManager extends FeatureManager {
 		ArrayList<Integer> featureList = new ArrayList<Integer>();
 		
 		int start = childPos;
+		int end = parentPos;
 		if(parentPos==0 || childType==NodeType.LEAF ) start = childPos;
-//		String childWord = childPos>=0? sent.get(childPos).getName():"STR";
-//		String childTag = childPos>=0? sent.get(childPos).getTag():"STR";
 		String currEn = Label.get(parentLabelId).getForm();
-		//word-level features
-		for(int i=start;i<=parentPos;i++){
-			int pos = i;
-			String lw = pos>0? sent.get(pos-1).getName():"STR";
-			String ls = pos>0? shape(lw):"STR_SHAPE";
-			String lt = pos>0? sent.get(pos-1).getTag():"STR";
-			String llw = pos==0? "STR1": pos==1? "STR":sent.get(pos-2).getName();
-			String llt = pos==0? "STR1": pos==1? "STR":sent.get(pos-2).getTag();
-			String rw = pos<sent.length()-1? sent.get(pos+1).getName():"END";
-			String rt = pos<sent.length()-1? sent.get(pos+1).getTag():"END";
-			String rs = pos<sent.length()-1? shape(rw):"END_SHAPE";
-			String rrw = pos==sent.length()-1? "END1": pos==sent.length()-2? "END":sent.get(pos+2).getName();
-			String rrt = pos==sent.length()-1? "END1": pos==sent.length()-2? "END":sent.get(pos+2).getTag();
-			String currWord = sent.get(pos).getName();
-			String currTag = sent.get(pos).getTag();
-			String currShape = shape(currWord);
-			
-			String prevEntity = i==start? Label.get(childLabelId).getForm():Label.get(parentLabelId).getForm();
-			
-			if(NetworkConfig.USE_NEURAL_FEATURES && !nonMarkovFeature){
-				featureList.add(this._param_g.toFeature(network, FeatureType.neural.name(), currEn, llw+IN_SEP+lw+IN_SEP+currWord+IN_SEP+rw+IN_SEP+rrw+OUT_SEP+
-																					llt+IN_SEP+lt+IN_SEP+currTag+IN_SEP+rt+IN_SEP+rrt));
-			}
-			
-			/** Features adapted from Jenny Rose Finkel et.al 2009. (Order follows the table)**/
-			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "EW",  	currEn+":"+currWord));
-			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "ELW",	currEn+":"+lw));
-			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "ERW",	currEn+":"+rw));
-			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "ET",		currEn+":"+currTag));
-			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "ELT",	currEn+":"+lt));
-			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "ERT",	currEn+":"+rt));
-			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "ES",		currEn+":"+currShape));
-			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "ELS",	currEn+":"+ls));
-			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "ERS",	currEn+":"+rs));
-			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "ELT-T",	currEn+":"+lt+","+currTag));
-			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "ELS-S",	currEn+":"+ls+","+currShape));
-			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "ES-RS",	currEn+":"+currShape+","+rs));
-			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "ELW-S",	currEn+":"+lw+","+currShape));
-			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "ES-RW",	currEn+":"+currShape+","+rw));
-			/** 5-word window features **/
-			featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "E-5-word",	currEn+":"+llw+","+lw+","+currWord+","+rw+","+rrw));
-			/****Add some prefix features******/
-			for(int plen = 1;plen<=6;plen++){
-				if(currWord.length()>=plen){
-					String suff = currWord.substring(currWord.length()-plen, currWord.length());
-					featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "E-PATTERN-SUFF-"+plen, currEn+":"+suff));
-					String pref = currWord.substring(0,plen);
-					featureList.add(this._param_g.toFeature(network,FeatureType.local.name(), "E-PATTERN-PREF-"+plen, currEn+":"+pref));
-				}
-			}
-			/*********Pairwise features********/
-			featureList.add(this._param_g.toFeature(network,FeatureType.pairwise.name(), "E-prev-E",			prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FeatureType.pairwise.name(), "currW-prevE-currE",	currWord+":"+prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FeatureType.pairwise.name(), "prevW-prevE-currE",	lw+":"+prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FeatureType.pairwise.name(), "nextW-prevE-currE",	rw+":"+prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FeatureType.pairwise.name(), "currT-prevE-currE",	currTag+":"+prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FeatureType.pairwise.name(), "prevT-prevE-currE",	lt+":"+prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FeatureType.pairwise.name(), "nextT-prevE-currE",	rt+":"+prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FeatureType.pairwise.name(), "prevT-currT-prevE-currE",lt+":"+currTag+":"+prevEntity+":"+currEn));	
-			featureList.add(this._param_g.toFeature(network,FeatureType.pairwise.name(), "S-LE-E",			currShape+":"+prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FeatureType.pairwise.name(), "LS-LE-E",			ls+":"+prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FeatureType.pairwise.name(), "RS-LE-E",			rs+":"+prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FeatureType.pairwise.name(), "LS-S-LE-E",		ls+":"+currShape+":"+prevEntity+":"+currEn));
-			featureList.add(this._param_g.toFeature(network,FeatureType.pairwise.name(), "LS-RS-LE-E",		ls+":"+rs+":"+prevEntity+":"+currEn));
-			/** (END) Features adapted from Jenny Rose Finkel et.al 2009 **/
-		}
 		
+		String lw = start>0? sent.get(start-1).getName():"STR";
+		String ls = start>0? shape(lw):"STR_SHAPE";
+		String lt = start>0? sent.get(start-1).getTag():"STR";
+		String rw = end<sent.length()-1? sent.get(end+1).getName():"END";
+		String rt = end<sent.length()-1? sent.get(end+1).getTag():"END";
+		String rs = end<sent.length()-1? shape(rw):"END_SHAPE";
+		featureList.add(this._param_g.toFeature(network,FeatureType.prev_word.name(), 		currEn,	lw));
+		featureList.add(this._param_g.toFeature(network,FeatureType.prev_word_shape.name(), currEn, ls));
+		featureList.add(this._param_g.toFeature(network,FeatureType.prev_tag.name(), 		currEn, lt));
+		featureList.add(this._param_g.toFeature(network,FeatureType.next_word.name(), 		currEn, rw));
+		featureList.add(this._param_g.toFeature(network,FeatureType.next_word_shape.name(), currEn, rs));
+		featureList.add(this._param_g.toFeature(network,FeatureType.next_word_tag.name(), 	currEn, rt));
 		
-		/** add non-markovian neural features **/
-		if(NetworkConfig.USE_NEURAL_FEATURES && nonMarkovFeature){
-			StringBuilder segPhrase = new StringBuilder(sent.get(start).getName());
-			for(int pos=start+1;pos<=parentPos; pos++){
-				String w = sent.get(pos).getName();
-				segPhrase.append(IN_SEP);
-				segPhrase.append(w);
-			}
-			int segL = parentPos-start+1;
-			for(int t=0;t<(maxSegLength-segL);t++) { segPhrase.append(IN_SEP);segPhrase.append("<UNK>");}
-			featureList.add(this._param_g.toFeature(network, FeatureType.neural.name(), currEn, segPhrase.toString()));
-		}
-		
-		
-		/**  End (non-markovian neural features)**/
-		
-		
-		/**Features from semi CRF, adapted from Sunita Sarawagi et.al 2004***/
-		StringBuilder segPhrase = new StringBuilder();
-		StringBuilder shapePhrase = new StringBuilder();
-		for(int pos=start;pos<=parentPos; pos++){
+		StringBuilder segPhrase = new StringBuilder(sent.get(start).getName());
+		for(int pos=start+1;pos<=end; pos++){
 			String w = sent.get(pos).getName();
-			segPhrase.append(w+":");
-			shapePhrase.append(shape(w)+":");
+			segPhrase.append(" "+w);
 		}
-		featureList.add(this._param_g.toFeature(network,FeatureType.semi.name(), "word-phrase-E",	segPhrase.toString()+"::"+currEn));
-		featureList.add(this._param_g.toFeature(network,FeatureType.semi.name(), "shape-phrase-E",	shapePhrase.toString()+"::"+currEn));
+		featureList.add(this._param_g.toFeature(network,FeatureType.segment.name(), currEn,	segPhrase.toString()));
 		
-		String segLw = start>0? sent.get(start-1).getName():"STR";
-		String segLLw = start==0? "STR1": start==1? "STR":sent.get(start-2).getName();
-		String segLLLw = start==0? "STR2": start==1? "STR1": start==2? "STR":sent.get(start-3).getName();
-		String segRw = parentPos<sent.length()-1? sent.get(parentPos+1).getName():"END";
-		String segRRw = parentPos==sent.length()-1? "END1": parentPos==sent.length()-2? "END":sent.get(parentPos+2).getName();
-		String segRRRw = parentPos==sent.length()-1? "END2": parentPos==sent.length()-2? "END1": parentPos==sent.length()-3?"END":sent.get(parentPos+3).getName();
-		
-		/** 3-word/pattern window features before and after the segment**/
-		featureList.add(this._param_g.toFeature(network,FeatureType.semi.name(), "3-word-BF-E",		segLLLw+","+segLLw+","+segLw+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FeatureType.semi.name(), "3-word-AF-E",		segRw+","+segRRw+","+segRRRw+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FeatureType.semi.name(), "3-word-BF-E",		shape(segLLLw)+","+shape(segLLw)+","+shape(segLw)+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FeatureType.semi.name(), "3-word-AF-E",		shape(segRw)+","+shape(segRRw)+","+shape(segRRRw)+":"+currEn));
+		int lenOfSeg = end-start+1;
+		featureList.add(this._param_g.toFeature(network,FeatureType.seg_len.name(), currEn, lenOfSeg+""));
 		
 		/** Start and end features. **/
 		String startWord = sent.get(start).getName();
 		String startTag = sent.get(start).getTag();
-		featureList.add(this._param_g.toFeature(network,FeatureType.semi.name(), "STR-W",  	currEn+":"+startWord));
-		featureList.add(this._param_g.toFeature(network,FeatureType.semi.name(), "STR-T",	currEn+":"+startTag));
-		String endW = sent.get(parentPos).getName();
-		String endT = sent.get(parentPos).getTag();
-		featureList.add(this._param_g.toFeature(network,FeatureType.semi.name(), "END-W",  	currEn+":"+endW));
-		featureList.add(this._param_g.toFeature(network,FeatureType.semi.name(), "END-T",	currEn+":"+endT));
+		featureList.add(this._param_g.toFeature(network,FeatureType.start_word.name(),	currEn,	startWord));
+		featureList.add(this._param_g.toFeature(network,FeatureType.start_tag.name(),	currEn,	startTag));
+		String endW = sent.get(end).getName();
+		String endT = sent.get(end).getTag();
+		featureList.add(this._param_g.toFeature(network,FeatureType.end_word.name(),	currEn,	endW));
+		featureList.add(this._param_g.toFeature(network,FeatureType.end_tag.name(),		currEn,	endT));
+		
+		int insideSegLen = lenOfSeg; //Math.min(twoDirInsideLen, lenOfSeg);
+		for(int i=0; i<insideSegLen; i++){
+			featureList.add(this._param_g.toFeature(network,FeatureType.words.name()+":"+i,			currEn, sent.get(start+i).getName()));
+			featureList.add(this._param_g.toFeature(network,FeatureType.words.name()+":-"+i,		currEn,	sent.get(start+lenOfSeg-i-1).getName()));
+			/**the following 4 may not be really used**/
+			featureList.add(this._param_g.toFeature(network,FeatureType.word_tags.name()+":"+i,		currEn, sent.get(start+i).getTag()));
+			featureList.add(this._param_g.toFeature(network,FeatureType.word_tags.name()+":-"+i,	currEn,	sent.get(start+lenOfSeg-i-1).getTag()));
+			featureList.add(this._param_g.toFeature(network,FeatureType.word_shapes.name()+":"+i,	currEn, shape(sent.get(start+i).getName())));
+			featureList.add(this._param_g.toFeature(network,FeatureType.word_shapes.name()+":-"+i,	currEn,	shape(sent.get(start+lenOfSeg-i-1).getName())));
+		}
 		/** needs to be modified maybe ***/
+		for(int i=0; i<prefixSuffixLen; i++){
+			String prefix = segPhrase.substring(0, Math.min(segPhrase.length(), i+1));
+			String suffix = segPhrase.substring(Math.max(segPhrase.length()-i-1, 0));
+			featureList.add(this._param_g.toFeature(network,FeatureType.seg_pref.name()+"-"+i,	currEn,	prefix));
+			featureList.add(this._param_g.toFeature(network,FeatureType.seg_suff.name()+"-"+i,	currEn,	suffix));
+		}
+		String prevEntity = Label.get(childLabelId).getForm();
+		featureList.add(this._param_g.toFeature(network,FeatureType.transition.name(), prevEntity+"-"+currEn,	""));
 		
-		/**Segemetn length features **/
-		int lenOfSeg = parentPos-start+1;
-		featureList.add(this._param_g.toFeature(network,FeatureType.semi.name(), "STR-W-LEN",  	currEn+":"+startWord+"&L:"+lenOfSeg));
-		featureList.add(this._param_g.toFeature(network,FeatureType.semi.name(), "END-W-LEN",  	currEn+":"+endW+"&L:"+lenOfSeg));
-		/**(END) Features from semi CRF, adapted from Sunita Sarawagi et.al 2004**/
 		
+		
+		/** add non-markovian neural features **/
+		if(NetworkConfig.USE_NEURAL_FEATURES && nonMarkovFeature){
+			String position = null;
+			if(start==0) position = "start";
+			if(parentPos==sent.length()-1) position = "end";
+			if(start!=0 && parentPos!=(sent.length()-1)) position = "inside";
+			if(start==0 && parentPos==(sent.length()-1)) position = "cover";
+			featureList.add(this._param_g.toFeature(network, FeatureType.neural.name(), currEn, lenOfSeg+OUT_SEP+position+OUT_SEP+startWord+IN_SEP+endW));
+//			featureList.add(this._param_g.toFeature(network, FeatureType.neural.name(), currEn, lenOfSeg+OUT_SEP+position+OUT_SEP+startWord+IN_SEP+endW+OUT_SEP+startTag+IN_SEP+endT));
+		}
+		/**  End (non-markovian neural features)**/
+		
+		
+		/**Add dependency features**/
+		if(this.depFeature){
+			for(int pos=start;pos<=end;pos++){
+				String currWord = sent.get(pos).getName();
+				String currTag = sent.get(pos).getTag();
+				int currHeadIndex = sent.get(pos).getHeadIndex();
+				String currHead = currHeadIndex>=0? sent.get(currHeadIndex).getName():"STR";
+				String currHeadTag = currHeadIndex>=0? sent.get(currHeadIndex).getTag():"STR";
+				featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(),	currEn, currWord+" "+currHead));
+				featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(),		currEn,	currTag+" "+currHeadTag));
+
+				int prevPos = pos - 1;
+				String prevLabel = pos==start? Label.get(childLabelId).getForm():Label.get(parentLabelId).getForm();
+				if(prevPos>=0){
+					int prevHeadIndex = sent.get(prevPos).getHeadIndex();
+					String prevWord = sent.get(prevPos).getName();
+					String prevTag = sent.get(prevPos).getTag();
+					String prevHead = prevHeadIndex>=0? sent.get(prevHeadIndex).getName():"STR";
+					String prevHeadTag = prevHeadIndex>=0? sent.get(prevHeadIndex).getTag():"STR";
+					featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(), "DPE-CWCH", prevLabel+":"+prevWord+","+prevHead));
+					featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(), "DPE-CWTCHT", prevLabel+":"+prevTag+","+prevHeadTag));
+					if(prevHeadIndex==pos || currHeadIndex==prevPos){
+						String dir = prevHeadIndex==pos? "LEFTDIR":"RIGHTDIR";
+						featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(), "DPE-WC-CON",currEn+","+prevLabel+":"+currWord+","+prevWord));
+						featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(), "DPE-WC-CON",currEn+","+prevLabel+":"+currWord+","+prevWord+":"+dir));
+						featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(), "DPE-WC-CON",currEn+","+prevLabel+":"+currTag+","+prevTag));
+						featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(), "DPE-WC-CON",currEn+","+prevLabel+":"+currTag+","+prevTag+":"+dir));
+					}
+				}
+			}
+			
+		}
+		/**(END) add dependency features**/
 		
 		ArrayList<Integer> finalList = new ArrayList<Integer>();
 		for(int i=0;i<featureList.size();i++){

@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 
 import com.statnlp.commons.types.Instance;
+import com.statnlp.commons.types.Sentence;
+import com.statnlp.entity.EntityChecker;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
@@ -22,6 +24,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 	public long[] allNodes;
 	public int[][][] allChildren;
 	private SemiViewer sViewer;
+	private boolean useDepNet = false; 
 	
 	public enum NodeType {
 		LEAF,
@@ -33,7 +36,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		NetworkIDMapper.setCapacity(new int[]{10000, 10, 100});
 	}
 
-	public SemiCRFNetworkCompiler(int maxSize, int maxSegLength,SemiViewer sViewer) {
+	public SemiCRFNetworkCompiler(int maxSize, int maxSegLength,SemiViewer sViewer, boolean useDepNet) {
 		this.maxSize = Math.max(maxSize, this.maxSize);
 //		this.maxSize = 3;
 		maxSegmentLength = Math.max(maxSegLength, maxSegmentLength);
@@ -42,7 +45,8 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		System.out.println(Label.LABELS.toString());
 		this.sViewer = sViewer;
 		this.sViewer.nothing();
-		buildUnlabeled();
+		this.useDepNet = useDepNet;
+		buildUnlabeled(); //maybe use dep net.. we don't need to build it.
 	}
 
 	@Override
@@ -51,7 +55,16 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 			if(inst.isLabeled()){
 				return compileLabeled(networkId, (SemiCRFInstance)inst, param);
 			} else {
-				return compileUnlabeled(networkId, (SemiCRFInstance)inst, param);
+				if(!useDepNet)
+					return compileUnlabeled(networkId, (SemiCRFInstance)inst, param);
+				else {
+					SemiCRFInstance semiInst = (SemiCRFInstance)inst;
+					if(inst.getInstanceId()<0){ //means the unlabel of trianing data
+						if(EntityChecker.checkAllIncomplete(semiInst.getInput()).size()==0) return buildDepBasedUnlabeled(networkId, (SemiCRFInstance)inst, param);
+						else return compileUnlabeled(networkId, (SemiCRFInstance)inst, param);
+					}else
+						return compileUnlabeled(networkId, (SemiCRFInstance)inst, param); //means the test data.
+				}
 			}
 		} catch (NetworkException e){
 			System.out.println(inst);
@@ -85,9 +98,12 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		//sViewer.visualizeNetwork(network, null, "Labeled Network");
 		if(DEBUG){
 //			System.out.println(network);
-			SemiCRFNetwork unlabeled = compileUnlabeled(networkId, instance, param);
+//			SemiCRFNetwork unlabeled = compileUnlabeled(networkId, instance, param);
+			SemiCRFNetwork unlabeled = buildDepBasedUnlabeled(networkId, instance, param);
+			//System.out.println("for instance: "+instance.getInput().toString());
 			if(!unlabeled.contains(network)){
 				System.out.println("not contains");
+				
 			}
 		}
 		return network;
@@ -101,6 +117,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		return new SemiCRFNetwork(networkId, instance, allNodes, allChildren, param, numNodes, this);
 	}
 	
+	//for O label, should only with span length 1.
 	private synchronized void buildUnlabeled(){
 		SemiCRFNetwork network = new SemiCRFNetwork();
 		long leaf = toNode_leaf();
@@ -109,15 +126,30 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		for(int pos=0; pos<maxSize; pos++){
 			for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
 				long node = toNode(pos, labelId);
-				for(int prevPos=pos-1; prevPos >= pos-maxSegmentLength && prevPos >= 0; prevPos--){
-					for(int prevLabelId=0; prevLabelId<Label.LABELS.size(); prevLabelId++){
-						long prevBeginNode = toNode(prevPos, prevLabelId);
-						if(network.contains(prevBeginNode)){
-							network.addNode(node);
-							network.addEdge(node, new long[]{prevBeginNode});
+				if(labelId!=Label.LABELS.get("O").id){
+					for(int prevPos=pos-1; prevPos >= pos-maxSegmentLength && prevPos >= 0; prevPos--){
+						for(int prevLabelId=0; prevLabelId<Label.LABELS.size(); prevLabelId++){
+							long prevBeginNode = toNode(prevPos, prevLabelId);
+							if(network.contains(prevBeginNode)){
+								network.addNode(node);
+								network.addEdge(node, new long[]{prevBeginNode});
+							}
+						}
+					}
+				}else{
+					//O label should be with only length 1. actually does not really affect.
+					int prevPos = pos - 1;
+					if(prevPos>=0){
+						for(int prevLabelId=0; prevLabelId<Label.LABELS.size(); prevLabelId++){
+							long prevBeginNode = toNode(prevPos, prevLabelId);
+							if(network.contains(prevBeginNode)){
+								network.addNode(node);
+								network.addEdge(node, new long[]{prevBeginNode});
+							}
 						}
 					}
 				}
+				
 				if(pos>=0){
 					network.addNode(node);
 					network.addEdge(node, new long[]{toNode_leaf()});
@@ -136,6 +168,68 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		//sViewer.visualizeNetwork(network, null, "UnLabeled Network");
 		allNodes = network.getAllNodes();
 		allChildren = network.getAllChildren();
+	}
+	
+	private SemiCRFNetwork buildDepBasedUnlabeled(int networkId, SemiCRFInstance instance, LocalNetworkParam param){
+		SemiCRFNetwork network = new SemiCRFNetwork(networkId, instance, param,this);
+		long leaf = toNode_leaf();
+		network.addNode(leaf);
+		long root = toNode_root(instance.size());
+		network.addNode(root);
+		Sentence sent = instance.getInput();
+		for(int pos=0; pos<instance.size(); pos++){
+			int headIdx = sent.get(pos).getHeadIndex();
+			if(headIdx<0) continue; //means this one, the head is outside the sentence, which is leftOutside
+			int smallOne = Math.min(pos, headIdx);
+			int largeOne = Math.max(pos, headIdx);
+			
+			if(smallOne==0){ //means that from the start up to here
+				for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
+					if(labelId==Label.LABELS.get("O").id) continue;
+					long node = toNode(largeOne, labelId);
+					network.addNode(node);
+					network.addEdge(node, new long[]{leaf});
+				}
+			}else{
+				int prevEnd = smallOne - 1;
+				for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
+					if(labelId==Label.LABELS.get("O").id) continue;
+					long node = toNode(largeOne, labelId);
+					for(int prevLabelId=0; prevLabelId<Label.LABELS.size(); prevLabelId++){
+						long prevEndNode = toNode(prevEnd, prevLabelId);
+						network.addNode(node);
+						network.addNode(prevEndNode);
+						network.addEdge(node, new long[]{prevEndNode});
+					}
+				}
+			}
+		}
+		
+		//sepecifically for O
+		for(int pos=0; pos<instance.size(); pos++){
+			for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
+				long node = toNode(pos, labelId);
+				int prevPos = pos - 1;
+				if(prevPos>=0){
+					for(int prevLabelId=0; prevLabelId<Label.LABELS.size(); prevLabelId++){
+						long prevEndNode = toNode(prevPos, prevLabelId);
+						network.addNode(node);
+						network.addNode(prevEndNode);
+						network.addEdge(node, new long[]{prevEndNode});
+					}
+				}else{
+					//pos==0
+					network.addNode(node);
+					network.addEdge(node, new long[]{leaf});
+				}
+				if(pos==instance.size()-1){
+					network.addEdge(root, new long[]{node});
+				}
+			}
+			
+		}
+		network.finalizeNetwork();
+		return network;
 	}
 	
 	private long toNode_leaf(){
