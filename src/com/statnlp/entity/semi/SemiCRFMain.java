@@ -42,12 +42,13 @@ public class SemiCRFMain {
 	public static boolean useIncompleteSpan = false;
 	public static boolean useDepNet = false;
 	public static String modelFile = "";
-//	public static String train_filename = "data/cnn/ecrf.train.MISC.txt";
-//	public static String test_filename = "data/cnn/ecrf.test.MISC.txt";
+	public static boolean isTrain = true;
+	public static String train_filename = "data/mnb/ecrf.train.MISC.txt";
+	public static String test_filename = "data/mnb/ecrf.test.MISC.txt";
 //	public static String train_filename = "data/semeval10t1/ecrf.smalltest.txt";
 //	public static String test_filename = "data/semeval10t1/ecrf.smalltest.txt";
-	public static String train_filename = "data/semeval10t1/ecrf.train.MISC.txt";
-	public static String test_filename = "data/semeval10t1/ecrf.test.MISC.txt";
+//	public static String train_filename = "data/semeval10t1/ecrf.train.MISC.txt";
+//	public static String test_filename = "data/semeval10t1/ecrf.test.MISC.txt";
 	
 	private static void processArgs(String[] args) throws FileNotFoundException{
 		for(int i=0;i<args.length;i=i+2){
@@ -151,11 +152,11 @@ public class SemiCRFMain {
 		SemiCRFFeatureManager fm = new SemiCRFFeatureManager(gnp, nonMarkov, depFeature);
 		NetworkModel model = NetworkConfig.TRAIN_MODE_IS_GENERATIVE ? GenerativeNetworkModel.create(fm, compiler) : DiscriminativeNetworkModel.create(fm, compiler);
 		
-		if(!new File(modelFile).exists()){
+		if(isTrain || !new File(modelFile).exists()){
 			model.train(trainInstances, numIterations);
-			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
-			out.writeObject(fm.getParam_G());
-			out.close();
+//			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
+//			out.writeObject(fm.getParam_G());
+//			out.close();
 		}
 		
 		Instance[] predictions = model.decode(testInstances);

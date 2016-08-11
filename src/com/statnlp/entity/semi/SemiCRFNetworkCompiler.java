@@ -17,7 +17,7 @@ import com.statnlp.hybridnetworks.NetworkIDMapper;
 
 public class SemiCRFNetworkCompiler extends NetworkCompiler {
 	
-	private final static boolean DEBUG = true;
+	private final static boolean DEBUG = false;
 	
 	private static final long serialVersionUID = 6585870230920484539L;
 	public int maxSize = 128;
@@ -61,7 +61,10 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 				if(!useDepNet)
 					return compileUnlabeled(networkId, (SemiCRFInstance)inst, param);
 				else {
-//					return buildDepBasedUnlabeled(networkId, (SemiCRFInstance)inst, param); //this one..only for incomplete case
+					if(incom2Linear)
+						return buildDepBasedUnlabeled(networkId, (SemiCRFInstance)inst, param); //this one..only for incomplete case
+					if(notConnect2Linear)
+						return buildDepBasedUnlabeled_bottomUp(networkId, (SemiCRFInstance)inst, param); 
 					/** Original setting for using the dependency net. **/
 //					SemiCRFInstance semiInst = (SemiCRFInstance)inst;
 //					if(inst.getInstanceId()<0){ //means the unlabel of trianing data
@@ -70,7 +73,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 //					}else
 //						return compileUnlabeled(networkId, (SemiCRFInstance)inst, param); //means the test data.
 					/** (END) Original setting for using the dependency net. **/
-					return buildDepBasedUnlabeled_bottomUp(networkId, (SemiCRFInstance)inst, param);
+					throw new RuntimeException("What's the config to build?");
 					
 				}
 			}
@@ -244,7 +247,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 					if(pos==instance.size()-1) network.addEdge(root, new long[]{node});
 				}
 			}else{
-				int[] leftDepIdxs = leftDepRel[pos];
+				
 				for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
 					//add the prevsPosition
 					long node = toNode(pos, labelId);
@@ -259,11 +262,15 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 					if(pos==instance.size()-1){
 						network.addEdge(root, new long[]{node});
 					}
-					if(labelId==Label.get("O").id) continue;
-					boolean[][] added = new boolean[sent.length()][Label.LABELS.size()]; //1-index. so 0 in this array is leaf. edges in network.
-					for(int l=0; l<leftDepIdxs.length; l++){
-						if(leftDepIdxs[l]<0) continue;
-						//if(pos==31) System.out.println(Arrays.toString(leftDepIdxs));
+				}
+				//based on the dependency add node
+				int[] leftDepIdxs = leftDepRel[pos];
+				for(int l=0; l<leftDepIdxs.length; l++){
+					if(leftDepIdxs[l]<0) continue;
+					for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
+						if(labelId==Label.get("O").id) continue;
+						long node = toNode(pos, labelId);
+						boolean[][] added = new boolean[sent.length()][Label.LABELS.size()]; //1-index. so 0 in this array is leaf. edges in network.
 						int leftDepId = leftDepIdxs[l];
 						long leftDepNode = toNode(leftDepId, labelId);
 						if(network.getChildren_tmp(leftDepNode)==null){
