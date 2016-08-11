@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import com.statnlp.commons.ml.opt.OptimizerFactory;
@@ -22,8 +23,8 @@ import com.statnlp.hybridnetworks.GenerativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkConfig.ModelType;
-import com.statnlp.neural.NeuralConfigReader;
 import com.statnlp.hybridnetworks.NetworkModel;
+import com.statnlp.neural.NeuralConfigReader;
 
 public class SemiCRFMain {
 	
@@ -40,7 +41,7 @@ public class SemiCRFMain {
 	public static boolean depFeature = false;
 	public static boolean useIncompleteSpan = false;
 	public static boolean useDepNet = false;
-	public static String modelFile = null;
+	public static String modelFile = "";
 //	public static String train_filename = "data/cnn/ecrf.train.MISC.txt";
 //	public static String test_filename = "data/cnn/ecrf.test.MISC.txt";
 //	public static String train_filename = "data/semeval10t1/ecrf.smalltest.txt";
@@ -94,6 +95,16 @@ public class SemiCRFMain {
 		/**data is 0-indexed, network compiler is 1-indexed since we have leaf nodes.**/
 		SemiCRFInstance[] trainInstances= readCoNLLData(train_filename, true,	trainNum);
 		SemiCRFInstance[] testInstances	= readCoNLLData(test_filename, 	false,	testNumber);
+		int notConnected = 0;
+		for(SemiCRFInstance inst: trainInstances){
+			notConnected+=checkConnected(inst);
+		}
+		System.out.println("not connected entities in train:"+notConnected);
+		notConnected = 0;
+		for(SemiCRFInstance inst: testInstances){
+			notConnected+=checkConnected(inst);
+		}
+		System.out.println("not connected entities in test:"+notConnected);
 	
 		int maxSize = 0;
 		int maxSpan = 0;
@@ -181,6 +192,7 @@ public class SemiCRFMain {
 				WordToken[] wtArr = new WordToken[wts.size()];
 				instance.input = new Sentence(wts.toArray(wtArr));
 				instance.output = output;
+				//instance.leftDepRel = sent2LeftDepRel(instance.input);
 				if(isLabeled){
 					instance.setLabeled(); // Important!
 				} else {
@@ -247,6 +259,37 @@ public class SemiCRFMain {
 		} else {
 			output.add(new Span(start, end, label));
 		}
+	}
+
+	
+	private static int checkConnected(SemiCRFInstance inst){
+		int number = 0;
+		List<Span> output = inst.getOutput();
+		Sentence sent = inst.getInput();
+		for(Span span: output){
+			int start = span.start;
+			int end = span.end;
+			Label label = span.label;
+			if(label.equals(Label.get("O")) || start==end) continue;
+			HashSet<Integer> set = new HashSet<Integer>();
+			int times = 0;
+			while(times<(end-start+1)){
+				for(int pos = start; pos<=end; pos++){
+					int headIdx = sent.get(pos).getHeadIndex();
+					if(headIdx<start || headIdx>end) continue;
+					if(set.size()==0 || set.contains(pos) || set.contains(headIdx)){
+						set.add(pos); set.add(headIdx);
+					}
+				}
+				times++;
+			}
+			if(set.size()!=(end-start+1)) {
+				number++;
+			}
+		}
+//		if(number>0)
+//			System.out.println(sent.toString());
+		return number;
 	}
 
 }

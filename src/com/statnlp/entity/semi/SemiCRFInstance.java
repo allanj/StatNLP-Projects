@@ -87,4 +87,5 @@ public class SemiCRFInstance extends BaseInstance<SemiCRFInstance, Sentence, Lis
 		
 		return finalRes;
 	}
+
 }

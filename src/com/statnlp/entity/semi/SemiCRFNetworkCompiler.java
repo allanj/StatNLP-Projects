@@ -3,6 +3,7 @@ package com.statnlp.entity.semi;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import com.statnlp.commons.types.Instance;
@@ -16,7 +17,7 @@ import com.statnlp.hybridnetworks.NetworkIDMapper;
 
 public class SemiCRFNetworkCompiler extends NetworkCompiler {
 	
-	private final static boolean DEBUG = false;
+	private final static boolean DEBUG = true;
 	
 	private static final long serialVersionUID = 6585870230920484539L;
 	public int maxSize = 128;
@@ -25,6 +26,8 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 	public int[][][] allChildren;
 	private SemiViewer sViewer;
 	private boolean useDepNet = false; 
+	private boolean incom2Linear = false; //means if not incomplete then change to linear.
+	private boolean notConnect2Linear = true;
 	
 	public enum NodeType {
 		LEAF,
@@ -58,12 +61,17 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 				if(!useDepNet)
 					return compileUnlabeled(networkId, (SemiCRFInstance)inst, param);
 				else {
-					SemiCRFInstance semiInst = (SemiCRFInstance)inst;
-					if(inst.getInstanceId()<0){ //means the unlabel of trianing data
-						if(EntityChecker.checkAllIncomplete(semiInst.getInput()).size()==0) return buildDepBasedUnlabeled(networkId, (SemiCRFInstance)inst, param);
-						else return compileUnlabeled(networkId, (SemiCRFInstance)inst, param);
-					}else
-						return compileUnlabeled(networkId, (SemiCRFInstance)inst, param); //means the test data.
+//					return buildDepBasedUnlabeled(networkId, (SemiCRFInstance)inst, param); //this one..only for incomplete case
+					/** Original setting for using the dependency net. **/
+//					SemiCRFInstance semiInst = (SemiCRFInstance)inst;
+//					if(inst.getInstanceId()<0){ //means the unlabel of trianing data
+//						if(EntityChecker.checkAllIncomplete(semiInst.getInput()).size()==0) return buildDepBasedUnlabeled(networkId, (SemiCRFInstance)inst, param);
+//						else return compileUnlabeled(networkId, (SemiCRFInstance)inst, param);
+//					}else
+//						return compileUnlabeled(networkId, (SemiCRFInstance)inst, param); //means the test data.
+					/** (END) Original setting for using the dependency net. **/
+					return buildDepBasedUnlabeled_bottomUp(networkId, (SemiCRFInstance)inst, param);
+					
 				}
 			}
 		} catch (NetworkException e){
@@ -72,13 +80,45 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		}
 	}
 	
+	private boolean checkIncomSpan(Sentence sent, Span span){
+		if(span.label.equals(Label.get("O")) || span.start==span.end) return true;
+		if(!(sent.get(span.start).getHeadIndex()==span.end || sent.get(span.end).getHeadIndex()==span.start)) return false;
+		return true;
+	}
+	
+
+	private int checkConnected(Sentence sent, Span span){
+		int number = 0;
+		int start = span.start;
+		int end = span.end;
+		Label label = span.label;
+		if(label.equals(Label.get("O")) || start==end) return 0;
+		HashSet<Integer> set = new HashSet<Integer>();
+		int times = 0;
+		while(times<(end-start+1)){
+			for(int pos = start; pos<=end; pos++){
+				int headIdx = sent.get(pos).getHeadIndex();
+				if(headIdx<start || headIdx>end) continue;
+				if(set.size()==0 || set.contains(pos) || set.contains(headIdx)){
+					set.add(pos); set.add(headIdx);
+				}
+			}
+			times++;
+		}
+		if(set.size()!=(end-start+1)) {
+			number++;
+		}
+		return number;
+	}
+
+	
 	private SemiCRFNetwork compileLabeled(int networkId, SemiCRFInstance instance, LocalNetworkParam param){
 		SemiCRFNetwork network = new SemiCRFNetwork(networkId, instance, param,this);
 		
 		int size = instance.size();
 		List<Span> output = instance.getOutput();
 		Collections.sort(output);
-		
+		Sentence sent = instance.getInput();
 		long leaf = toNode_leaf();
 		network.addNode(leaf);
 		long prevNode = leaf;
@@ -87,8 +127,18 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 			int labelId = span.label.id;
 			long end = toNode(span.end, labelId);
 			network.addNode(end);
+			if( (incom2Linear && !checkIncomSpan(sent,span)) 
+					|| (notConnect2Linear && checkConnected(sent, span)>0) ){
+				for(int pos=span.start; pos<span.end; pos++){
+					long node = toNode(pos, labelId);
+					network.addNode(node);
+					network.addEdge(node, new long[]{prevNode});
+					prevNode = node;
+				}
+			}
 			network.addEdge(end, new long[]{prevNode});
 			prevNode = end;
+			
 		}
 		long root = toNode_root(size);
 		network.addNode(root);
@@ -99,8 +149,8 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		if(DEBUG){
 //			System.out.println(network);
 //			SemiCRFNetwork unlabeled = compileUnlabeled(networkId, instance, param);
-			SemiCRFNetwork unlabeled = buildDepBasedUnlabeled(networkId, instance, param);
-			//System.out.println("for instance: "+instance.getInput().toString());
+			SemiCRFNetwork unlabeled = buildDepBasedUnlabeled_bottomUp(networkId, instance, param);
+//			System.out.println("for instance: "+instance.getInput().toString());
 			if(!unlabeled.contains(network)){
 				System.out.println("not contains");
 				
@@ -168,6 +218,71 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		//sViewer.visualizeNetwork(network, null, "UnLabeled Network");
 		allNodes = network.getAllNodes();
 		allChildren = network.getAllChildren();
+	}
+	
+	/**
+	 * No same entity nodes connected in this path
+	 * @param networkId
+	 * @param instance
+	 * @param param
+	 * @return
+	 */
+	private SemiCRFNetwork buildDepBasedUnlabeled_bottomUp(int networkId, SemiCRFInstance instance, LocalNetworkParam param){
+		SemiCRFNetwork network = new SemiCRFNetwork(networkId, instance, param,this);
+		long leaf = toNode_leaf();
+		network.addNode(leaf);
+		long root = toNode_root(instance.size());
+		network.addNode(root);
+		Sentence sent = instance.input;
+		int[][] leftDepRel = sent2LeftDepRel(sent);
+		for(int pos=0; pos<sent.length(); pos++){
+			if(pos==0){ //means that from the start up to here, so connect to leaf. And of course no leftDepRel
+				for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
+					long node = toNode(pos, labelId);
+					network.addNode(node);
+					network.addEdge(node, new long[]{leaf});
+					if(pos==instance.size()-1) network.addEdge(root, new long[]{node});
+				}
+			}else{
+				int[] leftDepIdxs = leftDepRel[pos];
+				for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
+					//add the prevsPosition
+					long node = toNode(pos, labelId);
+					for(int prevLabelId=0; prevLabelId<Label.LABELS.size(); prevLabelId++){
+						long child = toNode(pos-1, prevLabelId);
+						//if(labelId==prevLabelId && labelId!=Label.get("O").id) continue;
+						if(network.contains(child)){
+							network.addNode(node);
+							network.addEdge(node, new long[]{child});
+						}
+					}
+					if(pos==instance.size()-1){
+						network.addEdge(root, new long[]{node});
+					}
+					if(labelId==Label.get("O").id) continue;
+					boolean[][] added = new boolean[sent.length()][Label.LABELS.size()]; //1-index. so 0 in this array is leaf. edges in network.
+					for(int l=0; l<leftDepIdxs.length; l++){
+						if(leftDepIdxs[l]<0) continue;
+						//if(pos==31) System.out.println(Arrays.toString(leftDepIdxs));
+						int leftDepId = leftDepIdxs[l];
+						long leftDepNode = toNode(leftDepId, labelId);
+						if(network.getChildren_tmp(leftDepNode)==null){
+							throw new RuntimeException("Should have some children by: "+leftDepId+","+labelId);
+						}
+						for(long[] grandChildren: network.getChildren_tmp(leftDepNode)){
+							network.addNode(node);
+							int[] grandChild = NetworkIDMapper.toHybridNodeArray(grandChildren[0]);
+							if(!added[grandChild[0]][grandChild[1]]){
+								network.addEdge(node, new long[]{grandChildren[0]}); //if the grandchildren still have the same type..add it or not? an option.
+								added[grandChild[0]][grandChild[1]] = true;
+							}
+						}
+					}
+				}
+			}
+		}
+		network.finalizeNetwork();
+		return network;
 	}
 	
 	private SemiCRFNetwork buildDepBasedUnlabeled(int networkId, SemiCRFInstance instance, LocalNetworkParam param){
@@ -286,5 +401,26 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 
 	public double costAt(Network network, int parent_k, int[] child_k){
 		return 0.0;
+	}
+	
+	private int[][] sent2LeftDepRel(Sentence sent){
+		int[][] leftDepRel = new int[sent.length()][];
+		ArrayList<ArrayList<Integer>> leftDepList = new ArrayList<ArrayList<Integer>>();
+		for(int i=0;i<leftDepRel.length;i++) leftDepList.add(new ArrayList<Integer>());
+		for(int pos = 0; pos<sent.length(); pos++){
+			int headIdx = sent.get(pos).getHeadIndex();
+			if(headIdx<0) continue;
+			int smallOne = Math.min(pos, headIdx);
+			int largeOne = Math.max(pos, headIdx);
+			ArrayList<Integer> curr = leftDepList.get(largeOne);
+			curr.add(smallOne);
+		}
+		for(int pos=0; pos<sent.length(); pos++){
+			ArrayList<Integer> curr = leftDepList.get(pos);
+			leftDepRel[pos] = new int[curr.size()];
+			for(int j=0; j<curr.size();j++)
+				leftDepRel[pos][j] = curr.get(j);
+		}
+		return leftDepRel;
 	}
 }
