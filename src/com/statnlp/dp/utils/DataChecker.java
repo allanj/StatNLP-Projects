@@ -6,7 +6,6 @@ import java.util.HashMap;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.DependInstance;
 import com.statnlp.dp.commons.Entity;
-import com.statnlp.hybridnetworks.NetworkConfig;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.UnnamedDependency;

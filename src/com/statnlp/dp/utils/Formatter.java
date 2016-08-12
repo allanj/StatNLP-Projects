@@ -8,8 +8,6 @@ import java.util.List;
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.DependInstance;
-import com.statnlp.dp.DependencyReader;
-import com.statnlp.dp.Transformer;
 import com.statnlp.entity.lcr.ECRFInstance;
 
 public class Formatter {

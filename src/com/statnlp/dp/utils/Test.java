@@ -3,8 +3,6 @@ package com.statnlp.dp.utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.statnlp.commons.crf.RAWF;
 
@@ -56,7 +54,7 @@ public class Test {
 			}else{
 				double fw1 = Double.parseDouble(values1[1]);
 				double fw2 = Double.parseDouble(values2[1]);
-				double product = fw1*fw2;
+				//double product = fw1*fw2;
 				double diff = Math.abs(fw2)-Math.abs(fw1);
 				if(diff>0){
 					System.err.println(line1+",   "+line2);
