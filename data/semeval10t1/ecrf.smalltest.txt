@@ -1,0 +1,2 @@
+1	Daffynition	NN	O	0
+
