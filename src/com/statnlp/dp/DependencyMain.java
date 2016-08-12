@@ -55,13 +55,13 @@ public class DependencyMain {
 	
 		entities = initializeTypeMap();
 		dataTypeSet = Init.iniOntoNotesData();
-		trainingPath = DPConfig.trainingPath;
+		
 		testFile = DPConfig.testingPath;
 		
 		processArgs(args);
 		DPConfig.writeWeight = false;
 		
-		
+		trainingPath = DPConfig.trainingPath;
 		
 		String middle = isDev? ".dev":".test";
 		String modelType = "only";
@@ -105,9 +105,9 @@ public class DependencyMain {
 		NetworkConfig.NUM_THREADS = numThreads;
 		//0.1 is the best after tunning the parameters
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = 0.1;
-		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = false;
+		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		System.err.println("[Info] Regularization Parameter: "+NetworkConfig.L2_REGULARIZATION_CONSTANT);
-		NetworkConfig.MAX_MARGINAL_DECODING = false;
+		NetworkConfig.USE_NEURAL_FEATURES = true;
 //		NetworkConfig._topKValue = 3;
 		
 		

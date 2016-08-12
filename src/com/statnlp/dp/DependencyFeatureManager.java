@@ -3,7 +3,6 @@ package com.statnlp.dp;
 import java.util.ArrayList;
 
 import com.statnlp.commons.types.Sentence;
-import com.statnlp.entity.lcr.ECRFFeatureManager.FEATYPE;
 import com.statnlp.hybridnetworks.FeatureArray;
 import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -35,7 +34,7 @@ public class DependencyFeatureManager extends FeatureManager {
 		ArrayList<Integer> featureList = new ArrayList<Integer>();
 		
 		DependInstance di = (DependInstance)network.getInstance();
-		int instanceId = di.getInstanceId();
+		//int instanceId = di.getInstanceId();
 		Sentence sent  = di.getInput();
 		long parent = network.getNode(parent_k);
 		int[] parentArr = NetworkIDMapper.toHybridNodeArray(parent);

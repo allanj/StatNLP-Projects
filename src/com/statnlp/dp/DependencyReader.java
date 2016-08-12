@@ -3,16 +3,13 @@ package com.statnlp.dp;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
-import com.statnlp.dp.commons.Entity;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DataChecker;
 
@@ -78,7 +75,7 @@ public class DependencyReader {
 						continue;
 					}
 					Tree dependencyTree = transformer.toDependencyTree(dependencies, sent);
-					ArrayList<Entity> checkInvalid = DataChecker.checkAllIncomplete(sent);
+//					ArrayList<Entity> checkInvalid = DataChecker.checkAllIncomplete(sent);
 					if(dependencyTree.size()==sent.length() && sent.length()< maxLength){
 						sent.setRecognized();
 						DependInstance inst = new DependInstance(index++,1.0,sent,dependencies,dependencyTree,transformer.toSpanTree(dependencyTree, sent));

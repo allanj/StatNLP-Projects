@@ -13,17 +13,17 @@ public class WordToken extends InputToken{
 	
 	public WordToken(String name) {
 		super(name);
-		this.tag = "";
+		this.tag = null;
 		this.headIndex = -1;
-		this.entity = "O";
-		this.aTag = "";
+		this.entity = null;
+		this.aTag = null;
 	}
 	
 	public WordToken(String name, String tag) {
 		super(name);
 		this.tag = tag;
 		this.headIndex = -1;
-		this.entity = "O";
+		this.entity = null;
 		this.aTag = tag.substring(0, 1);
 	}
 	
@@ -31,7 +31,7 @@ public class WordToken extends InputToken{
 		super(name);
 		this.tag = tag;
 		this.headIndex = headIndex;
-		this.entity = "O";
+		this.entity = null;
 		this.aTag = tag.substring(0, 1);
 	}
 	
@@ -103,7 +103,7 @@ public class WordToken extends InputToken{
 	
 	@Override
 	public String toString() {
-		if(!tag.equals("")) return "Word:"+this._name+"/"+tag+","+headIndex+","+entity;
+		if(tag!=null && entity!=null) return "Word:"+this._name+"/"+tag+","+headIndex+","+entity;
 		return "WORD:"+this._name;
 	}
 	

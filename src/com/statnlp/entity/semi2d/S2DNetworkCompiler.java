@@ -64,7 +64,7 @@ public class S2DNetworkCompiler extends NetworkCompiler {
 	}
 	
 	private SemiCRFNetwork compileLabeled(int networkId, SemiCRFInstance instance, LocalNetworkParam param){
-		SemiCRFNetwork network = new SemiCRFNetwork(networkId, instance, param);
+		SemiCRFNetwork network = new SemiCRFNetwork(networkId, instance, param, this);
 		
 		int size = instance.size();
 		List<Span> output = instance.getOutput();
@@ -115,7 +115,7 @@ public class S2DNetworkCompiler extends NetworkCompiler {
 		long root = toNode_root(size-1);
 		int root_k = Arrays.binarySearch(allNodes, root);
 		int numNodes = root_k + 1;
-		return new SemiCRFNetwork(networkId, instance, allNodes, allChildren, param, numNodes);
+		return new SemiCRFNetwork(networkId, instance, allNodes, allChildren, param, numNodes, this);
 	}
 	
 	private synchronized void buildUnlabeled(){

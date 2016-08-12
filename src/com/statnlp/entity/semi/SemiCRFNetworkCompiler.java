@@ -27,7 +27,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 	private SemiViewer sViewer;
 	private boolean useDepNet = false; 
 	private boolean incom2Linear = false; //means if not incomplete then change to linear.
-	private boolean notConnect2Linear = true;
+	private boolean notConnect2Linear = false;
 	
 	public enum NodeType {
 		LEAF,
@@ -130,8 +130,8 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 			int labelId = span.label.id;
 			long end = toNode(span.end, labelId);
 			network.addNode(end);
-			if( (incom2Linear && !checkIncomSpan(sent,span)) 
-					|| (notConnect2Linear && checkConnected(sent, span)>0) ){
+			if( useDepNet && ( (incom2Linear && !checkIncomSpan(sent,span)) 
+					|| (notConnect2Linear && checkConnected(sent, span)>0) ) ){
 				for(int pos=span.start; pos<span.end; pos++){
 					long node = toNode(pos, labelId);
 					network.addNode(node);

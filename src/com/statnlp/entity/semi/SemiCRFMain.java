@@ -43,8 +43,8 @@ public class SemiCRFMain {
 	public static boolean useDepNet = false;
 	public static String modelFile = "";
 	public static boolean isTrain = true;
-	public static String train_filename = "data/mnb/ecrf.train.MISC.txt";
-	public static String test_filename = "data/mnb/ecrf.test.MISC.txt";
+	public static String train_filename = "data/nbc/ecrf.train.MISC.txt";
+	public static String test_filename = "data/nbc/ecrf.test.MISC.txt";
 //	public static String train_filename = "data/semeval10t1/ecrf.smalltest.txt";
 //	public static String test_filename = "data/semeval10t1/ecrf.smalltest.txt";
 //	public static String train_filename = "data/semeval10t1/ecrf.train.MISC.txt";
