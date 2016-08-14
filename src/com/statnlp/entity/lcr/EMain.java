@@ -39,6 +39,7 @@ public class EMain {
 	public static double adagrad_learningRate = 0.1;
 	public static boolean useSSVMCost = false;
 	public static boolean useAdaGrad = false;
+	public static boolean useDepf = false;
 	private static boolean testOnTrain = false;
 	
 	public static void initializeEntityMap(){
@@ -74,9 +75,9 @@ public class EMain {
 		
 		
 		String middle = isDev? ".dev":".test";
-		nerOut = DPConfig.data_prefix+modelType+middle+DPConfig.ner_eval_suffix;
-		topKNEROut = DPConfig.data_prefix + modelType + middle + DPConfig.ner_topk_res_suffix;
-		nerRes = DPConfig.data_prefix+modelType+middle+DPConfig.ner_res_suffix;
+		nerOut = DPConfig.data_prefix+modelType+middle+".depf-"+useDepf+DPConfig.ner_eval_suffix;
+		topKNEROut = DPConfig.data_prefix + modelType + middle +".depf-"+useDepf+ DPConfig.ner_topk_res_suffix;
+		nerRes = DPConfig.data_prefix+modelType+middle+".depf-"+useDepf+ DPConfig.ner_res_suffix;
 		testFile = isDev? DPConfig.ecrfdev:DPConfig.ecrftest;
 		if(isPipe){
 			testFile = isDev?DPConfig.dp2ner_dp_dev_input:DPConfig.dp2ner_dp_test_input;
@@ -128,7 +129,7 @@ public class EMain {
 		if(NetworkConfig.MODEL_TYPE==ModelType.SSVM) of = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(adagrad_learningRate);
 		if(useAdaGrad) of = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(adagrad_learningRate);
 		
-		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(of),entities,isPipe);
+		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(of),entities,isPipe,useDepf);
 		ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(entityMap, entities,useSSVMCost);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		ECRFInstance[] ecrfs = trainInstances.toArray(new ECRFInstance[trainInstances.size()]);
@@ -183,6 +184,7 @@ public class EMain {
 										break;
 					case "-adagrad": useAdaGrad = args[i+1].equals("true")? true:false;break;
 					case "-testtrain": testOnTrain = args[i+1].equals("true")? true:false;break;
+					case "-depf": useDepf = args[i+1].equals("true")? true:false; break;
 					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 				}
 			}

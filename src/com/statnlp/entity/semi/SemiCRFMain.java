@@ -97,11 +97,19 @@ public class SemiCRFMain {
 //		test_filename = "data/semi/semi.test.txt";
 		
 		processArgs(args);
-		String resEval = "data/semi/semi.eval.txt";
-		String resRes = "data/semi/semi.res.txt";
+		
 		/**data is 0-indexed, network compiler is 1-indexed since we have leaf nodes.**/
 		train_filename = "data/"+dataType+"/ecrf.train.MISC.txt";
 		test_filename = "data/"+dataType+"/ecrf."+testSuff+".MISC.txt";
+		boolean model1 = false;
+		boolean model2 = false;
+		
+		if(extention.equals("model1")) model1 = true;
+		else if(extention.equals("model2")) model2 = true;
+		System.out.println("Current Model Extention:"+extention);
+		String resEval = "data/"+dataType+"/output/semi."+extention+".depf-"+depFeature+".eval.txt";
+		String resRes = "data/"+dataType+"/output/semi."+extention+".depf-"+depFeature+".res.txt";
+		
 		SemiCRFInstance[] trainInstances= readCoNLLData(train_filename, true,	trainNum);
 		SemiCRFInstance[] testInstances	= readCoNLLData(test_filename, 	false,	testNumber);
 		int notConnected = 0;
@@ -156,12 +164,8 @@ public class SemiCRFMain {
 			in.close();
 		}
 		
-		boolean model1 = false;
-		boolean model2 = false;
 		
-		if(extention.equals("model1")) model1 = true;
-		else if(extention.equals("model2")) model2 = true;
-		System.out.println("Current Model Extention:"+extention);
+		
 		SemiCRFNetworkCompiler compiler = new SemiCRFNetworkCompiler(maxSize, maxSpan,sViewer, useDepNet, model1, model2);
 		SemiCRFFeatureManager fm = new SemiCRFFeatureManager(gnp, nonMarkov, depFeature);
 		NetworkModel model = NetworkConfig.TRAIN_MODE_IS_GENERATIVE ? GenerativeNetworkModel.create(fm, compiler) : DiscriminativeNetworkModel.create(fm, compiler);
