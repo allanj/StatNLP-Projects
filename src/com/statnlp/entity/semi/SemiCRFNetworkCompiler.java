@@ -8,7 +8,6 @@ import java.util.List;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
-import com.statnlp.entity.EntityChecker;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
@@ -51,7 +50,8 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		this.useDepNet = useDepNet;
 		this.incom2Linear = incom2Linear;
 		this.notConnect2Linear = notConnect2Linear;
-		buildUnlabeled(); //maybe use dep net.. we don't need to build it.
+		if(!useDepNet)
+			buildUnlabeled(); //maybe use dep net.. we don't need to build it.
 	}
 
 	@Override

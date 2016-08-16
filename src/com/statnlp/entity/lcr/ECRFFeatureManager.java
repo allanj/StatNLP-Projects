@@ -20,7 +20,7 @@ public class ECRFFeatureManager extends FeatureManager {
 	protected String[] entities;
 	protected boolean isPipeLine; 
 	protected boolean useDepF; 
-	private String OUT_SEP = NeuralConfig.OUT_SEP; 
+//	private String OUT_SEP = NeuralConfig.OUT_SEP; 
 	private String IN_SEP = NeuralConfig.IN_SEP;
 	private int prefixLength = 3;
 	
@@ -57,13 +57,13 @@ public class ECRFFeatureManager extends FeatureManager {
 		String ls = pos>0? shape(lw):"STR_SHAPE";
 		String lt = pos>0? sent.get(pos-1).getTag():"STR";
 		String llw = pos==0? "STR1": pos==1? "STR":sent.get(pos-2).getName();
-		String llt = pos==0? "STR1": pos==1? "STR":sent.get(pos-2).getTag();
+//		String llt = pos==0? "STR1": pos==1? "STR":sent.get(pos-2).getTag();
 		
 		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"END";
-		String rt = pos<sent.length()-1? sent.get(pos+1).getTag():"END";
-		String rs = pos<sent.length()-1? shape(rw):"END_SHAPE";
+//		String rt = pos<sent.length()-1? sent.get(pos+1).getTag():"END";
+//		String rs = pos<sent.length()-1? shape(rw):"END_SHAPE";
 		String rrw = pos==sent.length()-1? "END1": pos==sent.length()-2? "END":sent.get(pos+2).getName();
-		String rrt = pos==sent.length()-1? "END1": pos==sent.length()-2? "END":sent.get(pos+2).getTag();
+//		String rrt = pos==sent.length()-1? "END1": pos==sent.length()-2? "END":sent.get(pos+2).getTag();
 		
 		String currWord = inst.getInput().get(pos).getName();
 		String currTag = inst.getInput().get(pos).getTag();

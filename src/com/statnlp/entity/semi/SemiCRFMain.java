@@ -4,11 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -77,8 +75,8 @@ public class SemiCRFMain {
 				case "-adagrad": useAdaGrad = args[i+1].equals("true")? true:false;break;
 				case "-nonmarkov": if(args[i+1].equals("true")) nonMarkov = true; else nonMarkov= false; break;
 				case "-depf": if(args[i+1].equals("true")) depFeature = true; else depFeature= false; break;
-				case "-useincom": useIncompleteSpan = args[i+1].equals("true")? true:false;break;
-				case "-usedepnet": useDepNet = args[i+1].equals("true")? true:false;break;
+//				case "-useincom": useIncompleteSpan = args[i+1].equals("true")? true:false;break;
+//				case "-usedepnet": useDepNet = args[i+1].equals("true")? true:false;break;
 				case "-modelPath": modelFile = args[i+1]; break;
 				case "-dev": testSuff = args[i+1].equals("true")? "devel":"test"; break;
 				case "-data": dataType = args[i+1]; break;
@@ -104,24 +102,27 @@ public class SemiCRFMain {
 		boolean model1 = false;
 		boolean model2 = false;
 		
-		if(extention.equals("model1")) model1 = true;
-		else if(extention.equals("model2")) model2 = true;
+		if(extention.equals("model1")) { model1 = true; useDepNet = true; }
+		else if(extention.equals("model2")) {model2 = true; useDepNet = true;}
 		System.out.println("Current Model Extention:"+extention);
 		String resEval = "data/"+dataType+"/output/semi."+extention+".depf-"+depFeature+".eval.txt";
 		String resRes = "data/"+dataType+"/output/semi."+extention+".depf-"+depFeature+".res.txt";
 		
 		SemiCRFInstance[] trainInstances= readCoNLLData(train_filename, true,	trainNum);
 		SemiCRFInstance[] testInstances	= readCoNLLData(test_filename, 	false,	testNumber);
-		int notConnected = 0;
-		for(SemiCRFInstance inst: trainInstances){
-			notConnected+=checkConnected(inst);
+		if(model2){
+			//print some information if using model 2
+			int notConnected = 0;
+			for(SemiCRFInstance inst: trainInstances){
+				notConnected+=checkConnected(inst);
+			}
+			System.out.println("not connected entities in train:"+notConnected);
+			notConnected = 0;
+			for(SemiCRFInstance inst: testInstances){
+				notConnected+=checkConnected(inst);
+			}
+			System.out.println("not connected entities in test:"+notConnected);
 		}
-		System.out.println("not connected entities in train:"+notConnected);
-		notConnected = 0;
-		for(SemiCRFInstance inst: testInstances){
-			notConnected+=checkConnected(inst);
-		}
-		System.out.println("not connected entities in test:"+notConnected);
 	
 		int maxSize = 0;
 		int maxSpan = 0;

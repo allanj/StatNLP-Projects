@@ -30,7 +30,7 @@ public class EMain {
 	public static String nerOut;
 	public static String topKNEROut;
 	public static String nerRes;
-	public static boolean isDev;
+	public static boolean isDev = false;
 	public static String[] selectedEntities = {"person","organization","gpe","MISC"};
 	public static HashSet<String> dataTypeSet;
 	public static HashMap<String, Integer> entityMap;
