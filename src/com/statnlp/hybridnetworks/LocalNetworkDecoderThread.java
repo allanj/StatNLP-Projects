@@ -67,18 +67,20 @@ public class LocalNetworkDecoderThread extends Thread{
 	}
 	
 	public void max(){
-		long time = System.currentTimeMillis();
+		long time = 0;
+		long start = -1;
 		this._instances_output = new Instance[this._instances_input.length];
 		for(int k = 0; k<this._instances_input.length; k++){
-//			System.err.println("Thread "+this._threadId+"\t"+k);
-			this._instances_output[k] = this.max(this._instances_input[k], k);
+			Network network = this._compiler.compileAndStore(k, this._instances_input[k], this._param);
+			start = System.currentTimeMillis();
+			this._instances_output[k] = this.max(network, k);
+			time += System.currentTimeMillis() - start;
 		}
-		time = System.currentTimeMillis() - time;
-		System.err.println("Decoding time for thread "+this._threadId+" = "+ time/1000.0 +" secs.");
+		System.err.println("Decoding time [excluding network compiling] for thread "+this._threadId+" = "+ time/1000.0 +" secs.");
 	}
 	
-	public Instance max(Instance instance, int networkId){
-		Network network = this._compiler.compileAndStore(networkId, instance, this._param);
+	public Instance max(Network network, int networkId){
+		//Network network = this._compiler.compileAndStore(networkId, instance, this._param);
 		if(!_cacheParam){
 			this._param.disableCache();
 		}

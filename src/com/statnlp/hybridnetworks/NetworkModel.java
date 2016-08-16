@@ -349,7 +349,7 @@ public abstract class NetworkModel implements Serializable{
 		
 		System.err.println("Okay. Decoding done.");
 		time = System.currentTimeMillis() - time;
-		System.err.println("Overall decoding time = "+ time/1000.0 +" secs.");
+		System.err.println("Overall decoding time = "+ time/1000.0 +" secs (including network compiling time).");
 		
 		int k = 0;
 		for(int threadId = 0; threadId<this._numThreads; threadId++){
