@@ -155,7 +155,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 //			System.out.println(network);
 //			SemiCRFNetwork unlabeled = compileUnlabeled(networkId, instance, param);
 			SemiCRFNetwork unlabeled = buildDepBasedUnlabeled_bottomUp(networkId, instance, param);
-//			System.out.println("for instance: "+instance.getInput().toString());
+			System.out.println("for instance: "+instance.getInput().toString());
 			if(!unlabeled.contains(network)){
 				System.out.println("not contains");
 				
@@ -226,7 +226,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 	}
 	
 	/**
-	 * No same entity nodes connected in this path
+	 * No same entity nodes connected in this path. Model 2 Networkcomplier
 	 * @param networkId
 	 * @param instance
 	 * @param param
@@ -283,7 +283,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 						for(long[] grandChildren: network.getChildren_tmp(leftDepNode)){
 							network.addNode(node);
 							int[] grandChild = NetworkIDMapper.toHybridNodeArray(grandChildren[0]);
-							len = pos - (grandChild[0]-1) + 1;
+							len = pos - (grandChild[0]-1);
 							if(len > maxSegmentLength) continue;
 							if(!added[grandChild[0]][grandChild[1]]){
 								network.addEdge(node, new long[]{grandChildren[0]}); //if the grandchildren still have the same type..add it or not? an option.
@@ -298,6 +298,13 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		return network;
 	}
 	
+	/**
+	 * Model 1 Network Compiler
+	 * @param networkId
+	 * @param instance
+	 * @param param
+	 * @return
+	 */
 	private SemiCRFNetwork buildDepBasedUnlabeled(int networkId, SemiCRFInstance instance, LocalNetworkParam param){
 		SemiCRFNetwork network = new SemiCRFNetwork(networkId, instance, param,this);
 		long leaf = toNode_leaf();
