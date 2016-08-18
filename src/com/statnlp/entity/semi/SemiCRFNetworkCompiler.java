@@ -269,6 +269,8 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 				int[] leftDepIdxs = leftDepRel[pos];
 				for(int l=0; l<leftDepIdxs.length; l++){
 					if(leftDepIdxs[l]<0) continue;
+					int len = pos-leftDepIdxs[l] + 1;
+					if(len>maxSegmentLength) continue;
 					for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
 						if(labelId==Label.get("O").id) continue;
 						long node = toNode(pos, labelId);
@@ -281,6 +283,8 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 						for(long[] grandChildren: network.getChildren_tmp(leftDepNode)){
 							network.addNode(node);
 							int[] grandChild = NetworkIDMapper.toHybridNodeArray(grandChildren[0]);
+							len = pos - (grandChild[0]-1) + 1;
+							if(len > maxSegmentLength) continue;
 							if(!added[grandChild[0]][grandChild[1]]){
 								network.addEdge(node, new long[]{grandChildren[0]}); //if the grandchildren still have the same type..add it or not? an option.
 								added[grandChild[0]][grandChild[1]] = true;
@@ -306,7 +310,10 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 			if(headIdx<0) continue; //means this one, the head is outside the sentence, which is leftOutside
 			int smallOne = Math.min(pos, headIdx);
 			int largeOne = Math.max(pos, headIdx);
-			
+			int length = largeOne - smallOne +1;
+			if(length > maxSegmentLength){
+				continue;
+			}
 			if(smallOne==0){ //means that from the start up to here
 				for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
 					if(labelId==Label.LABELS.get("O").id) continue;
