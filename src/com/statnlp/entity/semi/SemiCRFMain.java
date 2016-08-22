@@ -4,9 +4,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -39,7 +41,7 @@ public class SemiCRFMain {
 	public static boolean depFeature = false;
 	public static boolean useIncompleteSpan = false;
 	public static boolean useDepNet = false;
-	public static String modelFile = "";
+	public static String modelFile = null;
 	public static boolean isTrain = true;
 	public static String dataType = "abc";
 	public static String testSuff = "test";
@@ -80,6 +82,7 @@ public class SemiCRFMain {
 				case "-dev": testSuff = args[i+1].equals("true")? "devel":"test"; break;
 				case "-data": dataType = args[i+1]; break;
 				case "-ext": extention = args[i+1]; break;
+				case "-mode": isTrain = args[i+1].equals("train")?true:false; break;
 				case "-pipe": isPipe = args[i+1].equals("true")?true:false;break;
 				default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 			}
@@ -114,7 +117,6 @@ public class SemiCRFMain {
 		String resRes = "data/alldata/"+dataType+"/output/semi."+extention+".depf-"+depFeature+".res.txt";
 		
 		SemiCRFInstance[] trainInstances = readCoNLLData(train_filename, true,	trainNum, false);
-		
 		SemiCRFInstance[] testInstances	 = readCoNLLData(test_filename, false,	testNumber, isPipe);
 		if(model2){
 			//print some information if using model 2
@@ -165,7 +167,7 @@ public class SemiCRFMain {
 		SemiViewer sViewer = new SemiViewer();
 		
 		GlobalNetworkParam gnp = null;
-		if(modelFile==null || !new File(modelFile).exists()){
+		if(isTrain || modelFile==null || modelFile.equals("") || !new File(modelFile).exists()){
 			gnp = new GlobalNetworkParam(of);
 		}else{
 			ObjectInputStream in = new ObjectInputStream(new FileInputStream(modelFile));
@@ -173,17 +175,17 @@ public class SemiCRFMain {
 			in.close();
 		}
 		
-		
-		
 		SemiCRFNetworkCompiler compiler = new SemiCRFNetworkCompiler(maxSize, maxSpan,sViewer, useDepNet, model1, model2);
 		SemiCRFFeatureManager fm = new SemiCRFFeatureManager(gnp, nonMarkov, depFeature);
 		NetworkModel model = NetworkConfig.TRAIN_MODE_IS_GENERATIVE ? GenerativeNetworkModel.create(fm, compiler) : DiscriminativeNetworkModel.create(fm, compiler);
 		
-		if(isTrain || !new File(modelFile).exists()){
+		if(isTrain){
 			model.train(trainInstances, numIterations);
-//			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
-//			out.writeObject(fm.getParam_G());
-//			out.close();
+			if(modelFile!=null && !modelFile.equals("") ){
+				ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
+				out.writeObject(fm.getParam_G());
+				out.close();
+			}
 		}
 		
 		Instance[] predictions = model.decode(testInstances);
