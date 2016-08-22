@@ -43,13 +43,12 @@ public class SemiCRFMain {
 	public static boolean isTrain = true;
 	public static String dataType = "abc";
 	public static String testSuff = "test";
-	public static String train_filename = "data/nbc/ecrf.train.MISC.txt";
-	public static String test_filename = "data/nbc/ecrf.test.MISC.txt";
+	public static String train_filename = "data/alldata/nbc/ecrf.train.MISC.txt";
+	public static String test_filename = "data/alldata/nbc/ecrf.test.MISC.txt";
 	public static String extention = "model0";
-//	public static String train_filename = "data/semeval10t1/ecrf.smalltest.txt";
-//	public static String test_filename = "data/semeval10t1/ecrf.smalltest.txt";
-//	public static String train_filename = "data/semeval10t1/ecrf.train.MISC.txt";
-//	public static String test_filename = "data/semeval10t1/ecrf.test.MISC.txt";
+	/** true means using the predicted dependency features.. if not used dep features, this option does not matter**/
+	public static boolean isPipe = false; 
+	
 	
 	private static void processArgs(String[] args) throws FileNotFoundException{
 		for(int i=0;i<args.length;i=i+2){
@@ -81,6 +80,7 @@ public class SemiCRFMain {
 				case "-dev": testSuff = args[i+1].equals("true")? "devel":"test"; break;
 				case "-data": dataType = args[i+1]; break;
 				case "-ext": extention = args[i+1]; break;
+				case "-pipe": isPipe = args[i+1].equals("true")?true:false;break;
 				default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 			}
 		}
@@ -95,26 +95,34 @@ public class SemiCRFMain {
 //		test_filename = "data/semi/semi.test.txt";
 		
 		processArgs(args);
+		System.out.println("[Info] using the predicted dependency?:"+isPipe);
 		
 		/**data is 0-indexed, network compiler is 1-indexed since we have leaf nodes.**/
-		train_filename = "data/"+dataType+"/ecrf.train.MISC.txt";
-		test_filename = "data/"+dataType+"/ecrf."+testSuff+".MISC.txt";
+//		train_filename = "data/"+dataType+"/ecrf.train.MISC.txt";
+//		test_filename = "data/"+dataType+"/ecrf."+testSuff+".MISC.txt";
+		/**Read the all data**/
+		String prefix = "data/alldata/"+dataType+"/";
+		train_filename = prefix+"train.output";
+		test_filename = isPipe? prefix+"only.test.dp.res.txt":prefix+"test.output";
 		boolean model1 = false;
 		boolean model2 = false;
-		
 		if(extention.equals("model1")) { model1 = true; useDepNet = true; }
 		else if(extention.equals("model2")) {model2 = true; useDepNet = true;}
-		System.out.println("Current Model Extention:"+extention);
-		String resEval = "data/"+dataType+"/output/semi."+extention+".depf-"+depFeature+".eval.txt";
-		String resRes = "data/"+dataType+"/output/semi."+extention+".depf-"+depFeature+".res.txt";
+		System.out.println("[Info] Current Model Extention:"+extention);
+		System.out.println("[Info] Current Dataset:"+dataType);
+		String resEval = "data/alldata/"+dataType+"/output/semi."+extention+".depf-"+depFeature+".eval.txt";
+		String resRes = "data/alldata/"+dataType+"/output/semi."+extention+".depf-"+depFeature+".res.txt";
 		
-		SemiCRFInstance[] trainInstances= readCoNLLData(train_filename, true,	trainNum);
-		SemiCRFInstance[] testInstances	= readCoNLLData(test_filename, 	false,	testNumber);
+		SemiCRFInstance[] trainInstances = readCoNLLData(train_filename, true,	trainNum, false);
+		
+		SemiCRFInstance[] testInstances	 = readCoNLLData(test_filename, false,	testNumber, isPipe);
 		if(model2){
 			//print some information if using model 2
 			int notConnected = 0;
 			for(SemiCRFInstance inst: trainInstances){
 				notConnected+=checkConnected(inst);
+//				if(checkConnected(inst)>0)
+//					System.out.println(inst.getInput().toString());
 			}
 			System.out.println("not connected entities in train:"+notConnected);
 			notConnected = 0;
@@ -187,10 +195,12 @@ public class SemiCRFMain {
 	 * Read data from file in a CoNLL format 0-index.
 	 * @param fileName
 	 * @param isLabeled
+	 * @param isPipe: true means read the predicted features. always set to false for reading training instances.
 	 * @return
 	 * @throws IOException
 	 */
-	private static SemiCRFInstance[] readCoNLLData(String fileName, boolean isLabeled, int number) throws IOException{
+	private static SemiCRFInstance[] readCoNLLData(String fileName, boolean isLabeled, int number, boolean isPipe) throws IOException{
+		if(isLabeled && isPipe) throw new RuntimeException("training instances always have the true dependency");
 		InputStreamReader isr = new InputStreamReader(new FileInputStream(fileName), "UTF-8");
 		BufferedReader br = new BufferedReader(isr);
 		ArrayList<SemiCRFInstance> result = new ArrayList<SemiCRFInstance>();
@@ -235,7 +245,16 @@ public class SemiCRFMain {
 				String[] values = line.split("[\t ]");
 				int index = Integer.valueOf(values[0]) - 1; //because it is starting from 1
 				String word = values[1];
-				wts.add(new WordToken(word, values[2], Integer.valueOf(values[4])-1, values[3]));
+				String depLabel = null;
+				int headIdx = -1;
+				if(!isPipe){
+					depLabel = values.length>5? values[5]:null;
+					headIdx = Integer.valueOf(values[4])-1;
+				}else{
+					depLabel = values.length>6? values[6]:null;
+					headIdx = Integer.valueOf(values[5])-1;
+				}
+				wts.add(new WordToken(word, values[2], headIdx, values[3], depLabel));
 				String form = values[3];
 				Label label = null;
 				if(form.startsWith("B")){
@@ -265,7 +284,7 @@ public class SemiCRFMain {
 		return result.toArray(new SemiCRFInstance[result.size()]);
 	}
 	
-	private static void createSpan(List<Span> output, int start, int end, Label label){
+ 	private static void createSpan(List<Span> output, int start, int end, Label label){
 		if(label==null){
 			throw new RuntimeException("The label is null");
 		}
