@@ -103,8 +103,8 @@ public class EMain {
 //		testFile = "data/semeval10t1/ecrf.test.part.txt";
 		/***************************/
 		if(dataTypeSet.contains(DPConfig.dataType)){
-			trainInstances = EReader.readCNN(DPConfig.ecrftrain, true, trainNumber, entityMap);
-			testInstances = EReader.readCNN(testFile, false, testNumber, entityMap);
+			trainInstances = EReader.readCNN(DPConfig.ecrftrain, true, trainNumber, entityMap, false);
+			testInstances = EReader.readCNN(testFile, false, testNumber, entityMap, isPipe);
 		}else{
 			trainInstances = EReader.readData(DPConfig.ecrftrain,true,trainNumber, entityMap);
 			testInstances = isPipe?EReader.readDP2NERPipe(testFile, testNumber,entityMap)

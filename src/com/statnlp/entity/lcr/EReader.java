@@ -98,7 +98,8 @@ public class EReader {
 		return myInsts;
 	}
 	
-	public static List<ECRFInstance> readCNN(String path, boolean setLabel, int number,HashMap<String, Integer> entityMap) throws IOException{
+	public static List<ECRFInstance> readCNN(String path, boolean setLabel, int number,HashMap<String, Integer> entityMap, boolean isPipe) throws IOException{
+		if(setLabel && isPipe) throw new RuntimeException("training instances always have the true dependency structure");
 		BufferedReader br = RAWF.reader(path);
 		String line = null;
 		List<ECRFInstance> insts = new ArrayList<ECRFInstance>();
@@ -123,7 +124,9 @@ public class EReader {
 			String[] values = line.split(" ");
 			String entity = values[3];
 			if(!entityMap.containsKey(entity)) entity = "O";
-			words.add(new WordToken(values[1],values[2],Integer.valueOf(values[4])-1,entity));
+			int headIdx = Integer.valueOf(values[4])-1;
+			if(isPipe) headIdx = Integer.valueOf(values[5])-1;
+			words.add(new WordToken(values[1],values[2],headIdx,entity));
 			es.add(entity);
 		}
 		br.close();

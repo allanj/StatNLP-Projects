@@ -30,16 +30,20 @@ public class DPConfig {
 		devPath = "data/alldata/"+dataType+"/dev.conllx";
 		testingPath = "data/alldata/"+dataType+"/test.conllx";
 		
-		ecrftrain = "data/"+dataType+"/ecrf.train.MISC.txt";
-		ecrfdev = "data/"+dataType+"/ecrf.devel.MISC.txt";
-		ecrftest = "data/"+dataType+"/ecrf.test.MISC.txt";
+//		ecrftrain = "data/"+dataType+"/ecrf.train.MISC.txt";
+//		ecrfdev = "data/"+dataType+"/ecrf.devel.MISC.txt";
+//		ecrftest = "data/"+dataType+"/ecrf.test.MISC.txt";
+		ecrftrain = "data/alldata/"+dataType+"/train.output";
+		ecrfdev = "data/alldata/"+dataType+"/dev.output";
+		ecrftest = "data/alldata/"+dataType+"/test.output";
 		
-		data_prefix = "data/"+dataType+"/output/";
+		
+		data_prefix = "data/alldata/"+dataType+"/output/";
 		
 		ner2dp_ner_dev_input = "data/"+dataType+"/pptest/ecrf.dev.ner.res.txt";
 		ner2dp_ner_test_input = "data/"+dataType+"/pptest/ecrf.test.ner.res.txt";
-		dp2ner_dp_dev_input = "data/"+dataType+"/pptest/only.dev.dp.res.txt";
-		dp2ner_dp_test_input = "data/"+dataType+"/pptest/only.test.dp.res.txt";
+		dp2ner_dp_dev_input = "data/alldata/"+dataType+"/only.dev.dp.res.txt";
+		dp2ner_dp_test_input = "data/alldata/"+dataType+"/only.test.dp.res.txt";
 		dp2ner_dp_topK_test_input = "data/"+dataType+"/pptest/only.test.dp.topk.res.txt";
 	}
 	

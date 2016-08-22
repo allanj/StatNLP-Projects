@@ -51,7 +51,7 @@ public class ECRFFeatureManager extends FeatureManager {
 		int eId = nodeArr[1];
 		int[] child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[0]));
 		int childEId = child[1];
-		int childPos = child[0]-1;
+//		int childPos = child[0]-1;
 		
 		String lw = pos>0? sent.get(pos-1).getName():"STR";
 		String ls = pos>0? shape(lw):"STR_SHAPE";
@@ -68,8 +68,8 @@ public class ECRFFeatureManager extends FeatureManager {
 		String currWord = inst.getInput().get(pos).getName();
 		String currTag = inst.getInput().get(pos).getTag();
 		String currShape = shape(currWord);
-		String childWord = childPos>=0? inst.getInput().get(childPos).getName():"STR";
-		String childTag = childPos>=0? inst.getInput().get(childPos).getTag():"STR";
+//		String childWord = childPos>=0? inst.getInput().get(childPos).getName():"STR";
+//		String childTag = childPos>=0? inst.getInput().get(childPos).getTag():"STR";
 		
 		
 		
