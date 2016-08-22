@@ -173,24 +173,24 @@ public class SemiCRFFeatureManager extends FeatureManager {
 				featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(),	currEn, currWord+" "+currHead));
 				featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(),		currEn,	currTag+" "+currHeadTag));
 
-				int prevPos = pos - 1;
-				String prevLabel = pos==start? Label.get(childLabelId).getForm():Label.get(parentLabelId).getForm();
-				if(prevPos>=0){
-					int prevHeadIndex = sent.get(prevPos).getHeadIndex();
-					String prevWord = sent.get(prevPos).getName();
-					String prevTag = sent.get(prevPos).getTag();
-					String prevHead = prevHeadIndex>=0? sent.get(prevHeadIndex).getName():"STR";
-					String prevHeadTag = prevHeadIndex>=0? sent.get(prevHeadIndex).getTag():"STR";
-					featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(), "DPE-CWCH", prevLabel+":"+prevWord+","+prevHead));
-					featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(), "DPE-CWTCHT", prevLabel+":"+prevTag+","+prevHeadTag));
-					if(prevHeadIndex==pos || currHeadIndex==prevPos){
-						String dir = prevHeadIndex==pos? "LEFTDIR":"RIGHTDIR";
-						featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(), "DPE-WC-CON",currEn+","+prevLabel+":"+currWord+","+prevWord));
-						featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(), "DPE-WC-CON",currEn+","+prevLabel+":"+currWord+","+prevWord+":"+dir));
-						featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(), "DPE-WC-CON",currEn+","+prevLabel+":"+currTag+","+prevTag));
-						featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(), "DPE-WC-CON",currEn+","+prevLabel+":"+currTag+","+prevTag+":"+dir));
-					}
-				}
+//				int prevPos = pos - 1;
+//				String prevLabel = pos==start? Label.get(childLabelId).getForm():Label.get(parentLabelId).getForm();
+//				if(prevPos>=0){
+//					int prevHeadIndex = sent.get(prevPos).getHeadIndex();
+//					String prevWord = sent.get(prevPos).getName();
+//					String prevTag = sent.get(prevPos).getTag();
+//					String prevHead = prevHeadIndex>=0? sent.get(prevHeadIndex).getName():"STR";
+//					String prevHeadTag = prevHeadIndex>=0? sent.get(prevHeadIndex).getTag():"STR";
+//					featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(), "DPE-CWCH", prevLabel+":"+prevWord+","+prevHead));
+//					featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(), "DPE-CWTCHT", prevLabel+":"+prevTag+","+prevHeadTag));
+//					if(prevHeadIndex==pos || currHeadIndex==prevPos){
+//						String dir = prevHeadIndex==pos? "LEFTDIR":"RIGHTDIR";
+//						featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(), "DPE-WC-CON",currEn+","+prevLabel+":"+currWord+","+prevWord));
+//						featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(), "DPE-WC-CON",currEn+","+prevLabel+":"+currWord+","+prevWord+":"+dir));
+//						featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(), "DPE-WC-CON",currEn+","+prevLabel+":"+currTag+","+prevTag));
+//						featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(), "DPE-WC-CON",currEn+","+prevLabel+":"+currTag+","+prevTag+":"+dir));
+//					}
+//				}
 			}
 			
 		}
