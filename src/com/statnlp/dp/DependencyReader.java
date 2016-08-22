@@ -176,6 +176,14 @@ public class DependencyReader {
 		return dataArr;
 	}
 	
+	/**
+	 * The data file only contain the projective dependencies only actually.
+	 * @param path
+	 * @param isLabeled
+	 * @param number
+	 * @param transformer
+	 * @return
+	 */
 	public static DependInstance[] readCNN(String path, boolean isLabeled, int number, Transformer transformer){
 		return readCNN(path, isLabeled, number, transformer, null);
 	}
@@ -255,6 +263,80 @@ public class DependencyReader {
 	}
 
 
+	public static DependInstance[] readOntoNotes5(String path, boolean isLabeled, int number, Transformer trans, boolean checkProjective){
+		ArrayList<DependInstance> data = new ArrayList<DependInstance>();
+		try {
+			BufferedReader br = RAWF.reader(path);
+			String line = null;
+			int index = 1;
+			ArrayList<WordToken> words = new ArrayList<WordToken>();
+			words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE, "ROOT"));
+			ArrayList<UnnamedDependency> dependencies = new ArrayList<UnnamedDependency>();
+			while((line = br.readLine())!=null){
+				if(line.startsWith("#")) continue;
+				if(line.equals("")){
+					WordToken[] wordsArr = new WordToken[words.size()];
+					words.toArray(wordsArr);
+					Sentence sent = new Sentence(wordsArr);
+					boolean projectiveness=  DataChecker.checkProjective(dependencies);
+					if(checkProjective && !projectiveness) {
+						dependencies = new ArrayList<UnnamedDependency>();
+						words = new ArrayList<WordToken>();
+						words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE, "ROOT"));
+						continue;
+					}
+					Tree dependencyTree = trans.toDependencyTree(dependencies, sent);
+					if(!checkProjective || dependencyTree.size()==sent.length()){
+						sent.setRecognized();
+						Tree spanTree = isLabeled? trans.toSpanTree(dependencyTree, sent): null;
+						DependInstance inst = new DependInstance(index++,1.0,sent,dependencies,dependencyTree,spanTree);
+						for(UnnamedDependency ud: dependencies){
+							CoreLabel mo = (CoreLabel)ud.dependent();
+							CoreLabel he = (CoreLabel)ud.governor();
+							mo.setNER(sent.get(mo.sentIndex()).getEntity());
+							he.setNER(sent.get(he.sentIndex()).getEntity());
+						}
+						if(isLabeled) {
+							sent.setRecognized();
+							inst.setLabeled();
+							data.add(inst);
+						}
+						else {
+							inst.setUnlabeled();
+							data.add(inst);
+						}
+						
+					}
+					words = new ArrayList<WordToken>();
+					words.add(new WordToken(ROOT_WORD,ROOT_TAG,-1,O_TYPE, "ROOT"));
+					dependencies = new ArrayList<UnnamedDependency>();
+					if(number!= -1 && data.size()==number) break;
+					continue;
+				}
+				String[] values = line.split("\\t");
+				int headIndex = Integer.valueOf(values[6]);
+				String entity = values[10];
+				String depLabel = values[7];
+				words.add(new WordToken(values[1], values[4], headIndex, entity, depLabel));
+				CoreLabel headLabel = new CoreLabel();
+				CoreLabel modifierLabel = new CoreLabel();
+				headLabel.setSentIndex(headIndex);
+				headLabel.setValue("index:"+headIndex);
+				modifierLabel.setSentIndex(words.size()-1);
+				modifierLabel.setValue("index:"+modifierLabel.sentIndex());
+				dependencies.add(new UnnamedDependency(headLabel, modifierLabel));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		List<DependInstance> myData = data;
+		DependInstance[] dataArr = new DependInstance[myData.size()];
+		String type = isLabeled? "Training":"Testing"; 
+		System.err.println("[Info] "+type+" instance, total:"+ dataArr.length+" Instance. ");
+		myData.toArray(dataArr);
+		return dataArr;
+	}
+	
 	
 	/***
 	 * The data format should (index	word	entity	headIndex)

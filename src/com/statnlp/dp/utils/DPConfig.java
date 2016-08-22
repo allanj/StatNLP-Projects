@@ -23,9 +23,12 @@ public class DPConfig {
 	public static String ner2dp_ner_topK_test_input = "data/"+dataType+"/pptest/ecrf.test.ner.topk.res.txt";
 	
 	public static void changeDataType(){
-		trainingPath = "data/"+dataType+"/en.train.txt";
-		devPath = "data/"+dataType+"/en.devel.txt";
-		testingPath = "data/"+dataType+"/en.test.txt";
+//		trainingPath = "data/"+dataType+"/en.train.txt";
+//		devPath = "data/"+dataType+"/en.devel.txt";
+//		testingPath = "data/"+dataType+"/en.test.txt";
+		trainingPath = "data/alldata/"+dataType+"/train.conllx";
+		devPath = "data/alldata/"+dataType+"/dev.conllx";
+		testingPath = "data/alldata/"+dataType+"/test.conllx";
 		
 		ecrftrain = "data/"+dataType+"/ecrf.train.MISC.txt";
 		ecrfdev = "data/"+dataType+"/ecrf.devel.MISC.txt";

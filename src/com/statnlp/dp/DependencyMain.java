@@ -92,8 +92,11 @@ public class DependencyMain {
 		DependInstance[] trainingInsts = null;
 		DependInstance[] testingInsts = null;
 		if(dataTypeSet.contains(DPConfig.dataType)){
-			trainingInsts = DependencyReader.readCNN(trainingPath, true, trainNumber, trans);
-			testingInsts = DependencyReader.readCNN(testFile, false,testNumber,trans);
+//			trainingInsts = DependencyReader.readCNN(trainingPath, true, trainNumber, trans);
+//			testingInsts = DependencyReader.readCNN(testFile, false,testNumber,trans);
+			trainingInsts = DependencyReader.readOntoNotes5(trainingPath, true, trainNumber, trans, true); //true: check projective
+			boolean checkTestProjective = isDev? true:false;
+			testingInsts = DependencyReader.readOntoNotes5(testFile, false,testNumber,trans, checkTestProjective);   //false: not check the projective in testing
 		}else{
 			trainingInsts = DependencyReader.readInstance(trainingPath, true,trainNumber,entities,trans);
 			testingInsts = isPipe? DependencyReader.readFromPipeline(testFile,testNumber,trans, topKinput): DependencyReader.readInstance(testFile, false,testNumber,entities,trans);
@@ -107,7 +110,7 @@ public class DependencyMain {
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = 0.1;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		System.err.println("[Info] Regularization Parameter: "+NetworkConfig.L2_REGULARIZATION_CONSTANT);
-		NetworkConfig.USE_NEURAL_FEATURES = true;
+		NetworkConfig.USE_NEURAL_FEATURES = false;
 //		NetworkConfig._topKValue = 3;
 		
 		

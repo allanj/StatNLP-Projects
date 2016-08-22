@@ -79,16 +79,13 @@ public class Evaluator {
 				}
 				
 			}else{
-				
 				ArrayList<UnnamedDependency> predDependencies = inst.toDependencies(prediction);
-				ArrayList<UnnamedDependency> corrDependencies = inst.toDependencies(inst.getOutput());
 				int[] predHeads = Transformer.getHeads(predDependencies, inst.getInput());
-				int[] trueHeads = Transformer.getHeads(corrDependencies, inst.getInput());
 				for(int i=1;i<predHeads.length;i++){
-					if(predHeads[i]==trueHeads[i])
+					if(predHeads[i]==sent.get(i).getHeadIndex())
 						dp_corr++;
 					dp_total++;
-					pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+trueHeads[i]+" "+predHeads[i]+"\n");
+					pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+sent.get(i).getHeadIndex()+" "+predHeads[i]+"\n");
 				}
 				pw.write("\n");
 			}
