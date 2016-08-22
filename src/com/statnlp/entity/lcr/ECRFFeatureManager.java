@@ -135,22 +135,22 @@ public class ECRFFeatureManager extends FeatureManager {
 			//This is the features that really help the model: most important features
 			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-WH", entities[eId]+":"+currWord+","+currHead));
 			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-WTHT", entities[eId]+":"+currTag+","+currHeadTag)); //the most powerful one
-			if(childPos>=0){
-				int childHeadIndex = sent.get(childPos).getHeadIndex();
-				//remove this feature, just down a bit
-				String childHead = childHeadIndex>=0? sent.get(childHeadIndex).getName():"STR";
-				String childHeadTag = childHeadIndex>=0? sent.get(childHeadIndex).getTag():"STR";
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-CWCH", entities[childEId]+":"+childWord+","+childHead));
-				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-CWTCHT", entities[childEId]+":"+childTag+","+childHeadTag));
-
-				if(childHeadIndex==pos || currHeadIndex==childPos){
-					String dir = childHeadIndex==pos? "LEFTDIR":"RIGHTDIR";
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-WC-CON",entities[eId]+","+entities[childEId]+":"+currWord+","+childWord));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-WC-CON",entities[eId]+","+entities[childEId]+":"+currWord+","+childWord+":"+dir));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-WC-CON",entities[eId]+","+entities[childEId]+":"+currTag+","+childTag));
-					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-WC-CON",entities[eId]+","+entities[childEId]+":"+currTag+","+childTag+":"+dir));
-				}
-			}
+//			if(childPos>=0){
+//				int childHeadIndex = sent.get(childPos).getHeadIndex();
+//				//remove this feature, just down a bit
+//				String childHead = childHeadIndex>=0? sent.get(childHeadIndex).getName():"STR";
+//				String childHeadTag = childHeadIndex>=0? sent.get(childHeadIndex).getTag():"STR";
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-CWCH", entities[childEId]+":"+childWord+","+childHead));
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-CWTCHT", entities[childEId]+":"+childTag+","+childHeadTag));
+//
+//				if(childHeadIndex==pos || currHeadIndex==childPos){
+//					String dir = childHeadIndex==pos? "LEFTDIR":"RIGHTDIR";
+//					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-WC-CON",entities[eId]+","+entities[childEId]+":"+currWord+","+childWord));
+//					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-WC-CON",entities[eId]+","+entities[childEId]+":"+currWord+","+childWord+":"+dir));
+//					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-WC-CON",entities[eId]+","+entities[childEId]+":"+currTag+","+childTag));
+//					featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "DPE-WC-CON",entities[eId]+","+entities[childEId]+":"+currTag+","+childTag+":"+dir));
+//				}
+//			}
 			
 		}
 		
