@@ -39,10 +39,7 @@ public class LogReader {
 					continue;
 				}
 				if(decode && line.startsWith("Decoding time")){
-					if(model.equals("lcrf"))
-						smallDecodeTime[Integer.valueOf(vals[4])] = Double.valueOf(vals[6]);
-					else
-						smallDecodeTime[Integer.valueOf(vals[7])] = Double.valueOf(vals[9]);
+					smallDecodeTime[Integer.valueOf(vals[7])] = Double.valueOf(vals[9]);
 					continue;
 				}
 				
@@ -63,6 +60,22 @@ public class LogReader {
 		}
 	}
 	
+	public void printFmeasure(){
+		try{
+			BufferedReader reader = RAWF.reader(data);
+			String line = null;
+			while((line = reader.readLine())!=null){
+				String[] vals = line.split("\\s+");
+				if(line.startsWith("accuracy:")){
+					System.out.println(vals[vals.length-1]);
+				}
+			}
+			reader.close();
+		}catch(IOException ioe){
+			ioe.printStackTrace();
+		}
+	}
+	
 	public static void main(String[] args){
 		String[] types = new String[]{"abc","cnn","mnb","nbc","pri","voa"};
 		String[] models = new String[]{"lcrf","semi","model1","model2"};
@@ -76,7 +89,8 @@ public class LogReader {
 				for(String type: types){
 					String data = prefix+"/"+model+"/"+model+"-"+dep+"-test-"+type+".log";
 					LogReader lr = new LogReader(model, data);
-					lr.calculateDecodeTime();
+//					lr.calculateDecodeTime();
+					lr.printFmeasure();
 				}
 				System.out.println();
 			}

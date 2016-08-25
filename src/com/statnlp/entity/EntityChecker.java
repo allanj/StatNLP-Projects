@@ -4,11 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.commons.Entity;
-import com.statnlp.dp.utils.DPConfig;
 
 public class EntityChecker {
 
@@ -91,7 +91,93 @@ public class EntityChecker {
 		return (end>start+1)  && !(sent.get(start).getHeadIndex()==end-1 || sent.get(end-1).getHeadIndex()==start);
 	}
 	
-//	public static void main(String[] args){
+	/**
+	 * Read alldata file from data/alldata/abc/train.output or dev.output or test.output
+	 * @param file
+	 * @throws IOException
+	 */
+	public static void checkEntityLength(String file) throws IOException {
+		//entity, length, number
+		HashMap<String, ArrayList<Integer>> map = new HashMap<String, ArrayList<Integer>>();
+		int maxEntityLen = 10;
+		BufferedReader reader = RAWF.reader(file);
+		String line = null;
+		int total = 0;
+		//int numE = 0; //number of entities in one sentence.
+		ArrayList<String> esent = new ArrayList<String>();
+		while((line = reader.readLine())!=null){
+			if(line.equals("")) {
+				int elen = 0;
+				if(esent.size()==0) continue;
+				for(int k=0; k<esent.size();k++){
+					String e = esent.get(k);
+					if(e.startsWith("B-")) {
+						if(elen!=0){
+							String prevE = esent.get(k-1);
+							if(map.containsKey(prevE.substring(2))){
+								int num = map.get(prevE.substring(2)).get(elen);
+								map.get(prevE.substring(2)).set(elen, num+1);
+							}else{
+								ArrayList<Integer> lenNumList = new ArrayList<Integer>();
+								for(int i=0;i<=maxEntityLen;i++) lenNumList.add(0);
+								lenNumList.set(elen, 1);
+								map.put(prevE.substring(2), lenNumList);
+							}
+						}
+						elen = 1;
+					}
+					if(e.startsWith("I-")) elen++;
+				}
+				String prevE = esent.get(esent.size()-1);
+				if(map.containsKey(prevE.substring(2))){
+					int num = map.get(prevE.substring(2)).get(elen);
+					map.get(prevE.substring(2)).set(elen, num+1);
+				}else{
+					ArrayList<Integer> lenNumList = new ArrayList<Integer>();
+					for(int i=0;i<=maxEntityLen;i++) lenNumList.add(0);
+					lenNumList.set(elen, 1);
+					map.put(prevE.substring(2), lenNumList);
+				}
+				
+				
+				esent = new ArrayList<String>();
+				//numE = 0;
+				continue;
+			}
+			String[] vals = line.split("\\s+");
+			String entity = vals[3];
+			if(entity.equals("O"))  continue;
+			esent.add(entity);
+			if(entity.startsWith("B-")){
+				//numE++;
+				total++;
+			}
+		}
+		reader.close();
+		System.out.println("Number of total entities:"+total);
+		int checkNum = 0;
+		for(String entity: map.keySet()){
+			ArrayList<Integer> nums = map.get(entity);
+			for(int k=0;k<nums.size();k++){
+				System.out.println("Entity:"+entity+" len:"+k+" number:"+nums.get(k));
+				checkNum+=nums.get(k);
+			}
+		}
+		System.out.println("[checked]Number of total entities:"+checkNum);
+	}
+	
+	public static void checkAllEntityLength() throws IOException{
+		String[] datas = new String[]{"abc","cnn","mnb","nbc","pri","voa"};
+		String[] types = new String[]{"train","dev","test"};
+		for(String dat: datas){
+			for(String type: types){
+				checkEntityLength("data/alldata");
+			}
+		}
+	}
+	
+	public static void main(String[] args) throws IOException{
 //		printAllEntities(DPConfig.ecrftrain);
-//	}
+		checkEntityLength("data/alldata/nbc/test.output");
+	}
 }

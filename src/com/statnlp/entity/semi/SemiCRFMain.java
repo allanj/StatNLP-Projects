@@ -107,13 +107,13 @@ public class SemiCRFMain {
 		String prefix = "data/alldata/"+dataType+"/";
 		train_filename = prefix+"train.output";
 		test_filename = isPipe? prefix+"only.test.dp.res.txt":prefix+"test.output";
+		String depStruct = isPipe? "pred":"gold";
 		boolean model1 = false;
 		boolean model2 = false;
 		if(extention.equals("model1")) { model1 = true; useDepNet = true; }
 		else if(extention.equals("model2")) {model2 = true; useDepNet = true;}
 		System.out.println("[Info] Current Model Extention:"+extention);
 		System.out.println("[Info] Current Dataset:"+dataType);
-		String depStruct = isPipe? "pred":"gold";
 		String resEval = "data/alldata/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+".eval.txt";
 		String resRes  = "data/alldata/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+".res.txt";
 		
