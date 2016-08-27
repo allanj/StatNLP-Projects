@@ -79,7 +79,7 @@ public class SemiCRFMain {
 //				case "-useincom": useIncompleteSpan = args[i+1].equals("true")? true:false;break;
 //				case "-usedepnet": useDepNet = args[i+1].equals("true")? true:false;break;
 				case "-modelPath": modelFile = args[i+1]; break;
-				case "-dev": testSuff = args[i+1].equals("true")? "devel":"test"; break;
+				case "-dev": testSuff = args[i+1].equals("true")? "dev":"test"; break;
 				case "-data": dataType = args[i+1]; break;
 				case "-ext": extention = args[i+1]; break;
 				case "-mode": isTrain = args[i+1].equals("train")?true:false; break;
@@ -106,7 +106,7 @@ public class SemiCRFMain {
 		/**Read the all data**/
 		String prefix = "data/alldata/"+dataType+"/";
 		train_filename = prefix+"train.output";
-		test_filename = isPipe? prefix+"only.test.dp.res.txt":prefix+"test.output";
+		test_filename = isPipe? prefix+"only.test.dp.res.txt":prefix+testSuff+".output";
 		String depStruct = isPipe? "pred":"gold";
 		boolean model1 = false;
 		boolean model2 = false;
@@ -117,6 +117,8 @@ public class SemiCRFMain {
 		String resEval = "data/alldata/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+".eval.txt";
 		String resRes  = "data/alldata/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+".res.txt";
 		
+		System.out.println("[Info] Reading data:"+train_filename);
+		System.out.println("[Info] Reading data:"+test_filename);
 		SemiCRFInstance[] trainInstances = readCoNLLData(train_filename, true,	trainNum, false);
 		SemiCRFInstance[] testInstances	 = readCoNLLData(test_filename, false,	testNumber, isPipe);
 		if(model2){
@@ -133,6 +135,23 @@ public class SemiCRFMain {
 				notConnected+=checkConnected(inst);
 			}
 			System.out.println("not connected entities in test:"+notConnected);
+		}
+		if(model1){
+			//print some information if using model 2
+			int incom = 0;
+			for(SemiCRFInstance inst: trainInstances){
+				incom+=EntityChecker.checkAllIncomplete(inst.input).size();
+//				if(EntityChecker.checkAllIncomplete(inst.input).size()>0 && inst.size()<=15)
+//					System.out.println(inst.input.toString()+"\n");
+			}
+			System.out.println("incomplete entities in train:"+incom);
+			incom = 0;
+			for(SemiCRFInstance inst: testInstances){
+				incom+=EntityChecker.checkAllIncomplete(inst.input).size();
+//				if(EntityChecker.checkAllIncomplete(inst.input).size()>0 && inst.size()<=15)
+//					System.out.println(inst.input.toString()+"\n");
+			}
+			System.out.println("incomplete entities in test:"+incom);
 		}
 	
 		int maxSize = 0;
@@ -224,6 +243,7 @@ public class SemiCRFMain {
 				SemiCRFInstance instance = new SemiCRFInstance(instanceId, 1);
 				WordToken[] wtArr = new WordToken[wts.size()];
 				instance.input = new Sentence(wts.toArray(wtArr));
+				instance.input.setRecognized();
 				instance.output = output;
 				//instance.leftDepRel = sent2LeftDepRel(instance.input);
 				if(isLabeled){

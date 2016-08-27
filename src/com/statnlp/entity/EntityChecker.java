@@ -154,16 +154,18 @@ public class EntityChecker {
 			}
 		}
 		reader.close();
-		System.out.println("Number of total entities:"+total);
+		//System.out.println("Number of total entities:"+total);
 		int checkNum = 0;
 		for(String entity: map.keySet()){
 			ArrayList<Integer> nums = map.get(entity);
-			for(int k=0;k<nums.size();k++){
-				System.out.println("Entity:"+entity+" len:"+k+" number:"+nums.get(k));
+			System.out.print("Entity "+entity+":");
+			for(int k=1;k<nums.size();k++){
+				System.out.print("\t"+nums.get(k));
 				checkNum+=nums.get(k);
 			}
+			System.out.println();
 		}
-		System.out.println("[checked]Number of total entities:"+checkNum);
+		//System.out.println("[checked]Number of total entities:"+checkNum);
 	}
 	
 	public static void checkAllEntityLength() throws IOException{
@@ -171,13 +173,16 @@ public class EntityChecker {
 		String[] types = new String[]{"train","dev","test"};
 		for(String dat: datas){
 			for(String type: types){
-				checkEntityLength("data/alldata");
+				//System.out.println("Data TYPE:"+dat+"\t"+type);
+				checkEntityLength("data/alldata/"+dat+"/"+type+".output");
+				//System.out.println();
 			}
 		}
 	}
 	
 	public static void main(String[] args) throws IOException{
 //		printAllEntities(DPConfig.ecrftrain);
-		checkEntityLength("data/alldata/nbc/test.output");
+//		checkEntityLength("data/alldata/abc/test.output");
+		checkAllEntityLength();
 	}
 }
