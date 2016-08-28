@@ -315,7 +315,7 @@ public class DependencyReader {
 				}
 				String[] values = line.split("\\t");
 				int headIndex = Integer.valueOf(values[6]);
-				String entity = values[10];
+				String entity = values.length>10? values[10]: null;
 				String depLabel = values[7];
 				words.add(new WordToken(values[1], values[4], headIndex, entity, depLabel));
 				CoreLabel headLabel = new CoreLabel();
