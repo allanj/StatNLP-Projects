@@ -154,7 +154,7 @@ public class EntityChecker {
 			}
 		}
 		reader.close();
-		//System.out.println("Number of total entities:"+total);
+		System.out.println("Number of total entities:"+total);
 		int checkNum = 0;
 		for(String entity: map.keySet()){
 			ArrayList<Integer> nums = map.get(entity);
@@ -165,7 +165,7 @@ public class EntityChecker {
 			}
 			System.out.println();
 		}
-		//System.out.println("[checked]Number of total entities:"+checkNum);
+		System.out.println("[checked]Number of total entities:"+checkNum);
 	}
 	
 	public static void checkAllEntityLength() throws IOException{
@@ -173,9 +173,9 @@ public class EntityChecker {
 		String[] types = new String[]{"train","dev","test"};
 		for(String dat: datas){
 			for(String type: types){
-				//System.out.println("Data TYPE:"+dat+"\t"+type);
+				System.out.println("Data TYPE:"+dat+"\t"+type);
 				checkEntityLength("data/alldata/"+dat+"/"+type+".output");
-				//System.out.println();
+				System.out.println();
 			}
 		}
 	}
