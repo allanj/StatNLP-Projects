@@ -16,6 +16,7 @@ public class Init {
 		set.add("nbc");
 		set.add("pri");
 		set.add("voa");
+		set.add("ptb");
 		return set;
 	}
 
