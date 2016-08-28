@@ -265,6 +265,7 @@ public class DependencyReader {
 
 	public static DependInstance[] readOntoNotes5(String path, boolean isLabeled, int number, Transformer trans, boolean checkProjective){
 		ArrayList<DependInstance> data = new ArrayList<DependInstance>();
+		int maxLength = -1;
 		try {
 			BufferedReader br = RAWF.reader(path);
 			String line = null;
@@ -296,6 +297,7 @@ public class DependencyReader {
 							mo.setNER(sent.get(mo.sentIndex()).getEntity());
 							he.setNER(sent.get(he.sentIndex()).getEntity());
 						}
+						maxLength = Math.max(inst.size(), maxLength);
 						if(isLabeled) {
 							sent.setRecognized();
 							inst.setLabeled();
@@ -333,6 +335,7 @@ public class DependencyReader {
 		DependInstance[] dataArr = new DependInstance[myData.size()];
 		String type = isLabeled? "Training":"Testing"; 
 		System.err.println("[Info] "+type+" instance, total:"+ dataArr.length+" Instance. ");
+		System.err.println("[Info] "+type+" instance, max Length:"+ maxLength);
 		myData.toArray(dataArr);
 		return dataArr;
 	}
