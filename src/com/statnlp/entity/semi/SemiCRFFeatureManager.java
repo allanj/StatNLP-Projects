@@ -46,13 +46,15 @@ public class SemiCRFFeatureManager extends FeatureManager {
 	
 	private String OUT_SEP = NeuralConfig.OUT_SEP; 
 	private String IN_SEP = NeuralConfig.IN_SEP;
-	private boolean CHEAT = false;
+	private final boolean CHEAT = false;
 	private boolean nonMarkovFeature;
 	
 	public SemiCRFFeatureManager(GlobalNetworkParam param_g, boolean nonMarkov, boolean depFeature) {
 		super(param_g);
 		this.nonMarkovFeature = nonMarkov;
 		this.depFeature = depFeature;
+		if(CHEAT)
+			System.out.println("[Info] Using the cheat features now..");
 	}
 	
 	@Override
@@ -81,8 +83,9 @@ public class SemiCRFFeatureManager extends FeatureManager {
 		int childLabelId = child_arr[1];
 
 		if(CHEAT){
-			int instanceId = Math.abs(instance.getInstanceId());
-			int cheatFeature = _param_g.toFeature(network, FeatureType.cheat.name(), parentLabelId+"", instanceId+" "+parentPos);
+			//int instanceId = Math.abs(instance.getInstanceId());
+			//int cheatFeature = _param_g.toFeature(network, FeatureType.cheat.name(), parentLabelId+"", instanceId+" "+parentPos);
+			int cheatFeature = _param_g.toFeature(network, FeatureType.cheat.name(), "cheat", "cheat");
 			return new FeatureArray(new int[]{cheatFeature});
 		}
 		

@@ -50,6 +50,7 @@ public class SemiCRFMain {
 	public static String extention = "model0";
 	/** true means using the predicted dependency features.. if not used dep features, this option does not matter**/
 	public static boolean isPipe = false; 
+	public static boolean ignore = false;
 	
 	
 	private static void processArgs(String[] args) throws FileNotFoundException{
@@ -84,6 +85,7 @@ public class SemiCRFMain {
 				case "-ext": extention = args[i+1]; break;
 				case "-mode": isTrain = args[i+1].equals("train")?true:false; break;
 				case "-pipe": isPipe = args[i+1].equals("true")?true:false;break;
+				case "-ignore": ignore = args[i+1].equals("true")?true:false;break;
 				default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 			}
 		}
@@ -101,8 +103,8 @@ public class SemiCRFMain {
 		System.out.println("[Info] using the predicted dependency?:"+isPipe);
 		
 		/**data is 0-indexed, network compiler is 1-indexed since we have leaf nodes.**/
-//		train_filename = "data/"+dataType+"/ecrf.train.MISC.txt";
-//		test_filename = "data/"+dataType+"/ecrf."+testSuff+".MISC.txt";
+//		train_filename = "data/semeval10t1/ecrf.train.MISC.txt";
+//		test_filename = "data/semeval10t1/ecrf."+testSuff+".MISC.txt";
 		/**Read the all data**/
 		String prefix = "data/alldata/"+dataType+"/";
 		train_filename = prefix+"train.output";
@@ -113,6 +115,7 @@ public class SemiCRFMain {
 		if(extention.equals("model1")) { model1 = true; useDepNet = true; }
 		else if(extention.equals("model2")) {model2 = true; useDepNet = true;}
 		System.out.println("[Info] Current Model Extention:"+extention);
+		System.out.println("[Info] Ignore those not fit in "+extention+":"+ignore);
 		System.out.println("[Info] Current Dataset:"+dataType);
 		String resEval = "data/alldata/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+".eval.txt";
 		String resRes  = "data/alldata/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+".res.txt";
@@ -133,6 +136,8 @@ public class SemiCRFMain {
 			notConnected = 0;
 			for(SemiCRFInstance inst: testInstances){
 				notConnected+=checkConnected(inst);
+//				if(checkConnected(inst)>0)
+//					System.out.println(inst.getInput().toString());
 			}
 			System.out.println("not connected entities in test:"+notConnected);
 		}
@@ -251,8 +256,9 @@ public class SemiCRFMain {
 				} else {
 					instance.setUnlabeled();
 				}
-				if(useIncompleteSpan && EntityChecker.checkAllIncomplete(instance.input).size()>0){
-					//do nothing. just don't add.
+				if(isLabeled && ignore && extention.equals("model2") && checkConnected(instance)>0){
+					//do nothing. just don't add, ignore those invalid.
+					
 				}else{
 					instanceId++;
 					result.add(instance);
