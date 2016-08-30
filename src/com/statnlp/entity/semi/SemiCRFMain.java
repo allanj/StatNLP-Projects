@@ -132,7 +132,7 @@ public class SemiCRFMain {
 //				if(checkConnected(inst)>0)
 //					System.out.println(inst.getInput().toString());
 			}
-			System.out.println("not connected entities in train:"+notConnected);
+			System.out.println("isgnore:"+ignore+" not connected entities in train:"+notConnected);
 			notConnected = 0;
 			for(SemiCRFInstance inst: testInstances){
 				notConnected+=checkConnected(inst);
@@ -200,7 +200,7 @@ public class SemiCRFMain {
 			in.close();
 		}
 		
-		SemiCRFNetworkCompiler compiler = new SemiCRFNetworkCompiler(maxSize, maxSpan,sViewer, useDepNet, model1, model2);
+		SemiCRFNetworkCompiler compiler = new SemiCRFNetworkCompiler(maxSize, maxSpan,sViewer, useDepNet, model1, model2, ignore);
 		SemiCRFFeatureManager fm = new SemiCRFFeatureManager(gnp, nonMarkov, depFeature);
 		NetworkModel model = NetworkConfig.TRAIN_MODE_IS_GENERATIVE ? GenerativeNetworkModel.create(fm, compiler) : DiscriminativeNetworkModel.create(fm, compiler);
 		

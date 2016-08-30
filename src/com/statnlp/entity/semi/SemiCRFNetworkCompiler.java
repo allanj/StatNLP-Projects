@@ -27,6 +27,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 	private boolean useDepNet = false; 
 	private boolean incom2Linear = false; //means if not incomplete then change to linear. //model 1
 	private boolean notConnect2Linear = false; //model 2
+	private boolean ignoreDisconnect = false; // if true, means the data must fit in the case that all of them are connected
 	
 	public enum NodeType {
 		LEAF,
@@ -38,7 +39,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		NetworkIDMapper.setCapacity(new int[]{10000, 10, 100});
 	}
 
-	public SemiCRFNetworkCompiler(int maxSize, int maxSegLength,SemiViewer sViewer, boolean useDepNet, boolean incom2Linear, boolean notConnect2Linear) {
+	public SemiCRFNetworkCompiler(int maxSize, int maxSegLength,SemiViewer sViewer, boolean useDepNet, boolean incom2Linear, boolean notConnect2Linear, boolean ignoreDisconnect) {
 		this.maxSize = Math.max(maxSize, this.maxSize);
 //		this.maxSize = 3;
 		maxSegmentLength = Math.max(maxSegLength, maxSegmentLength);
@@ -50,6 +51,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		this.useDepNet = useDepNet;
 		this.incom2Linear = incom2Linear;
 		this.notConnect2Linear = notConnect2Linear;
+		this.ignoreDisconnect = ignoreDisconnect;
 		if(!useDepNet)
 			buildUnlabeled(); //maybe use dep net.. we don't need to build it.
 	}
@@ -132,8 +134,10 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 			int labelId = span.label.id;
 			long end = toNode(span.end, labelId);
 			network.addNode(end);
+			int disconnectNum = notConnect2Linear? checkConnected(sent, span):0;
+			if(notConnect2Linear && ignoreDisconnect && disconnectNum>0) throw new RuntimeException("Already ignore, shouldn't have disconnected in training data.");
 			if( useDepNet && ( (incom2Linear && !checkIncomSpan(sent,span)) 
-					|| (notConnect2Linear && checkConnected(sent, span)>0) ) ){
+					|| (notConnect2Linear && disconnectNum>0) ) ){
 				for(int pos=span.start; pos<span.end; pos++){
 					long node = toNode(pos, labelId);
 					network.addNode(node);
