@@ -117,8 +117,9 @@ public class SemiCRFMain {
 		System.out.println("[Info] Current Model Extention:"+extention);
 		System.out.println("[Info] Ignore those not fit in "+extention+":"+ignore);
 		System.out.println("[Info] Current Dataset:"+dataType);
-		String resEval = "data/alldata/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+".eval.txt";
-		String resRes  = "data/alldata/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+".res.txt";
+		String ign = ignore? "ignore":"noignore";
+		String resEval = "data/alldata/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".eval.txt";
+		String resRes  = "data/alldata/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".es.txt";
 		
 		System.out.println("[Info] Reading data:"+train_filename);
 		System.out.println("[Info] Reading data:"+test_filename);
@@ -259,6 +260,8 @@ public class SemiCRFMain {
 				if(isLabeled && ignore && extention.equals("model2") && checkConnected(instance)>0){
 					//do nothing. just don't add, ignore those invalid.
 					
+				}else if(isLabeled && ignore && extention.equals("model1") && EntityChecker.checkAllIncomplete(instance.input).size()>0){
+					//do nothing
 				}else{
 					instanceId++;
 					result.add(instance);
