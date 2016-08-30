@@ -117,7 +117,7 @@ public class SemiCRFMain {
 		System.out.println("[Info] Current Model Extention:"+extention);
 		System.out.println("[Info] Ignore those not fit in "+extention+":"+ignore);
 		System.out.println("[Info] Current Dataset:"+dataType);
-		String ign = ignore? "ignore":"";
+		String ign = ignore? "ignore":"noignore";
 		String resEval = "data/alldata/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".eval.txt";
 		String resRes  = "data/alldata/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".es.txt";
 		
