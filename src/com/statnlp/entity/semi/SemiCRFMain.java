@@ -260,6 +260,8 @@ public class SemiCRFMain {
 				if(isLabeled && ignore && extention.equals("model2") && checkConnected(instance)>0){
 					//do nothing. just don't add, ignore those invalid.
 					
+				}else if(isLabeled && ignore && extention.equals("model1") && EntityChecker.checkAllIncomplete(instance.input).size()>0){
+					//do nothing
 				}else{
 					instanceId++;
 					result.add(instance);
