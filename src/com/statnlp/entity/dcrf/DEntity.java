@@ -27,35 +27,35 @@ import java.util.Map;
  * @author wei_lu
  *
  */
-public class Entity implements Serializable{
+public class DEntity implements Serializable{
 	
 	private static final long serialVersionUID = -5006849791095171763L;
 	
-	public static final Map<String, Entity> ENTS = new HashMap<String, Entity>();
-	public static final Map<Integer, Entity> ENTS_INDEX = new HashMap<Integer, Entity>();
+	public static final Map<String, DEntity> ENTS = new HashMap<String, DEntity>();
+	public static final Map<Integer, DEntity> ENTS_INDEX = new HashMap<Integer, DEntity>();
 	
-	public static Entity get(String form){
+	public static DEntity get(String form){
 		if(!ENTS.containsKey(form)){
-			Entity label = new Entity(form, ENTS.size());
+			DEntity label = new DEntity(form, ENTS.size());
 			ENTS.put(form, label);
 			ENTS_INDEX.put(label._id, label);
 		}
 		return ENTS.get(form);
 	}
 	
-	public static Entity get(int id){
+	public static DEntity get(int id){
 		return ENTS_INDEX.get(id);
 	}
 	
 	private String _form;
 	private int _id;
 	
-	public Entity(Entity lbl){
+	public DEntity(DEntity lbl){
 		this._form = lbl._form;
 		this._id = lbl._id;
 	}
 	
-	private Entity(String form, int id){
+	private DEntity(String form, int id){
 		this._form = form;
 		this._id = id;
 	}
@@ -73,8 +73,8 @@ public class Entity implements Serializable{
 	}
 	
 	public boolean equals(Object o){
-		if(o instanceof Entity){
-			Entity l = (Entity)o;
+		if(o instanceof DEntity){
+			DEntity l = (DEntity)o;
 			return this._form.equals(l._form);
 		}
 		return false;

@@ -86,7 +86,7 @@ public class DCRFReader {
 				if(values[2].startsWith("B-")) chunk = "B";
 				else if(values[2].startsWith("I-")) chunk = "I";
 			}else chunk = "O";
-			Entity.get(chunk);
+			DEntity.get(chunk);
 			Tag.get(values[1]);
 			
 			words.add(new WordToken(values[0], values[1], -1, chunk));

@@ -39,7 +39,7 @@ public class DCRFViewer extends VisualizationViewerEngine {
 		}else if (ids[4]==NODE_TYPES.tagLEAF.ordinal()){
 			type = "tag leaf";
 		}else if (ids[4]==NODE_TYPES.entNODE.ordinal()){
-			type = Entity.ENTS_INDEX.get(labelId).getForm();
+			type = DEntity.ENTS_INDEX.get(labelId).getForm();
 		}else if (ids[4]==NODE_TYPES.tagNODE.ordinal()){
 			type = Tag.TAGS_INDEX.get(labelId).getForm();
 		}else if (ids[4]==NODE_TYPES.ROOT.ordinal()){

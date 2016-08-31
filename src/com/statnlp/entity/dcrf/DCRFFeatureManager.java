@@ -65,7 +65,7 @@ public class DCRFFeatureManager extends FeatureManager {
 			
 			//String currTag = inst.getInput().get(pos).getTag();
 			
-			String currEn = Entity.ENTS_INDEX.get(eId).getForm();
+			String currEn = DEntity.ENTS_INDEX.get(eId).getForm();
 			featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "EW",  	currEn+":"+currWord));
 			//featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ET",	currEn+":"+currTag));
 			featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELW",	currEn+":"+lw));
@@ -84,7 +84,7 @@ public class DCRFFeatureManager extends FeatureManager {
 			}
 			
 			
-			String prevEntity =  Entity.ENTS_INDEX.get(childEId).getForm();
+			String prevEntity =  DEntity.ENTS_INDEX.get(childEId).getForm();
 
 			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E",prevEntity+":"+currEn));
 			featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE",currWord+":"+prevEntity+":"+currEn));
@@ -102,8 +102,8 @@ public class DCRFFeatureManager extends FeatureManager {
 			String lt = pos>0? Tag.TAGS_INDEX.get(childTagId).getForm():"STR";
 			String currTag = Tag.TAGS_INDEX.get(tagId).getForm();
 			featureList.add(this._param_g.toFeature(network,FEATYPE.transition.name(), currTag, lt));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.transition.name(), "HyperEdge", currTag+":"+lt+":"+Entity.ENTS_INDEX.get(childEId).getForm()));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.transition.name(), "EntityTrans:"+currTag, Entity.ENTS_INDEX.get(childEId).getForm()));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.transition.name(), "HyperEdge", currTag+":"+lt+":"+DEntity.ENTS_INDEX.get(childEId).getForm()));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.transition.name(), "EntityTrans:"+currTag, DEntity.ENTS_INDEX.get(childEId).getForm()));
 			featureList.add(this._param_g.toFeature(network,FEATYPE.emission.name(), currWord, currTag));
 			
 		}

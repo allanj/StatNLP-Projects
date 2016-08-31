@@ -96,7 +96,7 @@ public class DCRFMain {
 			trainInstances = DCRFReader.readCONLLData(DCRFConfig.CONLL_train,true,trainNumber);
 			testInstances = DCRFReader.readCONLLData(testFile,false,testNumber);
 //		}
-		System.err.println("entity size:"+Entity.ENTS_INDEX.toString());
+		System.err.println("entity size:"+DEntity.ENTS_INDEX.toString());
 		System.err.println("tag size:"+Tag.TAGS.size());
 		System.err.println("tag size:"+Tag.TAGS_INDEX.toString());
 //		Formatter.ner2Text(trainInstances, "data/testRandom2.txt");
