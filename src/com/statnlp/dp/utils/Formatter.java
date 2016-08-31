@@ -80,7 +80,8 @@ public class Formatter {
 	
 	
 	/**
-	 * Convert the semeval data to ner format which is the input of linear-chain NER
+	 * Convert the semeval data to ner format which is the input of linear-chain NER (Conll-x format)
+	 * Conll-x format: 1.id 2. form 	3.lemma 4. cpostag 5.postag 
 	 * @param insts
 	 * @param output
 	 */
@@ -90,7 +91,7 @@ public class Formatter {
 			for(DependInstance inst:insts){
 				Sentence sent = inst.getInput();
 				for(int i=1;i<sent.length();i++){
-					pw.write(i+"\t"+sent.get(i).getName()+"\t"+sent.get(i).getTag()+"\t"+sent.get(i).getEntity()+"\t"+sent.get(i).getHeadIndex()+"\n");
+					pw.write(i+"\t"+sent.get(i).getName()+"\t_\t"+sent.get(i).getTag()+"\t"+sent.get(i).getTag()+"\t_\t"+sent.get(i).getHeadIndex()+"\t"+sent.get(i).getDepLabel()+"\t_\t_\t"+sent.get(i).getEntity()+"\n");
 				}
 				pw.write("\n");
 			}

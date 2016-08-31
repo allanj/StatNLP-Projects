@@ -86,13 +86,13 @@ public class DIVMain {
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
-		trainingPath = "data/semeval10t1/small.txt";
+//		trainingPath = "data/semeval10t1/small.txt";
 //		testingPath = "data/semeval10t1/test.txt";
-		trainNumber = 1;
-		testNumber = 1;
-		numIteration = 40;
-		numThreads = 1;
-		testingPath = trainingPath;
+//		trainNumber = 1;
+//		testNumber = 1;
+//		numIteration = 40;
+//		numThreads = 1;
+//		testingPath = trainingPath;
 //		DPConfig.readWeight = false;
 //		DPConfig.writeWeight = false;
 		/************/
@@ -114,8 +114,8 @@ public class DIVMain {
 			trainingInsts = DIVReader.readInstance(trainingPath, true,trainNumber,selectedEntities,tran, false);
 			testingInsts = DIVReader.readInstance(decodePath, false,testNumber,selectedEntities,tran, false);
 		}
-//		Formatter.semevalToNER(trainingInsts, "data/"+DPConfig.dataType+"/ecrf.train.part.txt");
-//		Formatter.semevalToNER(testingInsts, "data/"+DPConfig.dataType+"/ecrf.test.part.txt");
+//		Formatter.semevalToNER(trainingInsts, "data/"+DPConfig.dataType+"/ecrf.train.conllx");
+//		Formatter.semevalToNER(testingInsts, "data/"+DPConfig.dataType+"/ecrf.dev.conllx");
 //		Formatter.semevalToText(devInsts, "data/"+DPConfig.dataType+"/proj/en.devel.txt");
 //		Formatter.semevalToText(tInsts, "data/"+DPConfig.dataType+"/proj/en.test.txt");
 //		System.exit(0);
