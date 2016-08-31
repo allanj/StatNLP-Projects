@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.Transformer;
-import com.statnlp.dp.commons.Entity;
+import com.statnlp.dp.commons.EntitySpan;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DataChecker;
 
@@ -30,8 +30,8 @@ public class VarTransformer extends Transformer {
 	 * @param incompletes
 	 * @param sentEntities
 	 */
-	private void processInvalid(Sentence sent, ArrayList<Entity> incompletes, String[][] sentEntities){
-		for(Entity e: incompletes){
+	private void processInvalid(Sentence sent, ArrayList<EntitySpan> incompletes, String[][] sentEntities){
+		for(EntitySpan e: incompletes){
 			int left = e.getLeft();
 			int right = e.getRight();
 			//set the inside parts
@@ -58,7 +58,7 @@ public class VarTransformer extends Transformer {
 	}
 	
 	private String[][] getLeavesInfo(Sentence sent){
-		ArrayList<Entity> incompletes = DataChecker.checkAllIncomplete(sent);
+		ArrayList<EntitySpan> incompletes = DataChecker.checkAllIncomplete(sent);
 		String[][] sentEntities = new String[sent.length()][2];
 		sentEntities[0][0] = null;
 		sentEntities[0][1] = ONE;

@@ -41,7 +41,7 @@ public class BFReader {
 			String[] values = line.split("\\t");
 			String entity = values[3];
 			//String eInSet = entity.length()>2? entity.substring(2):entity;
-			Entity.get(entity);
+			BREntity.get(entity);
 			words.add(new WordToken(values[1],values[2],Integer.valueOf(values[4]),entity));
 			es.add(entity);
 		}

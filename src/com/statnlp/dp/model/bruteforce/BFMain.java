@@ -62,9 +62,9 @@ public class BFMain {
 		
 		trainInstances = BFReader.readData(DPConfig.ecrftrain,true,trainNumber);
 		testInstances = BFReader.readData(testFile,false,testNumber);
-		System.err.println("The entity set read:"+Entity.ENTS.toString());
-		System.err.println("The entity set read:"+Entity.ENTS_INDEX.toString());
-		Entity.lock();
+		System.err.println("The entity set read:"+BREntity.ENTS.toString());
+		System.err.println("The entity set read:"+BREntity.ENTS_INDEX.toString());
+		BREntity.lock();
 //		Formatter.ner2Text(trainInstances, "data/testRandom2.txt");
 //		System.exit(0);
 		

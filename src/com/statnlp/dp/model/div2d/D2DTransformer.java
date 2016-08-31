@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.Transformer;
-import com.statnlp.dp.commons.Entity;
+import com.statnlp.dp.commons.EntitySpan;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DataChecker;
 

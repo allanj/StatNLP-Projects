@@ -84,7 +84,7 @@ public class BFFeatureManager extends FeatureManager {
 		
 		
 //		String currEn = entities[eId].equals("O")?entities[eId]:entities[eId].substring(2);
-		String currEn = Entity.get(eId).getForm();
+		String currEn = BREntity.get(eId).getForm();
 		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "EW",  	currEn+":"+currWord));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ET",	currEn+":"+currTag));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELW",	currEn+":"+lw));
@@ -103,7 +103,7 @@ public class BFFeatureManager extends FeatureManager {
 		}
 		
 		
-		String prevEntity = childPos==0? "STR":Entity.get(childEId).getForm();
+		String prevEntity = childPos==0? "STR":BREntity.get(childEId).getForm();
 //		String prevEntity = entities[childEId].equals("O")?entities[childEId]:entities[childEId].substring(2);
 
 		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E",prevEntity+":"+currEn));
@@ -328,13 +328,13 @@ public class BFFeatureManager extends FeatureManager {
 		String headTag = sent.get(headIdx).getTag();
 		String currWord = sent.get(modifierIdx).getName();
 		String currTag = sent.get(modifierIdx).getTag();
-		String entity = Entity.get(entityId).getForm();
+		String entity = BREntity.get(entityId).getForm();
 		featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "DPE-WH", entity+":"+currWord+","+headWord));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "DPE-WTHT", entity+":"+currTag+","+headTag));
 		
 		if(paArr[4]!=NODE_TYPES.ROOT.ordinal()){
 			int nextEntityId = paArr[1];
-			String nextE = Entity.get(nextEntityId).getForm();
+			String nextE = BREntity.get(nextEntityId).getForm();
 			featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "DP2E-WH", nextE+":"+entity+":"+currWord+","+headWord));
 			featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "DP2E-WTHT", nextE+":"+entity+":"+currTag+","+headTag));
 		}

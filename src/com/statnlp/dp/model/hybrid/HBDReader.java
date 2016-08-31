@@ -11,7 +11,7 @@ import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
 import com.statnlp.dp.Transformer;
-import com.statnlp.dp.commons.Entity;
+import com.statnlp.dp.commons.EntitySpan;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DataChecker;
 

@@ -27,18 +27,18 @@ import java.util.Map;
  * @author wei_lu
  *
  */
-public class Entity implements Serializable{
+public class BREntity implements Serializable{
 	
 	private static final long serialVersionUID = -5006849791095171763L;
 	
-	public static final Map<String, Entity> ENTS = new HashMap<String, Entity>();
-	public static final Map<Integer, Entity> ENTS_INDEX = new HashMap<Integer, Entity>();
+	public static final Map<String, BREntity> ENTS = new HashMap<String, BREntity>();
+	public static final Map<Integer, BREntity> ENTS_INDEX = new HashMap<Integer, BREntity>();
 	
 	private static boolean lock  = false;
 	
-	public static Entity get(String form){
+	public static BREntity get(String form){
 		if(!ENTS.containsKey(form) && !lock){
-			Entity label = new Entity(form, ENTS.size());
+			BREntity label = new BREntity(form, ENTS.size());
 			ENTS.put(form, label);
 			ENTS_INDEX.put(label._id, label);
 		}
@@ -56,19 +56,19 @@ public class Entity implements Serializable{
 		lock = true;
 	}
 	
-	public static Entity get(int id){
+	public static BREntity get(int id){
 		return ENTS_INDEX.get(id);
 	}
 	
 	private String _form;
 	private int _id;
 	
-	public Entity(Entity lbl){
+	public BREntity(BREntity lbl){
 		this._form = lbl._form;
 		this._id = lbl._id;
 	}
 	
-	private Entity(String form, int id){
+	private BREntity(String form, int id){
 		this._form = form;
 		this._id = id;
 	}
@@ -86,8 +86,8 @@ public class Entity implements Serializable{
 	}
 	
 	public boolean equals(Object o){
-		if(o instanceof Entity){
-			Entity l = (Entity)o;
+		if(o instanceof BREntity){
+			BREntity l = (BREntity)o;
 			return this._form.equals(l._form);
 		}
 		return false;

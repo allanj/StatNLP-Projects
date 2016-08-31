@@ -32,7 +32,7 @@ public class BFNetworkCompiler extends NetworkCompiler{
 	}
 	
 	public long toNode_leaf(){
-		int[] arr = new int[]{0,Entity.ENTS.size(),0,0,NODE_TYPES.LEAF.ordinal()};
+		int[] arr = new int[]{0,BREntity.ENTS.size(),0,0,NODE_TYPES.LEAF.ordinal()};
 		return NetworkIDMapper.toHybridNodeID(arr);
 	}
 	
@@ -46,7 +46,7 @@ public class BFNetworkCompiler extends NetworkCompiler{
 	}
 	
 	public long toNode_root(int size){
-		int[] arr = new int[]{size-1, Entity.ENTS.size()+this._size,0,0,NODE_TYPES.ROOT.ordinal()};
+		int[] arr = new int[]{size-1, BREntity.ENTS.size()+this._size,0,0,NODE_TYPES.ROOT.ordinal()};
 		return NetworkIDMapper.toHybridNodeID(arr);
 	}
 
@@ -70,7 +70,7 @@ public class BFNetworkCompiler extends NetworkCompiler{
 			int pos = child_1_arr[0];
 			int tagID = child_1_arr[1];
 			//System.err.println(Arrays.toString(child_1_arr));
-			leaves[pos] = Entity.ENTS_INDEX.get(tagID).getForm();
+			leaves[pos] = BREntity.ENTS_INDEX.get(tagID).getForm();
 			
 			int child_2  = lcrfNetwork.getMaxPath(rootIdx)[1];
 			long child2 = lcrfNetwork.getNode(child_2);
@@ -116,7 +116,7 @@ public class BFNetworkCompiler extends NetworkCompiler{
 			
 			String entity = bfInst.getInput().get(i).getEntity();
 			//if(entity.length()>1) entity = entity.substring(2);
-			long node = toNode_linear(i, Entity.get(entity).getId());
+			long node = toNode_linear(i, BREntity.get(entity).getId());
 			if(i==bfInst.getInput().get(i).getHeadIndex()){
 				throw new RuntimeException(" current index and the head index cannot be the same");
 			}
@@ -154,15 +154,15 @@ public class BFNetworkCompiler extends NetworkCompiler{
 		long linearLeaf = toNode_leaf();
 		long[] children = new long[]{linearLeaf};
 		lcrfNetwork.addNode(linearLeaf);
-		long[] currentNodes = new long[Entity.ENTS.size()];
+		long[] currentNodes = new long[BREntity.ENTS.size()];
 		
 		for(int i=1;i<_size;i++){
-			currentNodes = new long[Entity.ENTS.size()];
-			for(int l=0;l<Entity.ENTS.size();l++){
+			currentNodes = new long[BREntity.ENTS.size()];
+			for(int l=0;l<BREntity.ENTS.size();l++){
 				long node = toNode_linear(i, l);
 				currentNodes[l] = node;
 				lcrfNetwork.addNode(node);
-				String paEntity = Entity.get(l).getForm();
+				String paEntity = BREntity.get(l).getForm();
 				
 				
 				for(long child: children){
@@ -171,7 +171,7 @@ public class BFNetworkCompiler extends NetworkCompiler{
 						lcrfNetwork.addEdge(node, new long[]{child});
 					else{
 						int[] childArr = NetworkIDMapper.toHybridNodeArray(child);
-						String childEntity = Entity.get(childArr[1]).getForm();
+						String childEntity = BREntity.get(childArr[1]).getForm();
 						if(childEntity.startsWith("B") && paEntity.startsWith("I") && !childEntity.substring(2).equals(paEntity.substring(2))) continue;
 						if(childEntity.startsWith("I-") && paEntity.startsWith("I-") && !childEntity.substring(2).equals(paEntity.substring(2))) continue;
 						//if(entities[childArr[1]].startsWith("I-") && entities[l].startsWith("B-") && entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;

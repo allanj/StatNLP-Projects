@@ -11,7 +11,7 @@ import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
 import com.statnlp.dp.Transformer;
-import com.statnlp.dp.commons.Entity;
+import com.statnlp.dp.commons.EntitySpan;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DataChecker;
 
@@ -76,7 +76,7 @@ public class DIVReader {
 						continue;
 					}
 					Tree dependencyTree = transformer.toDependencyTree(dependencies, sent);
-					ArrayList<Entity> checkInvalid = DataChecker.checkAllIncomplete(sent);
+					ArrayList<EntitySpan> checkInvalid = DataChecker.checkAllIncomplete(sent);
 					if(dependencyTree.size()==sent.length() && sent.length()< maxLength ){
 						sent.setRecognized();
 						Tree spanTree = isLabeled? transformer.toSpanTree(dependencyTree, sent): null;

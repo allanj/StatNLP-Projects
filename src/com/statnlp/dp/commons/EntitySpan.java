@@ -5,7 +5,7 @@ package com.statnlp.dp.commons;
  * @author allanjie
  *
  */
-public class Entity {
+public class EntitySpan {
 
 	private String entityType;
 	private int left;
@@ -17,7 +17,7 @@ public class Entity {
 	 * @param left
 	 * @param right
 	 */
-	public Entity(String entityType,int left,int right){
+	public EntitySpan(String entityType,int left,int right){
 		this.entityType = entityType;
 		this.left = left;
 		this.right = right;

@@ -10,7 +10,7 @@ import java.util.List;
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
-import com.statnlp.dp.commons.Entity;
+import com.statnlp.dp.commons.EntitySpan;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DataChecker;
 
@@ -74,7 +74,7 @@ public class VarReader {
 						continue;
 					}
 					Tree dependencyTree = transformer.toDependencyTree(dependencies, sent);
-					ArrayList<Entity> checkInvalid = DataChecker.checkAllIncomplete(sent);
+					ArrayList<EntitySpan> checkInvalid = DataChecker.checkAllIncomplete(sent);
 					if(dependencyTree.size()==sent.length() && sent.length()< maxLength ){
 						sent.setRecognized();
 						VarInstance inst = new VarInstance(index++,1.0,sent,dependencies, transformer.toDep(dependencyTree));

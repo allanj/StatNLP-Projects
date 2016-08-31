@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.DependInstance;
-import com.statnlp.dp.commons.Entity;
+import com.statnlp.dp.commons.EntitySpan;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.UnnamedDependency;
@@ -232,9 +232,9 @@ public class DataChecker {
 	 * @param sent: just check for one sentence.
 	 * @param entities
 	 */
-	public static ArrayList<Entity> checkAllIncomplete(Sentence sent){
+	public static ArrayList<EntitySpan> checkAllIncomplete(Sentence sent){
 		int start = 0; int end = -1;
-		ArrayList<Entity> elist = new ArrayList<Entity>();
+		ArrayList<EntitySpan> elist = new ArrayList<EntitySpan>();
 		String prevEntity = "";
 		for(int i=1;i<sent.length();i++){
 			String e = sent.get(i).getEntity();
@@ -247,13 +247,13 @@ public class DataChecker {
 					if(!prevEntity.equals("O")){
 						end = i;
 						if(notIncomplete(sent,start,end))
-							elist.add(new Entity(prevEntity,start,end-1));
+							elist.add(new EntitySpan(prevEntity,start,end-1));
 					}
 					start = i;
 				}else{
 					end = i;
 					if(notIncomplete(sent,start,end)){
-						elist.add(new Entity(prevEntity,start,end-1));
+						elist.add(new EntitySpan(prevEntity,start,end-1));
 					}
 				}
 			}
@@ -263,7 +263,7 @@ public class DataChecker {
 		if(!lastE.equals("O")){
 			end = sent.length();
 			if(notIncomplete(sent,start,end))
-				elist.add(new Entity(lastE,start,end-1));
+				elist.add(new EntitySpan(lastE,start,end-1));
 		}
 		return elist;
 	}
