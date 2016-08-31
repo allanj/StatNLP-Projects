@@ -62,6 +62,10 @@ Resolution in Multiple Languages".
   website regularly for updates (or subscribe to the official mailing
   list).
 
+   * /data/ecrf.train.conllx, ecrf.dev.conllx, ecrf.test.conll have the same
+   number of sentences and tokens with the files above. Only the entities are different
+   they are converted into 4 types, person, organization, GPE and MISC
+	
 (4) DATA FORMATTING
 
   General formatting is shared by all languages in the task. Data

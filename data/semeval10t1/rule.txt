@@ -1,5 +1,0 @@
-#combination rule:
-
-E,E
-#E,ONE
-#ONE,E

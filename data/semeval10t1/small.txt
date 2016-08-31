@@ -1,9 +1,0 @@
-1	The	_	_	DT	_	DT	_	3	_	NMOD	_	_	_	_	_	_	_	_	_	(312
-2	good	_	_	JJ	_	JJ	_	3	_	NMOD	_	_	_	_	_	_	_	_	_	_
-3	teacher	_	_	NN	_	NN	_	4	_	SBJ	_	_	_	_	_	arg0	_	_	_	312)
-4	sees	_	_	VBZ	_	VBZ	_	0	_	sentence	_	_	_	see.01	_	_	_	_	_	_
-5	what	_	_	WP	_	WP	_	6	_	SBJ	_	_	_	_	_	_	arg1	_	_	_
-6	is	_	_	VBZ	_	VBZ	_	4	_	OBJ	_	_	_	be.01	_	arg1	_	_	_	_
-7	possible	_	_	JJ	_	JJ	_	6	_	PRD	_	_	_	_	_	_	arg2	_	_	_
-8	.	_	_	.	_	.	_	4	_	P	_	_	_	_	_	_	_	_	_	_
-
