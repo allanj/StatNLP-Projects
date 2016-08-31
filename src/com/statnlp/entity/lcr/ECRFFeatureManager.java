@@ -27,6 +27,8 @@ public class ECRFFeatureManager extends FeatureManager {
 		head_word,
 		head_tag,
 		head_token,
+		dep_word_label,
+		dep_tag_label,
 		neural};
 	protected boolean isPipeLine; 
 	protected boolean useDepF; 
@@ -141,11 +143,16 @@ public class ECRFFeatureManager extends FeatureManager {
 			int currHeadIndex = sent.get(pos).getHeadIndex();
 			String currHead = currHeadIndex>=0? sent.get(currHeadIndex).getName():"STR";
 			String currHeadTag = currHeadIndex>=0? sent.get(currHeadIndex).getTag():"STR";
+			String currDepLabel = currHeadIndex>=0? sent.get(currHeadIndex).getDepLabel():"NOLABEL";
 			//This is the features that really help the model: most important features
-			featureList.add(this._param_g.toFeature(network,FEATYPE.head_word.name(), 	currEn, currWord+"& head:"+currHead));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.head_tag.name(), 	currEn, currTag+"& head:"+currHeadTag)); //the most powerful one
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.head_word.name(), 	entities[eId], currHead));
-//			featureList.add(this._param_g.toFeature(network,FEATYPE.head_tag.name(), 	entities[eId], currHeadTag));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.head_word.name(), 		currEn, currWord+"& head:"+currHead));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.head_tag.name(), 		currEn, currTag+"& head:"+currHeadTag)); //the most powerful one
+			featureList.add(this._param_g.toFeature(network,FEATYPE.dep_word_label.name(), 	currEn, currWord+"& label:"+currDepLabel));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.dep_tag_label.name(), 	currEn, currTag+"& label:"+currDepLabel));
+			featureList.add(this._param_g.toFeature(network,FEATYPE.head_token.name(), 		currEn, currWord+"& "+currTag+"& label:"+currDepLabel));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.head_token.name(), 	currEn, currTag+"& head:"+currHead+" & headt:"+currHeadTag));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.head_word.name(), 	currEn, currHead));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.head_tag.name(), 	currEn, currHeadTag));
 //			featureList.add(this._param_g.toFeature(network,FEATYPE.head_token.name(), 	entities[eId], currHeadTag.charAt(0)+""));
 			
 		}
