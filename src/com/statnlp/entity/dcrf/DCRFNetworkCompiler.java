@@ -77,7 +77,7 @@ public class DCRFNetworkCompiler extends NetworkCompiler{
 		for(int i=0;i<lcrfInstance.size();i++){
 			int maxEId = -1;
 			double maxMarginal = Double.NEGATIVE_INFINITY;
-			for(int e=0;e<Entity.ENTS.size();e++){
+			for(int e=0;e<DEntity.ENTS.size();e++){
 				long node = toNode_e(i, e);
 				int idx = Arrays.binarySearch(lcrfNetwork.getAllNodes(), node);
 				if(idx>=0){
@@ -92,7 +92,7 @@ public class DCRFNetworkCompiler extends NetworkCompiler{
 				}
 				
 			}
-			entityPrediction.add(Entity.ENTS_INDEX.get(maxEId).getForm());
+			entityPrediction.add(DEntity.ENTS_INDEX.get(maxEId).getForm());
 			
 			int maxTagId = -1;
 			maxMarginal = Double.NEGATIVE_INFINITY;
@@ -126,7 +126,7 @@ public class DCRFNetworkCompiler extends NetworkCompiler{
 		lcrfNetwork.addNode(tleaf);
 		for(int i=0;i<inst.size();i++){
 			
-			long enode = toNode_e(i, Entity.ENTS.get(inst.getOutput().get(i)).getId());
+			long enode = toNode_e(i, DEntity.ENTS.get(inst.getOutput().get(i)).getId());
 			long tnode = toNode_t(i, Tag.TAGS.get(inst.getInput().get(i).getTag()).getId());
 			lcrfNetwork.addNode(enode);
 			lcrfNetwork.addNode(tnode);
@@ -165,16 +165,16 @@ public class DCRFNetworkCompiler extends NetworkCompiler{
 		lcrfNetwork.addNode(tleaf);
 		lcrfNetwork.addNode(eleaf);
 		for(int i=0;i<_size;i++){
-			for(int l=0;l< Entity.ENTS.size();l++){
-				if(i==0 && Entity.ENTS_INDEX.get(l).getForm().startsWith("I")) continue;
-				String currentEntity = Entity.ENTS_INDEX.get(l).getForm();
+			for(int l=0;l< DEntity.ENTS.size();l++){
+				if(i==0 && DEntity.ENTS_INDEX.get(l).getForm().startsWith("I")) continue;
+				String currentEntity = DEntity.ENTS_INDEX.get(l).getForm();
 				long enode = toNode_e(i,l);
 				if(i==0){
 					lcrfNetwork.addNode(enode);
 					lcrfNetwork.addEdge(enode, leaves);
 				}else{
-					for(int prevL=0; prevL<Entity.ENTS.size(); prevL++){
-						String prevEntity = Entity.ENTS_INDEX.get(prevL).getForm();
+					for(int prevL=0; prevL<DEntity.ENTS.size(); prevL++){
+						String prevEntity = DEntity.ENTS_INDEX.get(prevL).getForm();
 						//if(entities[childArr[1]].startsWith("I-") && entities[l].startsWith("B-") && entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
 						if(prevEntity.equals("O") && currentEntity.startsWith("I")) continue;
 						long prev_e_node = toNode_e(i-1, prevL);
@@ -195,7 +195,7 @@ public class DCRFNetworkCompiler extends NetworkCompiler{
 					lcrfNetwork.addNode(tnode);
 					lcrfNetwork.addEdge(tnode, leaves);
 				}else{
-					for(int prevL=0; prevL<Entity.ENTS.size(); prevL++){
+					for(int prevL=0; prevL<DEntity.ENTS.size(); prevL++){
 						for(int prevT=0;prevT<Tag.TAGS.size();prevT++){
 							long prev_e_node = toNode_e(i-1, prevL);
 							long prev_t_node = toNode_t(i-1, prevT);
@@ -211,7 +211,7 @@ public class DCRFNetworkCompiler extends NetworkCompiler{
 			
 			long root = toNode_root(i+1);
 			lcrfNetwork.addNode(root);
-			for(int prevL=0; prevL<Entity.ENTS.size(); prevL++){
+			for(int prevL=0; prevL<DEntity.ENTS.size(); prevL++){
 				for(int prevT=0;prevT<Tag.TAGS.size();prevT++){
 					long prev_e_node = toNode_e(i, prevL);
 					long prev_t_node = toNode_t(i, prevT);
@@ -242,17 +242,17 @@ public class DCRFNetworkCompiler extends NetworkCompiler{
 				"B","B","O","O","O",
 				"O","B","I","I"};
 		for(int i=0;i<_size;i++){
-			for(int l=0;l< Entity.ENTS.size();l++){
-				if(i==0 && Entity.ENTS_INDEX.get(l).getForm().startsWith("I")) continue;
-				String currentEntity = Entity.ENTS_INDEX.get(l).getForm();
+			for(int l=0;l< DEntity.ENTS.size();l++){
+				if(i==0 && DEntity.ENTS_INDEX.get(l).getForm().startsWith("I")) continue;
+				String currentEntity = DEntity.ENTS_INDEX.get(l).getForm();
 				if(!currentEntity.equals(es[i])) continue;
 				long enode = toNode_e(i,l);
 				if(i==0){
 					lcrfNetwork.addNode(enode);
 					lcrfNetwork.addEdge(enode, leaves);
 				}else{
-					for(int prevL=0; prevL<Entity.ENTS.size(); prevL++){
-						String prevEntity = Entity.ENTS_INDEX.get(prevL).getForm();
+					for(int prevL=0; prevL<DEntity.ENTS.size(); prevL++){
+						String prevEntity = DEntity.ENTS_INDEX.get(prevL).getForm();
 						//if(entities[childArr[1]].startsWith("I-") && entities[l].startsWith("B-") && entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
 						if(prevEntity.equals("O") && currentEntity.startsWith("I")) continue;
 						long prev_e_node = toNode_e(i-1, prevL);
@@ -274,7 +274,7 @@ public class DCRFNetworkCompiler extends NetworkCompiler{
 					lcrfNetwork.addNode(tnode);
 					lcrfNetwork.addEdge(tnode, leaves);
 				}else{
-					for(int prevL=0; prevL<Entity.ENTS.size(); prevL++){
+					for(int prevL=0; prevL<DEntity.ENTS.size(); prevL++){
 						for(int prevT=0;prevT<Tag.TAGS.size();prevT++){
 							long prev_e_node = toNode_e(i-1, prevL);
 							long prev_t_node = toNode_t(i-1, prevT);
@@ -290,7 +290,7 @@ public class DCRFNetworkCompiler extends NetworkCompiler{
 			
 			long root = toNode_root(i+1);
 			lcrfNetwork.addNode(root);
-			for(int prevL=0; prevL<Entity.ENTS.size(); prevL++){
+			for(int prevL=0; prevL<DEntity.ENTS.size(); prevL++){
 				for(int prevT=0;prevT<Tag.TAGS.size();prevT++){
 					long prev_e_node = toNode_e(i, prevL);
 					long prev_t_node = toNode_t(i, prevT);
