@@ -173,8 +173,8 @@ public class SemiCRFFeatureManager extends FeatureManager {
 				int currHeadIndex = sent.get(pos).getHeadIndex();
 				String currHead = currHeadIndex>=0? sent.get(currHeadIndex).getName():"STR";
 				String currHeadTag = currHeadIndex>=0? sent.get(currHeadIndex).getTag():"STR";
-				featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(),	currEn, currWord+" "+currHead));
-				featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(),		currEn,	currTag+" "+currHeadTag));
+				featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(),	currEn, currWord+"& head:"+currHead));
+				featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(),		currEn,	currTag+"& head:"+currHeadTag));
 
 //				int prevPos = pos - 1;
 //				String prevLabel = pos==start? Label.get(childLabelId).getForm():Label.get(parentLabelId).getForm();
