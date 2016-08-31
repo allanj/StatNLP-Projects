@@ -40,6 +40,7 @@ public class WordToken extends InputToken{
 		this.tag = tag;
 		this.headIndex = headIndex;
 		this.entity = entity;
+		this.depLabel=null;
 		this.aTag = tag.substring(0, 1);
 	}
 	
