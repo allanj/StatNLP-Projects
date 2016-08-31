@@ -3,7 +3,6 @@ package data.preprocess;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +16,7 @@ import com.statnlp.commons.types.WordToken;
 public class OntoNotesPreprocess {
 
 	
-	public static String[] datasets = {"abc","cnn","mnb","nbc","pri","voa"};
+	public static String[] datasets = {"pri","voa"};
 	public static String[] valid = {"PERSON", "ORG", "GPE"};
 	public static String[] validConvert = {"person", "organization", "gpe"};
 	public static String[] others = {"NORP","FAC","LOC","PRODUCT","DATE","TIME","PERCENT","MONEY","QUANTITY","ORDINAL","CARDINAL","EVENT","WORK_OF_ART","LAW","LANGUAGE"};
@@ -28,6 +27,8 @@ public class OntoNotesPreprocess {
 	public static String filePrefix = "F:/phd/data/ontonotes-release-5.0_LDC2013T19/ontonotes-release-5.0_LDC2013T19/ontonotes-release-5.0/data/files/data/english/annotations/bn";
 //	public static String filePrefix = "D:/Downloads/test";
 	public static String tmpTreebank = "D:/Downloads/tmp/temp";
+	public static String tmpOutput = "D:/Downloads/tmp/temp.output";
+	public static String tmpError = "D:/Downloads/tmp/temp.error";
 	public static String converterPath = "F:/Dropbox/SUTD/tools/pennconverter.jar";
 	public static String converterLog = "F:/Dropbox/SUTD/tools/log.log";
 	public static String outputPrefx = "E:/Framework/data/allanprocess/";
@@ -48,11 +49,11 @@ public class OntoNotesPreprocess {
 	private static Sentence convert() throws IOException, InterruptedException{
 		ProcessBuilder pb = new ProcessBuilder("java","-jar", converterPath,"-rightBranching=false","-log", converterLog,"-stopOnError=false"); 
 		pb.redirectInput(new File(tmpTreebank));
-//		pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-//		pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+		pb.redirectOutput(ProcessBuilder.Redirect.to(new File(tmpOutput)));
+		pb.redirectError(ProcessBuilder.Redirect.to(new File(tmpError)));
 		Process p = pb.start();
 		p.waitFor();
-		BufferedReader reader =  new BufferedReader(new InputStreamReader(p.getErrorStream()));
+		BufferedReader reader =  RAWF.reader(tmpError); //new BufferedReader(new InputStreamReader(p.getErrorStream()));
 		String line = null;
 		while ( (line = reader.readLine()) != null) {
 			if(line.startsWith("Number of errors")){
@@ -64,7 +65,7 @@ public class OntoNotesPreprocess {
 			}
 		}
 		reader.close();
-		reader =  new BufferedReader(new InputStreamReader(p.getInputStream()));
+		reader =  RAWF.reader(tmpOutput); //new BufferedReader(new InputStreamReader(p.getInputStream()));
 		line = null;
 		ArrayList<WordToken> wts = new ArrayList<WordToken>();
 		wts.add(new WordToken("ROOT", "ROOT", -1, "O", "NOLABEL"));
@@ -85,22 +86,22 @@ public class OntoNotesPreprocess {
 		BufferedReader reader = RAWF.reader(file);
 		String line = null;
 		String flag = "ready";
-		PrintWriter pw = RAWF.writer(tmpTreebank);
+		PrintWriter pw = null;
 		int fake = 0;
-		int numOfWords = 0;
+		int currSentIdx = 0;
 		while((line=reader.readLine())!=null){
 //			System.out.println(line);
 			if(flag.equals("ready") && line.startsWith("Tree:")) { flag = "tree"; continue; }
-			if(flag.equals("tree") && line.startsWith("--")) {flag = "read_tree"; pw = RAWF.writer(tmpTreebank);  continue;}
+			if(flag.equals("tree") && line.startsWith("--")) {flag = "read_tree";   pw = RAWF.writer(tmpTreebank);   continue;}
 			if(flag.equals("read_tree")){
 				pw.write(line+"\n");
 //				System.out.println("reading:"+line);
 				if(line.equals("")) {
 					flag = "finish_tree"; 
 					pw.close();
+//					Thread.sleep(100);
 					if(flag.equals("finish_tree")){
 						Sentence sent = convert();
-						//System.out.println(sent.toString());
 						if(sent!=null) { sents.add(sent); flag = "waiting_entity";}
 						else flag = "ready";
 					}
@@ -109,24 +110,36 @@ public class OntoNotesPreprocess {
 			}
 			
 			if(flag.equals("waiting_entity") && line.startsWith("Leaves:")){flag = "entity"; continue;}
-			if(flag.equals("entity") && line.startsWith("--")) {flag = "read_entity"; fake=0; continue; }
+			if(flag.equals("entity") && line.startsWith("--")) {flag = "read_entity"; fake=0; currSentIdx=1; continue; }
 			if(flag.equals("read_entity")){
 				String trimmed = line.trim();
 				
-				String[] ccs = trimmed.split("[\\s\\t]+");
-				if(ccs[0].matches("\\d+")) numOfWords = Integer.valueOf(ccs[0]) + 1;
-				if(ccs[0].matches("\\d+") && (ccs[1].startsWith("*") || ccs[1].equals("0"))) {  fake++;}
 				
+				Sentence sent = sents.get(sents.size()-1);
 				if(line.equals("")) {
 					flag = "ready";
-					if((numOfWords+1-fake)!=sents.get(sents.size()-1).length()){
-						System.out.println("wrong:"+sents.get(sents.size()-1).toString());
-						throw new RuntimeException("Not with the same length:"+(numOfWords+1-fake)+ " (fake: "+fake+") and "+sents.get(sents.size()-1).length());
+					if((currSentIdx)!=sent.length()){
+						System.out.println(file);
+						System.out.println("wrong:"+sent.toString());
+						throw new RuntimeException("Not with the same length:"+(currSentIdx)+ " (fake: "+fake+") and "+sent.length());
 					}
-						
+					//System.out.println(sent.toString());
+					continue;
 				}
-				if(trimmed.startsWith("name")){
-					Sentence sent = sents.get(sents.size()-1);
+				
+				String[] ccs = trimmed.split("[\\s\\t]+");
+				if(ccs.length==2 && ccs[0].matches("\\d+")){
+					
+					//if(ccs[0].matches("\\d+") && (ccs[1].startsWith("*") || ccs[1].equals("0"))) {  fake++;}
+					String word = ccs[1];
+					if(!word.equals(sent.get(currSentIdx).getName())){
+						fake++;
+					}else currSentIdx++;
+					//currSentIdx--;
+				}
+				
+				if(trimmed.startsWith("name:")){
+					//Sentence sent = sents.get(sents.size()-1);
 //					System.out.println( file);
 //					System.out.println( sent.length()+" "+sent.toString());
 					String[] vals = trimmed.split("[\\s\\t]+");
