@@ -3,16 +3,16 @@ package com.statnlp.entity.lcr;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
+import com.statnlp.entity.Entity;
 
 public class EReader {
 
-	public static List<ECRFInstance> readData(String path, boolean setLabel, int number,HashMap<String, Integer> entityMap) throws IOException{
+	public static List<ECRFInstance> readData(String path, boolean setLabel, int number) throws IOException{
 		BufferedReader br = RAWF.reader(path);
 		String line = null;
 		List<ECRFInstance> insts = new ArrayList<ECRFInstance>();
@@ -35,14 +35,9 @@ public class EReader {
 				continue;
 			}
 			String[] values = line.split("\\t");
-			//String entity = values[3].equals("O")? values[3]: values[3].substring(2, values[3].length());
-			String entity = values[3];
-			if(!entityMap.containsKey(entity)) {
-				if(!entity.equals("O"))
-					entity = entity.substring(0, 2)+"MISC";
-				else entity = "O";
-			}
-			words.add(new WordToken(values[1],values[2],Integer.valueOf(values[4])-1,entity));
+			String entity = values[10];
+			Entity.get(entity);
+			words.add(new WordToken(values[1],values[4],Integer.valueOf(values[6])-1,entity));
 			es.add(entity);
 		}
 		br.close();
@@ -53,7 +48,7 @@ public class EReader {
 	}
 
 	
-	public static List<ECRFInstance> readDP2NERPipe(String path, int number,HashMap<String, Integer> entityMap) throws IOException{
+	public static List<ECRFInstance> readDP2NERPipe(String path, int number) throws IOException{
 		BufferedReader br = RAWF.reader(path);
 		String line = null;
 		List<ECRFInstance> insts = new ArrayList<ECRFInstance>();
@@ -88,7 +83,7 @@ public class EReader {
 			String[] values = line.split(" ");
 			//String entity = values[3].equals("O")? values[3]: values[3].substring(2, values[3].length());
 			String entity = values[3];
-			if(!entityMap.containsKey(entity)) entity = "O";
+			Entity.get(entity);
 			words.add(new WordToken(values[1],values[2],Integer.valueOf(values[5])-1,entity));
 			es.add(entity);
 		}
@@ -98,7 +93,7 @@ public class EReader {
 		return myInsts;
 	}
 	
-	public static List<ECRFInstance> readCNN(String path, boolean setLabel, int number,HashMap<String, Integer> entityMap, boolean isPipe) throws IOException{
+	public static List<ECRFInstance> readCNN(String path, boolean setLabel, int number,boolean isPipe) throws IOException{
 		if(setLabel && isPipe) throw new RuntimeException("training instances always have the true dependency structure");
 		BufferedReader br = RAWF.reader(path);
 		String line = null;
@@ -123,7 +118,7 @@ public class EReader {
 			}
 			String[] values = line.split(" ");
 			String entity = values[3];
-			if(!entityMap.containsKey(entity)) entity = "O";
+			Entity.get(entity);
 			int headIdx = Integer.valueOf(values[4])-1;
 			if(isPipe) headIdx = Integer.valueOf(values[5])-1;
 			words.add(new WordToken(values[1],values[2],headIdx,entity));

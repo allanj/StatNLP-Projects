@@ -2,9 +2,7 @@ package com.statnlp.entity.lcr;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import com.statnlp.commons.ml.opt.OptimizerFactory;
@@ -20,7 +18,6 @@ import com.statnlp.neural.NeuralConfigReader;
 
 public class EMain {
 
-	public static String[] entities; 
 	public static int trainNumber = -100;
 	public static int testNumber = -100;
 	public static int numIteration = -100;
@@ -33,7 +30,6 @@ public class EMain {
 	public static boolean isDev = false;
 	public static String[] selectedEntities = {"person","organization","gpe","MISC"};
 	public static HashSet<String> dataTypeSet;
-	public static HashMap<String, Integer> entityMap;
 	public static boolean topkinput = false;
 	public static String MODEL = "crf";
 	public static double adagrad_learningRate = 0.1;
@@ -41,23 +37,6 @@ public class EMain {
 	public static boolean useAdaGrad = false;
 	public static boolean useDepf = false;
 	private static boolean testOnTrain = false;
-	
-	public static void initializeEntityMap(){
-		entityMap = new HashMap<String, Integer>();
-		int index = 0;
-		entityMap.put("O", index++);  
-		for(int i=0;i<selectedEntities.length;i++){
-			entityMap.put("B-"+selectedEntities[i], index++);
-			entityMap.put("I-"+selectedEntities[i], index++);
-		}
-		entities = new String[entityMap.size()];
-		Iterator<String> iter = entityMap.keySet().iterator();
-		while(iter.hasNext()){
-			String entity = iter.next();
-			entities[entityMap.get(entity)] = entity;
-		}
-	}
-
 	
 	
 	public static void main(String[] args) throws IOException, InterruptedException{
@@ -70,7 +49,6 @@ public class EMain {
 		isPipe = false;
 		processArgs(args);
 		dataTypeSet = Init.iniOntoNotesData();
-		initializeEntityMap();
 		String modelType = DPConfig.MODEL.ecrf.name();
 		
 		
@@ -103,15 +81,16 @@ public class EMain {
 //		testFile = "data/semeval10t1/ecrf.test.part.txt";
 		/***************************/
 		if(dataTypeSet.contains(DPConfig.dataType)){
-			trainInstances = EReader.readCNN(DPConfig.ecrftrain, true, trainNumber, entityMap, false);
-			testInstances = EReader.readCNN(testFile, false, testNumber, entityMap, isPipe);
+			trainInstances = EReader.readCNN(DPConfig.ecrftrain, true, trainNumber, false);
+			testInstances = EReader.readCNN(testFile, false, testNumber, isPipe);
 		}else{
-			trainInstances = EReader.readData(DPConfig.ecrftrain,true,trainNumber, entityMap);
-			testInstances = isPipe?EReader.readDP2NERPipe(testFile, testNumber,entityMap)
-					:EReader.readData(testFile,false,testNumber,entityMap);
+			trainInstances = EReader.readData(DPConfig.ecrftrain,true,trainNumber);
+			testInstances = isPipe?EReader.readDP2NERPipe(testFile, testNumber)
+					:EReader.readData(testFile,false,testNumber);
 			
 //			testInstances = EReader.readData(testFile,false,testNumber,entityMap);
 		}
+//		System.out.println(com.statnlp.entity.Entity.Entities.toString());
 //		Formatter.ner2Text(trainInstances, "data/testRandom2.txt");
 //		System.exit(0);
 		
@@ -129,8 +108,8 @@ public class EMain {
 		if(NetworkConfig.MODEL_TYPE==ModelType.SSVM) of = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(adagrad_learningRate);
 		if(useAdaGrad) of = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(adagrad_learningRate);
 		
-		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(of),entities,isPipe,useDepf);
-		ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(entityMap, entities,useSSVMCost);
+		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(of),isPipe,useDepf);
+		ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(useSSVMCost);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		ECRFInstance[] ecrfs = trainInstances.toArray(new ECRFInstance[trainInstances.size()]);
 		model.train(ecrfs, numIteration);

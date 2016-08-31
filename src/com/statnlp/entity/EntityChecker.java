@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
-import com.statnlp.dp.commons.Entity;
+import com.statnlp.dp.commons.EntitySpan;
 
 public class EntityChecker {
 
@@ -44,9 +44,9 @@ public class EntityChecker {
 		}
 	}
 	
-	public static ArrayList<Entity> checkAllIncomplete(Sentence sent){
+	public static ArrayList<EntitySpan> checkAllIncomplete(Sentence sent){
 		int start = 0; int end = -1;
-		ArrayList<Entity> elist = new ArrayList<Entity>();
+		ArrayList<EntitySpan> elist = new ArrayList<EntitySpan>();
 		String prevEntity = "";
 		for(int i=1;i<sent.length();i++){
 			String e = sent.get(i).getEntity();
@@ -59,13 +59,13 @@ public class EntityChecker {
 					if(!prevEntity.equals("O")){
 						end = i;
 						if(notIncomplete(sent,start,end))
-							elist.add(new Entity(prevEntity,start,end-1));
+							elist.add(new EntitySpan(prevEntity,start,end-1));
 					}
 					start = i;
 				}else{
 					end = i;
 					if(notIncomplete(sent,start,end)){
-						elist.add(new Entity(prevEntity,start,end-1));
+						elist.add(new EntitySpan(prevEntity,start,end-1));
 					}
 				}
 			}
@@ -75,7 +75,7 @@ public class EntityChecker {
 		if(!lastE.equals("O")){
 			end = sent.length();
 			if(notIncomplete(sent,start,end))
-				elist.add(new Entity(lastE,start,end-1));
+				elist.add(new EntitySpan(lastE,start,end-1));
 		}
 		return elist;
 	}

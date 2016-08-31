@@ -2,9 +2,9 @@ package com.statnlp.entity.lcr;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 import com.statnlp.commons.types.Instance;
+import com.statnlp.entity.Entity;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
@@ -18,13 +18,10 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 	public enum NODE_TYPES {LEAF,NODE,ROOT};
 	public int _size;
 	public ECRFNetwork genericUnlabeledNetwork;
-	private HashMap<String, Integer> entityMap;
-	private String[] entities;
 	private boolean useSSVMCost;
+	private static boolean DEBUG = false;
 	
-	public ECRFNetworkCompiler(HashMap<String, Integer> entityMap,String[] entities, boolean useSSVMCost){
-		this.entityMap = entityMap;
-		this.entities = entities;
+	public ECRFNetworkCompiler(boolean useSSVMCost){
 		this._size = 150;
 		this.useSSVMCost = useSSVMCost;
 		this.compileUnlabeledInstancesGeneric();
@@ -51,7 +48,7 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 	}
 	
 	public long toNode_root(int size){
-		int[] arr = new int[]{size+1,entityMap.get("O"),0,0,NODE_TYPES.ROOT.ordinal()};
+		int[] arr = new int[]{size+1,Entity.get("O").id,0,0,NODE_TYPES.ROOT.ordinal()};
 		return NetworkIDMapper.toHybridNodeID(arr);
 	}
 
@@ -72,7 +69,7 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 				long child = lcrfNetwork.getNode(child_k);
 				rootIdx = child_k;
 				int tagID = NetworkIDMapper.toHybridNodeArray(child)[1];
-				prediction.add(0, entities[tagID]);
+				prediction.add(0, Entity.get(tagID).getForm());
 			}
 			
 			result.setPrediction(prediction);
@@ -98,7 +95,7 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 					rootIdx = child_k;
 					subk = child_k_best_order;
 					int tagID = NetworkIDMapper.toHybridNodeArray(child)[1];
-					tmpPrediction.add(0, entities[tagID]);
+					tmpPrediction.add(0, Entity.get(tagID).getForm());
 				}
 				String[] tmpArr = new String[lcrfInstance.size()];
 				tmpPrediction.toArray(tmpArr);
@@ -121,8 +118,7 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 		long[] children = new long[]{leaf};
 		lcrfNetwork.addNode(leaf);
 		for(int i=0;i<inst.size();i++){
-			
-			long node = toNode(i,entityMap.get(inst.getOutput().get(i)));
+			long node = toNode(i,Entity.get(inst.getOutput().get(i)).id);
 			lcrfNetwork.addNode(node);
 			long[] currentNodes = new long[]{node};
 			lcrfNetwork.addEdge(node, children);
@@ -134,7 +130,7 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 		
 		lcrfNetwork.finalizeNetwork();
 		
-		if(!genericUnlabeledNetwork.contains(lcrfNetwork)){
+		if(DEBUG && !genericUnlabeledNetwork.contains(lcrfNetwork)){
 			System.err.println("wrong");
 		}
 		return lcrfNetwork;
@@ -156,19 +152,21 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 		long[] children = new long[]{leaf};
 		lcrfNetwork.addNode(leaf);
 		for(int i=0;i<_size;i++){
-			long[] currentNodes = new long[entities.length];
-			for(int l=0;l<entities.length;l++){
-				if(i==0 && entities[l].startsWith("I-")){ currentNodes[l]=-1; continue;}
+			long[] currentNodes = new long[Entity.Entities.size()];
+			for(int l=0;l<Entity.Entities.size();l++){
+				if(i==0 && Entity.get(l).getForm().startsWith("I-")){ currentNodes[l]=-1; continue;}
 				long node = toNode(i,l);
 				currentNodes[l] = node;
 				lcrfNetwork.addNode(node);
 				for(long child: children){
 					if(child==-1) continue;
 					int[] childArr = NetworkIDMapper.toHybridNodeArray(child);
-					if(entities[childArr[1]].startsWith("B-") && entities[l].startsWith("I-") && !entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
-					if(entities[childArr[1]].startsWith("I-") && entities[l].startsWith("I-") && !entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
+					String currE = Entity.get(l).getForm();
+					String childE = Entity.get(childArr[1]).getForm();
+					if(childE.startsWith("B-") && currE.startsWith("I-") && !childE.substring(2).equals(currE.substring(2))) continue;
+					if(childE.startsWith("I-") && currE.startsWith("I-") && !childE.substring(2).equals(currE.substring(2))) continue;
 					//if(entities[childArr[1]].startsWith("I-") && entities[l].startsWith("B-") && entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
-					if(entities[childArr[1]].equals("O") && entities[l].startsWith("I-")) continue;
+					if(childE.equals("O") && currE.startsWith("I-")) continue;
 					lcrfNetwork.addEdge(node, new long[]{child});
 				}
 			}

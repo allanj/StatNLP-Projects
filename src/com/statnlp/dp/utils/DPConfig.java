@@ -9,9 +9,9 @@ public class DPConfig {
 	public static String devPath = "data/"+dataType+"/en.devel.txt";
 	public static String testingPath = "data/"+dataType+"/en.test.txt";
 	
-	public static String ecrftrain = "data/"+dataType+"/ecrf.train.MISC.txt";
-	public static String ecrfdev = "data/"+dataType+"/ecrf.devel.MISC.txt";
-	public static String ecrftest = "data/"+dataType+"/ecrf.test.MISC.txt";
+	public static String ecrftrain = "data/"+dataType+"/ecrf.train.conllx";
+	public static String ecrfdev = "data/"+dataType+"/ecrf.dev.conllx";
+	public static String ecrftest = "data/"+dataType+"/ecrf.test.conllx";
 	
 	public static String data_prefix = "data/"+dataType+"/output/";
 	
