@@ -68,7 +68,6 @@ public class DIVReader {
 					words.toArray(wordsArr);
 					Sentence sent = new Sentence(wordsArr);
 					boolean projectiveness=  DataChecker.checkProjective(dependencies);
-//					System.err.println("Instance "+(index+1)+", projective:"+projectiveness); index++;
 					if(!projectiveness) {
 						dependencies = new ArrayList<UnnamedDependency>();
 						words = new ArrayList<WordToken>();
@@ -80,7 +79,8 @@ public class DIVReader {
 					ArrayList<Entity> checkInvalid = DataChecker.checkAllIncomplete(sent);
 					if(dependencyTree.size()==sent.length() && sent.length()< maxLength ){
 						sent.setRecognized();
-						DIVInstance inst = new DIVInstance(index++,1.0,sent,dependencies,dependencyTree,transformer.toSpanTree(dependencyTree, sent));
+						Tree spanTree = isLabeled? transformer.toSpanTree(dependencyTree, sent): null;
+						DIVInstance inst = new DIVInstance(index++,1.0,sent,dependencies,dependencyTree,spanTree);
 						
 						if(entities!=null && typeMap!=null) inst.setHaveEntity(typeMap);
 						inst.continousNum = conNum;

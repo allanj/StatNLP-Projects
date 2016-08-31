@@ -115,7 +115,7 @@ public class DIVMain {
 			testingInsts = DIVReader.readInstance(decodePath, false,testNumber,selectedEntities,tran, false);
 		}
 //		Formatter.semevalToNER(trainingInsts, "data/"+DPConfig.dataType+"/ecrf.train.conllx");
-//		Formatter.semevalToNER(testingInsts, "data/"+DPConfig.dataType+"/ecrf.dev.conllx");
+//		Formatter.semevalToNER(testingInsts, "data/"+DPConfig.dataType+"/ecrf.test.conllx");
 //		Formatter.semevalToText(devInsts, "data/"+DPConfig.dataType+"/proj/en.devel.txt");
 //		Formatter.semevalToText(tInsts, "data/"+DPConfig.dataType+"/proj/en.test.txt");
 //		System.exit(0);
