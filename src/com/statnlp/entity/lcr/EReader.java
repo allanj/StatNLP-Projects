@@ -101,7 +101,10 @@ public class EReader {
 		int index =1;
 		ArrayList<WordToken> words = new ArrayList<WordToken>();
 		ArrayList<String> es = new ArrayList<String>();
+		String prevEntity = "O";
+//		int lineNumber = 0;
 		while((line = br.readLine())!=null){
+//			lineNumber++;
 			if(line.startsWith("#")) continue;
 			if(line.equals("")){
 				WordToken[] wordsArr = new WordToken[words.size()];
@@ -113,16 +116,23 @@ public class EReader {
 				insts.add(inst);
 				words = new ArrayList<WordToken>();
 				es = new ArrayList<String>();
+				prevEntity = "O";
 				if(number!=-1 && insts.size()==number) break;
 				continue;
 			}
 			String[] values = line.split(" ");
 			String entity = values[3];
+			/***This part of code check the consecutive entities with same types**/
+			if(!prevEntity.equals("O") && !entity.equals("O") && prevEntity.substring(2).equals(entity.substring(2)) && entity.startsWith("B-")){
+				//TODO: nothing 
+			}
+			/***/
 			Entity.get(entity);
 			int headIdx = Integer.valueOf(values[4])-1;
 			if(isPipe) headIdx = Integer.valueOf(values[5])-1;
 			words.add(new WordToken(values[1],values[2],headIdx,entity));
 			es.add(entity);
+			prevEntity = entity;
 		}
 		br.close();
 		List<ECRFInstance> myInsts = insts;
