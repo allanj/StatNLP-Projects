@@ -42,8 +42,8 @@ public class BFMain {
 		dpOut = DPConfig.data_prefix+modelType+middle+DPConfig.dp_res_suffix;
 		nerOut = DPConfig.data_prefix+modelType+middle+DPConfig.ner_eval_suffix;
 		nerRes = DPConfig.data_prefix+modelType+middle+DPConfig.ner_res_suffix;
-		testFile = isDev? DPConfig.ecrfdev:DPConfig.ecrftest;
-		System.err.println("[Info] trainingFile: "+DPConfig.ecrftrain);
+		testFile = isDev? DPConfig.devPath:DPConfig.testingPath;
+		System.err.println("[Info] trainingFile: "+DPConfig.trainingPath);
 		System.err.println("[Info] testFile: "+testFile);
 		System.err.println("[Info] nerOut: "+nerOut);
 		System.err.println("[Info] nerRes: "+nerRes);
@@ -60,7 +60,7 @@ public class BFMain {
 //		testFile = "data/semeval10t1/ecrf.test.part.txt";
 		/***************************/
 		
-		trainInstances = BFReader.readData(DPConfig.ecrftrain,true,trainNumber);
+		trainInstances = BFReader.readData(DPConfig.trainingPath,true,trainNumber);
 		testInstances = BFReader.readData(testFile,false,testNumber);
 		System.err.println("The entity set read:"+BREntity.ENTS.toString());
 		System.err.println("The entity set read:"+BREntity.ENTS_INDEX.toString());

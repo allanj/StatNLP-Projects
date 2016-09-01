@@ -12,7 +12,6 @@ import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.Init;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
-import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkModel;
 
@@ -68,13 +67,13 @@ public class E2DMain {
 		String middle = isDev? ".dev":".test";
 		nerOut = DPConfig.data_prefix+modelType+middle+DPConfig.ner_eval_suffix;
 		nerRes = DPConfig.data_prefix+modelType+middle+DPConfig.ner_res_suffix;
-		testFile = isDev? DPConfig.ecrfdev:DPConfig.ecrftest;
+		testFile = isDev? DPConfig.devPath:DPConfig.testingPath;
 		if(isPipe){
 			testFile = isDev?DPConfig.dp2ner_dp_dev_input:DPConfig.dp2ner_dp_test_input;
 			nerOut = DPConfig.data_prefix+middle+".pp.dp2ner.ner.eval.txt";
 			nerRes = DPConfig.data_prefix+middle+".pp.dp2ner.ner.res.txt";
 		}
-		System.err.println("[Info] trainingFile: "+DPConfig.ecrftrain);
+		System.err.println("[Info] trainingFile: "+DPConfig.trainingPath);
 		System.err.println("[Info] testFile: "+testFile);
 		System.err.println("[Info] nerOut: "+nerOut);
 		System.err.println("[Info] nerRes: "+nerRes);
@@ -93,10 +92,10 @@ public class E2DMain {
 //		testFile = DPConfig.ecrftrain;
 		/***************************/
 		if(dataTypeSet.contains(DPConfig.dataType)){
-			trainInstances = E2DReader.readCNN(DPConfig.ecrftrain, true, trainNumber, entityMap);
+			trainInstances = E2DReader.readCNN(DPConfig.trainingPath, true, trainNumber, entityMap);  //Error: this one should be changed to use a conll reader
 			testInstances = E2DReader.readCNN(testFile, false, testNumber, entityMap);
 		}else{
-			trainInstances = E2DReader.readData(DPConfig.ecrftrain,true,trainNumber, entityMap);
+			trainInstances = E2DReader.readData(DPConfig.trainingPath,true,trainNumber, entityMap);
 			testInstances = isPipe?E2DReader.readDP2NERPipe(testFile, testNumber,entityMap)
 					:E2DReader.readData(testFile,false,testNumber,entityMap);
 		}

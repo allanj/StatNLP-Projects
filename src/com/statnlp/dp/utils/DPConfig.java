@@ -9,9 +9,9 @@ public class DPConfig {
 	public static String devPath = "data/"+dataType+"/en.devel.txt";
 	public static String testingPath = "data/"+dataType+"/en.test.txt";
 	
-	public static String ecrftrain = "data/"+dataType+"/ecrf.train.conllx";
-	public static String ecrfdev = "data/"+dataType+"/ecrf.dev.conllx";
-	public static String ecrftest = "data/"+dataType+"/ecrf.test.conllx";
+//	public static String ecrftrain = "data/"+dataType+"/train.conllx";
+//	public static String ecrfdev = "data/"+dataType+"/dev.conllx";
+//	public static String ecrftest = "data/"+dataType+"/test.conllx";
 	
 	public static String data_prefix = "data/"+dataType+"/output/";
 	
@@ -33,9 +33,9 @@ public class DPConfig {
 //		ecrftrain = "data/"+dataType+"/ecrf.train.MISC.txt";
 //		ecrfdev = "data/"+dataType+"/ecrf.devel.MISC.txt";
 //		ecrftest = "data/"+dataType+"/ecrf.test.MISC.txt";
-		ecrftrain = "data/alldata/"+dataType+"/train.output";
-		ecrfdev = "data/alldata/"+dataType+"/dev.output";
-		ecrftest = "data/alldata/"+dataType+"/test.output";
+//		ecrftrain = "data/alldata/"+dataType+"/train.output";
+//		ecrfdev = "data/alldata/"+dataType+"/dev.output";
+//		ecrftest = "data/alldata/"+dataType+"/test.output";
 		
 		
 		data_prefix = "data/alldata/"+dataType+"/output/";
@@ -50,7 +50,7 @@ public class DPConfig {
 	public static void changeTrainingPath(){
 		
 		trainingPath = "data/"+dataType+"/en.train.combined.txt";
-		ecrftrain = "data/"+dataType+"/ecrf.train.MISC.combined.txt";
+//		ecrftrain = "data/"+dataType+"/ecrf.train.MISC.combined.txt";
 	}
 	
 	public static String ner_res_suffix = ".ner.res.txt";
