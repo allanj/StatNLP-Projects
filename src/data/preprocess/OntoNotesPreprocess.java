@@ -16,7 +16,7 @@ import com.statnlp.commons.types.WordToken;
 public class OntoNotesPreprocess {
 
 	
-	public static String[] datasets = {"pri","voa"};
+	public static String[] datasets = {"abc","cnn","mnb","nbc","pri","voa"};
 	public static String[] valid = {"PERSON", "ORG", "GPE"};
 	public static String[] validConvert = {"person", "organization", "gpe"};
 	public static String[] others = {"NORP","FAC","LOC","PRODUCT","DATE","TIME","PERCENT","MONEY","QUANTITY","ORDINAL","CARDINAL","EVENT","WORK_OF_ART","LAW","LANGUAGE"};
@@ -126,10 +126,9 @@ public class OntoNotesPreprocess {
 					//System.out.println(sent.toString());
 					continue;
 				}
-				
+
 				String[] ccs = trimmed.split("[\\s\\t]+");
 				if(ccs.length==2 && ccs[0].matches("\\d+")){
-					
 					//if(ccs[0].matches("\\d+") && (ccs[1].startsWith("*") || ccs[1].equals("0"))) {  fake++;}
 					String word = ccs[1];
 					if(!word.equals(sent.get(currSentIdx).getName())){
@@ -222,9 +221,66 @@ public class OntoNotesPreprocess {
 		pw.close();
 	}
 	
+	/**
+	 * Split the data with 50/25/25 portion
+	 * @throws IOException
+	 */
+	public static void splitTrainDevTest() throws IOException{
+		for(String data: datasets){
+			BufferedReader reader = RAWF.reader(outputPrefx+data+"/all.conllx");
+			String line = null;
+			int numberOfSentence = 0;
+			while((line = reader.readLine())!=null){
+				if(line.equals("")) numberOfSentence++;
+			}
+			reader.close();
+			System.out.println("dataset:"+data+" number:"+numberOfSentence);
+			int trainNum = numberOfSentence/2+1;
+			int devNum = (numberOfSentence - trainNum)/2;
+			int testNum = numberOfSentence - trainNum - devNum;
+			System.out.println("split with:"+trainNum+"\t"+devNum+"\t"+testNum);
+			PrintWriter pwTrain = RAWF.writer(outputPrefx+data+"/train.conllx");
+			PrintWriter pwDev = RAWF.writer(outputPrefx+data+"/dev.conllx");
+			PrintWriter pwTest = RAWF.writer(outputPrefx+data+"/test.conllx");
+			reader = RAWF.reader(outputPrefx+data+"/all.conllx");
+			int number = 0;
+			String state = "train";
+			while((line = reader.readLine())!=null){
+				if(line.equals("")) {
+					number++;
+					if(state.equals("train")){
+						pwTrain.write("\n");
+						if(number==trainNum) { pwTrain.close(); state = "dev"; number= 0;}
+					}else if(state.equals("dev")){
+						pwDev.write("\n");
+						if(number==devNum) { pwDev.close(); state = "test"; number = 0;}
+					}else if(state.equals("test")){
+						pwTest.write("\n");
+						if(number==testNum) { pwTest.close(); state = "done"; number = 0;}
+					}
+					continue;
+				}
+				if(state.equals("train")) pwTrain.write(line+"\n");
+				else if(state.equals("dev")) pwDev.write(line+"\n");
+				else if(state.equals("test")) pwTest.write(line+"\n");
+				
+			}
+			reader.close();
+		}
+	}
+	
+	/**
+	 * To run this on the scratch
+	 *   1. process()
+	 *   2. splitTrainDevTest() on 50/25/25 portion.
+	 * @param args
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public static void main(String[] args) throws IOException, InterruptedException{
 //		System.out.println(convert());
-		process();
+		//process();
+//		splitTrainDevTest();
 	}
 
 }
