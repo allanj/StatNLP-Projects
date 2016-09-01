@@ -37,7 +37,7 @@ public class EReader {
 			String[] values = line.split("\\t");
 			String entity = values[10];
 			Entity.get(entity);
-			words.add(new WordToken(values[1],values[4],Integer.valueOf(values[6])-1,entity));
+			words.add(new WordToken(values[1],values[4],Integer.valueOf(values[6])-1,entity,values[7]));
 			es.add(entity);
 		}
 		br.close();
@@ -131,6 +131,60 @@ public class EReader {
 			int headIdx = Integer.valueOf(values[4])-1;
 			if(isPipe) headIdx = Integer.valueOf(values[5])-1;
 			words.add(new WordToken(values[1],values[2],headIdx,entity));
+			es.add(entity);
+			prevEntity = entity;
+		}
+		br.close();
+		List<ECRFInstance> myInsts = insts;
+		String type = setLabel? "Training":"Testing";
+		System.err.println(type+" instance, total:"+ myInsts.size()+" Instance. ");
+		return myInsts;
+	}
+	
+	
+	public static List<ECRFInstance> readCoNLLX(String path, boolean setLabel, int number,boolean isPipe) throws IOException{
+		if(setLabel && isPipe) throw new RuntimeException("training instances always have the true dependency structure");
+		BufferedReader br = RAWF.reader(path);
+		String line = null;
+		List<ECRFInstance> insts = new ArrayList<ECRFInstance>();
+		int index =1;
+		ArrayList<WordToken> words = new ArrayList<WordToken>();
+		ArrayList<String> es = new ArrayList<String>();
+		String prevEntity = "O";
+//		int lineNumber = 0;
+		while((line = br.readLine())!=null){
+//			lineNumber++;
+			if(line.startsWith("#")) continue;
+			if(line.equals("")){
+				WordToken[] wordsArr = new WordToken[words.size()];
+				words.toArray(wordsArr);
+				Sentence sent = new Sentence(wordsArr);
+				ECRFInstance inst = new ECRFInstance(index++,1.0,sent);
+				inst.entities = es;
+				if(setLabel) inst.setLabeled(); else inst.setUnlabeled();
+				insts.add(inst);
+				words = new ArrayList<WordToken>();
+				es = new ArrayList<String>();
+				prevEntity = "O";
+				if(number!=-1 && insts.size()==number) break;
+				continue;
+			}
+			String[] values = line.split("\\t");
+			String entity = values[10];
+			/***This part of code check the consecutive entities with same types**/
+			if(!prevEntity.equals("O") && !entity.equals("O") && prevEntity.substring(2).equals(entity.substring(2)) && entity.startsWith("B-")){
+				//TODO: nothing 
+			}
+			/***/
+			Entity.get(entity);
+			int headIdx = Integer.valueOf(values[6])-1;
+			String depLabel = values[7];
+			if(isPipe) {
+				if(values.length<13) throw new RuntimeException("No predicted dependency apperared");
+				headIdx = Integer.valueOf(values[11])-1;
+				depLabel = values[12];
+			}
+			words.add(new WordToken(values[1],values[4],headIdx,entity, depLabel));
 			es.add(entity);
 			prevEntity = entity;
 		}

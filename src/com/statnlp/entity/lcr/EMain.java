@@ -56,7 +56,7 @@ public class EMain {
 		nerOut = DPConfig.data_prefix+modelType+middle+".depf-"+useDepf+DPConfig.ner_eval_suffix;
 		topKNEROut = DPConfig.data_prefix + modelType + middle +".depf-"+useDepf+ DPConfig.ner_topk_res_suffix;
 		nerRes = DPConfig.data_prefix+modelType+middle+".depf-"+useDepf+ DPConfig.ner_res_suffix;
-		testFile = isDev? DPConfig.ecrfdev:DPConfig.ecrftest;
+		testFile = isDev? DPConfig.devPath:DPConfig.testingPath;
 		if(isPipe){
 			testFile = isDev?DPConfig.dp2ner_dp_dev_input:DPConfig.dp2ner_dp_test_input;
 			if(topkinput)
@@ -64,7 +64,7 @@ public class EMain {
 			nerOut = DPConfig.data_prefix+middle+".pp.dp2ner.ner.eval.txt";
 			nerRes = DPConfig.data_prefix+middle+".pp.dp2ner.ner.res.txt";
 		}
-		System.err.println("[Info] trainingFile: "+DPConfig.ecrftrain);
+		System.err.println("[Info] trainingFile: "+DPConfig.trainingPath);
 		System.err.println("[Info] testFile: "+testFile);
 		System.err.println("[Info] nerOut: "+nerOut);
 		System.err.println("[Info] nerRes: "+nerRes);
@@ -81,10 +81,10 @@ public class EMain {
 //		testFile = "data/semeval10t1/ecrf.test.part.txt";
 		/***************************/
 		if(dataTypeSet.contains(DPConfig.dataType)){
-			trainInstances = EReader.readCNN(DPConfig.ecrftrain, true, trainNumber, false);
-			testInstances = EReader.readCNN(testFile, false, testNumber, isPipe);
+			trainInstances = EReader.readCoNLLX(DPConfig.trainingPath, true, trainNumber, false);
+			testInstances = EReader.readCoNLLX(testFile, false, testNumber, isPipe);
 		}else{
-			trainInstances = EReader.readData(DPConfig.ecrftrain,true,trainNumber);
+			trainInstances = EReader.readData(DPConfig.trainingPath,true,trainNumber);
 			testInstances = isPipe?EReader.readDP2NERPipe(testFile, testNumber)
 					:EReader.readData(testFile,false,testNumber);
 			

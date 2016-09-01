@@ -4,10 +4,14 @@ public class DPConfig {
 
 	public static String dataType = "semeval10t1";
 	
-	public static String trainingPath = "data/"+dataType+"/en.train.txt";
-//	public static String trainingPath = "data/"+dataType+"/small.txt";
-	public static String devPath = "data/"+dataType+"/en.devel.txt";
-	public static String testingPath = "data/"+dataType+"/en.test.txt";
+	//this one for dependency parsing
+//	public static String trainingPath = "data/"+dataType+"/en.train.txt";
+//	public static String devPath = "data/"+dataType+"/en.devel.txt";
+//	public static String testingPath = "data/"+dataType+"/en.test.txt";
+	
+	public static String trainingPath = "data/"+dataType+"/train.conllx";
+	public static String devPath = "data/"+dataType+"/dev.conllx";
+	public static String testingPath = "data/"+dataType+"/test.conllx";
 	
 //	public static String ecrftrain = "data/"+dataType+"/train.conllx";
 //	public static String ecrfdev = "data/"+dataType+"/dev.conllx";

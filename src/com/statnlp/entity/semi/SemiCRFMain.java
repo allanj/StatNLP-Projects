@@ -107,8 +107,8 @@ public class SemiCRFMain {
 //		test_filename = "data/semeval10t1/ecrf."+testSuff+".MISC.txt";
 		/**Read the all data**/
 		String prefix = "data/alldata/"+dataType+"/";
-		train_filename = prefix+"train.output";
-		test_filename = isPipe? prefix+"only.test.dp.res.txt":prefix+testSuff+".output";
+		train_filename = prefix+"train.conllx";
+		test_filename = isPipe? prefix+"only.test.dp.res.txt":prefix+testSuff+".conllx";
 		String depStruct = isPipe? "pred":"gold";
 		boolean model1 = false;
 		boolean model2 = false;
@@ -280,11 +280,13 @@ public class SemiCRFMain {
 				String depLabel = null;
 				int headIdx = -1;
 				if(!isPipe){
-					depLabel = values.length>5? values[5]:null;
-					headIdx = Integer.valueOf(values[4])-1;
+					depLabel = values[7];
+					headIdx = Integer.valueOf(values[6])-1;
 				}else{
-					depLabel = values.length>6? values[6]:null;
-					headIdx = Integer.valueOf(values[5])-1;
+					if(values.length<13) {br.close(); throw new RuntimeException("No predicted dependency label comes out?");}
+					depLabel = values.length==13? values[12]: null;
+					headIdx = Integer.valueOf(values[11])-1;
+					
 				}
 				wts.add(new WordToken(word, values[2], headIdx, values[3], depLabel));
 				String form = values[3];
