@@ -30,9 +30,9 @@ public class DPConfig {
 //		trainingPath = "data/"+dataType+"/en.train.txt";
 //		devPath = "data/"+dataType+"/en.devel.txt";
 //		testingPath = "data/"+dataType+"/en.test.txt";
-		trainingPath = "data/alldata/"+dataType+"/train.conllx";
-		devPath = "data/alldata/"+dataType+"/dev.conllx";
-		testingPath = "data/alldata/"+dataType+"/test.conllx";
+		trainingPath = "data/allanprocess/"+dataType+"/train.conllx";
+		devPath = "data/allanprocess/"+dataType+"/dev.conllx";
+		testingPath = "data/allanprocess/"+dataType+"/test.conllx";
 		
 //		ecrftrain = "data/"+dataType+"/ecrf.train.MISC.txt";
 //		ecrfdev = "data/"+dataType+"/ecrf.devel.MISC.txt";

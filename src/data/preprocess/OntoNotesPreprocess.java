@@ -7,10 +7,15 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
+
+import cern.colt.Arrays;
 
 
 public class OntoNotesPreprocess {
@@ -82,7 +87,7 @@ public class OntoNotesPreprocess {
 		return sent;
 	}
 	
-	private static void processTheFiles(String file, ArrayList<Sentence> sents) throws IOException, InterruptedException{
+	private static void processTheONFFiles(String file, ArrayList<Sentence> sents) throws IOException, InterruptedException{
 		BufferedReader reader = RAWF.reader(file);
 		String line = null;
 		String flag = "ready";
@@ -191,18 +196,79 @@ public class OntoNotesPreprocess {
 					File theNumber = new File(filePrefix+"/"+data+"/"+numberFolder); //abc/00/
 					if(theNumber.isDirectory()){
 						String[] textFileList = theNumber.list();  //abc/00/0001.parse.. something like this.
+//						System.out.println(Arrays.toString(textFileList));
 						for(String textFile: textFileList){
-							if(textFile.endsWith(".onf"))
-								processTheFiles(filePrefix+"/"+data+"/"+numberFolder+"/"+textFile, sents);
+//							if(textFile.endsWith(".onf"))
+//								processTheONFFiles(filePrefix+"/"+data+"/"+numberFolder+"/"+textFile, sents);
+							if(textFile.endsWith(".name")){
+								String[] codes = textFile.split("\\.");
+								String parseFile = codes[0]+".parse";
+								processNameFiles(filePrefix+"/"+data+"/"+numberFolder+"/"+textFile, filePrefix+"/"+data+"/"+numberFolder+"/"+parseFile, sents);
+							}
 						}
 					}
 				}
-				System.out.print("[Info] Finishing dataset:"+data);
+//				System.out.print("[Info] Finishing dataset:"+data);
 				//print these sentences.
-				printConll(data,sents);
+//				printConll(data,sents);
 			}
 		}
 	}
+	
+	
+	private static void processNameFiles(String file, String parseFile, ArrayList<Sentence> sents) throws IOException, InterruptedException{
+		BufferedReader reader = RAWF.reader(file);
+		BufferedReader parseReader = RAWF.reader(parseFile);
+		String line = null;
+		while((line = reader.readLine())!=null){
+			if(line.startsWith("<DOC ")|| line.startsWith("</DOC")) continue;
+			String[] vals = line.split(" ");
+			ArrayList<String> words = new ArrayList<String>();
+			int index = 1;  //starting from 1.
+			ArrayList<ESpan> spans = new ArrayList<ESpan>();
+			int left = -1;
+			int right = -1;
+			for(String word: vals){
+				if(word.equals("<ENAMEX")) continue;
+				
+				if(word.startsWith("TYPE=\"")){
+					if(word.endsWith("</ENAMEX>")){
+						List<String> singleEntity = getTagValues(word);
+						String type = singleEntity.get(0);
+						spans.add(new ESpan(index, index, type));
+					}else{
+						left = index;
+					}
+				}else if(word.endsWith("</ENAMEX>")){
+					
+				}
+				index++;
+			}
+
+		    //System.out.println(Arrays.toString(getTagValues(line).toArray()));
+			
+		}
+		parseReader.close();
+		reader.close();
+		System.exit(0);
+	}
+	
+	private static final Pattern TAG_REGEX = Pattern.compile("TYPE=\"(.+?)\">(.+?)</ENAMEX>");
+
+	private static List<String> getTagValues(final String str) {
+	    final List<String> tagValues = new ArrayList<String>();
+	    final Matcher matcher = TAG_REGEX.matcher(str);
+	    while (matcher.find()) {
+//	    	System.out.println(matcher.end(2));
+	    	//tagValues.add(matcher.group(0));
+	    	tagValues.add(matcher.group(1));
+	    	tagValues.add(matcher.group(2));
+	    }
+	    return tagValues;
+	}
+
+
+	
 	
 	/**
 	 * 
@@ -279,7 +345,7 @@ public class OntoNotesPreprocess {
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException{
 //		System.out.println(convert());
-		//process();
+		process();
 //		splitTrainDevTest();
 	}
 

@@ -39,8 +39,10 @@ public class SemiCRFFeatureManager extends FeatureManager {
 		seg_suff,
 		transition,
 		neural,
-		dep_word,
-		dep_tag,
+		head_word,
+		head_tag,
+		dep_word_label,
+		dep_tag_label,
 		cheat
 	}
 	
@@ -173,27 +175,8 @@ public class SemiCRFFeatureManager extends FeatureManager {
 				int currHeadIndex = sent.get(pos).getHeadIndex();
 				String currHead = currHeadIndex>=0? sent.get(currHeadIndex).getName():"STR";
 				String currHeadTag = currHeadIndex>=0? sent.get(currHeadIndex).getTag():"STR";
-				featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(),	currEn, currWord+"& head:"+currHead));
-				featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(),		currEn,	currTag+"& head:"+currHeadTag));
-
-//				int prevPos = pos - 1;
-//				String prevLabel = pos==start? Label.get(childLabelId).getForm():Label.get(parentLabelId).getForm();
-//				if(prevPos>=0){
-//					int prevHeadIndex = sent.get(prevPos).getHeadIndex();
-//					String prevWord = sent.get(prevPos).getName();
-//					String prevTag = sent.get(prevPos).getTag();
-//					String prevHead = prevHeadIndex>=0? sent.get(prevHeadIndex).getName():"STR";
-//					String prevHeadTag = prevHeadIndex>=0? sent.get(prevHeadIndex).getTag():"STR";
-//					featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(), "DPE-CWCH", prevLabel+":"+prevWord+","+prevHead));
-//					featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(), "DPE-CWTCHT", prevLabel+":"+prevTag+","+prevHeadTag));
-//					if(prevHeadIndex==pos || currHeadIndex==prevPos){
-//						String dir = prevHeadIndex==pos? "LEFTDIR":"RIGHTDIR";
-//						featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(), "DPE-WC-CON",currEn+","+prevLabel+":"+currWord+","+prevWord));
-//						featureList.add(this._param_g.toFeature(network,FeatureType.dep_word.name(), "DPE-WC-CON",currEn+","+prevLabel+":"+currWord+","+prevWord+":"+dir));
-//						featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(), "DPE-WC-CON",currEn+","+prevLabel+":"+currTag+","+prevTag));
-//						featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag.name(), "DPE-WC-CON",currEn+","+prevLabel+":"+currTag+","+prevTag+":"+dir));
-//					}
-//				}
+				featureList.add(this._param_g.toFeature(network,FeatureType.head_word.name(),	currEn, currWord+"& head:"+currHead));
+				featureList.add(this._param_g.toFeature(network,FeatureType.head_tag.name(),	currEn,	currTag+"& head:"+currHeadTag));
 			}
 			
 		}

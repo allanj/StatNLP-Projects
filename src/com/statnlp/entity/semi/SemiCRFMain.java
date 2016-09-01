@@ -130,8 +130,8 @@ public class SemiCRFMain {
 			int notConnected = 0;
 			for(SemiCRFInstance inst: trainInstances){
 				notConnected+=checkConnected(inst);
-//				if(checkConnected(inst)>0)
-//					System.out.println(inst.getInput().toString());
+				if(checkConnected(inst)>0)
+					System.out.println(inst.getInput().toString());
 			}
 			System.out.println("isgnore:"+ignore+" not connected entities in train:"+notConnected);
 			notConnected = 0;
@@ -278,6 +278,7 @@ public class SemiCRFMain {
 				int index = Integer.valueOf(values[0]) - 1; //because it is starting from 1
 				String word = values[1];
 				String depLabel = null;
+				String form = values[10];
 				int headIdx = -1;
 				if(!isPipe){
 					depLabel = values[7];
@@ -288,8 +289,8 @@ public class SemiCRFMain {
 					headIdx = Integer.valueOf(values[11])-1;
 					
 				}
-				wts.add(new WordToken(word, values[2], headIdx, values[3], depLabel));
-				String form = values[3];
+				wts.add(new WordToken(word, values[4], headIdx, form, depLabel));
+				
 				Label label = null;
 				if(form.startsWith("B")){
 					if(start != -1){
