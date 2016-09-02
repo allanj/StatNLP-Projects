@@ -11,4 +11,12 @@ public class ESpan {
 		this.right = right;
 		this.entity = entity;
 	}
+
+	@Override
+	public String toString() {
+		return "ESpan [left=" + left + ", right=" + right + ", entity=" + entity + "]";
+	}
+	
+	
+	
 }

@@ -106,7 +106,7 @@ public class SemiCRFMain {
 //		train_filename = "data/semeval10t1/ecrf.train.MISC.txt";
 //		test_filename = "data/semeval10t1/ecrf."+testSuff+".MISC.txt";
 		/**Read the all data**/
-		String prefix = "data/alldata/"+dataType+"/";
+		String prefix = "data/allanprocess/"+dataType+"/";
 		train_filename = prefix+"train.conllx";
 		test_filename = isPipe? prefix+"only.test.dp.res.txt":prefix+testSuff+".conllx";
 		String depStruct = isPipe? "pred":"gold";
@@ -125,13 +125,27 @@ public class SemiCRFMain {
 		System.out.println("[Info] Reading data:"+test_filename);
 		SemiCRFInstance[] trainInstances = readCoNLLData(train_filename, true,	trainNum, false);
 		SemiCRFInstance[] testInstances	 = readCoNLLData(test_filename, false,	testNumber, isPipe);
+		
+		/****Printing the total Number of entities***/
+		int totalNumber = 0;
+		for(SemiCRFInstance inst: trainInstances){
+			totalNumber+=totalEntities(inst);
+		}
+		System.out.println("[Info] Total number of entities in training:"+totalNumber);
+		totalNumber = 0;
+		for(SemiCRFInstance inst: testInstances){
+			totalNumber+=totalEntities(inst);
+		}
+		System.out.println("[Info] Total number of entities in testing:"+totalNumber);
+		/****(END) Printing the total Number of entities***/
+		
 		if(model2){
 			//print some information if using model 2
 			int notConnected = 0;
 			for(SemiCRFInstance inst: trainInstances){
 				notConnected+=checkConnected(inst);
-				if(checkConnected(inst)>0)
-					System.out.println(inst.getInput().toString());
+//				if(checkConnected(inst)>0)
+//					System.out.println(inst.getInput().toString());
 			}
 			System.out.println("isgnore:"+ignore+" not connected entities in train:"+notConnected);
 			notConnected = 0;
@@ -364,6 +378,17 @@ public class SemiCRFMain {
 //		if(number>0)
 //			System.out.println(sent.toString());
 		return number;
+	}
+	
+	private static int totalEntities(SemiCRFInstance inst){
+		int total = 0;
+		List<Span> output = inst.getOutput();
+		for(Span span: output){
+			Label label = span.label;
+			if(label.equals(Label.get("O"))) continue;
+			total++;
+		}
+		return total;
 	}
 
 }

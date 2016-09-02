@@ -15,7 +15,6 @@ import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
 
-import cern.colt.Arrays;
 
 
 public class OntoNotesPreprocess {
@@ -208,9 +207,9 @@ public class OntoNotesPreprocess {
 						}
 					}
 				}
-//				System.out.print("[Info] Finishing dataset:"+data);
+				System.out.println("[Info] Finishing dataset:"+data);
 				//print these sentences.
-//				printConll(data,sents);
+				printConll(data,sents);
 			}
 		}
 	}
@@ -219,50 +218,102 @@ public class OntoNotesPreprocess {
 	private static void processNameFiles(String file, String parseFile, ArrayList<Sentence> sents) throws IOException, InterruptedException{
 		BufferedReader reader = RAWF.reader(file);
 		BufferedReader parseReader = RAWF.reader(parseFile);
+		PrintWriter pw = null;
 		String line = null;
+		String parseLine = null;
 		while((line = reader.readLine())!=null){
 			if(line.startsWith("<DOC ")|| line.startsWith("</DOC")) continue;
-			String[] vals = line.split(" ");
-			ArrayList<String> words = new ArrayList<String>();
-			int index = 1;  //starting from 1.
+			String rpline = line.replace("<ENAMEX", "</ENAMEX>");
+			String[] vals = rpline.split("(\\s?)</ENAMEX>");
+			int index = 1;
 			ArrayList<ESpan> spans = new ArrayList<ESpan>();
 			int left = -1;
 			int right = -1;
-			for(String word: vals){
-				if(word.equals("<ENAMEX")) continue;
-				
-				if(word.startsWith("TYPE=\"")){
-					if(word.endsWith("</ENAMEX>")){
-						List<String> singleEntity = getTagValues(word);
-						String type = singleEntity.get(0);
-						spans.add(new ESpan(index, index, type));
-					}else{
-						left = index;
-					}
-				}else if(word.endsWith("</ENAMEX>")){
-					
+			String type = "";
+			for(int i=0;i<vals.length;i++){
+				vals[i] = vals[i].trim();
+				if(vals[i].equals("")) {
+//					System.out.println(index+"\n"+vals[i+1]+"\n"+rpline+"\n");
+					continue;
 				}
-				index++;
+				if(vals[i].startsWith("TYPE=")){
+					String[] eAndWords = vals[i].split(">");
+					if(eAndWords.length!=2)
+						throw new RuntimeException("ws length is not 2:"+vals[i]+" \n"+rpline+"\n"+file); //cnn_0425: modify. 
+					List<String> singleEntity = getTagValues(vals[i], "long");
+					if(singleEntity.size()!=1) throw new RuntimeException("The length should be only one:"+vals[i]+"\n"+rpline+"\n"+file);
+					String[] ewords = eAndWords[1].trim().split(" ");
+					left = index;
+					right = index+ewords.length-1;
+					type = singleEntity.get(0);
+					ESpan span = new ESpan(left, right, type);
+					spans.add(span);
+					if(!validSet.contains(span.entity) && !otherSet.contains(span.entity))
+						throw new RuntimeException("cannot find this entity:"+span.entity);
+					index += ewords.length;
+				}else{
+					String[] words = vals[i].trim().split(" ");
+					index += words.length;
+				}
+//				System.out.println(index);
 			}
-
-		    //System.out.println(Arrays.toString(getTagValues(line).toArray()));
-			
+//		    System.out.println(spans.toString());
+		    //parse oneSentence here?
+		    pw = RAWF.writer(tmpTreebank);
+			while((parseLine=parseReader.readLine())!=null){
+				if(parseLine.equals("")){
+					pw.write("\n");
+					pw.close();
+					break;
+				}
+				pw.write(parseLine+"\n");
+			}
+			Sentence sent = convert();
+//			System.out.println(sent.toString());
+			if(sent!=null){
+				//check the sentence length
+				if(index!=sent.length()) throw new RuntimeException("The length is not the same: index:"+index+" sent len:"+sent.length()+"\n"+sent.toString()+"\n"+file);
+				for(ESpan span: spans){
+					for(int i=span.left; i<=span.right;i++) {
+						String entity = null;
+						if(validSet.contains(span.entity)){
+							entity  = validMap.get(span.entity);
+							entity = i==span.left? "B-"+entity:"I-"+entity;
+						}else if(otherSet.contains(span.entity)){
+							entity = i==span.left? "B-MISC":"I-MISC";
+						}else{
+							throw new RuntimeException("cannot find this entity:"+entity);
+						}
+						sent.get(i).setEntity(entity);
+					}
+				}
+				sents.add(sent);
+			}else{
+				continue;
+			}
 		}
 		parseReader.close();
 		reader.close();
-		System.exit(0);
 	}
 	
 	private static final Pattern TAG_REGEX = Pattern.compile("TYPE=\"(.+?)\">(.+?)</ENAMEX>");
+	private static final Pattern LONG_REGEX = Pattern.compile("TYPE=\"(.+?)\"(.*?)>(.+)");
+	
+//	private static final Pattern CHECK_REGEX = Pattern.compile("<ENAMEX (.+?)>(.+?)</ENAMEX>");
 
-	private static List<String> getTagValues(final String str) {
+	private static List<String> getTagValues(final String str, String len) {
 	    final List<String> tagValues = new ArrayList<String>();
-	    final Matcher matcher = TAG_REGEX.matcher(str);
+	    final Matcher matcher = len.equals("short")?TAG_REGEX.matcher(str): LONG_REGEX.matcher(str);
+	    
+//	    final Matcher matcher = CHECK_REGEX.matcher(str);
 	    while (matcher.find()) {
 //	    	System.out.println(matcher.end(2));
 	    	//tagValues.add(matcher.group(0));
+
+//	    	System.out.println(matcher.group(0));
+//	    	System.out.println(matcher.group(1));
 	    	tagValues.add(matcher.group(1));
-	    	tagValues.add(matcher.group(2));
+	    	//tagValues.add(matcher.group(2));
 	    }
 	    return tagValues;
 	}
@@ -346,7 +397,7 @@ public class OntoNotesPreprocess {
 	public static void main(String[] args) throws IOException, InterruptedException{
 //		System.out.println(convert());
 		process();
-//		splitTrainDevTest();
+		splitTrainDevTest();
 	}
 
 }
