@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import com.statnlp.commons.crf.RAWF;
@@ -31,26 +30,27 @@ public class OntoNotesProcess {
 			String[] names = file.list();
 			for(String newstype: names){
 				if(dataNames.contains(newstype)){
+					
 					File subFile = new File(currPrefix+"/"+newstype); //the folder that bc/bn/nw
 					String[] subNames = subFile.list();
 					ArrayList<Sentence> sents = new ArrayList<Sentence>();
 					for(String program: subNames){
 						File programFolder = new File(currPrefix+"/"+newstype+"/"+program); //abc/cctc/cnn/so on
-						String[] numFileList = programFolder.list();  //cnn/00 ,01,02, 
-//							System.out.println(Arrays.toString(textFileList));
-						for(String textFile: textFileList){
-//								if(textFile.endsWith(".onf"))
-//									processTheONFFiles(filePrefix+"/"+data+"/"+numberFolder+"/"+textFile, sents);
-							if(textFile.endsWith(".name")){
-								String[] codes = textFile.split("\\.");
-								String parseFile = codes[0]+".parse";
-								processNameFiles(filePrefix+"/"+data+"/"+numberFolder+"/"+textFile, filePrefix+"/"+data+"/"+numberFolder+"/"+parseFile, sents);
+						String[] numFolderList = programFolder.list();  //cnn/00 ,01,02,
+						for(String numFolderName: numFolderList){
+							File numFolder = new File(currPrefix+"/"+newstype+"/"+program+"/"+numFolderName); //abc/00 folder
+							String[] textFileList = numFolder.list();
+							for(String textFile: textFileList){  //the textfile inside the number folder
+								if(textFile.endsWith("_conll")){
+									processNameFile(currPrefix+"/"+newstype+"/"+program+"/"+numFolderName+"/"+textFile, sents);
+								}
 							}
 						}
+						
 					}
-					System.out.println("[Info] Finishing dataset:"+data);
-					//print these sentences.
-					printConll(data,sents, fileType[f]);
+					System.out.println("[Info] Finishing "+fileType[f]+" dataset:"+newstype);
+					//print these sentences. write to Files
+					printConll(newstype,sents, fileType[f]);
 				}
 			}
 		}
@@ -58,7 +58,20 @@ public class OntoNotesProcess {
 		
 	}
 	
+	private static void processNameFile(String filePath, ArrayList<Sentence> sents) throws IOException{
+		
+	}
+	
+	
+	/**
+	 * Write the sentence to files and save as conllx format
+	 * @param datasetName: news type
+	 * @param sents: the sentences read from original file
+	 * @param fileType: train/test/development
+	 * @throws IOException
+	 */
 	private static void printConll(String datasetName, ArrayList<Sentence> sents, String fileType) throws IOException{
+		if(fileType.equals("development")) fileType = "dev";
 		PrintWriter pw = RAWF.writer(outputPrefx+"/"+datasetName+"/"+fileType+".conllx");
 		System.out.println("dataset:"+datasetName+" type:"+fileType+" size:"+sents.size());
 		for(Sentence sent: sents){
