@@ -16,8 +16,14 @@ import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
 
 
-
-public class OntoNotesPreprocess {
+/**
+ * This file is for reading the broadcast news only. 
+ * The English broadcast news in ontonotes.
+ * The file needed is 
+ * @author allanjie
+ *
+ */
+public class BroadcastNewsPreprocess {
 
 	
 	public static String[] datasets = {"abc","cnn","mnb","nbc","pri","voa"};
@@ -86,6 +92,15 @@ public class OntoNotesPreprocess {
 		return sent;
 	}
 	
+	/**
+	 * This one is deprecated.
+	 * @param file
+	 * @param sents
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	@SuppressWarnings("unused")
+	@Deprecated
 	private static void processTheONFFiles(String file, ArrayList<Sentence> sents) throws IOException, InterruptedException{
 		BufferedReader reader = RAWF.reader(file);
 		String line = null;
@@ -396,7 +411,7 @@ public class OntoNotesPreprocess {
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException{
 //		System.out.println(convert());
-		process();
+//		process();
 		splitTrainDevTest();
 	}
 
