@@ -57,7 +57,7 @@ public class BroadcastNewsPreprocess {
 	 * @throws InterruptedException 
 	 */
 	private static Sentence convert() throws IOException, InterruptedException{
-		ProcessBuilder pb = new ProcessBuilder("java","-jar", converterPath,"-rightBranching=false","-log", converterLog,"-stopOnError=false"); 
+		ProcessBuilder pb = new ProcessBuilder("java","-jar", converterPath,"-log", converterLog,"-stopOnError=false"); 
 		pb.redirectInput(new File(tmpTreebank));
 		pb.redirectOutput(ProcessBuilder.Redirect.to(new File(tmpOutput)));
 		pb.redirectError(ProcessBuilder.Redirect.to(new File(tmpError)));
