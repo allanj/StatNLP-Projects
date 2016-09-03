@@ -12,13 +12,14 @@
 		    <version>0.8.8</version>
  		</dependency>
 
-		<dependency>
-   		 <groupId>edu.stanford.nlp</groupId>
-   		 <artifactId>stanford-corenlp</artifactId>
-   		 <version>3.6.0</version>
-	</dependency>
+        <!-- 
         
         <dependency>
+	   		 <groupId>edu.stanford.nlp</groupId>
+	   		 <artifactId>stanford-corenlp</artifactId>
+	   		 <version>3.6.0</version>
+		</dependency>
+         <dependency>
     		<groupId>edu.emory.clir</groupId>
     		<artifactId>clearnlp</artifactId>
     		<version>3.2.0</version>
@@ -29,6 +30,9 @@
 	    <artifactId>clearnlp-dictionary</artifactId>
 	    <version>3.2</version>
 		</dependency>
+        
+         -->
+       
 		
         
         

@@ -50,7 +50,7 @@ public class StanfordRecognizer {
 			for(int i=0;i<sent.length();i++){
 				oneSent[i] = sent.get(i).getName();
 			}
-			List<CoreLabel> rawWords = edu.stanford.nlp.ling.Sentence.toCoreLabelList(oneSent);
+			List<CoreLabel> rawWords = null;//Sentence.toCoreLabelList(oneSent);
 			rawWords.get(0).setTag("NNP");
 			rawWords.get(1).setTag("VBZ");
 			rawWords.get(2).setTag("NNP");
