@@ -36,7 +36,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 	}
 	
 	static {
-		NetworkIDMapper.setCapacity(new int[]{10000, 10, 100});
+		NetworkIDMapper.setCapacity(new int[]{10000, 20, 100});
 	}
 
 	public SemiCRFNetworkCompiler(int maxSize, int maxSegLength,SemiViewer sViewer, boolean useDepNet, boolean incom2Linear, boolean notConnect2Linear, boolean ignoreDisconnect) {

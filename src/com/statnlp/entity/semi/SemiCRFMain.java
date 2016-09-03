@@ -106,7 +106,7 @@ public class SemiCRFMain {
 //		train_filename = "data/semeval10t1/ecrf.train.MISC.txt";
 //		test_filename = "data/semeval10t1/ecrf."+testSuff+".MISC.txt";
 		/**Read the all data**/
-		String prefix = "data/allanprocess/"+dataType+"/";
+		String prefix = "data/ontonotes/"+dataType+"/";
 		train_filename = prefix+"train.conllx";
 		test_filename = isPipe? prefix+"only.test.dp.res.txt":prefix+testSuff+".conllx";
 		String depStruct = isPipe? "pred":"gold";
@@ -128,15 +128,19 @@ public class SemiCRFMain {
 		
 		/****Printing the total Number of entities***/
 		int totalNumber = 0;
+		int tokenNum = 0;
 		for(SemiCRFInstance inst: trainInstances){
 			totalNumber+=totalEntities(inst);
+			tokenNum += inst.size();
 		}
-		System.out.println("[Info] Total number of entities in training:"+totalNumber);
+		System.out.println("[Info] Total number of entities in training:"+totalNumber+" token:"+tokenNum);
 		totalNumber = 0;
+		tokenNum = 0;
 		for(SemiCRFInstance inst: testInstances){
 			totalNumber+=totalEntities(inst);
+			tokenNum += inst.size();
 		}
-		System.out.println("[Info] Total number of entities in testing:"+totalNumber);
+		System.out.println("[Info] Total number of entities in testing:"+totalNumber+" token:"+tokenNum);
 		/****(END) Printing the total Number of entities***/
 		
 		if(model2){
@@ -252,6 +256,7 @@ public class SemiCRFMain {
 		int start = -1;
 		int end = 0;
 		Label prevLabel = null;
+		int numE = 0;
 		while(br.ready()){
 			String line = br.readLine().trim();
 			if(line.length() == 0){
@@ -260,7 +265,7 @@ public class SemiCRFMain {
 				if(start != -1){
 					createSpan(output, start, end, prevLabel);
 				}
-				SemiCRFInstance instance = new SemiCRFInstance(instanceId, 1);
+				SemiCRFInstance instance = new SemiCRFInstance(instanceId, 1.0);
 				WordToken[] wtArr = new WordToken[wts.size()];
 				instance.input = new Sentence(wts.toArray(wtArr));
 				instance.input.setRecognized();
@@ -291,6 +296,7 @@ public class SemiCRFMain {
 				String[] values = line.split("[\t ]");
 				int index = Integer.valueOf(values[0]) - 1; //because it is starting from 1
 				String word = values[1];
+				String pos = values[4];
 				String depLabel = null;
 				String form = values[10];
 				int headIdx = -1;
@@ -303,16 +309,16 @@ public class SemiCRFMain {
 					headIdx = Integer.valueOf(values[11])-1;
 					
 				}
-				wts.add(new WordToken(word, values[4], headIdx, form, depLabel));
+				wts.add(new WordToken(word, pos, headIdx, form, depLabel));
 				
 				Label label = null;
 				if(form.startsWith("B")){
+					numE++;
 					if(start != -1){
 						end = index - 1;
 						createSpan(output, start, end, prevLabel);
 					}
 					start = index;
-					
 					label = Label.get(form.substring(2));
 					
 				} else if(form.startsWith("I")){
@@ -330,6 +336,7 @@ public class SemiCRFMain {
 			}
 		}
 		br.close();
+		System.out.println("number of entities:"+numE);
 		return result.toArray(new SemiCRFInstance[result.size()]);
 	}
 	
@@ -383,6 +390,10 @@ public class SemiCRFMain {
 	private static int totalEntities(SemiCRFInstance inst){
 		int total = 0;
 		List<Span> output = inst.getOutput();
+//		Sentence sent = inst.getInput();
+//		for(int i=0;i<sent.length();i++){
+//			if(sent.get(i).getEntity().startsWith("B")) total++;
+//		}
 		for(Span span: output){
 			Label label = span.label;
 			if(label.equals(Label.get("O"))) continue;
