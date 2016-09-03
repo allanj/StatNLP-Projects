@@ -1,5 +1,6 @@
 package data.preprocess;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -8,6 +9,7 @@ import java.util.HashSet;
 
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
+import com.statnlp.commons.types.WordToken;
 
 public class OntoNotesProcess {
 
@@ -59,7 +61,31 @@ public class OntoNotesProcess {
 	}
 	
 	private static void processNameFile(String filePath, ArrayList<Sentence> sents) throws IOException{
+		BufferedReader reader = RAWF.reader(filePath);
+		String line = null;
+		String prevEntity = "O";
+		while((line = reader.readLine())!=null){
+			if(line.startsWith("#end")) break;
+			if(line.startsWith("#")) continue;
+			String[] vals = line.split("\\s+");
+			//first-step convert to dep structure
+			if(vals.length!=13) throw new RuntimeException("split length not equal to 13:\n"+filePath+"\n"+line);
+			if(line.equals("")){
+				//finish a sentence
+				prevEntity = "O";
+			}
+			String word = vals[2];
+			String pos = vals[4]; 
+			if(pos.equals("XX")) throw new RuntimeException("No POS tag:\n"+filePath);
+			String parseBit = vals[5];
+			
+			WordToken wt = new WordToken(vals[2]);
+			/***later check if all documents here have the entity**/
+			
+			
+		}
 		
+		reader.close();
 	}
 	
 	
