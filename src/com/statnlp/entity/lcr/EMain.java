@@ -81,6 +81,7 @@ public class EMain {
 //		testFile = "data/semeval10t1/ecrf.test.part.txt";
 		/***************************/
 		if(dataTypeSet.contains(DPConfig.dataType)){
+			System.out.println("Reading Ontonotes conllx format...");
 			trainInstances = EReader.readCoNLLX(DPConfig.trainingPath, true, trainNumber, false);
 			testInstances = EReader.readCoNLLX(testFile, false, testNumber, isPipe);
 		}else{

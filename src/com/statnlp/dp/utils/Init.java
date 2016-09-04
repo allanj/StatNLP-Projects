@@ -10,13 +10,13 @@ public class Init {
 	
 	public static HashSet<String> iniOntoNotesData(){
 		HashSet<String> set = new HashSet<String>();
-		set.add("cnn");
-		set.add("abc");
-		set.add("mnb");
-		set.add("nbc");
-		set.add("pri");
-		set.add("voa");
-		set.add("ptb");
+		set.add("bc");
+		set.add("bn");
+		set.add("mz");
+		set.add("nw");
+		set.add("tc");
+		set.add("wb");
+//		set.add("ptb");
 		return set;
 	}
 
