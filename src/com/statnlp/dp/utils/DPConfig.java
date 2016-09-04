@@ -30,10 +30,9 @@ public class DPConfig {
 //		trainingPath = "data/"+dataType+"/en.train.txt";
 //		devPath = "data/"+dataType+"/en.devel.txt";
 //		testingPath = "data/"+dataType+"/en.test.txt";
-		trainingPath = "data/allanprocess/"+dataType+"/train.conllx";
-		devPath = "data/allanprocess/"+dataType+"/dev.conllx";
-		testingPath = "data/allanprocess/"+dataType+"/test.conllx";
-		
+		trainingPath = "data/ontonotes/"+dataType+"/train.conllx";
+		devPath = "data/ontonotes/"+dataType+"/dev.conllx";
+		testingPath = "data/ontonotes/"+dataType+"/test.conllx";
 //		ecrftrain = "data/"+dataType+"/ecrf.train.MISC.txt";
 //		ecrfdev = "data/"+dataType+"/ecrf.devel.MISC.txt";
 //		ecrftest = "data/"+dataType+"/ecrf.test.MISC.txt";
@@ -42,7 +41,7 @@ public class DPConfig {
 //		ecrftest = "data/alldata/"+dataType+"/test.output";
 		
 		
-		data_prefix = "data/alldata/"+dataType+"/output/";
+		data_prefix = "data/ontonotes/"+dataType+"/output/";
 		
 		ner2dp_ner_dev_input = "data/"+dataType+"/pptest/ecrf.dev.ner.res.txt";
 		ner2dp_ner_test_input = "data/"+dataType+"/pptest/ecrf.test.ner.res.txt";

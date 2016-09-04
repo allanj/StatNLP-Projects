@@ -118,8 +118,8 @@ public class SemiCRFMain {
 		System.out.println("[Info] Ignore those not fit in "+extention+":"+ignore);
 		System.out.println("[Info] Current Dataset:"+dataType);
 		String ign = ignore? "ignore":"noignore";
-		String resEval = "data/alldata/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".eval.txt";
-		String resRes  = "data/alldata/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".es.txt";
+		String resEval = "data/ontonotes/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".eval.txt";
+		String resRes  = "data/ontonotes/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".es.txt";
 		
 		System.out.println("[Info] Reading data:"+train_filename);
 		System.out.println("[Info] Reading data:"+test_filename);
@@ -245,6 +245,7 @@ public class SemiCRFMain {
 	 * @return
 	 * @throws IOException
 	 */
+	@SuppressWarnings("resource")
 	private static SemiCRFInstance[] readCoNLLData(String fileName, boolean isLabeled, int number, boolean isPipe) throws IOException{
 		if(isLabeled && isPipe) throw new RuntimeException("training instances always have the true dependency");
 		InputStreamReader isr = new InputStreamReader(new FileInputStream(fileName), "UTF-8");
@@ -257,10 +258,11 @@ public class SemiCRFMain {
 		int end = 0;
 		Label prevLabel = null;
 		int numE = 0;
+		int sentIndex = 0;
 		while(br.ready()){
 			String line = br.readLine().trim();
 			if(line.length() == 0){
-
+				sentIndex++;
 				end = wts.size()-1;
 				if(start != -1){
 					createSpan(output, start, end, prevLabel);
@@ -270,6 +272,19 @@ public class SemiCRFMain {
 				instance.input = new Sentence(wts.toArray(wtArr));
 				instance.input.setRecognized();
 				instance.output = output;
+				/** debug information **/
+				int realE = 0;
+				for(int i=0;i<instance.input.length(); i++){
+					if(instance.input.get(i).getEntity().startsWith("B-")) realE++;
+				}
+				int outputNum = 0;
+				for(int i=0; i<instance.output.size();i++){
+					if(!instance.output.get(i).label.form.equals("O")) outputNum++;
+				}
+				if(realE!=outputNum) {
+					throw new RuntimeException("real number of entities:"+realE+" "+"span num:"+outputNum+" \n sent:"+sentIndex);
+				}
+				/***/
 				//instance.leftDepRel = sent2LeftDepRel(instance.input);
 				if(isLabeled){
 					instance.setLabeled(); // Important!
@@ -310,7 +325,6 @@ public class SemiCRFMain {
 					
 				}
 				wts.add(new WordToken(word, pos, headIdx, form, depLabel));
-				
 				Label label = null;
 				if(form.startsWith("B")){
 					numE++;
@@ -347,7 +361,7 @@ public class SemiCRFMain {
 		if(start>end){
 			throw new RuntimeException("start cannot be larger than end");
 		}
-		if(label.form.startsWith("O")){
+		if(label.form.equals("O")){
 			for(int i=start; i<=end; i++){
 				output.add(new Span(i, i, label));
 			}
