@@ -23,7 +23,7 @@ public class OntoNotesProcess {
 	public static HashSet<String> validSet;
 	public static HashSet<String> dataNames;
 	
-	public static String[] fileType = {"conll-2012-test"};
+	public static String[] fileType = {"train","development","conll-2012-test"};
 	public static String filePrefix = "F:/phd/data/conll-formatted-ontonotes-5.0/data";
 //	public static String filePrefix = "F:/phd/data/conll2012/data";
 	public static String outputPrefx = "E:/Framework/data/ontonotes/";

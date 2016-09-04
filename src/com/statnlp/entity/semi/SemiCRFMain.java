@@ -51,6 +51,7 @@ public class SemiCRFMain {
 	/** true means using the predicted dependency features.. if not used dep features, this option does not matter**/
 	public static boolean isPipe = false; 
 	public static boolean ignore = false;
+	public static String dataset = "ontonotes"; //default
 	
 	
 	private static void processArgs(String[] args) throws FileNotFoundException{
@@ -86,6 +87,7 @@ public class SemiCRFMain {
 				case "-mode": isTrain = args[i+1].equals("train")?true:false; break;
 				case "-pipe": isPipe = args[i+1].equals("true")?true:false;break;
 				case "-ignore": ignore = args[i+1].equals("true")?true:false;break;
+				case "-dataset": dataset = args[i+1]; break;
 				default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 			}
 		}
@@ -101,7 +103,6 @@ public class SemiCRFMain {
 		
 		processArgs(args);
 		System.out.println("[Info] using the predicted dependency?:"+isPipe);
-		String dataset = "";
 		/**data is 0-indexed, network compiler is 1-indexed since we have leaf nodes.**/
 //		train_filename = "data/semeval10t1/ecrf.train.MISC.txt";
 //		test_filename = "data/semeval10t1/ecrf."+testSuff+".MISC.txt";
@@ -257,7 +258,6 @@ public class SemiCRFMain {
 		int start = -1;
 		int end = 0;
 		Label prevLabel = null;
-		int numE = 0;
 		int sentIndex = 0;
 		while(br.ready()){
 			String line = br.readLine().trim();
@@ -327,7 +327,6 @@ public class SemiCRFMain {
 				wts.add(new WordToken(word, pos, headIdx, form, depLabel));
 				Label label = null;
 				if(form.startsWith("B")){
-					numE++;
 					if(start != -1){
 						end = index - 1;
 						createSpan(output, start, end, prevLabel);
@@ -350,7 +349,8 @@ public class SemiCRFMain {
 			}
 		}
 		br.close();
-		System.out.println("number of entities:"+numE);
+		String type = isLabeled? "train":"test";
+		System.out.println("[Info] number of "+type+" instances:"+result.size());
 		return result.toArray(new SemiCRFInstance[result.size()]);
 	}
 	
