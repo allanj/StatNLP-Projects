@@ -175,8 +175,12 @@ public class SemiCRFFeatureManager extends FeatureManager {
 				int currHeadIndex = sent.get(pos).getHeadIndex();
 				String currHead = currHeadIndex>=0? sent.get(currHeadIndex).getName():"STR";
 				String currHeadTag = currHeadIndex>=0? sent.get(currHeadIndex).getTag():"STR";
+				String currDepLabel = currHeadIndex>=0? sent.get(currHeadIndex).getDepLabel():"NOLABEL";
+				if(currDepLabel==null) throw new RuntimeException("The depenency label is null?");
 				featureList.add(this._param_g.toFeature(network,FeatureType.head_word.name(),	currEn, currWord+"& head:"+currHead));
 				featureList.add(this._param_g.toFeature(network,FeatureType.head_tag.name(),	currEn,	currTag+"& head:"+currHeadTag));
+				featureList.add(this._param_g.toFeature(network,FeatureType.dep_word_label.name(), 	currEn, currWord+"& head:"+currHead+"& label:"+currDepLabel));
+				featureList.add(this._param_g.toFeature(network,FeatureType.dep_tag_label.name(), 	currEn, currTag+"& head:"+currHeadTag+"& label:"+currDepLabel));
 			}
 			
 		}

@@ -43,7 +43,7 @@ public class SemiCRFMain {
 	public static boolean useDepNet = false;
 	public static String modelFile = null;
 	public static boolean isTrain = true;
-	public static String dataType = "abc";
+	public static String dataType = "semeval10t1";
 	public static String testSuff = "test";
 	public static String train_filename = "data/alldata/nbc/ecrf.train.MISC.txt";
 	public static String test_filename = "data/alldata/nbc/ecrf.test.MISC.txt";
@@ -101,12 +101,12 @@ public class SemiCRFMain {
 		
 		processArgs(args);
 		System.out.println("[Info] using the predicted dependency?:"+isPipe);
-		
+		String dataset = "";
 		/**data is 0-indexed, network compiler is 1-indexed since we have leaf nodes.**/
 //		train_filename = "data/semeval10t1/ecrf.train.MISC.txt";
 //		test_filename = "data/semeval10t1/ecrf."+testSuff+".MISC.txt";
 		/**Read the all data**/
-		String prefix = "data/ontonotes/"+dataType+"/";
+		String prefix = "data/"+dataset+"/"+dataType+"/";
 		train_filename = prefix+"train.conllx";
 		test_filename = isPipe? prefix+"only.test.dp.res.txt":prefix+testSuff+".conllx";
 		String depStruct = isPipe? "pred":"gold";
@@ -118,8 +118,8 @@ public class SemiCRFMain {
 		System.out.println("[Info] Ignore those not fit in "+extention+":"+ignore);
 		System.out.println("[Info] Current Dataset:"+dataType);
 		String ign = ignore? "ignore":"noignore";
-		String resEval = "data/ontonotes/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".eval.txt";
-		String resRes  = "data/ontonotes/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".es.txt";
+		String resEval = "data/"+dataset+"/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".eval.txt";
+		String resRes  = "data/"+dataset+"/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".es.txt";
 		
 		System.out.println("[Info] Reading data:"+train_filename);
 		System.out.println("[Info] Reading data:"+test_filename);
