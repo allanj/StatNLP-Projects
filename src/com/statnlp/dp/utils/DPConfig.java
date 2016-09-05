@@ -26,28 +26,21 @@ public class DPConfig {
 	public static String dp2ner_dp_topK_test_input = "data/"+dataType+"/pptest/only.test.dp.topk.res.txt";
 	public static String ner2dp_ner_topK_test_input = "data/"+dataType+"/pptest/ecrf.test.ner.topk.res.txt";
 	
-	public static void changeDataType(){
-//		trainingPath = "data/"+dataType+"/en.train.txt";
-//		devPath = "data/"+dataType+"/en.devel.txt";
-//		testingPath = "data/"+dataType+"/en.test.txt";
-		trainingPath = "data/alldata/"+dataType+"/train.conllx";
-		devPath = "data/alldata/"+dataType+"/dev.conllx";
-		testingPath = "data/alldata/"+dataType+"/test.conllx";
-//		ecrftrain = "data/"+dataType+"/ecrf.train.MISC.txt";
-//		ecrfdev = "data/"+dataType+"/ecrf.devel.MISC.txt";
-//		ecrftest = "data/"+dataType+"/ecrf.test.MISC.txt";
-//		ecrftrain = "data/alldata/"+dataType+"/train.output";
-//		ecrfdev = "data/alldata/"+dataType+"/dev.output";
-//		ecrftest = "data/alldata/"+dataType+"/test.output";
-		
-		
-		data_prefix = "data/alldata/"+dataType+"/output/";
+	public static void changeDataType(String dataset){
+		trainingPath = "data/"+dataset+"/"+dataType+"/train.conllx";
+		devPath = "data/"+dataset+"/"+dataType+"/dev.conllx";
+		testingPath = "data/"+dataset+"/"+dataType+"/test.conllx";
+		data_prefix = "data/"+dataset+"/"+dataType+"/output/";
 		
 		ner2dp_ner_dev_input = "data/"+dataType+"/pptest/ecrf.dev.ner.res.txt";
 		ner2dp_ner_test_input = "data/"+dataType+"/pptest/ecrf.test.ner.res.txt";
-		dp2ner_dp_dev_input = "data/alldata/"+dataType+"/only.dev.dp.res.txt";
-		dp2ner_dp_test_input = "data/alldata/"+dataType+"/only.test.dp.res.txt";
+		dp2ner_dp_dev_input = "data/"+dataset+"/"+dataType+"/only.dev.dp.res.txt";
+		dp2ner_dp_test_input = "data/"+dataset+"/"+dataType+"/only.test.dp.res.txt";
 		dp2ner_dp_topK_test_input = "data/"+dataType+"/pptest/only.test.dp.topk.res.txt";
+	}
+	
+	public static void changeDataType(){
+		changeDataType("allanprocess");
 	}
 	
 	public static void changeTrainingPath(){

@@ -37,6 +37,7 @@ public class EMain {
 	public static boolean useAdaGrad = false;
 	public static boolean useDepf = false;
 	private static boolean testOnTrain = false;
+	public static String dataset = "allanprocess";
 	
 	
 	public static void main(String[] args) throws IOException, InterruptedException{
@@ -48,7 +49,7 @@ public class EMain {
 		numIteration = 200;
 		isPipe = false;
 		processArgs(args);
-		dataTypeSet = Init.iniOntoNotesData();
+		dataTypeSet = Init.iniOntoNotesData(dataset);
 		String modelType = DPConfig.MODEL.ecrf.name();
 		
 		
@@ -147,7 +148,7 @@ public class EMain {
 					case "-dev":isDev = args[i+1].equals("true")?true:false; break;
 					case "-windows":DPConfig.windows = true; break;
 					case "-comb": DPConfig.comb = true; break;
-					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
+					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(dataset); break;
 					case "-topkinput": topkinput = true; break;
 					case "-topk": NetworkConfig._topKValue = Integer.valueOf(args[i+1]); break;
 					case "-batch": NetworkConfig.USE_BATCH_TRAINING = true;
@@ -165,6 +166,7 @@ public class EMain {
 					case "-adagrad": useAdaGrad = args[i+1].equals("true")? true:false;break;
 					case "-testtrain": testOnTrain = args[i+1].equals("true")? true:false;break;
 					case "-depf": useDepf = args[i+1].equals("true")? true:false; break;
+					case "-dataset": dataset = args[i+1]; break;
 					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 				}
 			}

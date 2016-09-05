@@ -67,7 +67,7 @@ public class LogReader {
 			while((line = reader.readLine())!=null){
 				String[] vals = line.split("\\s+");
 				if(line.startsWith("accuracy:")){
-					System.out.println(vals[vals.length-1]);
+					System.out.print(vals[vals.length-1]+"\t");
 				}
 			}
 			reader.close();
@@ -77,24 +77,31 @@ public class LogReader {
 	}
 	
 	public static void main(String[] args){
-		String[] types = new String[]{"abc","cnn","mnb","nbc","pri","voa"};
-		String[] models = new String[]{"lcrf","semi","model1","model2"};
+		String[] types = new String[]{"abc","cnn","mnb","nbc", "p25","pri","voa"};
+//		String[] models = new String[]{"lcrf","semi","model1","model2"};
+		String[] models = new String[]{"semi"};
 		String[] deps = new String[]{"nodep","dep"};
-		String prefix = "/Users/allanjie/Dropbox/SUTD/AAAI17/exp/Testing";
+		String[] igs = new String[]{"-ignore","-noignore"};
+		String prefix = "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/Testing-bn";
 		//String model = "lcrf";
 //		String type = "abc";
 //		String dep = "nodep";
-		for(String model: models){
-			for(String dep: deps){
-				for(String type: types){
-					String data = prefix+"/"+model+"/"+model+"-"+dep+"-test-"+type+".log";
+
+		String goldPred = "-gold";
+		for(String type: types){
+			for(String model: models){
+				String ignore = "-noignore";
+				if(model.equals("lcrf")) { goldPred = ""; ignore = "";}
+				for(String dep: deps){
+					String data = prefix+"/"+model+"/"+model+goldPred+"-"+dep+ignore+"-test-"+type+".log";
 					LogReader lr = new LogReader(model, data);
 //					lr.calculateDecodeTime();
 					lr.printFmeasure();
 				}
-				System.out.println();
 			}
+			System.out.println();
 		}
+		
 		
 	}
 }

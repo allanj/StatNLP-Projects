@@ -51,7 +51,7 @@ public class SemiCRFMain {
 	/** true means using the predicted dependency features.. if not used dep features, this option does not matter**/
 	public static boolean isPipe = false; 
 	public static boolean ignore = false;
-	public static String dataset = "ontonotes"; //default
+	public static String dataset = "allanprocess"; //default
 	
 	
 	private static void processArgs(String[] args) throws FileNotFoundException{
@@ -120,7 +120,7 @@ public class SemiCRFMain {
 		System.out.println("[Info] Current Dataset:"+dataType);
 		String ign = ignore? "ignore":"noignore";
 		String resEval = "data/"+dataset+"/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".eval.txt";
-		String resRes  = "data/"+dataset+"/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".es.txt";
+		String resRes  = "data/"+dataset+"/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".res.txt";
 		
 		System.out.println("[Info] Reading data:"+train_filename);
 		System.out.println("[Info] Reading data:"+test_filename);

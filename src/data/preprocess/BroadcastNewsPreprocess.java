@@ -2,7 +2,9 @@ package data.preprocess;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +17,8 @@ import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
 
+import edu.stanford.nlp.trees.EnglishGrammaticalStructure;
+
 
 /**
  * This file is for reading the broadcast news only. 
@@ -26,7 +30,8 @@ import com.statnlp.commons.types.WordToken;
 public class BroadcastNewsPreprocess {
 
 	
-	public static String[] datasets = {"abc","cnn","mnb","nbc","pri","voa"};
+//	public static String[] datasets = {"abc","cnn","mnb","nbc","pri","voa", "p2.5_a2e", "p2.5_c2e", "p2.5"};
+	public static String[] datasets = {"p2.5"};
 	public static String[] valid = {"PERSON", "ORG", "GPE"};
 	public static String[] validConvert = {"person", "organization", "gpe"};
 	public static String[] others = {"NORP","FAC","LOC","PRODUCT","DATE","TIME","PERCENT","MONEY","QUANTITY","ORDINAL","CARDINAL","EVENT","WORK_OF_ART","LAW","LANGUAGE"};
@@ -43,12 +48,37 @@ public class BroadcastNewsPreprocess {
 	public static String converterLog = "F:/Dropbox/SUTD/tools/log.log";
 	public static String outputPrefx = "E:/Framework/data/allanprocess/";
 	
+	public static boolean useStanfordConverter = true;
 	//linux setup
 //	public static String filePrefix = "/home/allan/data/ontonotes_subset";
 //	public static String tmpTreebank = "/home/allan/temp/temp.txt";
 //	public static String converterPath = "/home/allan/tools/pennconverter.jar";
 //	public static String converterLog = "/home/allan/tools/log.log";
 //	public static String outputPrefx = "/home/allan/jointdpe/data/allanprocess/";
+	
+	
+	private static Sentence convertUsingStanfordNLP() throws IOException{
+		PrintStream out = new PrintStream(new FileOutputStream(tmpOutput));
+		System.setOut(out);
+		EnglishGrammaticalStructure.main(new String[]{"-basic","-keepPunct","-conllx","-treeFile",tmpTreebank});
+		System.setOut(System.out);
+		BufferedReader depReader = RAWF.reader(tmpOutput);
+		String depLine = null;
+		ArrayList<WordToken> wts = new ArrayList<WordToken>();
+		wts.add(new WordToken("ROOT", "ROOT", -1, "O", "NOLABEL"));
+		while((depLine=depReader.readLine())!=null){
+			if(depLine.equals("")) continue;
+			String[] components = depLine.split("\\t+");
+			int headIdx = Integer.valueOf(components[6]);
+			String depLabel = components[7];
+			wts.add(new WordToken(components[1], components[4], headIdx, "O", depLabel));
+		}
+		depReader.close();
+		WordToken[] wta  = new WordToken[wts.size()];
+		wts.toArray(wta);
+		Sentence sent = new Sentence(wta);
+		return sent;
+	}
 	
 	/**
 	 * The sentence returned will have a root on the leftmost
@@ -112,19 +142,22 @@ public class BroadcastNewsPreprocess {
 					File theNumber = new File(filePrefix+"/"+data+"/"+numberFolder); //abc/00/
 					if(theNumber.isDirectory()){
 						String[] textFileList = theNumber.list();  //abc/00/0001.parse.. something like this.
-//						System.out.println(Arrays.toString(textFileList));
+//						System.err.println(Arrays.toString(textFileList));
 						for(String textFile: textFileList){
 //							if(textFile.endsWith(".onf"))
 //								processTheONFFiles(filePrefix+"/"+data+"/"+numberFolder+"/"+textFile, sents);
 							if(textFile.endsWith(".name")){
+//								System.err.println(textFile);
 								String[] codes = textFile.split("\\.");
-								String parseFile = codes[0]+".parse";
+								String preName = codes[0];
+								for(int c=1; c<codes.length-1;c++) preName = preName+"."+codes[c];
+								String parseFile = preName+".parse";
 								processNameFiles(filePrefix+"/"+data+"/"+numberFolder+"/"+textFile, filePrefix+"/"+data+"/"+numberFolder+"/"+parseFile, sents);
 							}
 						}
 					}
 				}
-				System.out.println("[Info] Finishing dataset:"+data);
+				System.err.println("[Info] Finishing dataset:"+data);
 				//print these sentences.
 				printConll(data,sents);
 			}
@@ -150,7 +183,7 @@ public class BroadcastNewsPreprocess {
 			for(int i=0;i<vals.length;i++){
 				vals[i] = vals[i].trim();
 				if(vals[i].equals("")) {
-//					System.out.println(index+"\n"+vals[i+1]+"\n"+rpline+"\n");
+//					System.err.println(index+"\n"+vals[i+1]+"\n"+rpline+"\n");
 					continue;
 				}
 				if(vals[i].startsWith("TYPE=")){
@@ -172,9 +205,9 @@ public class BroadcastNewsPreprocess {
 					String[] words = vals[i].trim().split(" ");
 					index += words.length;
 				}
-//				System.out.println(index);
+//				System.err.println(index);
 			}
-//		    System.out.println(spans.toString());
+//		    System.err.println(spans.toString());
 		    //parse oneSentence here?
 		    pw = RAWF.writer(tmpTreebank);
 			while((parseLine=parseReader.readLine())!=null){
@@ -185,8 +218,8 @@ public class BroadcastNewsPreprocess {
 				}
 				pw.write(parseLine+"\n");
 			}
-			Sentence sent = convert();
-//			System.out.println(sent.toString());
+			Sentence sent = useStanfordConverter? convertUsingStanfordNLP():convert();
+//			System.err.println(sent.toString());
 			if(sent!=null){
 				//check the sentence length
 				if(index!=sent.length()) throw new RuntimeException("The length is not the same: index:"+index+" sent len:"+sent.length()+"\n"+sent.toString()+"\n"+file);
@@ -224,11 +257,11 @@ public class BroadcastNewsPreprocess {
 	    
 //	    final Matcher matcher = CHECK_REGEX.matcher(str);
 	    while (matcher.find()) {
-//	    	System.out.println(matcher.end(2));
+//	    	System.err.println(matcher.end(2));
 	    	//tagValues.add(matcher.group(0));
 
-//	    	System.out.println(matcher.group(0));
-//	    	System.out.println(matcher.group(1));
+//	    	System.err.println(matcher.group(0));
+//	    	System.err.println(matcher.group(1));
 	    	tagValues.add(matcher.group(1));
 	    	//tagValues.add(matcher.group(2));
 	    }
@@ -245,7 +278,7 @@ public class BroadcastNewsPreprocess {
 	 */
 	private static void printConll(String datasetName, ArrayList<Sentence> sents) throws IOException{
 		PrintWriter pw = RAWF.writer(outputPrefx+"/"+datasetName+"/all.conllx");
-		System.out.println("   dataset:"+datasetName+":"+sents.size());
+		System.err.println("   dataset:"+datasetName+":"+sents.size());
 		for(Sentence sent: sents){
 			for(int i=1; i<sent.length(); i++)
 				pw.write(i+"\t"+sent.get(i).getName()+"\t_\t"+sent.get(i).getTag()+"\t"+sent.get(i).getTag()+"\t_\t"+sent.get(i).getHeadIndex()+"\t"+sent.get(i).getDepLabel()+"\t_\t_\t"+sent.get(i).getEntity()+"\n");
@@ -261,6 +294,7 @@ public class BroadcastNewsPreprocess {
 	 */
 	public static void splitTrainDevTest() throws IOException{
 		for(String data: datasets){
+			if(data.equals("p2.5_a2e") ||data.equals("p2.5_c2e") ) continue;
 			BufferedReader reader = RAWF.reader(outputPrefx+data+"/all.conllx");
 			String line = null;
 			int numberOfSentence = 0;
@@ -268,11 +302,11 @@ public class BroadcastNewsPreprocess {
 				if(line.equals("")) numberOfSentence++;
 			}
 			reader.close();
-			System.out.println("dataset:"+data+" number:"+numberOfSentence);
+			System.err.println("dataset:"+data+" number:"+numberOfSentence);
 			int trainNum = numberOfSentence/2+1;
 			int devNum = (numberOfSentence - trainNum)/2;
 			int testNum = numberOfSentence - trainNum - devNum;
-			System.out.println("split with:"+trainNum+"\t"+devNum+"\t"+testNum);
+			System.err.println("split with:"+trainNum+"\t"+devNum+"\t"+testNum);
 			PrintWriter pwTrain = RAWF.writer(outputPrefx+data+"/train.conllx");
 			PrintWriter pwDev = RAWF.writer(outputPrefx+data+"/dev.conllx");
 			PrintWriter pwTest = RAWF.writer(outputPrefx+data+"/test.conllx");
@@ -312,7 +346,7 @@ public class BroadcastNewsPreprocess {
 	 * @throws InterruptedException
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException{
-//		System.out.println(convert());
+//		System.err.println(convert());
 //		process();
 		splitTrainDevTest();
 	}
