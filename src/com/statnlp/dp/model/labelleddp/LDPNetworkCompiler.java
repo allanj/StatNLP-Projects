@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
+import com.statnlp.dp.commons.DepLabel;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;

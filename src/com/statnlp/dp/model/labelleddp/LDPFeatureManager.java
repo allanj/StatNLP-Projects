@@ -3,6 +3,7 @@ package com.statnlp.dp.model.labelleddp;
 import java.util.ArrayList;
 
 import com.statnlp.commons.types.Sentence;
+import com.statnlp.dp.commons.DepLabel;
 import com.statnlp.hybridnetworks.FeatureArray;
 import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;

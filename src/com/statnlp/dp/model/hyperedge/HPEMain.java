@@ -100,8 +100,8 @@ public class HPEMain {
 		DependInstance[] trainingInsts = null;
 		DependInstance[] testingInsts = null;
 		if(dataTypeSet.contains(DPConfig.dataType)){
-			trainingInsts = DependencyReader.readCNN(trainingPath, true,trainNumber,tran);
-			testingInsts = DependencyReader.readCNN(decodePath, false,testNumber,tran);
+			trainingInsts = DependencyReader.readCoNLLX(trainingPath, true,trainNumber,tran, true);
+			testingInsts = DependencyReader.readCoNLLX(decodePath, false,testNumber,tran, false);
 		}else{
 			trainingInsts = DependencyReader.readInstance(trainingPath, true,trainNumber,selectedEntities,tran, false);
 			testingInsts = DependencyReader.readInstance(decodePath, false,testNumber,selectedEntities,tran, false);

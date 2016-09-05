@@ -17,7 +17,7 @@
 /**
  * 
  */
-package com.statnlp.dp.model.labelleddp;
+package com.statnlp.dp.commons;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -33,6 +33,8 @@ public class DepLabel implements Serializable{
 	
 	public static final Map<String, DepLabel> LABELS = new HashMap<String, DepLabel>();
 	public static final Map<Integer, DepLabel> LABELS_INDEX = new HashMap<Integer, DepLabel>();
+	public static String rootDepLabel;
+	
 	
 	public static DepLabel get(String form){
 		if(!LABELS.containsKey(form)){

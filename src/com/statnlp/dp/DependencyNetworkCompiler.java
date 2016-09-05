@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
+import com.statnlp.dp.commons.DepLabel;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
@@ -21,9 +22,11 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 	private long[] _nodes;
 	private int maxSentLen = 143;
 	private int[][][] _children;
+	private boolean labeledDep;
 	
-	public DependencyNetworkCompiler() {
-		
+	public DependencyNetworkCompiler(boolean labeledDep) {
+		this.labeledDep = labeledDep;
+		NetworkIDMapper.setCapacity(new int[]{500, 500, 5, 5, 100, 10});
 	}
 
 	@Override
@@ -79,7 +82,16 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 //		System.err.println("Parent Info:"+Arrays.toString(info));
 //		if(pa_leftIndex==pa_rightIndex-1) return; //means the span width now is 2, already enough
 		if(pa_leftIndex==pa_rightIndex) return; //means the span width now is 1, already enough
-		long parentNode = toNode(pa_leftIndex, pa_rightIndex, pa_direction, pa_completeness);
+
+		Sentence sent = ((DependInstance)network.getInstance()).getInput();
+		int pa_depLabelId = -1;
+		if(!labeledDep || pa_completeness==1) pa_depLabelId = DepLabel.LABELS.size();
+		else{
+			String depLabel = pa_direction==1? sent.get(pa_rightIndex).getDepLabel():sent.get(pa_leftIndex).getDepLabel();
+			if(!DepLabel.LABELS.containsKey(depLabel)) throw new RuntimeException("not contain this label");
+			pa_depLabelId = DepLabel.get(depLabel).getId();
+		}
+		long parentNode = toNode(pa_leftIndex, pa_rightIndex, pa_direction, pa_completeness, pa_depLabelId);
 		Tree[] children = parent.children();
 		if(children.length!=2){
 			throw new RuntimeException("The children length should be 2 in the labeled tree.");
@@ -91,7 +103,15 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 		int child_rightIndex_1 = Integer.valueOf(childInfo_1[1]);
 		int child_direction_1 = Integer.valueOf(childInfo_1[2]);
 		int child_completeness_1 = Integer.valueOf(childInfo_1[3]);
-		long childNode_1 = toNode(child_leftIndex_1, child_rightIndex_1, child_direction_1, child_completeness_1);
+		
+		int c1_depLabelId = -1;
+		if(!labeledDep || child_completeness_1==1) c1_depLabelId = DepLabel.LABELS.size();
+		else{
+			String depLabel = child_direction_1==1? sent.get(child_rightIndex_1).getDepLabel():sent.get(child_leftIndex_1).getDepLabel();
+			if(!DepLabel.LABELS.containsKey(depLabel)) throw new RuntimeException("not contain this label");
+			c1_depLabelId = DepLabel.get(depLabel).getId();
+		}
+		long childNode_1 = toNode(child_leftIndex_1, child_rightIndex_1, child_direction_1, child_completeness_1, c1_depLabelId);
 //		System.err.println("network node child 1:"+Arrays.toString(NetworkIDMapper.toHybridNodeArray(childNode_1)));
 		network.addNode(childNode_1);
 		
@@ -102,7 +122,14 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 		int child_direction_2 = Integer.valueOf(childInfo_2[2]);
 		int child_completeness_2 = Integer.valueOf(childInfo_2[3]);
 //		System.err.println("child 2 Info:"+Arrays.toString(childInfo_2));
-		long childNode_2 = toNode(child_leftIndex_2, child_rightIndex_2, child_direction_2, child_completeness_2);
+		int c2_depLabelId = -1;
+		if(!labeledDep || child_completeness_2==1) c2_depLabelId = DepLabel.LABELS.size();
+		else{
+			String depLabel = child_direction_2==1? sent.get(child_rightIndex_2).getDepLabel():sent.get(child_leftIndex_2).getDepLabel();
+			if(!DepLabel.LABELS.containsKey(depLabel)) throw new RuntimeException("not contain this label");
+			c2_depLabelId = DepLabel.get(depLabel).getId();
+		}
+		long childNode_2 = toNode(child_leftIndex_2, child_rightIndex_2, child_direction_2, child_completeness_2,c2_depLabelId);
 		network.addNode(childNode_2);
 //		System.err.println("network node child 2:"+Arrays.toString(NetworkIDMapper.toHybridNodeArray(childNode_2)));
 		network.addEdge(parentNode, new long[]{childNode_1,childNode_2});
@@ -116,7 +143,7 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 			this.compileUnlabeled();
 		}
 //		System.err.println("[Info] Compile Unlabeled instance, length: "+inst.getInput().length());
-		long root = this.toNode(0, inst.getInput().length()-1, 1, 1);
+		long root = this.toNode(0, inst.getInput().length()-1, 1, 1, DepLabel.LABELS.size());
 		int rootIdx = Arrays.binarySearch(this._nodes, root);
 //		System.err.println("Number of nodes under this root Index: "+ (rootIdx+1));
 
@@ -127,11 +154,11 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 	
 	public DependencyNetwork debug(int networkId, DependInstance inst, LocalNetworkParam param){
 		DependencyNetwork network = new DependencyNetwork();
-		long rootNode = this.toNode(0, 3, 1, 1);
-		long rootchild1 = this.toNode(0, 2, 1, 0);
-		long rootchild2 = this.toNode(2, 3, 1, 1);
-		long leaf1 = this.toNode(0, 0, 1, 1);
-		long leaf2 = this.toNode(1, 2, 0, 1);
+		long rootNode = this.toNode(0, 3, 1, 1,1);
+		long rootchild1 = this.toNode(0, 2, 1, 0,1);
+		long rootchild2 = this.toNode(2, 3, 1, 1,1);
+		long leaf1 = this.toNode(0, 0, 1, 1,1);
+		long leaf2 = this.toNode(1, 2, 0, 1,1);
 		network.addNode(rootNode);
 		network.addNode(rootchild1);
 		network.addNode(rootchild2);
@@ -139,24 +166,24 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 		network.addNode(leaf1);
 		network.addNode(leaf2);
 		network.addEdge(rootchild1, new long[]{leaf1,leaf2});
-		long leaf11 = this.toNode(1, 1, 0, 1);
-		long leaf12 = this.toNode(1, 2, 0, 0);
+		long leaf11 = this.toNode(1, 1, 0, 1,1);
+		long leaf12 = this.toNode(1, 2, 0, 0,1);
 		network.addNode(leaf11);
 		network.addNode(leaf12);
 		network.addEdge(leaf2, new long[]{leaf11,leaf12});
-		long leaf11r = this.toNode(1, 1, 1, 1);
-		long leaf22l = this.toNode(2, 2, 0, 1);
+		long leaf11r = this.toNode(1, 1, 1, 1,1);
+		long leaf22l = this.toNode(2, 2, 0, 1,1);
 		network.addNode(leaf11r);
 		network.addNode(leaf22l);
 		network.addEdge(leaf12, new long[]{leaf11r,leaf22l});
 		
-		long node23 = this.toNode(2, 3, 1, 0);
-		long leaf33r = this.toNode(3, 3, 1, 1);
+		long node23 = this.toNode(2, 3, 1, 0,1);
+		long leaf33r = this.toNode(3, 3, 1, 1,1);
 		network.addNode(node23); network.addNode(leaf33r);
 		network.addEdge(rootchild2, new long[]{node23,leaf33r});
 		
-		long leaf22r = this.toNode(2, 2, 1, 1);
-		long leaf33l = this.toNode(3, 3, 0, 1);
+		long leaf22r = this.toNode(2, 2, 1, 1,1);
+		long leaf33l = this.toNode(3, 3, 0, 1,1);
 		network.addNode(leaf22r); network.addNode(leaf33l);
 		network.addEdge(node23, new long[]{leaf22r,leaf33l});
 		
@@ -164,7 +191,7 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 		this._nodes = network.getAllNodes();
 		this._children = network.getAllChildren();
 		System.err.println("Debug mode:"+network.countNodes()+" nodes..");
-		long root = this.toNode(0, 3, 1, 1);
+		long root = this.toNode(0, 3, 1, 1,1);
 		int rootIdx = Arrays.binarySearch(this._nodes, root);
 		DependencyNetwork mynetwork = new DependencyNetwork(networkId, inst, this._nodes, this._children, param, rootIdx+1);
 		return mynetwork;
@@ -177,14 +204,14 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 		DependencyNetwork network = new DependencyNetwork();
 		//add the root word and other nodes
 		//all are complete nodes.
-		long rootWordNode = this.toNode(0, 0, 1, 1);
+		long rootWordNode = this.toNode(0, 0, 1, 1, DepLabel.LABELS.size());
 		network.addNode(rootWordNode);
 		
 		for(int rightIndex = 1; rightIndex<=this.maxSentLen-1;rightIndex++){
 			//eIndex: 1,2,3,4,5,..n
 			
-			long wordLeftNode = this.toNode(rightIndex, rightIndex, 0, 1);
-			long wordRightNode = this.toNode(rightIndex, rightIndex, 1, 1);
+			long wordLeftNode = this.toNode(rightIndex, rightIndex, 0, 1, DepLabel.LABELS.size());
+			long wordRightNode = this.toNode(rightIndex, rightIndex, 1, 1, DepLabel.LABELS.size());
 			network.addNode(wordLeftNode);
 			network.addNode(wordRightNode);
 			
@@ -197,18 +224,34 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 				
 				for(int complete=0;complete<=1;complete++){
 					for(int direction=0;direction<=1;direction++){
-						long parent = this.toNode(leftIndex, rightIndex, direction, complete);
 //						System.err.println("[Info] Network Parent: "+Arrays.toString(NetworkIDMapper.toHybridNodeArray(parent)));
+						long parent = this.toNode(leftIndex, rightIndex, direction, complete, DepLabel.LABELS.size());
 						if(leftIndex==0 && direction==0) continue;
 						if(complete==0){
 							for(int m=leftIndex;m<rightIndex;m++){
-								long child_1 = this.toNode(leftIndex, m, 1, 1);
+								long child_1 = this.toNode(leftIndex, m, 1, 1, DepLabel.LABELS.size());
 //								System.err.println("[Info] Network child 1: "+Arrays.toString(NetworkIDMapper.toHybridNodeArray(child_1)));
-								long child_2 = this.toNode(m+1, rightIndex, 0, 1);
+								long child_2 = this.toNode(m+1, rightIndex, 0, 1, DepLabel.LABELS.size());
 //								System.err.println("[Info] Network child 2: "+Arrays.toString(NetworkIDMapper.toHybridNodeArray(child_2)));
 								if(network.contains(child_1) && network.contains(child_2)){
-									network.addNode(parent);
-									network.addEdge(parent, new long[]{child_1,child_2});
+									if(labeledDep){
+										if(leftIndex==0 && direction==1){
+											parent = this.toNode(leftIndex, rightIndex, direction, complete, DepLabel.get(DepLabel.rootDepLabel).getId());
+											network.addNode(parent);
+											network.addEdge(parent, new long[]{child_1,child_2});
+										}else{
+											for(int l=0;l<DepLabel.LABELS.size();l++){
+												if(DepLabel.get(l).getForm().equals(DepLabel.rootDepLabel)) continue;
+												parent = this.toNode(leftIndex, rightIndex, direction, complete,l);
+												network.addNode(parent);
+												network.addEdge(parent, new long[]{child_1,child_2});
+											}
+										}
+									}else{
+										network.addNode(parent);
+										network.addEdge(parent, new long[]{child_1,child_2});
+									}
+									
 								}
 								
 							}
@@ -216,23 +259,48 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 						
 						if(complete==1 && direction==0){
 							for(int m=leftIndex;m<rightIndex;m++){
-								long child_1 = this.toNode(leftIndex, m, 0, 1);
-								long child_2 = this.toNode(m, rightIndex, 0, 0);
-								if(network.contains(child_1) && network.contains(child_2)){
-									network.addNode(parent);
-									network.addEdge(parent, new long[]{child_1,child_2});
+								long child_1 = this.toNode(leftIndex, m, 0, 1, DepLabel.LABELS.size());
+								long child_2 = this.toNode(m, rightIndex, 0, 0, DepLabel.LABELS.size());
+								if(labeledDep){
+									for(int l=0;l<DepLabel.LABELS.size();l++){
+										if(DepLabel.get(l).getForm().equals(DepLabel.rootDepLabel)) continue;
+										child_2 = this.toNode(m, rightIndex, 0, 0, l);
+										if(network.contains(child_1) && network.contains(child_2)){
+											network.addNode(parent);
+											network.addEdge(parent, new long[]{child_1,child_2});
+										}
+									}
+								}else{
+									if(network.contains(child_1) && network.contains(child_2)){
+										network.addNode(parent);
+										network.addEdge(parent, new long[]{child_1,child_2});
+									}
 								}
+								
 							}
 						}
 						
 						if(complete==1 && direction==1){
 							for(int m=leftIndex+1;m<=rightIndex;m++){
-								long child_1 = this.toNode(leftIndex, m, 1, 0);
-								long child_2 = this.toNode(m, rightIndex, 1, 1);
-								if(network.contains(child_1) && network.contains(child_2)){
-									network.addNode(parent);
-									network.addEdge(parent, new long[]{child_1,child_2});
+								long child_1 = this.toNode(leftIndex, m, 1, 0, DepLabel.LABELS.size());
+								long child_2 = this.toNode(m, rightIndex, 1, 1, DepLabel.LABELS.size());
+								if(labeledDep){
+									for(int l=0;l<DepLabel.LABELS.size();l++){
+										if(leftIndex==0 && !DepLabel.get(l).getForm().equals(DepLabel.rootDepLabel)) continue;
+										if(DepLabel.get(l).getForm().equals(DepLabel.rootDepLabel) && leftIndex!=0) continue;
+										child_1 = this.toNode(leftIndex, m, 1, 0,l);
+										if(network.contains(child_1) && network.contains(child_2)){
+											network.addNode(parent);
+											network.addEdge(parent, new long[]{child_1,child_2});
+										}
+									}
+								}else{
+									if(network.contains(child_1) && network.contains(child_2)){
+										network.addNode(parent);
+										network.addEdge(parent, new long[]{child_1,child_2});
+									}
 								}
+								
 							}
 						}
 						
@@ -265,7 +333,7 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 		
 		Tree root = new LabeledScoredTreeNode();
 		CoreLabel rootLabel = new CoreLabel();
-		rootLabel.setValue("0,"+(inst.getInput().length()-1)+",1,1");
+		rootLabel.setValue("0,"+(inst.getInput().length()-1)+",1,1,"+DepLabel.LABELS.size());
 		root.setLabel(rootLabel);
 		root.setScore(network.getMax());
 		this.toTreeHelper(network, network.countNodes()-1, root);
@@ -284,7 +352,7 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 				total += score;
 				kthRoot.setScore(score);
 				CoreLabel kthRootLabel = new CoreLabel();
-				kthRootLabel.setValue("0,"+(inst.getInput().length()-1)+",1,1");
+				kthRootLabel.setValue("0,"+(inst.getInput().length()-1)+",1,1,"+DepLabel.LABELS.size());
 				kthRoot.setLabel(kthRootLabel);
 				this.toTreeHelperTopK(network, network.countNodes()-1, kthRoot, kth);
 				topK[kth] = kthRoot;
@@ -313,7 +381,8 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 			sb.append(leftIndex);  sb.append(",");
 			sb.append(ids_child[0]);  sb.append(",");
 			sb.append(ids_child[3]); sb.append(",");
-			sb.append(ids_child[2]);
+			sb.append(ids_child[2]); sb.append(",");
+			sb.append(ids_child[4]);
 			childLabel.setValue(sb.toString());
 			childNode.setLabel(childLabel);
 			parentNode.addChild(childNode);
@@ -336,7 +405,8 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 			sb.append(leftIndex);  sb.append(",");
 			sb.append(ids_child[0]);  sb.append(",");
 			sb.append(ids_child[3]); sb.append(",");
-			sb.append(ids_child[2]);
+			sb.append(ids_child[2]); sb.append(",");
+			sb.append(ids_child[4]);
 			childLabel.setValue(sb.toString());
 			childNode.setLabel(childLabel);
 			parentNode.addChild(childNode);
@@ -382,13 +452,13 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 	public long toNode_root(int sentLen){
 		int sentence_len = sentLen;
 		//Largest span and the node id is sentence len, because the id 0 to sentence len-1
-		return NetworkIDMapper.toHybridNodeID(new int[]{sentence_len-1, sentence_len-1,1,1,Network.NODE_TYPE.max.ordinal()});
+		return NetworkIDMapper.toHybridNodeID(new int[]{sentence_len-1, sentence_len-1,1,1,DepLabel.LABELS.size(),Network.NODE_TYPE.max.ordinal()});
 	}
 	
-	public long toNode(int leftIndex, int rightIndex, int direction, int complete){
+	public long toNode(int leftIndex, int rightIndex, int direction, int complete, int depLabelId){
 		//dfn has the id the sentence.
 		//could be same span but not same word id.
-		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex,rightIndex-leftIndex,complete, direction,Network.NODE_TYPE.max.ordinal()});
+		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex,rightIndex-leftIndex,complete, direction,depLabelId,Network.NODE_TYPE.max.ordinal()});
 	}
 
 }

@@ -10,6 +10,7 @@ import java.util.List;
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.dp.Transformer;
+import com.statnlp.dp.commons.DepLabel;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DataChecker;
 

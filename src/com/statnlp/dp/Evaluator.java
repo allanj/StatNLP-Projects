@@ -19,15 +19,20 @@ public class Evaluator {
 	public static boolean DEBUG = false;
 
 	
+	public static void evalDP(Instance[] testInsts, String dpOut) throws IOException{
+		evalDP(testInsts, dpOut, false);
+	}
+	
 	/**
 	 * Evaluate the dependency
 	 * @param testInsts
 	 * @param dpOut, index \t word \t tag \t true entity \t trueHead \t predHead
 	 * @throws IOException
 	 */
-	public static void evalDP(Instance[] testInsts, String dpOut) throws IOException{
+	public static void evalDP(Instance[] testInsts, String dpOut, boolean labeledDep) throws IOException{
 		int dp_corr=0;
 		int dp_total=0;
+		int las_corr = 0;
 		int lastGlobalId = Integer.MIN_VALUE;
 		double max = Double.NEGATIVE_INFINITY;
 		int bestId = -1;
@@ -81,9 +86,13 @@ public class Evaluator {
 			}else{
 				ArrayList<UnnamedDependency> predDependencies = inst.toDependencies(prediction);
 				int[] predHeads = Transformer.getHeads(predDependencies, inst.getInput());
+				String[] predLabels = labeledDep? Transformer.getDepLabel(predDependencies, inst.getInput()): null;
 				for(int i=1;i<predHeads.length;i++){
-					if(predHeads[i]==sent.get(i).getHeadIndex())
+					if(predHeads[i]==sent.get(i).getHeadIndex()){
 						dp_corr++;
+						if(labeledDep && predLabels[i].equals(sent.get(i).getDepLabel()))
+							las_corr++;
+					}
 					dp_total++;
 					pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+sent.get(i).getHeadIndex()+" "+predHeads[i]+"\n");
 				}
@@ -96,6 +105,7 @@ public class Evaluator {
 		System.out.println("[Dependency] Correct: "+dp_corr);
 		System.out.println("[Dependency] total: "+dp_total);
 		System.out.println("[Dependency] UAS: "+dp_corr*1.0/dp_total);
+		if(labeledDep) System.out.println("[Dependency] LAS: "+las_corr*1.0/dp_total);
 		System.out.println("*************************");
 	}
 	
@@ -229,10 +239,6 @@ public class Evaluator {
 	
 	
 	
-	
-	public static void main(String[] args) throws IOException{
-		evalNER("data/semeval10t1/ecrf.dev.ner.res.txt");
-	}
 
 	
 }

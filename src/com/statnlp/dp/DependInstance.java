@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.statnlp.commons.types.Sentence;
+import com.statnlp.dp.commons.DepLabel;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.DPConfig.MODEL;
 
@@ -181,6 +182,8 @@ public class DependInstance extends ModelInstance {
 		int pa_rightIndex = Integer.valueOf(info[1]);
 		int pa_direction = Integer.valueOf(info[2]);  //previously the position for direction is 2.
 		int pa_completeness = Integer.valueOf(info[3]);
+		int pa_deplabel = Integer.valueOf(info[4]);
+		String depLabel = pa_deplabel==DepLabel.LABELS.size()? "NA": DepLabel.get(pa_deplabel).getForm();
 		String type = null;
 		if(info.length>4)
 			type = info[4];
@@ -190,17 +193,19 @@ public class DependInstance extends ModelInstance {
 		CoreLabel governorLabel = new CoreLabel();
 		CoreLabel dependentLabel = new CoreLabel();
 //		System.err.println("left:"+pa_leftIndex+", right:"+pa_rightIndex);
-		if(pa_completeness==0 && ( (info.length>4 && type.startsWith("pae")) || info.length==4 || validModel()    ) ){
+		if(pa_completeness==0 && ( (info.length>4 && type.startsWith("pae")) || info.length==5 || validModel()    ) ){
 			if(pa_direction==0){
 				governorLabel.setSentIndex(pa_rightIndex);
 				governorLabel.setValue("index:"+pa_rightIndex);
 				dependentLabel.setSentIndex(pa_leftIndex);
 				dependentLabel.setValue("index:"+pa_leftIndex);
+				dependentLabel.setTag(depLabel);
 			}else{
 				governorLabel.setSentIndex(pa_leftIndex);
 				governorLabel.setValue("index:"+pa_leftIndex);
 				dependentLabel.setSentIndex(pa_rightIndex);
 				dependentLabel.setValue("index:"+pa_rightIndex);
+				dependentLabel.setTag(depLabel);
 			}
 			dependencies.add(new UnnamedDependency(governorLabel, dependentLabel));
 			

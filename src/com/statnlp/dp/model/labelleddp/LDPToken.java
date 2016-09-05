@@ -1,6 +1,7 @@
 package com.statnlp.dp.model.labelleddp;
 
 import com.statnlp.commons.types.WordToken;
+import com.statnlp.dp.commons.DepLabel;
 
 public class LDPToken extends WordToken {
 

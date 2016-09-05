@@ -3,6 +3,7 @@ package com.statnlp.dp;
 import java.util.ArrayList;
 
 import com.statnlp.commons.types.Sentence;
+import com.statnlp.dp.commons.DepLabel;
 import com.statnlp.hybridnetworks.FeatureArray;
 import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -13,13 +14,14 @@ public class DependencyFeatureManager extends FeatureManager {
 
 	private static final long serialVersionUID = 7274939836196010680L;
 
-	public enum FEATYPE {unigram, bigram,contextual, inbetween, prefix,pipe};
+	public enum FEATYPE {unigram, bigram,contextual, inbetween, prefix,pipe,label};
 	protected boolean isPipe;
+	protected boolean labeledDep;
 	
-	public DependencyFeatureManager(GlobalNetworkParam param_g, boolean isPipe) {
+	public DependencyFeatureManager(GlobalNetworkParam param_g, boolean isPipe, boolean labeledDep) {
 		super(param_g);
 		this.isPipe = isPipe;
-		// TODO Auto-generated constructor stub
+		this.labeledDep = labeledDep;
 	}
 	
 	
@@ -60,7 +62,7 @@ public class DependencyFeatureManager extends FeatureManager {
 		
 		//if incomplete span or complete but with spanlen is 2
 		if(completeness==0){
-			
+			String label = labeledDep? DepLabel.LABELS_INDEX.get(parentArr[4]).getForm(): null;
 			int dist = Math.abs(rightIndex-leftIndex);
 			String att = direction==1? "RA":"LA";
 			String distBool = "0";
@@ -91,6 +93,10 @@ public class DependencyFeatureManager extends FeatureManager {
 			headTag = sent.get(headIndex).getTag();
 			modifierWord = sent.get(modifierIndex).getName();
 			modifierTag = sent.get(modifierIndex).getTag();
+			if(labeledDep){
+				addLabeledFeatures(network, att, true, sent, modifierIndex, label, featureList);
+				addLabeledFeatures(network, att, false, sent, headIndex, label, featureList);
+			}
 			
 			
 			/***Prefix 5 gram features*********/
@@ -260,8 +266,6 @@ public class DependencyFeatureManager extends FeatureManager {
 			
 		}
 		
-		
-		
 		ArrayList<Integer> finalList = new ArrayList<Integer>();
 		for(int i=0;i<featureList.size();i++){
 			if(featureList.get(i)!=-1)
@@ -273,6 +277,28 @@ public class DependencyFeatureManager extends FeatureManager {
 		fa = new FeatureArray(features);
 		return fa;
 	}
-
+	
+	private void addLabeledFeatures(Network network, String att, boolean childFeatures, Sentence sent,int pos, String label, ArrayList<Integer> featureList){
+		
+		String w = sent.get(pos).getName();
+		String wP = sent.get(pos).getTag();
+		String wPm1 = pos > 0 ? sent.get(pos-1).getTag() : "STR";
+		String wPp1 = pos < sent.length()-1 ? sent.get(pos+1).getTag() : "END";
+		
+		featureList.add(this._param_g.toFeature(network,FEATYPE.label.name(), "LABEL-dir", label+"&"+att));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.label.name(), "LABEL", label));
+		for(int i = 0; i < 2; i++) {
+			String suff = i < 1 ? "&"+att : "";
+			suff = "&"+label+suff;
+		 
+		 	featureList.add(this._param_g.toFeature(network,FEATYPE.label.name(), "LABEL-W-WP-suff", w+" "+wP+suff));
+		 	featureList.add(this._param_g.toFeature(network,FEATYPE.label.name(), "LABEL-WP-suff", wP+suff));
+		 	featureList.add(this._param_g.toFeature(network,FEATYPE.label.name(), "LABEL-WM-WP-suff", wPm1+" "+wP+suff));
+		 
+		 	featureList.add(this._param_g.toFeature(network,FEATYPE.label.name(), "LABEL-WP-WPT-suff", wP+" "+wPp1+suff));
+		 	featureList.add(this._param_g.toFeature(network,FEATYPE.label.name(), "LABEL-WM-WP-WPT-suff", wPm1+" "+wP+" "+wPp1+suff));
+		 	featureList.add(this._param_g.toFeature(network,FEATYPE.label.name(), "LABEL-W-suff", w+suff));
+		}
+	}
 	
 }

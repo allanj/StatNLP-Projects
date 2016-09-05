@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import com.statnlp.commons.types.Instance;
+import com.statnlp.dp.commons.DepLabel;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.dp.utils.Init;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
@@ -33,6 +34,7 @@ public class DependencyMain {
 	public static boolean isDev = false;
 	public static HashSet<String> dataTypeSet;
 	public static boolean topKinput = false;
+	public static boolean labeledDep = false;
 	
 	
 	public static String[] initializeTypeMap(){
@@ -77,7 +79,7 @@ public class DependencyMain {
 		}
 		/****Debug info****/
 //		trainingPath = "data/semeval10t1/small.txt";
-//		testFile = "data/semeval10t1/small.txt";
+		testFile = "data/semeval10t1/train.conllx";
 		/****/
 		System.err.println("[Info] DEBUG MODE: "+DPConfig.DEBUG);
 		
@@ -91,17 +93,11 @@ public class DependencyMain {
 		DependencyTransformer trans = new DependencyTransformer();
 		DependInstance[] trainingInsts = null;
 		DependInstance[] testingInsts = null;
-		if(dataTypeSet.contains(DPConfig.dataType)){
-//			trainingInsts = DependencyReader.readCNN(trainingPath, true, trainNumber, trans);
-//			testingInsts = DependencyReader.readCNN(testFile, false,testNumber,trans);
-			trainingInsts = DependencyReader.readOntoNotes5(trainingPath, true, trainNumber, trans, true); //true: check projective
-			boolean checkTestProjective = isDev? true:false;
-			testingInsts = DependencyReader.readOntoNotes5(testFile, false,testNumber,trans, checkTestProjective);   //false: not check the projective in testing
-		}else{
-			trainingInsts = DependencyReader.readInstance(trainingPath, true,trainNumber,entities,trans);
-			testingInsts = isPipe? DependencyReader.readFromPipeline(testFile,testNumber,trans, topKinput): DependencyReader.readInstance(testFile, false,testNumber,entities,trans);
-		}
-		
+		trainingInsts = DependencyReader.readCoNLLX(trainingPath, true, trainNumber, trans, true); //true: check projective
+		boolean checkTestProjective = isDev? true:false;
+		testingInsts =   isPipe? DependencyReader.readFromPipeline(testFile,testNumber,trans, topKinput): 
+								DependencyReader.readCoNLLX(testFile, false,testNumber,trans, checkTestProjective);   //false: not check the projective in testing
+		System.out.println("[Info] Total number of dependency label:"+DepLabel.LABELS.size());
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
 		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
@@ -115,14 +111,14 @@ public class DependencyMain {
 		
 		
 		
-		DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(), isPipe);
-		DependencyNetworkCompiler dnc = new DependencyNetworkCompiler();
+		DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(), isPipe, labeledDep);
+		DependencyNetworkCompiler dnc = new DependencyNetworkCompiler(labeledDep);
 		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);
 		model.train(trainingInsts, numIteration); 
 		
 		/****************Evaluation Part**************/
 		Instance[] predInsts = model.decode(testingInsts);
-		Evaluator.evalDP(predInsts, dpOut);
+		Evaluator.evalDP(predInsts, dpOut, labeledDep);
 		if(NetworkConfig._topKValue>1)
 			Evaluator.outputTopKDep(predInsts, topKDepOut);
 		
@@ -154,6 +150,7 @@ public class DependencyMain {
 					case "-wpath":DPConfig.weightPath=args[i+1]; DPConfig.writeWeight = true; break;
 					case "-topk":NetworkConfig._topKValue = Integer.valueOf(args[i+1]); break;
 					case "-topkinput": topKinput = true; break;
+					case "-las": labeledDep= args[i+1].equals("true")?true:false; break;
 					default: System.err.println("Invalid arguments, please check usage."); System.err.println(usage);System.exit(0);
 				}
 			}
