@@ -15,11 +15,12 @@ public class BFNetworkCompiler extends NetworkCompiler{
 	private static final long serialVersionUID = -2388666010977956073L;
 
 	public enum NODE_TYPES {LEAF, depInLinear,ROOT};
-	public int _size = 10;
+	public int _size;
 	public BFNetwork genericUnlabeledNetwork;
 	public int number = 0;
 	public int addedNum = 0;
-	public BFNetworkCompiler(){
+	public BFNetworkCompiler(int size){
+		_size  = size;
 		this.compileUnlabeledInstancesGeneric();
 	}
 	

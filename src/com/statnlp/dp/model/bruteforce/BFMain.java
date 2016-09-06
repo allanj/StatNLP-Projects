@@ -3,7 +3,6 @@ package com.statnlp.dp.model.bruteforce;
 import java.io.IOException;
 import java.util.List;
 
-import com.statnlp.commons.types.Instance;
 import com.statnlp.dp.utils.DPConfig;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -21,6 +20,7 @@ public class BFMain {
 	public static String dpOut;
 	public static String nerRes;
 	public static boolean isDev;
+	public static int number;
 	
 	public static void main(String[] args) throws IOException, InterruptedException{
 		// TODO Auto-generated method stub
@@ -67,7 +67,7 @@ public class BFMain {
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = false;
 		
 		BFFeatureManager fa = new BFFeatureManager(new GlobalNetworkParam());
-		BFNetworkCompiler compiler = new BFNetworkCompiler();
+		BFNetworkCompiler compiler = new BFNetworkCompiler(number);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		BFInstance[] ecrfs = trainInstances.toArray(new BFInstance[trainInstances.size()]);
 		model.train(ecrfs, numIteration);
@@ -94,6 +94,7 @@ public class BFMain {
 					case "-reg": DPConfig.L2 = Double.valueOf(args[i+1]); break;
 					case "-dev":isDev = args[i+1].equals("true")?true:false; break;
 					case "-windows":DPConfig.windows = true; break;
+					case "-num":number = Integer.valueOf(args[i+1]); break;
 					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 				}
 			}
