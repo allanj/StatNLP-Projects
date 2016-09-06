@@ -1,5 +1,7 @@
 package data.preprocess;
 
+import org.maltparser.Malt;
+
 import edu.stanford.nlp.trees.EnglishGrammaticalStructure;
 
 public class Test {
@@ -11,8 +13,11 @@ public class Test {
 	public static void main(String[] args){
 //		String[] myargs = new String[]{"-h",head_rule,"-i","/Users/allanjie/Downloads/abc_0020.parse"};
 //		C2DConvert.main(args);
-		String tmpParse = "F:/phd/data/ontonotes-release-5.0_LDC2013T19/ontonotes-release-5.0_LDC2013T19/ontonotes-release-5.0/data/files/data/english/annotations/bn/abc/00/abc_0001.parse";
-		EnglishGrammaticalStructure.main(new String[]{"-basic","-keepPunct","-conllx","-treeFile",tmpParse});
+//		String tmpParse = "F:/phd/data/ontonotes-release-5.0_LDC2013T19/ontonotes-release-5.0_LDC2013T19/ontonotes-release-5.0/data/files/data/english/annotations/bn/abc/00/abc_0001.parse";
+//		EnglishGrammaticalStructure.main(new String[]{"-basic","-keepPunct","-conllx","-treeFile",tmpParse});
+//		Malt.main(new String[]{"-m","learn","-i","data/allanprocess/abc/train.conllx"});
+		Malt.main(new String[]{"-m","learn","-c","test","-i","output"});
+		
 	}
 
 }
