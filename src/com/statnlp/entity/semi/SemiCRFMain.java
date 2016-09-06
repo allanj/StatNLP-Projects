@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import com.statnlp.commons.ml.opt.OptimizerFactory;
@@ -375,30 +374,30 @@ public class SemiCRFMain {
 		int number = 0;
 		List<Span> output = inst.getOutput();
 		Sentence sent = inst.getInput();
+		int[][] leftNodes = Utils.sent2LeftDepRel(sent);
 		for(Span span: output){
 			int start = span.start;
 			int end = span.end;
 			Label label = span.label;
 			if(label.equals(Label.get("O")) || start==end) continue;
-			HashSet<Integer> set = new HashSet<Integer>();
-			int times = 0;
-			while(times<(end-start+1)){
-				for(int pos = start; pos<=end; pos++){
-					int headIdx = sent.get(pos).getHeadIndex();
-					if(headIdx<start || headIdx>end) continue;
-					if(set.size()==0 || set.contains(pos) || set.contains(headIdx)){
-						set.add(pos); set.add(headIdx);
-					}
-				}
-				times++;
-			}
-			if(set.size()!=(end-start+1)) {
-				number++;
-			}
+			boolean connected = traverseLeft(start, end, leftNodes);
+			if(!connected) number++;
 		}
 //		if(number>0)
 //			System.out.println(sent.toString());
 		return number;
+	}
+	
+	private static boolean traverseLeft(int start, int end, int[][] leftNodes){
+		for(int l=0; l<leftNodes[end].length; l++){
+			if(leftNodes[end][l]<start) continue;
+			if(leftNodes[end][l]==start)
+				return true;
+			else if(traverseLeft(start, leftNodes[end][l], leftNodes))
+				return true;
+			else continue;
+		}
+		return false;
 	}
 	
 	private static int totalEntities(SemiCRFInstance inst){

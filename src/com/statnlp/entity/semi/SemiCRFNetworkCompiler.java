@@ -243,7 +243,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		long root = toNode_root(instance.size());
 		network.addNode(root);
 		Sentence sent = instance.input;
-		int[][] leftDepRel = sent2LeftDepRel(sent);
+		int[][] leftDepRel = Utils.sent2LeftDepRel(sent);
 		for(int pos=0; pos<sent.length(); pos++){
 			if(pos==0){ //means that from the start up to here, so connect to leaf. And of course no leftDepRel
 				for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
@@ -430,24 +430,5 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		return 0.0;
 	}
 	
-	private int[][] sent2LeftDepRel(Sentence sent){
-		int[][] leftDepRel = new int[sent.length()][];
-		ArrayList<ArrayList<Integer>> leftDepList = new ArrayList<ArrayList<Integer>>();
-		for(int i=0;i<leftDepRel.length;i++) leftDepList.add(new ArrayList<Integer>());
-		for(int pos = 0; pos<sent.length(); pos++){
-			int headIdx = sent.get(pos).getHeadIndex();
-			if(headIdx<0) continue;
-			int smallOne = Math.min(pos, headIdx);
-			int largeOne = Math.max(pos, headIdx);
-			ArrayList<Integer> curr = leftDepList.get(largeOne);
-			curr.add(smallOne);
-		}
-		for(int pos=0; pos<sent.length(); pos++){
-			ArrayList<Integer> curr = leftDepList.get(pos);
-			leftDepRel[pos] = new int[curr.size()];
-			for(int j=0; j<curr.size();j++)
-				leftDepRel[pos][j] = curr.get(j);
-		}
-		return leftDepRel;
-	}
+	
 }
