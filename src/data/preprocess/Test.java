@@ -2,8 +2,6 @@ package data.preprocess;
 
 import org.maltparser.Malt;
 
-import edu.stanford.nlp.trees.EnglishGrammaticalStructure;
-
 public class Test {
 
 	public static String head_rule = "data/headrule_en_stanford.txt";
