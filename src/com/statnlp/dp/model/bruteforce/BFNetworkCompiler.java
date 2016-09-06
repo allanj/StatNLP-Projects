@@ -9,14 +9,16 @@ import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
 
+
 public class BFNetworkCompiler extends NetworkCompiler{
 
 	private static final long serialVersionUID = -2388666010977956073L;
 
-	public enum NODE_TYPES {LEAF, depInLinear ,NODE,ROOT};
-	public int _size = 128;
+	public enum NODE_TYPES {LEAF, depInLinear,ROOT};
+	public int _size = 10;
 	public BFNetwork genericUnlabeledNetwork;
-	
+	public int number = 0;
+	public int addedNum = 0;
 	public BFNetworkCompiler(){
 		this.compileUnlabeledInstancesGeneric();
 	}
@@ -32,74 +34,194 @@ public class BFNetworkCompiler extends NetworkCompiler{
 	}
 	
 	public long toNode_leaf(){
-		int[] arr = new int[]{0,BREntity.ENTS.size(),0,0,NODE_TYPES.LEAF.ordinal()};
+		int[] arr = new int[]{0,0,0,0,NODE_TYPES.LEAF.ordinal()};
 		return NetworkIDMapper.toHybridNodeID(arr);
 	}
 	
-	public long toNode_linear(int pos, int tag_id){
-		int[] arr = new int[]{pos, tag_id,0,0,NODE_TYPES.NODE.ordinal()};
-		return NetworkIDMapper.toHybridNodeID(arr);
-	} 
 	
 	private long toNodeDepInLinear(int currIndex, int headIndex){
 		return NetworkIDMapper.toHybridNodeID(new int[]{currIndex, headIndex, 0,0, NODE_TYPES.depInLinear.ordinal()});
 	}
 	
 	public long toNode_root(int size){
-		int[] arr = new int[]{size-1, BREntity.ENTS.size()+this._size,0,0,NODE_TYPES.ROOT.ordinal()};
+		int[] arr = new int[]{size, 0,0,0,NODE_TYPES.ROOT.ordinal()};
 		return NetworkIDMapper.toHybridNodeID(arr);
 	}
 
+	private int[][] sent2LeftDepRel(int[] heads){
+		int[][] leftDepRel = new int[_size][];
+		ArrayList<ArrayList<Integer>> leftDepList = new ArrayList<ArrayList<Integer>>();
+		for(int i=0;i<leftDepRel.length;i++) leftDepList.add(new ArrayList<Integer>());
+		for(int pos = 1; pos<_size; pos++){
+			int headIdx = heads[pos];
+			if(headIdx<0) continue;
+			int smallOne = Math.min(pos, headIdx);
+			int largeOne = Math.max(pos, headIdx);
+			ArrayList<Integer> curr = leftDepList.get(largeOne);
+			curr.add(smallOne);
+		}
+		for(int pos = 1; pos<_size; pos++){
+			ArrayList<Integer> curr = leftDepList.get(pos);
+			leftDepRel[pos] = new int[curr.size()];
+			for(int j=0; j<curr.size();j++)
+				leftDepRel[pos][j] = curr.get(j);
+		}
+		return leftDepRel;
+	}
+	
+	
+	public void findAllNetworks(Network network){
+		BFNetwork lcrfNetwork = (BFNetwork)network;
+		BFInstance lcrfInstance = (BFInstance)lcrfNetwork.getInstance();
+		
+		int[] heads = new int[_size];
+		long root = toNode_root(_size);
+		int rootIdx = Arrays.binarySearch(lcrfNetwork.getAllNodes(),root);
+		find(lcrfNetwork, rootIdx, heads);
+		System.out.println("number is:"+number/(_size-1));
+		System.out.println("added edges is: "+addedNum/(_size-1)+" addedNum:"+addedNum+" size:"+(_size-1));
+	}
+	
+	private void find(BFNetwork network, int curr_k, int[] curr_heads){
+		
+		int[][] children = network.getChildren(curr_k);
+		for(int i=0; i<children.length; i++){
+			int[] new_curr_heads = curr_heads.clone();
+			if(children[i].length==0) continue;
+			int[] childArr = network.getNodeArray(children[i][0]);
+			int headIndex = childArr[1];
+			new_curr_heads[childArr[0]] = headIndex;
+			find(network, children[i][0], new_curr_heads);
+		}
+		if(network.getNodeArray(curr_k)[0]==0){
+			
+			int[][] graph = new int[this._size][_size];
+			boolean haveRootHead = false;
+			for(int i=1; i<curr_heads.length;i++){
+				graph[i][curr_heads[i]] = 1;
+				graph[curr_heads[i]][i] = 1;
+				if(curr_heads[i]==0) haveRootHead = true;
+			}
+			if(haveRootHead){
+//				System.out.println("now "+Arrays.toString(curr_heads));
+				boolean[] visited = new boolean[_size];
+				visited[1] = true;
+				boolean connected = isConnected(graph, visited);
+				if(connected){
+					graph = new int[_size][_size];
+					for(int i=1; i<curr_heads.length;i++){
+						graph[curr_heads[i]][i] = 1;
+					}
+					//build a directed graph. 
+					visited = new boolean[_size];
+					visited[0] = true;
+					boolean cyclic = traverseCycle(graph, 0, visited);
+					if(!cyclic){
+						int added = checkNumAdded(curr_heads);
+//						System.out.println(Arrays.toString(curr_heads)+ " added:"+added);
+						addedNum+=added;
+						number++;
+					}
+				}
+			}
+		}
+	}
+	
+	private int checkNumAdded(int[] heads){
+		int added = 0;
+		int[][] leftNodes = sent2LeftDepRel(heads);
+		int[][] addedEdges = new int[_size][_size];
+		for(int span = 3; span <= _size-1; span++){
+			for(int start = 1; start <=  _size - span; start++ ){
+				int end = start + span - 1; 
+				if(heads[start]==end || heads[end]==start || addedEdges[start][end]==1) continue;
+				
+				boolean connected = traverseLeft(start, end, leftNodes);
+				
+				if(connected && addedEdges[start][end]!=1) {
+					added++;
+					addedEdges[start][end]=1;
+					addedEdges[end][start]=1;
+				}
+			}
+		}
+		return added;
+	}
+	
+	private boolean traverseLeft(int start, int end, int[][] leftNodes){
+		for(int l=0; l<leftNodes[end].length; l++){
+			if(leftNodes[end][l]<start) continue;
+			if(leftNodes[end][l]==start)
+				return true;
+			else if(traverseLeft(start, leftNodes[end][l], leftNodes))
+				return true;
+			else continue;
+		}
+		return false;
+	}
+	
+	private boolean isConnected(int[][] graph, boolean[] visited){
+		boolean connected = true;
+		//traverse from node 1
+		for(int b = 2; b<graph.length; b++){
+			if(!visited[b] && graph[1][b] == 1) {
+				visited[b] = true;
+				traverse(graph, b, visited);
+			}
+		}
+		for(int idx=1;idx<visited.length; idx++)
+			if(!visited[idx]) connected = false;
+		
+		return connected;
+	}
+	
+	private void traverse(int[][] graph, int curr, boolean[] visited){
+		for(int c=1; c<graph.length; c++){
+			if(!visited[c] && graph[curr][c]==1){
+				visited[c] = true;
+				traverse(graph, c, visited);
+			}
+		}
+	}
+	
+	private boolean traverseCycle(int[][] graph, int curr, boolean[] visited){
+		for(int c=1; c<graph.length; c++){
+			if(graph[curr][c]==1){
+				if(!visited[c]){
+					visited[c] = true;
+					boolean cycle = traverseCycle(graph, c, visited);
+					if(cycle) return true;
+				}else{
+					return true; //is cyclic
+				}
+			}
+		}
+//		System.err.println("run out of the loop? means all graph[curr][c] = 0?");
+		return false;
+	}
+	
+	
 	@Override
 	public BFInstance decompile(Network network) {
 		BFNetwork lcrfNetwork = (BFNetwork)network;
 		BFInstance lcrfInstance = (BFInstance)lcrfNetwork.getInstance();
 		BFInstance result = lcrfInstance.duplicate();
 		
-		String[] leaves = new String[lcrfInstance.size()];
 		int[] heads = new int[lcrfInstance.size()];
 		long root = toNode_root(lcrfInstance.size());
 		int rootIdx = Arrays.binarySearch(lcrfNetwork.getAllNodes(),root);
-		//System.err.println(rootIdx+" final score:"+network.getMax(rootIdx));
 		
-		//up to the leave, that's why to lcrfInstance.size -1 
-		for(int i=0;i<lcrfInstance.size()-1;i++){
+		for(int i=1;i<lcrfInstance.size();i++){
 			int child_k = lcrfNetwork.getMaxPath(rootIdx)[0];
 			long child = lcrfNetwork.getNode(child_k);
 			int[] child_1_arr = NetworkIDMapper.toHybridNodeArray(child);
 			int pos = child_1_arr[0];
-			int tagID = child_1_arr[1];
 			//System.err.println(Arrays.toString(child_1_arr));
-			leaves[pos] = BREntity.ENTS_INDEX.get(tagID).getForm();
-			
-			int child_2  = lcrfNetwork.getMaxPath(rootIdx)[1];
-			long child2 = lcrfNetwork.getNode(child_2);
-			int headIndex = NetworkIDMapper.toHybridNodeArray(child2)[1];
+			int headIndex = NetworkIDMapper.toHybridNodeArray(child)[1];
 			heads[pos] = headIndex;
 					
 			rootIdx = child_k;
 		}
-		heads[0] = -1;
-		leaves[0] = "O";
-		ArrayList<String> res = new ArrayList<String>();
-		String prev = "O";
-		res.add("O");
-		for(int i=1;i< leaves.length;i++){
-			res.add(leaves[i]);
-//			String current = leaves[i];
-//			if(current.equals(prev)){
-//				if(prev.equals("O"))
-//					res.add("O");
-//				else 
-//					res.add("I-"+current);
-//			}else{
-//				if(current.equals("O"))
-//					res.add("O");
-//				else res.add("B-"+current);
-//			}
-//			prev = current;
-		}
-		result.setPredEntities(res);
 		result.setPredHeads(heads);
 		return result;
 	}
@@ -114,17 +236,13 @@ public class BFNetworkCompiler extends NetworkCompiler{
 		BFInstance bfInst = (BFInstance)lcrfNetwork.getInstance();
 		for(int i=1;i<lcrfNetwork.getInstance().size();i++){
 			
-			String entity = bfInst.getInput().get(i).getEntity();
-			//if(entity.length()>1) entity = entity.substring(2);
-			long node = toNode_linear(i, BREntity.get(entity).getId());
 			if(i==bfInst.getInput().get(i).getHeadIndex()){
 				throw new RuntimeException(" current index and the head index cannot be the same");
 			}
 			long depInLinear = toNodeDepInLinear(i, bfInst.getInput().get(i).getHeadIndex());
-			lcrfNetwork.addNode(node);
 			lcrfNetwork.addNode(depInLinear);
-			long[] currentNodes = new long[]{node, depInLinear};
-			lcrfNetwork.addEdge(node, children);
+			long[] currentNodes = new long[]{depInLinear};
+			lcrfNetwork.addEdge(depInLinear, children);
 			children = currentNodes;
 		}
 		long root = toNode_root(bfInst.size());
@@ -133,9 +251,9 @@ public class BFNetworkCompiler extends NetworkCompiler{
 		
 		lcrfNetwork.finalizeNetwork();
 		lcrfNetwork.iniRemoveArr();
-//		if(!genericUnlabeledNetwork.contains(lcrfNetwork)){
-//			System.err.println("wrong");
-//		}
+		if(!genericUnlabeledNetwork.contains(lcrfNetwork)){
+			System.err.println("wrong");
+		}
 		return lcrfNetwork;
 	}
 	
@@ -145,6 +263,8 @@ public class BFNetworkCompiler extends NetworkCompiler{
 		long root = toNode_root(inst.size());
 		int rootIdx = Arrays.binarySearch(allNodes, root);
 		BFNetwork lcrfNetwork = new BFNetwork(networkId, inst,allNodes,genericUnlabeledNetwork.getAllChildren() , param, rootIdx+1);
+		
+		findAllNetworks(lcrfNetwork);
 		return lcrfNetwork;
 	}
 	
@@ -154,51 +274,31 @@ public class BFNetworkCompiler extends NetworkCompiler{
 		long linearLeaf = toNode_leaf();
 		long[] children = new long[]{linearLeaf};
 		lcrfNetwork.addNode(linearLeaf);
-		long[] currentNodes = new long[BREntity.ENTS.size()];
+		long[] currentNodes = new long[this._size];
 		
 		for(int i=1;i<_size;i++){
-			currentNodes = new long[BREntity.ENTS.size()];
-			for(int l=0;l<BREntity.ENTS.size();l++){
-				long node = toNode_linear(i, l);
-				currentNodes[l] = node;
-				lcrfNetwork.addNode(node);
-				String paEntity = BREntity.get(l).getForm();
-				
-				
+			currentNodes = new long[this._size];
+			
+			
+			for(int headIdx = 0; headIdx < this._size;headIdx++){
+				if(headIdx==i) { currentNodes[headIdx] = -1; continue;}
+				long depInLinear = toNodeDepInLinear(i, headIdx);
 				for(long child: children){
 					if(child==-1) continue;
-					if(i==1) 
-						lcrfNetwork.addEdge(node, new long[]{child});
-					else{
-						int[] childArr = NetworkIDMapper.toHybridNodeArray(child);
-						String childEntity = BREntity.get(childArr[1]).getForm();
-						if(childEntity.startsWith("B") && paEntity.startsWith("I") && !childEntity.substring(2).equals(paEntity.substring(2))) continue;
-						if(childEntity.startsWith("I-") && paEntity.startsWith("I-") && !childEntity.substring(2).equals(paEntity.substring(2))) continue;
-						//if(entities[childArr[1]].startsWith("I-") && entities[l].startsWith("B-") && entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
-						if(childEntity.equals("O") && paEntity.startsWith("I-")) continue;
-						
-						for(int headIdx = 0; headIdx < this._size;headIdx++){
-							if(headIdx==(i-1)) continue;
-							long depInLinear = toNodeDepInLinear(i-1, headIdx);
-							lcrfNetwork.addNode(depInLinear);
-							lcrfNetwork.addEdge(node, new long[]{child, depInLinear});
-						}
+					if(lcrfNetwork.contains(child)){
+						currentNodes[headIdx] = depInLinear;
+						lcrfNetwork.addNode(depInLinear);
+						lcrfNetwork.addEdge(depInLinear, new long[]{child});
 					}
-					
 				}
-				
 			}
+			
 			
 			long root = toNode_root(i+1);
 			lcrfNetwork.addNode(root);
 			for(long child:currentNodes){
 				if(child==-1) continue;
-				for(int headIdx = 0; headIdx < this._size;headIdx++){
-					if(headIdx==i) continue;
-					long depInLinear = toNodeDepInLinear(i, headIdx);
-					lcrfNetwork.addNode(depInLinear);
-					lcrfNetwork.addEdge(root, new long[]{child, depInLinear});
-				}
+				lcrfNetwork.addEdge(root, new long[]{child});
 			}
 			children = currentNodes;
 			
@@ -207,6 +307,8 @@ public class BFNetworkCompiler extends NetworkCompiler{
 		genericUnlabeledNetwork =  lcrfNetwork;
 		System.err.println("total number of nodes:"+genericUnlabeledNetwork.getAllNodes().length);
 	}
+	
+	
 	
 	
 	

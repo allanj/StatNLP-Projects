@@ -1,10 +1,8 @@
 package com.statnlp.dp.model.bruteforce;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import com.statnlp.commons.types.Sentence;
-import com.statnlp.dp.model.bruteforce.BFNetworkCompiler.NODE_TYPES;
 import com.statnlp.hybridnetworks.FeatureArray;
 import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -15,7 +13,9 @@ public class BFFeatureManager extends FeatureManager {
 
 	private static final long serialVersionUID = 376931974939202432L;
 
-	public enum FEATYPE {local,entity, unigram, bigram, prefix, contextual, inbetween, joint};
+	public enum FEATYPE {local,entity, unigram, bigram, prefix, contextual, inbetween, joint,cheat};
+	
+	public static boolean CHEAT = true;
 	
 	public BFFeatureManager(GlobalNetworkParam param_g) {
 		super(param_g);
@@ -28,21 +28,18 @@ public class BFFeatureManager extends FeatureManager {
 		BFInstance inst = ((BFInstance)network.getInstance());
 		//int instanceId = inst.getInstanceId();
 		Sentence sent = inst.getInput();
-		long node = network.getNode(parent_k);
-		int[] nodeArr = NetworkIDMapper.toHybridNodeArray(node);
+//		long node = network.getNode(parent_k);
+//		int[] nodeArr = NetworkIDMapper.toHybridNodeArray(node);
+		
+		if(CHEAT){
+			return new FeatureArray(new int[]{this._param_g.toFeature(network,FEATYPE.cheat.name(), "cheat", "nothing")});
+		}
 		
 		FeatureArray fa = null;
 		ArrayList<Integer> featureList = new ArrayList<Integer>();
 		
-		if(nodeArr[4]==NODE_TYPES.NODE.ordinal())
-			addLinearFeatures(featureList, network, nodeArr, children_k, sent);
-			
 		if(children_k.length==2)
 			addDepFeatures(featureList, network, children_k, sent);
-		
-		if(children_k.length==2)
-			addJointFeatures(featureList, network,nodeArr, children_k, sent);
-		
 		
 		/*********Pairwise features********/
 		ArrayList<Integer> finalList = new ArrayList<Integer>();
@@ -57,69 +54,9 @@ public class BFFeatureManager extends FeatureManager {
 		
 		return fa;
 	}
-	
-	private void addLinearFeatures(ArrayList<Integer> featureList, Network network,int[] parentArr, int[] children_k, Sentence sent){
-		
-		BFInstance inst = ((BFInstance)network.getInstance());
-		int pos = parentArr[0];
-		
-		if(pos==0 || pos >= inst.size()) return;
-		
-		int eId = parentArr[1];
-		int[] child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[0]));
-		int childEId = child[1];
-		int childPos = child[0];
-		
-		String lw = pos>0? sent.get(pos-1).getName():"STR";
-		String lt = pos>0? sent.get(pos-1).getTag():"STR";
-		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"END";
-		String rt = pos<sent.length()-1? sent.get(pos+1).getTag():"END";
-		
-		String currWord = inst.getInput().get(pos).getName();
-		String currTag = inst.getInput().get(pos).getTag();
-//		String childWord = childPos>=0? inst.getInput().get(childPos).getName():"STR";
-//		String childTag = childPos>=0? inst.getInput().get(childPos).getTag():"STR";
-		
-		
-		
-		
-//		String currEn = entities[eId].equals("O")?entities[eId]:entities[eId].substring(2);
-		String currEn = BREntity.get(eId).getForm();
-		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "EW",  	currEn+":"+currWord));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ET",	currEn+":"+currTag));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELW",	currEn+":"+lw));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELT",	currEn+":"+lt));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ERW",	currEn+":"+rw));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ERT",	currEn+":"+rt));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELT-T",	currEn+":"+lt+","+currTag));
-		/****Add some prefix features******/
-		for(int plen = 1;plen<=6;plen++){
-			if(currWord.length()>=plen){
-				String suff = currWord.substring(currWord.length()-plen, currWord.length());
-				featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-SUFF-"+plen, currEn+":"+suff));
-				String pref = currWord.substring(0,plen);
-				featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-PATTERN-PREF-"+plen, currEn+":"+pref));
-			}
-		}
-		
-		
-		String prevEntity = childPos==0? "STR":BREntity.get(childEId).getForm();
-//		String prevEntity = entities[childEId].equals("O")?entities[childEId]:entities[childEId].substring(2);
-
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "E-prev-E",prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE",currWord+":"+prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevW-prevE-currE",lw+":"+prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextW-prevE-currE",rw+":"+prevEntity+":"+currEn));
-		
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE",currTag+":"+prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-prevE-currE",lt+":"+prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextT-prevE-currE",rt+":"+prevEntity+":"+currEn));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-currT-prevE-currE",lt+":"+currTag+":"+prevEntity+":"+currEn));
-	}
 
 	private void addDepFeatures(ArrayList<Integer> featureList, Network network, int[] children_k, Sentence sent){
 		
-		//int[] moArr = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[0]));
 		int[] headArr = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[1]));
 		
 		int headIndex = headArr[1]; 
@@ -312,31 +249,5 @@ public class BFFeatureManager extends FeatureManager {
 		}
 			
 			
-	}
-	
-	private void addJointFeatures(ArrayList<Integer> featureList, Network network, int[] paArr, int[] children_k, Sentence sent){
-		int[] headArr = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[1]));
-		int[] moArr = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[0]));
-		int headIdx = headArr[1]; 
-		int modifierIdx = headArr[0];
-		
-		if(headIdx>(sent.length()-1)) return;
-		
-		int entityId = moArr[1];
-		
-		String headWord = sent.get(headIdx).getName();
-		String headTag = sent.get(headIdx).getTag();
-		String currWord = sent.get(modifierIdx).getName();
-		String currTag = sent.get(modifierIdx).getTag();
-		String entity = BREntity.get(entityId).getForm();
-		featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "DPE-WH", entity+":"+currWord+","+headWord));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "DPE-WTHT", entity+":"+currTag+","+headTag));
-		
-		if(paArr[4]!=NODE_TYPES.ROOT.ordinal()){
-			int nextEntityId = paArr[1];
-			String nextE = BREntity.get(nextEntityId).getForm();
-			featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "DP2E-WH", nextE+":"+entity+":"+currWord+","+headWord));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), "DP2E-WTHT", nextE+":"+entity+":"+currTag+","+headTag));
-		}
 	}
 }

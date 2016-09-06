@@ -39,10 +39,9 @@ public class BFReader {
 				continue;
 			}
 			String[] values = line.split("\\t");
-			String entity = values[3];
+			String entity = values[10];
 			//String eInSet = entity.length()>2? entity.substring(2):entity;
-			BREntity.get(entity);
-			words.add(new WordToken(values[1],values[2],Integer.valueOf(values[4]),entity));
+			words.add(new WordToken(values[1],values[4],Integer.valueOf(values[6]),entity));
 			es.add(entity);
 		}
 		br.close();

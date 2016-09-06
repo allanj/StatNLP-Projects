@@ -1,15 +1,10 @@
 package com.statnlp.dp.model.bruteforce;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.dp.utils.DPConfig;
-import com.statnlp.dp.utils.Init;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
@@ -51,20 +46,17 @@ public class BFMain {
 		List<BFInstance> trainInstances = null;
 		List<BFInstance> testInstances = null;
 		/***********DEBUG*****************/
-//		DPConfig.ecrftrain = "data/semeval10t1/ecrf.smalltest.txt";
+		DPConfig.trainingPath = "data/semeval10t1/debug.conllx";
 //		testFile="data/semeval10t1/ecrf.smalltest.txt";
-//		numThreads = 8;
-//		trainNumber = 50;
-//		testNumber = 50;
-//		testFile = DPConfig.ecrftrain;
+		numThreads = 4;
+		trainNumber = 50;
+		testNumber = 50;
+		testFile = DPConfig.trainingPath;
 //		testFile = "data/semeval10t1/ecrf.test.part.txt";
 		/***************************/
 		
 		trainInstances = BFReader.readData(DPConfig.trainingPath,true,trainNumber);
 		testInstances = BFReader.readData(testFile,false,testNumber);
-		System.err.println("The entity set read:"+BREntity.ENTS.toString());
-		System.err.println("The entity set read:"+BREntity.ENTS_INDEX.toString());
-		BREntity.lock();
 //		Formatter.ner2Text(trainInstances, "data/testRandom2.txt");
 //		System.exit(0);
 		
@@ -79,10 +71,8 @@ public class BFMain {
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		BFInstance[] ecrfs = trainInstances.toArray(new BFInstance[trainInstances.size()]);
 		model.train(ecrfs, numIteration);
-		Instance[] predictions = model.decode(testInstances.toArray(new BFInstance[testInstances.size()]));
-		BFEval.evalDP(predictions, dpOut);
-		BFEval.evalNER(predictions, nerOut);
-		BFEval.writeNERResult(predictions, nerRes, true);
+//		Instance[] predictions = model.decode(testInstances.toArray(new BFInstance[testInstances.size()]));
+//		BFEval.evalDP(predictions, dpOut);
 	}
 
 	
