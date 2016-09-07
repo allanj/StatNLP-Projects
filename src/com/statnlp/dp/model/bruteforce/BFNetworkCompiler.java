@@ -79,8 +79,8 @@ public class BFNetworkCompiler extends NetworkCompiler{
 		long root = toNode_root(_size);
 		int rootIdx = Arrays.binarySearch(lcrfNetwork.getAllNodes(),root);
 		find(lcrfNetwork, rootIdx, heads);
-		System.out.println("number is:"+number/(_size-1));
-		System.out.println("added edges is: "+addedNum/(_size-1)+" addedNum:"+addedNum+" size:"+(_size-1));
+		System.out.println("number is:"+number);
+		System.out.println("added edges is: "+addedNum);
 	}
 	
 	private void find(BFNetwork network, int curr_k, int[] curr_heads){
@@ -90,8 +90,13 @@ public class BFNetworkCompiler extends NetworkCompiler{
 			int[] new_curr_heads = curr_heads.clone();
 			if(children[i].length==0) continue;
 			int[] childArr = network.getNodeArray(children[i][0]);
+			int pos = childArr[0];
 			int headIndex = childArr[1];
-			new_curr_heads[childArr[0]] = headIndex;
+			new_curr_heads[pos] = headIndex;
+			if(pos==(_size-1) && headIndex!=0){
+//				System.out.println(pos);
+				continue;
+			}
 			find(network, children[i][0], new_curr_heads);
 		}
 		if(network.getNodeArray(curr_k)[0]==0){
