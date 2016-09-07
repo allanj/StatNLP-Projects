@@ -108,7 +108,7 @@ public class SemiCRFMain {
 		/**Read the all data**/
 		String prefix = "data/"+dataset+"/"+dataType+"/";
 		train_filename = prefix+"train.conllx";
-		test_filename = isPipe? prefix+"only.test.dp.res.txt":prefix+testSuff+".conllx";
+		test_filename = isPipe? prefix+"pred_"+testSuff+".conllx":prefix+testSuff+".conllx";
 		String depStruct = isPipe? "pred":"gold";
 		boolean model1 = false;
 		boolean model2 = false;
@@ -123,8 +123,8 @@ public class SemiCRFMain {
 		
 		System.out.println("[Info] Reading data:"+train_filename);
 		System.out.println("[Info] Reading data:"+test_filename);
-		SemiCRFInstance[] trainInstances = readCoNLLData(train_filename, true,	trainNum, false);
-		SemiCRFInstance[] testInstances	 = readCoNLLData(test_filename, false,	testNumber, isPipe);
+		SemiCRFInstance[] trainInstances = readCoNLLData(train_filename, true,	trainNum);
+		SemiCRFInstance[] testInstances	 = readCoNLLData(test_filename, false,	testNumber);
 		
 		/****Printing the total Number of entities***/
 		int totalNumber = 0;
@@ -246,8 +246,7 @@ public class SemiCRFMain {
 	 * @throws IOException
 	 */
 	@SuppressWarnings("resource")
-	private static SemiCRFInstance[] readCoNLLData(String fileName, boolean isLabeled, int number, boolean isPipe) throws IOException{
-		if(isLabeled && isPipe) throw new RuntimeException("training instances always have the true dependency");
+	private static SemiCRFInstance[] readCoNLLData(String fileName, boolean isLabeled, int number) throws IOException{
 		InputStreamReader isr = new InputStreamReader(new FileInputStream(fileName), "UTF-8");
 		BufferedReader br = new BufferedReader(isr);
 		ArrayList<SemiCRFInstance> result = new ArrayList<SemiCRFInstance>();
@@ -314,16 +313,9 @@ public class SemiCRFMain {
 				String depLabel = null;
 				String form = values[10];
 				int headIdx = -1;
-				if(!isPipe){
-					depLabel = values[7];
-					headIdx = Integer.valueOf(values[6])-1;
-				}else{
-					if(values.length<13) {br.close(); throw new RuntimeException("No predicted dependency label comes out?");}
-					depLabel = values.length==13? values[12]: null;
-					headIdx = Integer.valueOf(values[11])-1;
-					if(depLabel.contains("|")) throw new RuntimeException("Mutiple label?");
-					
-				}
+				depLabel = values[7];
+				headIdx = Integer.valueOf(values[6])-1;
+				if(depLabel.contains("|")) throw new RuntimeException("Mutiple label?");
 				wts.add(new WordToken(word, pos, headIdx, form, depLabel));
 				Label label = null;
 				if(form.startsWith("B")){
