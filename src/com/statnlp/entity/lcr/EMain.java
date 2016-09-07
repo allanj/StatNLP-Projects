@@ -109,7 +109,7 @@ public class EMain {
 		if(NetworkConfig.MODEL_TYPE==ModelType.SSVM) of = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(adagrad_learningRate);
 		if(useAdaGrad) of = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(adagrad_learningRate);
 		
-		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(of),isPipe,useDepf);
+		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(of),useDepf);
 		ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(useSSVMCost);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		ECRFInstance[] ecrfs = trainInstances.toArray(new ECRFInstance[trainInstances.size()]);
