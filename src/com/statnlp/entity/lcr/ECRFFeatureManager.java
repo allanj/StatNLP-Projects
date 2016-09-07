@@ -30,15 +30,13 @@ public class ECRFFeatureManager extends FeatureManager {
 		dep_word_label,
 		dep_tag_label,
 		neural};
-	protected boolean isPipeLine; 
 	protected boolean useDepF; 
 //	private String OUT_SEP = NeuralConfig.OUT_SEP; 
 	private String IN_SEP = NeuralConfig.IN_SEP;
 	private int prefixLength = 3;
 	
-	public ECRFFeatureManager(GlobalNetworkParam param_g, boolean isPipeLine, boolean depf) {
+	public ECRFFeatureManager(GlobalNetworkParam param_g, boolean depf) {
 		super(param_g);
-		this.isPipeLine = isPipeLine;
 		this.useDepF = depf;
 	}
 	
@@ -138,7 +136,7 @@ public class ECRFFeatureManager extends FeatureManager {
 		
 		
 //		if(true){
-		if(this.isPipeLine || this.useDepF){
+		if(this.useDepF){
 			/** This option is for the pipeline from the dependency result to named entity recogntion.**/
 			int currHeadIndex = sent.get(pos).getHeadIndex();
 			String currHead = currHeadIndex>=0? sent.get(currHeadIndex).getName():"STR";
