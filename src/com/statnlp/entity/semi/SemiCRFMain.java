@@ -321,6 +321,7 @@ public class SemiCRFMain {
 					if(values.length<13) {br.close(); throw new RuntimeException("No predicted dependency label comes out?");}
 					depLabel = values.length==13? values[12]: null;
 					headIdx = Integer.valueOf(values[11])-1;
+					if(depLabel.contains("|")) throw new RuntimeException("Mutiple label?");
 					
 				}
 				wts.add(new WordToken(word, pos, headIdx, form, depLabel));
