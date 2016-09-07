@@ -62,8 +62,8 @@ public class EMain {
 			testFile = isDev?DPConfig.dp2ner_dp_dev_input:DPConfig.dp2ner_dp_test_input;
 			if(topkinput)
 				testFile = isDev?DPConfig.dp2ner_dp_dev_input:DPConfig.dp2ner_dp_topK_test_input;
-			nerOut = DPConfig.data_prefix+middle+".pp.dp2ner.ner.eval.txt";
-			nerRes = DPConfig.data_prefix+middle+".pp.dp2ner.ner.res.txt";
+			nerOut = DPConfig.data_prefix+modelType+middle+".pred.depf-"+useDepf+DPConfig.ner_eval_suffix;
+			nerRes = DPConfig.data_prefix+modelType+middle+".pred.depf-"+useDepf+ DPConfig.ner_res_suffix;
 		}
 		System.err.println("[Info] trainingFile: "+DPConfig.trainingPath);
 		System.err.println("[Info] testFile: "+testFile);
@@ -83,12 +83,11 @@ public class EMain {
 		/***************************/
 		if(dataTypeSet.contains(DPConfig.dataType)){
 			System.out.println("Reading Ontonotes conllx format...");
-			trainInstances = EReader.readCoNLLX(DPConfig.trainingPath, true, trainNumber, false);
-			testInstances = EReader.readCoNLLX(testFile, false, testNumber, isPipe);
+			trainInstances = EReader.readCoNLLX(DPConfig.trainingPath, true, trainNumber);
+			testInstances = EReader.readCoNLLX(testFile, false, testNumber);
 		}else{
 			trainInstances = EReader.readData(DPConfig.trainingPath,true,trainNumber);
-			testInstances = isPipe?EReader.readDP2NERPipe(testFile, testNumber)
-					:EReader.readData(testFile,false,testNumber);
+			testInstances = EReader.readData(testFile,false,testNumber);
 			
 //			testInstances = EReader.readData(testFile,false,testNumber,entityMap);
 		}
