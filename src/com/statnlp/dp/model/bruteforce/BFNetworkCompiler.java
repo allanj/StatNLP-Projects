@@ -18,7 +18,7 @@ public class BFNetworkCompiler extends NetworkCompiler{
 	public int _size;
 	public BFNetwork genericUnlabeledNetwork;
 	public int number = 0;
-	public int addedNum = 0;
+	public long addedNum = 0;
 	public BFNetworkCompiler(int size){
 		_size  = size;
 		this.compileUnlabeledInstancesGeneric();
@@ -118,7 +118,7 @@ public class BFNetworkCompiler extends NetworkCompiler{
 					visited[0] = true;
 					boolean cyclic = traverseCycle(graph, 0, visited);
 					if(!cyclic){
-						int added = checkNumAdded(curr_heads);
+						long added = checkNumAdded(curr_heads);
 //						System.out.println(Arrays.toString(curr_heads)+ " added:"+added);
 						addedNum+=added;
 						number++;
@@ -128,8 +128,8 @@ public class BFNetworkCompiler extends NetworkCompiler{
 		}
 	}
 	
-	private int checkNumAdded(int[] heads){
-		int added = 0;
+	private long checkNumAdded(int[] heads){
+		long added = 0;
 		int[][] leftNodes = sent2LeftDepRel(heads);
 		int[][] addedEdges = new int[_size][_size];
 		for(int span = 3; span <= _size-1; span++){
