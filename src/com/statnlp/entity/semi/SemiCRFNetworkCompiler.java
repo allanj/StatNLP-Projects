@@ -159,7 +159,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 //			System.out.println(network);
 //			SemiCRFNetwork unlabeled = compileUnlabeled(networkId, instance, param);
 			SemiCRFNetwork unlabeled = buildDepBasedUnlabeled_bottomUp(networkId, instance, param);
-			System.out.println("for instance: "+instance.getInput().toString());
+//			System.out.println("for instance: "+instance.getInput().toString());
 			if(!unlabeled.contains(network)){
 				System.out.println("not contains");
 				

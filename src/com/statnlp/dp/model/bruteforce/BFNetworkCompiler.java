@@ -125,6 +125,9 @@ public class BFNetworkCompiler extends NetworkCompiler{
 					if(!cyclic){
 						long added = checkNumAdded(curr_heads);
 //						System.out.println(Arrays.toString(curr_heads)+ " added:"+added);
+//						for(int k=1; k<curr_heads.length-1;k++)
+//							System.out.print(curr_heads[k]+"");
+//						System.out.println();
 						addedNum+=added;
 						number++;
 					}
