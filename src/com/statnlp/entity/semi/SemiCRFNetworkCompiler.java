@@ -159,7 +159,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 //			System.out.println(network);
 //			SemiCRFNetwork unlabeled = compileUnlabeled(networkId, instance, param);
 			SemiCRFNetwork unlabeled = buildDepBasedUnlabeled_bottomUp(networkId, instance, param);
-			System.out.println("for instance: "+instance.getInput().toString());
+//			System.out.println("for instance: "+instance.getInput().toString());
 			if(!unlabeled.contains(network)){
 				System.out.println("not contains");
 				
@@ -288,7 +288,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 							network.addNode(node);
 							int[] grandChild = NetworkIDMapper.toHybridNodeArray(grandChildren[0]);
 							len = pos - (grandChild[0]-1);
-							if(len > maxSegmentLength) continue;
+							if(len > maxSegmentLength || len==1) continue;
 							if(!added[grandChild[0]][grandChild[1]]){
 								network.addEdge(node, new long[]{grandChildren[0]}); //if the grandchildren still have the same type..add it or not? an option.
 								added[grandChild[0]][grandChild[1]] = true;
