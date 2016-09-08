@@ -288,7 +288,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 							network.addNode(node);
 							int[] grandChild = NetworkIDMapper.toHybridNodeArray(grandChildren[0]);
 							len = pos - (grandChild[0]-1);
-							if(len > maxSegmentLength || len==1) continue;
+							if(len > maxSegmentLength) continue;
 							if(!added[grandChild[0]][grandChild[1]]){
 								network.addEdge(node, new long[]{grandChildren[0]}); //if the grandchildren still have the same type..add it or not? an option.
 								added[grandChild[0]][grandChild[1]] = true;
