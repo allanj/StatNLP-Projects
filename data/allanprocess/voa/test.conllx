@@ -1,3 +1,23 @@
+1	Mr.	_	NNP	NNP	_	4	nn	_	_	O
+2	Ben	_	NNP	NNP	_	4	nn	_	_	B-person
+3	-	_	HYPH	HYPH	_	4	punct	_	_	I-person
+4	Ami	_	NNP	NNP	_	5	nsubj	_	_	I-person
+5	said	_	VBD	VBD	_	0	root	_	_	O
+6	the	_	DT	DT	_	8	det	_	_	O
+7	next	_	JJ	JJ	_	8	amod	_	_	O
+8	step	_	NN	NN	_	13	nsubj	_	_	O
+9	might	_	MD	MD	_	13	aux	_	_	O
+10	be	_	VB	VB	_	13	cop	_	_	O
+11	separate	_	JJ	JJ	_	13	amod	_	_	O
+12	Washington	_	NNP	NNP	_	13	nn	_	_	B-gpe
+13	visits	_	NNS	NNS	_	5	ccomp	_	_	O
+14	by	_	IN	IN	_	13	prep	_	_	O
+15	Israeli	_	JJ	JJ	_	18	amod	_	_	B-MISC
+16	and	_	CC	CC	_	15	cc	_	_	O
+17	Palestinian	_	JJ	JJ	_	15	conj	_	_	B-MISC
+18	leaders	_	NNS	NNS	_	14	pobj	_	_	O
+19	.	_	.	.	_	5	punct	_	_	O
+
 1	US	_	NNP	NNP	_	2	nn	_	_	B-gpe
 2	officials	_	NNS	NNS	_	3	nsubj	_	_	O
 3	say	_	VBP	VBP	_	0	root	_	_	O

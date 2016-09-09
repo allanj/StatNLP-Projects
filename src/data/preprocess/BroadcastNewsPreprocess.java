@@ -30,8 +30,8 @@ import edu.stanford.nlp.trees.EnglishGrammaticalStructure;
 public class BroadcastNewsPreprocess {
 
 	
-//	public static String[] datasets = {"abc","cnn","mnb","nbc","pri","voa", "p2.5_a2e", "p2.5_c2e", "p2.5"};
-	public static String[] datasets = {"p2.5"};
+	public static String[] datasets = {"abc","cnn","mnb","nbc","pri","voa", "p25"};
+//	public static String[] datasets = {"p2.5"};
 	public static String[] valid = {"PERSON", "ORG", "GPE"};
 	public static String[] validConvert = {"person", "organization", "gpe"};
 	public static String[] others = {"NORP","FAC","LOC","PRODUCT","DATE","TIME","PERCENT","MONEY","QUANTITY","ORDINAL","CARDINAL","EVENT","WORK_OF_ART","LAW","LANGUAGE"};
@@ -303,12 +303,12 @@ public class BroadcastNewsPreprocess {
 			}
 			reader.close();
 			System.err.println("dataset:"+data+" number:"+numberOfSentence);
-			int trainNum = numberOfSentence/2+1;
-			int devNum = (numberOfSentence - trainNum)/2;
-			int testNum = numberOfSentence - trainNum - devNum;
-			System.err.println("split with:"+trainNum+"\t"+devNum+"\t"+testNum);
+			int testNum = numberOfSentence/4+1;
+			int trainNum = numberOfSentence - testNum;
+			
+			System.err.println("split with:"+trainNum+"\t"+testNum);
 			PrintWriter pwTrain = RAWF.writer(outputPrefx+data+"/train.conllx");
-			PrintWriter pwDev = RAWF.writer(outputPrefx+data+"/dev.conllx");
+			//PrintWriter pwDev = RAWF.writer(outputPrefx+data+"/dev.conllx");
 			PrintWriter pwTest = RAWF.writer(outputPrefx+data+"/test.conllx");
 			reader = RAWF.reader(outputPrefx+data+"/all.conllx");
 			int number = 0;
@@ -318,10 +318,10 @@ public class BroadcastNewsPreprocess {
 					number++;
 					if(state.equals("train")){
 						pwTrain.write("\n");
-						if(number==trainNum) { pwTrain.close(); state = "dev"; number= 0;}
+						if(number==trainNum) { pwTrain.close(); state = "test"; number= 0;}
 					}else if(state.equals("dev")){
-						pwDev.write("\n");
-						if(number==devNum) { pwDev.close(); state = "test"; number = 0;}
+//						pwDev.write("\n");
+//						if(number==devNum) { pwDev.close(); state = "test"; number = 0;}
 					}else if(state.equals("test")){
 						pwTest.write("\n");
 						if(number==testNum) { pwTest.close(); state = "done"; number = 0;}
@@ -329,7 +329,7 @@ public class BroadcastNewsPreprocess {
 					continue;
 				}
 				if(state.equals("train")) pwTrain.write(line+"\n");
-				else if(state.equals("dev")) pwDev.write(line+"\n");
+//				else if(state.equals("dev")) pwDev.write(line+"\n");
 				else if(state.equals("test")) pwTest.write(line+"\n");
 				
 			}

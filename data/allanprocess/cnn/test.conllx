@@ -1,3 +1,9 @@
+1	Everybody	_	NN	NN	_	2	nsubj	_	_	O
+2	remembers	_	VBZ	VBZ	_	0	root	_	_	O
+3	that	_	DT	DT	_	4	det	_	_	O
+4	scene	_	NN	NN	_	2	dobj	_	_	O
+5	.	_	.	.	_	2	punct	_	_	O
+
 1	Brandy	_	NNP	NNP	_	2	nn	_	_	B-person
 2	Chastain	_	NNP	NNP	_	4	poss	_	_	I-person
 3	's	_	POS	POS	_	2	possessive	_	_	I-person
