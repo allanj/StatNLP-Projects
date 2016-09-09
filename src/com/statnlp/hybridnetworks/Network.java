@@ -84,8 +84,6 @@ public abstract class Network implements Serializable, HyperGraph{
 	protected transient boolean[] _visited;
 	/** The marginal score for each node */
 	protected transient double[] _marginal;
-	/** Store the number of edges in this network **/
-	protected transient int numEdges;
 	
 	/** The compiler that created this network */
 	protected NetworkCompiler _compiler;
@@ -426,7 +424,18 @@ public abstract class Network implements Serializable, HyperGraph{
 			objective = this.getMax() * this._weight;
 		}
 		this._param.addObj(objective);
+//		this._param.addObj(computeEdges());
 	}
+	
+//	private double computeEdges(){
+//		int numEdges = 0;
+//		if(!this.getInstance().isLabeled()){
+//			for(int k=1; k<this.countNodes(); k++){
+//				numEdges += this.getChildren(k).length;
+//			}
+//		}
+//		return numEdges*1.0/this.getInstance().size();
+//	}
 	
 	/**
 	 * Goes through each nodes in the network to gather list of features
@@ -977,14 +986,6 @@ public abstract class Network implements Serializable, HyperGraph{
 		for(int i = 0; i<this.countNodes(); i++)
 			sb.append(Arrays.toString(NetworkIDMapper.toHybridNodeArray(this.getNode(i))));
 		return sb.toString();
-	}
-	
-	public void setNumEdges(int number){
-		this.numEdges = number;
-	}
-	
-	public int getNumEdges(){
-		return this.numEdges;
 	}
 	
 }
