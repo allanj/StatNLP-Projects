@@ -19,17 +19,11 @@ public class TuningLog {
 	public static String[] deps = new String[]{"nodep", "dep"};
 	public static String linear_dataPrefix = "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/Tunning/LinearCRF-bn/";
 	public static String semi_dataPrefix =  "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/Tunning/SemiCRF/";
+	public static boolean cross_validation = false;
 //	public static 
 	
 	
 	public static void findBestAcc() throws IOException{
-//		for(String model : models){
-//			for(String dep: deps){
-//				for(String news : newstypes){
-//					findBestAcc(model, dep, news);
-//				}
-//			}
-//		}
 		
 		for(String news : newstypes){
 			for(String model: models){
@@ -44,10 +38,11 @@ public class TuningLog {
 	public static void findBestAcc(String model, String dep, String news) throws IOException{
 		double bestAcc = -1;
 		String bestL2 = null;
+		String devType = cross_validation? "cv":"dev";
 		String dataPrefix = model.equals("lcrf")?linear_dataPrefix:semi_dataPrefix;
 		for(int l=0; l<l2vals.length; l++){
-			String file = model.equals("lcrf")? dataPrefix+model+"-"+dep+"-reg"+l2vals[l]+"-dev-"+news+".log" :dataPrefix+model+"-"+dep+"-reg"+l2vals[l]+"-noignore-dev-"+news+".log";
-			double acc = getAcc(file);
+			String file = model.equals("lcrf")? dataPrefix+model+"-"+dep+"-reg"+l2vals[l]+"-"+devType+"-"+news+".log" :dataPrefix+model+"-"+dep+"-reg"+l2vals[l]+"-noignore-dev-"+news+".log";
+			double acc = cross_validation? getCVAcc(file):getAcc(file);
 			if(acc > bestAcc){
 				bestAcc = acc;
 				bestL2 = l2vals[l];
@@ -76,6 +71,32 @@ public class TuningLog {
 		}
 		br.close();
 		if(acc==-1) throw new RuntimeException("no acc returned?");
+		return acc;
+	}
+	
+	/**
+	 * Return the overall f-score from the cv tuning log
+	 * @param log
+	 * @return
+	 * @throws IOException
+	 */
+	private static double getCVAcc(String log) throws IOException{
+		BufferedReader br = RAWF.reader(log);
+		String line = null;
+		double[] accs = new double[10];
+		int index = 0;
+		while((line = br.readLine())!=null){
+			if(line.startsWith("accuracy:")){
+				String[] vals = line.split("\\s+");
+				accs[index] = Double.valueOf(vals[vals.length-1]);
+				index++;
+			}
+		}
+		br.close();
+		if(index!=10) throw new RuntimeException("no 10 fold accuracy?");
+		double acc = 0;
+		for(double acy: accs) acc+=acy;
+		acc/=10;
 		return acc;
 	}
 	

@@ -13,14 +13,14 @@ public class ProcessMaltDep {
 //	public static String[] datasets = {"abc","cnn","mnb","nbc","p25","pri","voa"};
 //	public static String[] datasets = {"abc"};
 	public static String prefix = "data/allanprocess/";
-	public static String combName = "trainPdev.conllx";
+	public static String combName = "train.conllx";
 	public static String data = "abc";
 	public static String mode = "train";
 	public static boolean isDev = false;
 	
 	
 	private static void createModel(String dataset){
-		combine(dataset);
+		//combine(dataset);
 		Malt.main(new String[]{"-m","learn",
 		"-c",dataset+"model",
 		"-i",prefix+dataset+"/"+combName,
@@ -44,6 +44,7 @@ public class ProcessMaltDep {
 				"-o",prefix+dataset+"/pred_"+testFile});
 	}
 
+	@SuppressWarnings("unused")
 	private static void combine(String dataset) {
 		String[] files = new String[]{prefix+dataset+"/train.conllx", prefix+dataset+"/dev.conllx"};
 		String outFile = prefix+dataset+"/"+combName;
