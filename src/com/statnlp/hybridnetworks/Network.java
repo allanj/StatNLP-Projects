@@ -84,6 +84,8 @@ public abstract class Network implements Serializable, HyperGraph{
 	protected transient boolean[] _visited;
 	/** The marginal score for each node */
 	protected transient double[] _marginal;
+	/** Store the number of edges in this network **/
+	protected transient int numEdges;
 	
 	/** The compiler that created this network */
 	protected NetworkCompiler _compiler;
@@ -977,6 +979,13 @@ public abstract class Network implements Serializable, HyperGraph{
 		return sb.toString();
 	}
 	
+	public void setNumEdges(int number){
+		this.numEdges = number;
+	}
+	
+	public int getNumEdges(){
+		return this.numEdges;
+	}
 	
 }
 
