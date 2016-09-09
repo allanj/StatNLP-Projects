@@ -51,6 +51,7 @@ public class SemiCRFMain {
 	public static boolean isPipe = false; 
 	public static boolean ignore = false;
 	public static String dataset = "allanprocess"; //default
+	public static boolean cross_validation = false; //
 	
 	
 	private static void processArgs(String[] args) throws FileNotFoundException{
@@ -87,6 +88,9 @@ public class SemiCRFMain {
 				case "-pipe": isPipe = args[i+1].equals("true")?true:false;break;
 				case "-ignore": ignore = args[i+1].equals("true")?true:false;break;
 				case "-dataset": dataset = args[i+1]; break;
+				case "-cv": cross_validation = args[i+1].equals("true")?true:false; 
+							testSuff = cross_validation? "dev":"test"; 
+							break;//cross validation
 				default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 			}
 		}
@@ -224,17 +228,51 @@ public class SemiCRFMain {
 		NetworkModel model = NetworkConfig.TRAIN_MODE_IS_GENERATIVE ? GenerativeNetworkModel.create(fm, compiler) : DiscriminativeNetworkModel.create(fm, compiler);
 		
 		if(isTrain){
-			model.train(trainInstances, numIterations);
-			if(modelFile!=null && !modelFile.equals("") ){
+			
+			if(cross_validation){
+				int foldNum = 10;
+				//by default do 10-fold cross-validation
+				int devSize = trainInstances.length/foldNum;
+				int trainSize = trainInstances.length - devSize;
+				testInstances = new SemiCRFInstance[devSize];
+				SemiCRFInstance[] cvTrainInsts = new SemiCRFInstance[trainSize]; 
+				for(int fold = 0; fold < foldNum; fold++){
+					int start = fold*devSize;
+					int end = (fold+1)*devSize;
+					System.out.println("[Info] The "+(fold+1)+"th fold validation.");
+					int trainId = 0;
+					for(int idx=0; idx<trainInstances.length; idx++){
+						if(idx>=start && idx<end){
+							testInstances[idx - start] = trainInstances[idx];
+							testInstances[idx - start].setInstanceId(idx - start + 1);
+							testInstances[idx - start].setUnlabeled();
+						}else{
+							cvTrainInsts[trainId] = trainInstances[idx];
+							cvTrainInsts[trainId].setInstanceId(trainId+1);
+							cvTrainInsts[trainId].setLabeled();
+							trainId++;
+						}
+					}
+					gnp = new GlobalNetworkParam(of);
+					fm = new SemiCRFFeatureManager(gnp, nonMarkov, depFeature);
+					model = NetworkConfig.TRAIN_MODE_IS_GENERATIVE ? GenerativeNetworkModel.create(fm, compiler) : DiscriminativeNetworkModel.create(fm, compiler);
+					model.train(cvTrainInsts, numIterations);
+					Instance[] predictions = model.decode(testInstances);
+					SemiEval.evalNER(predictions, resEval);
+				}
+			}else
+				model.train(trainInstances, numIterations);
+			if(!cross_validation && modelFile!=null && !modelFile.equals("")){
 				ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
 				out.writeObject(fm.getParam_G());
 				out.close();
 			}
 		}
-		
-		Instance[] predictions = model.decode(testInstances);
-		SemiEval.evalNER(predictions, resEval);
-		SemiEval.writeNERResult(predictions, resRes);
+		if(!cross_validation){
+			Instance[] predictions = model.decode(testInstances);
+			SemiEval.evalNER(predictions, resEval);
+			SemiEval.writeNERResult(predictions, resRes);
+		}
 	}
 	
 	/**
