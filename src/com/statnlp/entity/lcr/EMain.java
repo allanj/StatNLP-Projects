@@ -1,6 +1,7 @@
 package com.statnlp.entity.lcr;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +39,7 @@ public class EMain {
 	public static boolean useDepf = false;
 	private static boolean testOnTrain = false;
 	public static String dataset = "allanprocess";
+	public static boolean cross_validation = false;
 	
 	
 	public static void main(String[] args) throws IOException, InterruptedException{
@@ -66,6 +68,7 @@ public class EMain {
 			nerRes = DPConfig.data_prefix+modelType+middle+".pred.depf-"+useDepf+ DPConfig.ner_res_suffix;
 		}
 		System.err.println("[Info] trainingFile: "+DPConfig.trainingPath);
+		System.err.println("[Info] Cross_Validation: "+cross_validation);
 		System.err.println("[Info] testFile: "+testFile);
 		System.err.println("[Info] nerOut: "+nerOut);
 		System.err.println("[Info] nerRes: "+nerRes);
@@ -109,6 +112,10 @@ public class EMain {
 		if(NetworkConfig.MODEL_TYPE==ModelType.SSVM) of = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(adagrad_learningRate);
 		if(useAdaGrad) of = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(adagrad_learningRate);
 		
+		if(cross_validation){
+			crossValidate(trainInstances.toArray(new ECRFInstance[trainInstances.size()]), of);
+			System.exit(0);
+		}
 		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(of),useDepf);
 		ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(useSSVMCost);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
@@ -125,6 +132,40 @@ public class EMain {
 			ECRFEval.outputTopKNER(predictions, topKNEROut);
 	}
 
+	public static void crossValidate(ECRFInstance[] trainInsts, OptimizerFactory of) throws InterruptedException, IOException{
+		System.err.println("[Info] Doing Cross Validation...");
+		int foldNum = 10;
+		//by default do 10-fold cross-validation
+		int devSize = trainInsts.length/foldNum;
+		ArrayList<ECRFInstance> cvInsts = new ArrayList<ECRFInstance>();
+		ArrayList<ECRFInstance> cvTrainInsts = new ArrayList<ECRFInstance>();
+		for(int fold = 0; fold < foldNum; fold++){
+			int start = fold*devSize;
+			int end = (fold+1)*devSize;
+			System.out.println("\n[Info] The "+(fold+1)+"th fold validation.");
+			int trainId = 0;
+			cvInsts = new ArrayList<ECRFInstance>();
+			cvTrainInsts = new ArrayList<ECRFInstance>();
+			for(int idx=0; idx<trainInsts.length; idx++){
+				if(idx>=start && idx<end){
+					trainInsts[idx].setInstanceId(idx - start + 1);
+					trainInsts[idx].setUnlabeled();
+					cvInsts.add(trainInsts[idx]);
+				}else{
+					trainInsts[idx].setInstanceId(trainId+1);
+					trainInsts[idx].setLabeled();
+					trainId++;
+					cvTrainInsts.add(trainInsts[idx]);
+				}
+			}
+			ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(of),useDepf);
+			ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(useSSVMCost);
+			NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
+			model.train(cvTrainInsts.toArray(new ECRFInstance[cvTrainInsts.size()]), numIteration);
+			Instance[] predictions = model.decode(cvInsts.toArray(new ECRFInstance[cvInsts.size()]));
+			ECRFEval.evalNER(predictions, nerOut);
+		}
+	}
 	
 	
 	public static void processArgs(String[] args){
@@ -166,6 +207,7 @@ public class EMain {
 					case "-testtrain": testOnTrain = args[i+1].equals("true")? true:false;break;
 					case "-depf": useDepf = args[i+1].equals("true")? true:false; break;
 					case "-dataset": dataset = args[i+1]; break;
+					case "-cv": cross_validation = args[i+1].equals("true")? true:false; break;
 					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 				}
 			}

@@ -81,7 +81,8 @@ public class SemiCRFMain {
 //				case "-useincom": useIncompleteSpan = args[i+1].equals("true")? true:false;break;
 //				case "-usedepnet": useDepNet = args[i+1].equals("true")? true:false;break;
 				case "-modelPath": modelFile = args[i+1]; break;
-				case "-dev": testSuff = args[i+1].equals("true")? "dev":"test"; break;
+				case "-dev": testSuff = args[i+1].equals("true")? "dev":"test"; 
+						break; //this option currently deprecated, since we are using cross_validation. no dev.conllx file 
 				case "-data": dataType = args[i+1]; break;
 				case "-ext": extention = args[i+1]; break;
 				case "-mode": isTrain = args[i+1].equals("train")?true:false; break;
@@ -89,7 +90,6 @@ public class SemiCRFMain {
 				case "-ignore": ignore = args[i+1].equals("true")?true:false;break;
 				case "-dataset": dataset = args[i+1]; break;
 				case "-cv": cross_validation = args[i+1].equals("true")?true:false; 
-							testSuff = cross_validation? "dev":"test"; 
 							break;//cross validation
 				default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 			}
@@ -119,6 +119,7 @@ public class SemiCRFMain {
 		if(extention.equals("model1")) { model1 = true; useDepNet = true; }
 		else if(extention.equals("model2")) {model2 = true; useDepNet = true;}
 		System.out.println("[Info] Current Model Extention:"+extention);
+		System.out.println("[Info] Cross Validation:"+cross_validation);
 		System.out.println("[Info] Ignore those not fit in "+extention+":"+ignore);
 		System.out.println("[Info] Current Dataset:"+dataType);
 		String ign = ignore? "ignore":"noignore";
@@ -233,31 +234,32 @@ public class SemiCRFMain {
 				int foldNum = 10;
 				//by default do 10-fold cross-validation
 				int devSize = trainInstances.length/foldNum;
-				int trainSize = trainInstances.length - devSize;
-				testInstances = new SemiCRFInstance[devSize];
-				SemiCRFInstance[] cvTrainInsts = new SemiCRFInstance[trainSize]; 
+				ArrayList<SemiCRFInstance> cvTestList = new ArrayList<SemiCRFInstance>();
+				ArrayList<SemiCRFInstance> cvTrainList = new ArrayList<SemiCRFInstance>();
 				for(int fold = 0; fold < foldNum; fold++){
 					int start = fold*devSize;
 					int end = (fold+1)*devSize;
-					System.out.println("[Info] The "+(fold+1)+"th fold validation.");
+					System.out.println("\n[Info] The "+(fold+1)+"th fold validation.");
+					cvTrainList = new ArrayList<SemiCRFInstance>();
+					cvTestList = new ArrayList<SemiCRFInstance>();
 					int trainId = 0;
 					for(int idx=0; idx<trainInstances.length; idx++){
 						if(idx>=start && idx<end){
-							testInstances[idx - start] = trainInstances[idx];
-							testInstances[idx - start].setInstanceId(idx - start + 1);
-							testInstances[idx - start].setUnlabeled();
+							trainInstances[idx].setInstanceId(idx - start + 1);
+							trainInstances[idx].setUnlabeled();
+							cvTestList.add(trainInstances[idx]);
 						}else{
-							cvTrainInsts[trainId] = trainInstances[idx];
-							cvTrainInsts[trainId].setInstanceId(trainId+1);
-							cvTrainInsts[trainId].setLabeled();
+							trainInstances[idx].setInstanceId(trainId+1);
+							trainInstances[idx].setLabeled();
 							trainId++;
+							cvTrainList.add(trainInstances[idx]);
 						}
 					}
 					gnp = new GlobalNetworkParam(of);
 					fm = new SemiCRFFeatureManager(gnp, nonMarkov, depFeature);
 					model = NetworkConfig.TRAIN_MODE_IS_GENERATIVE ? GenerativeNetworkModel.create(fm, compiler) : DiscriminativeNetworkModel.create(fm, compiler);
-					model.train(cvTrainInsts, numIterations);
-					Instance[] predictions = model.decode(testInstances);
+					model.train(cvTrainList.toArray(new SemiCRFInstance[cvTrainList.size()]), numIterations);
+					Instance[] predictions = model.decode(cvTestList.toArray(new SemiCRFInstance[cvTestList.size()]));
 					SemiEval.evalNER(predictions, resEval);
 				}
 			}else
