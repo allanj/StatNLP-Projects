@@ -10,5 +10,5 @@
 	<column name="DEPREL" category="DEPENDENCY_EDGE_LABEL" type="STRING"/>
 	<column name="PHEAD" category="IGNORE" type="INTEGER" default="_"/>
 	<column name="PDEPREL" category="IGNORE" type="STRING" default="_"/>
-	<column name="ENTITY" category="IGNORE" type="STRING" />
+	<column name="ENTITY" category="INPUT" type="STRING" />
 </dataformat>
