@@ -18,8 +18,9 @@ public class ECRFEval {
 	 * @param testInsts
 	 * @param nerOut: word, true pos, true entity, pred entity
 	 * @throws IOException
+	 * @throws InterruptedException 
 	 */
-	public static void evalNER(Instance[] testInsts, String nerOut) throws IOException{
+	public static void evalNER(Instance[] testInsts, String nerOut) throws IOException, InterruptedException{
 		PrintWriter pw = RAWF.writer(nerOut);
 		int lastGlobalId = Integer.MIN_VALUE;
 		double max = Double.NEGATIVE_INFINITY;
@@ -74,7 +75,7 @@ public class ECRFEval {
 	}
 	
 	
-	private static void evalNER(String outputFile) throws IOException{
+	private static void evalNER(String outputFile) throws IOException, InterruptedException{
 		try{
 			System.err.println("perl data/semeval10t1/conlleval.pl < "+outputFile);
 			ProcessBuilder pb = null;
@@ -86,7 +87,8 @@ public class ECRFEval {
 			pb.redirectInput(new File(outputFile));
 			pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
 			pb.redirectError(ProcessBuilder.Redirect.INHERIT);
-			pb.start();
+			Process p = pb.start();
+			p.waitFor();
 		}catch(IOException ioe){
 			ioe.printStackTrace();
 		}
