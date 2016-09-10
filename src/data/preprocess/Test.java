@@ -1,7 +1,5 @@
 package data.preprocess;
 
-import org.maltparser.Malt;
-
 public class Test {
 
 	public static String head_rule = "data/headrule_en_stanford.txt";
