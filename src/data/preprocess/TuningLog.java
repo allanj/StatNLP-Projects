@@ -12,14 +12,18 @@ import com.statnlp.commons.crf.RAWF;
  */
 public class TuningLog {
 
-	public static String[] newstypes = new String[]{"abc","cnn","mnb","nbc","p25","pri", "voa"};
-	public static String[] models = new String[]{"lcrf","semi","model1","model2"};
+//	public static String[] newstypes = new String[]{"abc","cnn","mnb","nbc","p25","pri", "voa"};
+	public static String[] newstypes = new String[]{"cnn"};
+	public static String[] models = new String[]{"model1"};
 //	public static String[] models = new String[]{"semi"};
 	public static String[] l2vals = new String[]{"0.0001", "0.001", "0.01", "0.1", "1"};
 	public static String[] deps = new String[]{"nodep", "dep"};
-	public static String linear_dataPrefix = "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/Tunning/LinearCRF-bn/";
-	public static String semi_dataPrefix =  "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/Tunning/SemiCRF/";
-	public static boolean cross_validation = false;
+//	public static String linear_dataPrefix = "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/Tunning/LinearCRF-bn/";
+//	public static String semi_dataPrefix =  "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/Tunning/SemiCRF/";
+	
+	public static String linear_dataPrefix = "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/cvtuning/";
+	public static String semi_dataPrefix =  "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/cvtuning/";
+	public static boolean cross_validation = true;
 //	public static 
 	
 	
@@ -41,7 +45,7 @@ public class TuningLog {
 		String devType = cross_validation? "cv":"dev";
 		String dataPrefix = model.equals("lcrf")?linear_dataPrefix:semi_dataPrefix;
 		for(int l=0; l<l2vals.length; l++){
-			String file = model.equals("lcrf")? dataPrefix+model+"-"+dep+"-reg"+l2vals[l]+"-"+devType+"-"+news+".log" :dataPrefix+model+"-"+dep+"-reg"+l2vals[l]+"-noignore-dev-"+news+".log";
+			String file = model.equals("lcrf")? dataPrefix+model+"-"+dep+"-reg"+l2vals[l]+"-"+devType+"-"+news+".log" :dataPrefix+model+"-"+dep+"-reg"+l2vals[l]+"-noignore-"+devType+"-"+news+".log";
 			double acc = cross_validation? getCVAcc(file):getAcc(file);
 			if(acc > bestAcc){
 				bestAcc = acc;
@@ -89,6 +93,7 @@ public class TuningLog {
 			if(line.startsWith("accuracy:")){
 				String[] vals = line.split("\\s+");
 				accs[index] = Double.valueOf(vals[vals.length-1]);
+				System.out.println(accs[index]);
 				index++;
 			}
 		}
@@ -97,6 +102,7 @@ public class TuningLog {
 		double acc = 0;
 		for(double acy: accs) acc+=acy;
 		acc/=10;
+		System.out.println("average:"+acc);
 		return acc;
 	}
 	

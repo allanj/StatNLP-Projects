@@ -80,10 +80,10 @@ public class LogReader {
 		String[] types = new String[]{"abc","cnn","mnb","nbc", "p25","pri","voa"};
 //		String[] models = new String[]{"lcrf","semi","model1","model2"};
 		String[] models = new String[]{"model2"};
-		String[] deps = new String[]{"nodep"};
+		String[] deps = new String[]{"dep"};
 		String[] igs = new String[]{"-ignore","-noignore"};
-//		String prefix = "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/Testing-bn";
-		String prefix = "/Users/allanjie/Dropbox/SUTD/Work (1)/AAAI17/exp/Testing-bn";
+		String prefix = "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/Testing-bn-cvtuned";
+//		String prefix = "/Users/allanjie/Dropbox/SUTD/Work (1)/AAAI17/exp/Testing-bn-cvtuned";
 		//String model = "lcrf";
 //		String type = "abc";
 //		String dep = "nodep";
@@ -92,7 +92,7 @@ public class LogReader {
 		for(String type: types){
 			for(String model: models){
 				String ignore = "-noignore";
-				if(model.equals("lcrf")) { goldPred = "-gold"; ignore = "";}
+				if(model.equals("lcrf")) { goldPred = "-pred"; ignore = "";}
 				for(String dep: deps){
 					String data = prefix+"/"+model+"/"+model+goldPred+"-"+dep+ignore+"-test-"+type+".log";
 //					System.out.print(data+" ");
