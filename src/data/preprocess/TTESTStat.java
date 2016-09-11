@@ -50,7 +50,7 @@ public class TTESTStat {
 		br1.close();
 		
 		int better = 0;
-		int total = 10000;
+		int total = 200000;
 		for(int it=1; it<=total; it++){
 			Random rand = new Random();
 			PrintWriter pw1 = RAWF.writer(tmpEval1);
