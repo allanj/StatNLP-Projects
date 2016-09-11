@@ -5,8 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-
-import org.apache.commons.math3.stat.inference.TTest;
+import java.util.Random;
 
 import com.statnlp.commons.crf.RAWF;
 import com.statnlp.dp.utils.DPConfig;
@@ -21,46 +20,66 @@ public class TTESTStat {
 	public static String tmpEval1 = "tmpfolder/tmp1.eval";
 	public static String tmpEval2 = "tmpfolder/tmp2.eval";
 	public static String tmpLog = "tmpfolder/tmp.log";
+	public static ArrayList<ArrayList<String>> res1 = new ArrayList<ArrayList<String>>();
+	public static ArrayList<ArrayList<String>> res2 = new ArrayList<ArrayList<String>>();
+	
 	
 	public static void testFiles(String eval1, String eval2) throws IOException{
 		BufferedReader br1 = RAWF.reader(eval1);
 		BufferedReader br2 = RAWF.reader(eval2);
-		PrintWriter pw1 = RAWF.writer(tmpEval1);
-		PrintWriter pw2 = RAWF.writer(tmpEval2);
+		
 		String line1 = null;
 		String line2 = null;
-		ArrayList<Double> sample1 = new ArrayList<Double>();
-		ArrayList<Double> sample2 = new ArrayList<Double>();
+		res1 = new ArrayList<ArrayList<String>>();
+		res2 = new ArrayList<ArrayList<String>>();
+		ArrayList<String> sent1 = new ArrayList<String>();
+		ArrayList<String> sent2 = new ArrayList<String>();
 		while((line1 = br1.readLine())!=null){
 			line2 = br2.readLine();
 			if(line1.equals("")){
-				pw1.close();
-				pw2.close();
-				//eval the file here.
-				double fscore1 = getScore(tmpEval1);
-				double fscore2 = getScore(tmpEval2);
-				sample1.add(fscore1);
-				sample2.add(fscore2);
-				pw1 = RAWF.writer(tmpEval1);
-				pw2 = RAWF.writer(tmpEval2);
+				res1.add(sent1);
+				res2.add(sent2);
+				sent1 = new ArrayList<String>();
+				sent2 = new ArrayList<String>();
+				continue;
 			}
-			pw1.write(line1+"\n");
-			pw2.write(line2+"\n");
+			sent1.add(line1);
+			sent2.add(line2);
 		}
 		br1.close();
 		br1.close();
 		
-		double[] sample1arr = new double[sample1.size()];
-		double[] sample2arr = new double[sample2.size()];
-		for(int i=0; i< sample1.size(); i++) sample1arr[i] = sample1.get(i).doubleValue();
-		for(int i=0; i< sample2.size(); i++) sample2arr[i] = sample2.get(i).doubleValue();
-		TTest ttest = new TTest();
-		double t_statistic = ttest.pairedTTest(sample1arr, sample2arr);
-		System.out.println(Double.toString( t_statistic) );
+		int better = 0;
+		int total = 10000;
+		for(int it=1; it<=total; it++){
+			Random rand = new Random();
+			PrintWriter pw1 = RAWF.writer(tmpEval1);
+			PrintWriter pw2 = RAWF.writer(tmpEval2);
+			for(int i=0;i<res1.size(); i++){
+				int idx = rand.nextInt(res1.size());
+				for(int w=0;w<res1.get(idx).size();w++){
+					pw1.write(res1.get(idx).get(w)+"\n");
+				}
+				pw1.write("\n");
+				for(int w=0;w<res2.get(idx).size();w++){
+					pw2.write(res2.get(idx).get(w)+"\n");
+				}
+				pw2.write("\n");
+			}
+			pw1.close();
+			pw2.close();
+			double f1 = getScore(tmpEval1);
+			double f2 = getScore(tmpEval2);
+			if(f1<f2) better++;
+			if(it%100==0)
+				System.out.println("iteration:"+it+" better num:"+better+" p-value:"+(1-better*1.0/it));
+		}
+		System.out.println("p-value:"+(1-better*1.0/total));
+		
 	}
 	
 	private static double getScore(String evalFile) throws IOException{
-		System.err.println("perl data/semeval10t1/conlleval.pl < "+evalFile);
+		//System.err.println("perl data/semeval10t1/conlleval.pl < "+evalFile);
 		ProcessBuilder pb = null;
 		if(DPConfig.windows){
 			pb = new ProcessBuilder("D:/Perl64/bin/perl","E:/Framework/data/semeval10t1/conlleval.pl"); 
@@ -103,8 +122,11 @@ public class TTESTStat {
 //		TTest ttest = new TTest();
 //		t_statistic = ttest.pairedTTest(sample1, sample2);
 //		System.out.println(Double.toString( t_statistic) );
-		testFiles("data/result_allan/all/semi.model0.gold.dep-false.noignore.all.txt", 
-				"data/result_allan/all/model2.gold.dep-false.noignore.eval.all.txt");
+//		testFiles("data/result_cv/all/semi.model0.pred.depf-true.noignore.eval.all.txt", 
+//				"data/result_cv/all/semi.model2.pred.depf-true.noignore.eval.all.txt");
+		
+		testFiles("data/result_cv/p25/ecrf.test.depf-true.ner.eval.txt", 
+				"data/result_cv/p25/semi.model2.gold.depf-true.noignore.eval.txt");
 	}
 
 }
