@@ -124,9 +124,9 @@ public class TTESTStat {
 //		System.out.println(Double.toString( t_statistic) );
 //		testFiles("data/result_cv/all/semi.model0.pred.depf-true.noignore.eval.all.txt", 
 //				"data/result_cv/all/semi.model2.pred.depf-true.noignore.eval.all.txt");
-		
-		testFiles("data/result_cv/p25/ecrf.test.depf-true.ner.eval.txt", 
-				"data/result_cv/p25/semi.model2.gold.depf-true.noignore.eval.txt");
+		DPConfig.windows = true;
+		testFiles("data/result_cv/all/semi.model0.pred.depf-true.noignore.eval.all.txt", 
+				"data/result_cv/all/semi.model2.pred.depf-true.noignore.eval.all.txt");
 	}
 
 }

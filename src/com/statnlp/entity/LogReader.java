@@ -60,6 +60,46 @@ public class LogReader {
 		}
 	}
 	
+	public void calculateTrainingPerIter(){
+		try{
+			BufferedReader reader = RAWF.reader(data);
+			String line = null;
+			boolean decode = false;
+			ArrayList<Integer> instNum = new ArrayList<Integer>();
+			double[] smallDecodeTime = null;
+			while((line = reader.readLine())!=null){
+				String[] vals = line.split(" ");
+				if(line.startsWith("Training completes")) { decode = true; continue;}
+				if(decode && line.startsWith("Thread")){
+					instNum.add(Integer.valueOf(vals[3]));
+					continue;
+				}
+				if(decode && line.startsWith("Okay. Decoding started.")){
+					smallDecodeTime = new double[instNum.size()];
+					continue;
+				}
+				if(decode && line.startsWith("Decoding time")){
+					smallDecodeTime[Integer.valueOf(vals[7])] = Double.valueOf(vals[9]);
+					continue;
+				}
+				
+			}
+			reader.close();
+			int sum = 0;
+			for(int x: instNum){
+				sum+=x;
+			}
+			double sumTime = 0;
+			for(double val: smallDecodeTime){
+				sumTime += val;
+			}
+			System.out.println(sumTime/sum);
+//			System.out.println("The average decode time for "+data+": "+sumTime/sum);
+		}catch(IOException ioe){
+			ioe.printStackTrace();
+		}
+	}
+	
 	public void printFmeasure(){
 		try{
 			BufferedReader reader = RAWF.reader(data);
