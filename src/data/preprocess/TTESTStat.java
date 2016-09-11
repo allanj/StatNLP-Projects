@@ -24,7 +24,7 @@ public class TTESTStat {
 	public static ArrayList<ArrayList<String>> res2 = new ArrayList<ArrayList<String>>();
 	
 	
-	public static void testFiles(String eval1, String eval2) throws IOException{
+	public static void testFiles(String eval1, String eval2, boolean leftBetter) throws IOException{
 		BufferedReader br1 = RAWF.reader(eval1);
 		BufferedReader br2 = RAWF.reader(eval2);
 		
@@ -70,7 +70,8 @@ public class TTESTStat {
 			pw2.close();
 			double f1 = getScore(tmpEval1);
 			double f2 = getScore(tmpEval2);
-			if(f1<f2) better++;
+			if(leftBetter && f1>f2) better++;
+			if(!leftBetter && f1<f2) better++;
 			if(it%100==0)
 				System.out.println("iteration:"+it+" better num:"+better+" p-value:"+(1-better*1.0/it));
 		}
@@ -124,9 +125,21 @@ public class TTESTStat {
 //		System.out.println(Double.toString( t_statistic) );
 //		testFiles("data/result_cv/all/semi.model0.pred.depf-true.noignore.eval.all.txt", 
 //				"data/result_cv/all/semi.model2.pred.depf-true.noignore.eval.all.txt");
-		DPConfig.windows = true;
-		testFiles("data/result_cv/all/semi.model0.pred.depf-true.noignore.eval.all.txt", 
-				"data/result_cv/all/semi.model2.pred.depf-true.noignore.eval.all.txt");
+		DPConfig.windows = false;
+		String data = args[0];//"all"; //args[0]
+		boolean leftBetter = args[1].equals("left")? true:false; //false
+		String gold = args[2];
+		String leftModel = args[3];//"model0";
+		String rightModel = args[4];//"model1";
+
+		String sub = ".all";
+		if(data.equals("all")) sub = ".all";
+		else sub = "";
+		tmpEval1 = "tmpfolder/"+data+".semi."+leftModel+"."+rightModel+"."+gold+".depf-true.noignore.eval"+sub+"1.eval";
+		tmpEval2 = "tmpfolder/"+data+".semi."+leftModel+"."+rightModel+"."+gold+".depf-true.noignore.eval"+sub+"2.eval";
+		tmpLog = "tmpfolder/"+data+".semi."+leftModel+"."+rightModel+"."+gold+".depf-true.noignore.eval"+sub+".log";
+		testFiles("data/result_cv/"+data+"/semi."+leftModel+"."+gold+".depf-true.noignore.eval"+sub+".txt", 
+				"data/result_cv/"+data+"/semi."+rightModel+"."+gold+".depf-true.noignore.eval"+sub+".txt", leftBetter);
 	}
 
 }
