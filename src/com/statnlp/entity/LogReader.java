@@ -84,6 +84,7 @@ public class LogReader {
 		String[] igs = new String[]{"-ignore","-noignore"};
 //		String prefix = "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/Testing-bn";
 		String prefix = "/Users/allanjie/Dropbox/SUTD/Work (1)/AAAI17/exp/Testing-bn-cvtuned";
+
 		//String model = "lcrf";
 //		String type = "abc";
 //		String dep = "nodep";
