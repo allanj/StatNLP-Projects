@@ -131,15 +131,26 @@ public class TTESTStat {
 		String gold = args[2];
 		String leftModel = args[3];//"model0";
 		String rightModel = args[4];//"model1";
-
+		String dep = args[5];
+		String leftGold = gold;
+		String rightGold = gold;
+		String logType = gold;
+		String tmpEval1Type = leftGold;
+		
 		String sub = ".all";
 		if(data.equals("all")) sub = ".all";
 		else sub = "";
-		tmpEval1 = "tmpfolder/"+data+".semi."+leftModel+"."+rightModel+"."+gold+".depf-true.noignore.eval"+sub+"1.eval";
-		tmpEval2 = "tmpfolder/"+data+".semi."+leftModel+"."+rightModel+"."+gold+".depf-true.noignore.eval"+sub+"2.eval";
-		tmpLog = "tmpfolder/"+data+".semi."+leftModel+"."+rightModel+"."+gold+".depf-true.noignore.eval"+sub+".log";
-		testFiles("data/result_cv/"+data+"/semi."+leftModel+"."+gold+".depf-true.noignore.eval"+sub+".txt", 
-				"data/result_cv/"+data+"/semi."+rightModel+"."+gold+".depf-true.noignore.eval"+sub+".txt", leftBetter);
+		
+		if(gold.equals("pred") && leftModel.equals("model0") && dep.equals("false")){
+			leftGold = "gold";
+			logType = "gold&pred";
+			tmpEval1Type = logType;
+		}
+		tmpEval1 = "tmpfolder/"+data+".semi."+leftModel+"."+rightModel+"."+tmpEval1Type+".depf-"+dep+".noignore.eval"+sub+"1.eval";
+		tmpEval2 = "tmpfolder/"+data+".semi."+leftModel+"."+rightModel+"."+rightGold+".depf-"+dep+".noignore.eval"+sub+"2.eval";
+		tmpLog = "tmpfolder/"+data+".semi."+leftModel+"."+rightModel+"."+logType+".depf-"+dep+".noignore.eval"+sub+".log";
+		testFiles("data/result_cv/"+data+"/semi."+leftModel+"."+leftGold+".depf-"+dep+".noignore.eval"+sub+".txt", 
+				"data/result_cv/"+data+"/semi."+rightModel+"."+rightGold+".depf-"+dep+".noignore.eval"+sub+".txt", leftBetter);
 	}
 
 }
