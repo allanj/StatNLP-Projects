@@ -53,6 +53,9 @@ public class SemiCRFMain {
 	public static String dataset = "allanprocess"; //default
 	public static boolean cross_validation = false; //
 	
+//	public static int[] debug = new int[150];
+//	public static int[] debugNum = new int[150];
+	
 	
 	private static void processArgs(String[] args) throws FileNotFoundException{
 		for(int i=0;i<args.length;i=i+2){
@@ -103,7 +106,6 @@ public class SemiCRFMain {
 		//always use conll data
 //		train_filename = "data/semi/semi.train.txt";
 //		test_filename = "data/semi/semi.test.txt";
-		
 		processArgs(args);
 		System.out.println("[Info] using the predicted dependency?:"+isPipe);
 		/**data is 0-indexed, network compiler is 1-indexed since we have leaf nodes.**/
@@ -275,6 +277,8 @@ public class SemiCRFMain {
 			SemiEval.evalNER(predictions, resEval);
 			SemiEval.writeNERResult(predictions, resRes);
 		}
+		
+		
 	}
 	
 	/**
