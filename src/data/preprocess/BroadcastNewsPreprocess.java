@@ -30,8 +30,8 @@ import edu.stanford.nlp.trees.EnglishGrammaticalStructure;
 public class BroadcastNewsPreprocess {
 
 	
-	public static String[] datasets = {"abc","cnn","mnb","nbc","pri","voa", "p25"};
-//	public static String[] datasets = {"p2.5"};
+//	public static String[] datasets = {"abc","cnn","mnb","nbc","pri","voa", "p25"};
+	public static String[] datasets = {"abc"};
 	public static String[] valid = {"PERSON", "ORG", "GPE"};
 	public static String[] validConvert = {"person", "organization", "gpe"};
 	public static String[] others = {"NORP","FAC","LOC","PRODUCT","DATE","TIME","PERCENT","MONEY","QUANTITY","ORDINAL","CARDINAL","EVENT","WORK_OF_ART","LAW","LANGUAGE"};
@@ -159,7 +159,7 @@ public class BroadcastNewsPreprocess {
 				}
 				System.err.println("[Info] Finishing dataset:"+data);
 				//print these sentences.
-				printConll(data,sents);
+				//printConll(data,sents);
 			}
 		}
 	}
@@ -347,8 +347,8 @@ public class BroadcastNewsPreprocess {
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException{
 //		System.err.println(convert());
-//		process();
-		splitTrainDevTest();
+		process();
+//		splitTrainDevTest();
 	}
 
 }

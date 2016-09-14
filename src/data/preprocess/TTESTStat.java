@@ -126,20 +126,23 @@ public class TTESTStat {
 //		testFiles("data/result_cv/all/semi.model0.pred.depf-true.noignore.eval.all.txt", 
 //				"data/result_cv/all/semi.model2.pred.depf-true.noignore.eval.all.txt");
 		DPConfig.windows = false;
-		String data = args[0];//"all"; //args[0]
-		boolean leftBetter = args[1].equals("left")? true:false; //false
-		String gold = args[2];
-		String leftModel = args[3];//"model0";
-		String rightModel = args[4];//"model1";
-
-		String sub = ".all";
-		if(data.equals("all")) sub = ".all";
-		else sub = "";
-		tmpEval1 = "tmpfolder/"+data+".semi."+leftModel+"."+rightModel+"."+gold+".depf-true.noignore.eval"+sub+"1.eval";
-		tmpEval2 = "tmpfolder/"+data+".semi."+leftModel+"."+rightModel+"."+gold+".depf-true.noignore.eval"+sub+"2.eval";
-		tmpLog = "tmpfolder/"+data+".semi."+leftModel+"."+rightModel+"."+gold+".depf-true.noignore.eval"+sub+".log";
-		testFiles("data/result_cv/"+data+"/semi."+leftModel+"."+gold+".depf-true.noignore.eval"+sub+".txt", 
-				"data/result_cv/"+data+"/semi."+rightModel+"."+gold+".depf-true.noignore.eval"+sub+".txt", leftBetter);
+//		String data = args[0];//"all"; //args[0]
+//		boolean leftBetter = args[1].equals("left")? true:false; //false
+//		String gold = args[2];
+//		String leftModel = args[3];//"model0";
+//		String rightModel = args[4];//"model1";
+//
+//		String sub = ".all";
+//		if(data.equals("all")) sub = ".all";
+//		else sub = "";
+//		tmpEval1 = "tmpfolder/"+data+".semi."+leftModel+"."+rightModel+"."+gold+".depf-true.noignore.eval"+sub+"1.eval";
+//		tmpEval2 = "tmpfolder/"+data+".semi."+leftModel+"."+rightModel+"."+gold+".depf-true.noignore.eval"+sub+"2.eval";
+//		tmpLog = "tmpfolder/"+data+".semi."+leftModel+"."+rightModel+"."+gold+".depf-true.noignore.eval"+sub+".log";
+//		testFiles("data/result_cv/"+data+"/semi."+leftModel+"."+gold+".depf-true.noignore.eval"+sub+".txt", 
+//				"data/result_cv/"+data+"/semi."+rightModel+"."+gold+".depf-true.noignore.eval"+sub+".txt", leftBetter);
+		
+		testFiles("data/result_cv/mnb/semi.model1.gold.depf-true.noignore.eval.txt", 
+				"data/result_cv/mnb/semi.model2.gold.depf-true.noignore.eval.txt", false);
 	}
 
 }
