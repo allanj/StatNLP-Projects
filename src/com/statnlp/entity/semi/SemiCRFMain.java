@@ -230,6 +230,27 @@ public class SemiCRFMain {
 		SemiCRFFeatureManager fm = new SemiCRFFeatureManager(gnp, nonMarkov, depFeature);
 		NetworkModel model = NetworkConfig.TRAIN_MODE_IS_GENERATIVE ? GenerativeNetworkModel.create(fm, compiler) : DiscriminativeNetworkModel.create(fm, compiler);
 		
+		/***Debug information**/
+		for(int n=1; n<=100; n++){
+			System.out.println("[Info] Now n is:"+n);
+			ArrayList<SemiCRFInstance> trains = new ArrayList<SemiCRFInstance>();
+			int idxId = 1;
+			for(SemiCRFInstance inst: trainInstances){
+				if(inst.size()==n) { inst.setLabeled();inst.setInstanceId(idxId++); trains.add(inst); }
+			}
+			for(SemiCRFInstance inst: testInstances){
+				if(inst.size()==n) { inst.setLabeled(); inst.setInstanceId(idxId++);trains.add(inst); }
+			}
+			if(trains.size()==0) continue;
+			gnp = new GlobalNetworkParam(of);
+			fm = new SemiCRFFeatureManager(gnp, nonMarkov, depFeature);
+			model = NetworkConfig.TRAIN_MODE_IS_GENERATIVE ? GenerativeNetworkModel.create(fm, compiler) : DiscriminativeNetworkModel.create(fm, compiler);
+			model.train(trains.toArray(new SemiCRFInstance[trains.size()]), numIterations);
+		}
+		System.exit(0);
+		/**debug***/
+		
+		
 		if(isTrain){
 			
 			if(cross_validation){

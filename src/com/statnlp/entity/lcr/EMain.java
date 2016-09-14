@@ -120,6 +120,25 @@ public class EMain {
 		ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(useSSVMCost);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		ECRFInstance[] ecrfs = trainInstances.toArray(new ECRFInstance[trainInstances.size()]);
+		/***Debug information****/
+		for(int n=1; n<=100; n++){
+			System.out.println("[Info] Now n is:"+n);
+			ArrayList<ECRFInstance> trains = new ArrayList<ECRFInstance>();
+			int idxId = 1;
+			for(ECRFInstance inst: trainInstances){
+				if(inst.size()==n) { inst.setLabeled(); inst.setInstanceId(idxId++); trains.add(inst); }
+			}
+			for(ECRFInstance inst: testInstances){
+				if(inst.size()==n) { inst.setLabeled(); inst.setInstanceId(idxId++); trains.add(inst); }
+			}
+			if(trains.size()==0) continue;
+			fa = new ECRFFeatureManager(new GlobalNetworkParam(of),useDepf);
+			compiler = new ECRFNetworkCompiler(useSSVMCost);
+			model = DiscriminativeNetworkModel.create(fa, compiler);
+			model.train(trains.toArray(new ECRFInstance[trains.size()]), numIteration);
+ 		}
+		System.exit(0);
+		/*********************/
 		model.train(ecrfs, numIteration);
 		if(testOnTrain){
 			for(ECRFInstance inst:trainInstances) inst.setUnlabeled();
