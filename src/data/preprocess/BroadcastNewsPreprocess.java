@@ -157,9 +157,9 @@ public class BroadcastNewsPreprocess {
 						}
 					}
 				}
-				System.err.println("[Info] Finishing dataset:"+data);
+				System.err.println("[Info] Finishing dataset:"+data+" numSents:"+sents.size());
 				//print these sentences.
-				//printConll(data,sents);
+//				printConll(data,sents)
 			}
 		}
 	}
