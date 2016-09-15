@@ -27,6 +27,7 @@ public class DPConfig {
 	public static String ner2dp_ner_topK_test_input = "data/"+dataType+"/pptest/ecrf.test.ner.topk.res.txt";
 	
 	public static void changeDataType(String dataset){
+		if(dataset.equals("semeval10t1")) dataset = "";
 		trainingPath = "data/"+dataset+"/"+dataType+"/train.conllx";
 		devPath = "data/"+dataset+"/"+dataType+"/dev.conllx";
 		testingPath = "data/"+dataset+"/"+dataType+"/test.conllx";

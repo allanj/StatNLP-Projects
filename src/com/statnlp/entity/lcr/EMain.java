@@ -53,7 +53,7 @@ public class EMain {
 		processArgs(args);
 		dataTypeSet = Init.iniOntoNotesData(dataset);
 		String modelType = DPConfig.MODEL.ecrf.name();
-		
+
 		
 		String middle = isDev? ".dev":".test";
 		nerOut = DPConfig.data_prefix+modelType+middle+".depf-"+useDepf+DPConfig.ner_eval_suffix;
@@ -121,23 +121,23 @@ public class EMain {
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		ECRFInstance[] ecrfs = trainInstances.toArray(new ECRFInstance[trainInstances.size()]);
 		/***Debug information****/
-		for(int n=1; n<=100; n++){
-			System.out.println("[Info] Now n is:"+n);
-			ArrayList<ECRFInstance> trains = new ArrayList<ECRFInstance>();
-			int idxId = 1;
-			for(ECRFInstance inst: trainInstances){
-				if(inst.size()==n) { inst.setLabeled(); inst.setInstanceId(idxId++); trains.add(inst); }
-			}
-			for(ECRFInstance inst: testInstances){
-				if(inst.size()==n) { inst.setLabeled(); inst.setInstanceId(idxId++); trains.add(inst); }
-			}
-			if(trains.size()==0) continue;
-			fa = new ECRFFeatureManager(new GlobalNetworkParam(of),useDepf);
-			compiler = new ECRFNetworkCompiler(useSSVMCost);
-			model = DiscriminativeNetworkModel.create(fa, compiler);
-			model.train(trains.toArray(new ECRFInstance[trains.size()]), numIteration);
- 		}
-		System.exit(0);
+//		for(int n=1; n<=100; n++){
+//			System.out.println("[Info] Now n is:"+n);
+//			ArrayList<ECRFInstance> trains = new ArrayList<ECRFInstance>();
+//			int idxId = 1;
+//			for(ECRFInstance inst: trainInstances){
+//				if(inst.size()==n) { inst.setLabeled(); inst.setInstanceId(idxId++); trains.add(inst); }
+//			}
+//			for(ECRFInstance inst: testInstances){
+//				if(inst.size()==n) { inst.setLabeled(); inst.setInstanceId(idxId++); trains.add(inst); }
+//			}
+//			if(trains.size()==0) continue;
+//			fa = new ECRFFeatureManager(new GlobalNetworkParam(of),useDepf);
+//			compiler = new ECRFNetworkCompiler(useSSVMCost);
+//			model = DiscriminativeNetworkModel.create(fa, compiler);
+//			model.train(trains.toArray(new ECRFInstance[trains.size()]), numIteration);
+// 		}
+//		System.exit(0);
 		/*********************/
 		model.train(ecrfs, numIteration);
 		if(testOnTrain){
@@ -225,7 +225,7 @@ public class EMain {
 					case "-adagrad": useAdaGrad = args[i+1].equals("true")? true:false;break;
 					case "-testtrain": testOnTrain = args[i+1].equals("true")? true:false;break;
 					case "-depf": useDepf = args[i+1].equals("true")? true:false; break;
-					case "-dataset": dataset = args[i+1]; break;
+					case "-dataset": dataset = args[i+1];DPConfig.changeDataType(dataset); break;
 					case "-cv": cross_validation = args[i+1].equals("true")? true:false; break;
 					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 				}
