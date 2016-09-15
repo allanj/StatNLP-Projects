@@ -427,12 +427,15 @@ public abstract class Network implements Serializable, HyperGraph{
 //		this._param.addObj(computeEdges());
 	}
 	
-//	private double computeEdges(){
+//	public double computeEdges(){
 //		int numEdges = 0;
 //		if(!this.getInstance().isLabeled()){
 //			for(int k=1; k<this.countNodes(); k++){
 //				numEdges += this.getChildren(k).length;
 //			}
+//
+//			SemiCRFMain.debug[this.getInstance().size()] += numEdges;
+//			SemiCRFMain.debugNum[this.getInstance().size()] ++;
 //		}
 //		return numEdges*1.0/this.getInstance().size();
 //	}
