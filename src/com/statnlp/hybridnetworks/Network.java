@@ -437,7 +437,7 @@ public abstract class Network implements Serializable, HyperGraph{
 //			SemiCRFMain.debug[this.getInstance().size()] += numEdges;
 //			SemiCRFMain.debugNum[this.getInstance().size()] ++;
 //		}
-//		return numEdges*1.0/this.getInstance().size();
+//		return numEdges*1.0;
 //	}
 	
 	/**
