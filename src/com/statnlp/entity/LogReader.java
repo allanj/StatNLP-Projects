@@ -12,10 +12,8 @@ public class LogReader {
 	 * The direct source file for the data
 	 */
 	private String data;
-	private String model;
 	
-	public LogReader(String model, String data) {
-		this.model = model;
+	public LogReader(String data) {
 		this.data = data;
 	}
 	
@@ -121,7 +119,7 @@ public class LogReader {
 //		String[] models = new String[]{"lcrf","semi","model1","model2"};
 		String[] models = new String[]{"semi"};
 		String[] deps = new String[]{"dep"};
-		String[] igs = new String[]{"-ignore","-noignore"};
+//		String[] igs = new String[]{"-ignore","-noignore"};
 //		String prefix = "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/Testing-bn";
 		String prefix = "/Users/allanjie/Dropbox/SUTD/Work (1)/AAAI17/exp/Testing-bn-cvtuned";
 
@@ -137,7 +135,7 @@ public class LogReader {
 				for(String dep: deps){
 					String data = prefix+"/"+model+"/"+model+goldPred+"-"+dep+ignore+"-test-"+type+".log";
 //					System.out.print(data+" ");
-					LogReader lr = new LogReader(model, data);
+					LogReader lr = new LogReader(data);
 					lr.calculateDecodeTime();
 //					lr.printFmeasure();
 				}

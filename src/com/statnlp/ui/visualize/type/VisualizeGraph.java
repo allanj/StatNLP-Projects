@@ -1,24 +1,14 @@
 package com.statnlp.ui.visualize.type;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 
-import javax.swing.JOptionPane;
-
-import org.apache.commons.collections15.Factory;
-
 import com.statnlp.hybridnetworks.NetworkIDMapper;
 
-import edu.uci.ics.jung.graph.DelegateForest;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
-import edu.uci.ics.jung.graph.Forest;
-import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.util.EdgeType;
-import edu.uci.ics.jung.visualization.VisualizationViewer;
-import edu.uci.ics.jung.visualization.picking.PickedState;
 
 
 
