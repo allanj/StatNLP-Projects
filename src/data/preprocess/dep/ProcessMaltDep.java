@@ -8,6 +8,14 @@ import org.maltparser.Malt;
 
 import com.statnlp.commons.crf.RAWF;
 
+/**
+ * This class uses a malt parser to train and test a dependency models.
+ * Used to obtain the dependency structures for CoNLLX files.
+ * 
+ * See main method for more configuration.
+ * @author allanjie
+ *
+ */
 public class ProcessMaltDep {
 
 //	public static String[] datasets = {"abc","cnn","mnb","nbc","p25","pri","voa"};
@@ -70,6 +78,7 @@ public class ProcessMaltDep {
 	
 	/**
 	 * Currently only for debug the output, not really used.
+	 * Check the UAS and LAS score of a gold conllx file and a predicted conllx file
 	 * @param goldConll
 	 * @param predConll
 	 */
@@ -106,7 +115,17 @@ public class ProcessMaltDep {
 		
 	}
 	
-	
+	/**
+	 * Main methods for using this parser
+	 * @param args
+	 * -data xxx.conllx Currently, we only accept the conllx format.
+	 * -mode train or test. Must train before test.
+	 * -dev means that devleopement set or not. only affect the file name
+	 * 
+	 * Note: besides this configuration. Also need to modify the format.xml files as user want.
+	 * Currently, I put it to data/malt/myformat.xml
+	 * Also the model used in this parser is the arcEager parser, I also save the configuration in data/malt
+	 */
 	public static void main(String[] args) {
 		for(int i=0;i<args.length;i=i+2){
 			switch(args[i]){

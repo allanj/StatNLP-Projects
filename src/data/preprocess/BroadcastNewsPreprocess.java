@@ -159,7 +159,7 @@ public class BroadcastNewsPreprocess {
 				}
 				System.err.println("[Info] Finishing dataset:"+data+" numSents:"+sents.size());
 				//print these sentences.
-//				printConll(data,sents)
+				printConll(data,sents);
 			}
 		}
 	}
@@ -347,7 +347,7 @@ public class BroadcastNewsPreprocess {
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException{
 //		System.err.println(convert());
-		process();
+//		process();
 //		splitTrainDevTest();
 	}
 
