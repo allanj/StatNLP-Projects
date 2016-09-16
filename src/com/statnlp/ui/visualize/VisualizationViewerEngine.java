@@ -148,6 +148,7 @@ public abstract class VisualizationViewerEngine {
 		gm.add(new ScalingGraphMousePlugin(new CrossoverScalingControl(), 0, 1.1f, 0.9f));
 		vv.setGraphMouse(gm);
 		
+		
 		if (frame == null)
 			frame = new JFrame(title);
 		
