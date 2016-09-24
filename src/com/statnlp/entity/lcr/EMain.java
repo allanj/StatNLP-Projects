@@ -17,6 +17,7 @@ import com.statnlp.hybridnetworks.NetworkConfig.ModelType;
 import com.statnlp.hybridnetworks.NetworkModel;
 import com.statnlp.neural.NeuralConfigReader;
 
+
 public class EMain {
 
 	public static int trainNumber = -100;
