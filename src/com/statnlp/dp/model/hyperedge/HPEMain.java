@@ -21,9 +21,9 @@ import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkModel;
 
 /**
- * Additional Dependency parsing
- * @author zhanming_jie
- *
+ * This one is modified for the whole named entity version
+ * @author allan_jie
+ * @version 2.0
  */
 public class HPEMain {
 	

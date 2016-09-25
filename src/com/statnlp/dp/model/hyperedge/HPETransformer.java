@@ -103,7 +103,7 @@ public class HPETransformer extends Transformer {
 		label.setValue(setSpanInfo(0, sentence.length()-1, 1, 1,type));
 		spanTreeERoot.setLabel(label);
 		String[][] leaves = getLeavesInfo(sentence);
-		constructSpanTree(spanTreeERoot,dependencyRoot, leaves);
+		constructSpanTree(spanTreeERoot,dependencyRoot);
 		//System.err.println(spanTreeERoot.pennString() );
 		return spanTreeERoot;
 	}
@@ -112,9 +112,9 @@ public class HPETransformer extends Transformer {
 	 * Construct the span tree recursively using the dependency tree.
 	 * @param currentSpan
 	 * @param currentDependency
-	 * @param sentence
+     * @param sent
 	 */
-	private void constructSpanTree(Tree currentSpan, Tree currentDependency,String[][] leaves){
+	private void constructSpanTree(Tree currentSpan, Tree currentDependency, Sentence sent){
 		
 		CoreLabel currentSpanLabel = (CoreLabel)(currentSpan.label());
 		String[] info = currentSpanLabel.value().split(",");
@@ -129,6 +129,7 @@ public class HPETransformer extends Transformer {
 		}
 		if(pa_completeness==0){
 			if(pa_direction==1){
+				//incomplete and direction is right.
 				Tree lastChildWord = currentDependency.lastChild();
 				Tree copyLastChildWord = lastChildWord.deepCopy(); 
 				currentDependency.removeChild(currentDependency.numChildren()-1);
@@ -145,7 +146,7 @@ public class HPETransformer extends Transformer {
 				
 				
 				boolean isMixed = false;
-				String leftType = leaves[pa_leftIndex][1];
+				String leftType = sent.get(pa_leftIndex).getEntity();
 				for(int i=pa_leftIndex+1;i<=maxSentIndex;i++){
 					for(int dir=0;dir<=1;dir++){
 						if(!leaves[i][dir].equals(leftType)){isMixed = true; break;}
