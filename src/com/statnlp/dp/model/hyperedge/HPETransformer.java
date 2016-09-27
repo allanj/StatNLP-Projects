@@ -145,38 +145,54 @@ public class HPETransformer extends Transformer {
 				Tree rightChildSubSpan = new LabeledScoredTreeNode();
 				
 				
-				boolean isMixed = false;
 				String leftType = sent.get(pa_leftIndex).getEntity();
-				for(int i=pa_leftIndex+1;i<=maxSentIndex;i++){
-					for(int dir=0;dir<=1;dir++){
-						if(!leaves[i][dir].equals(leftType)){isMixed = true; break;}
+				if(leftType.startsWith("B-")){
+					boolean isEntity = true;
+					for(int i=pa_leftIndex+1;i<=maxSentIndex;i++){
+						if(!sent.get(i).getEntity().startsWith("I-")){
+							isEntity = false;
+							break;
+						}
+						if(i==maxSentIndex && sent.get(i+1).getEntity().startsWith("I-"))
+							isEntity = false;
 					}
+					if(isEntity) leftType = sent.get(pa_leftIndex).getEntity().substring(2);
+					else leftType = "empty";
+				}else{
+					leftType =  "empty";
 				}
-				leftType = isMixed? OE:leftType;
 				currType = leftType;
 				
 				CoreLabel leftSubSpanLabel = new CoreLabel();
 				leftSubSpanLabel.setValue(this.setSpanInfo(pa_leftIndex, maxSentIndex, 1, 1, currType));
 				leftChildSubSpan.setLabel(leftSubSpanLabel);
 				
-				isMixed = false;
-				String rightType = leaves[pa_rightIndex][0];
-				for(int i=maxSentIndex+1; i<=pa_rightIndex-1;i++){
-					for(int dir=0;dir<=1;dir++){
-						if(!leaves[i][dir].equals(rightType)) {isMixed = true; break;}
+				String rightType = sent.get(maxSentIndex+1).getEntity();
+				if(rightType.startsWith("B-")){
+					boolean isEntity = true;
+					for(int i=maxSentIndex+2; i<=pa_rightIndex; i++){
+
 					}
+				}else{
+					rightType = "empty";
+				}
+				for(int i=maxSentIndex+1; i<=pa_rightIndex-1;i++){
+					if(!leaves[i][dir].equals(rightType)) {isMixed = true; break;}
+
+
+
 				}
 				rightType =isMixed?OE:rightType;
 				currType = rightType;
-				
-				CoreLabel rightSpanSubLabel = new CoreLabel(); 
-				rightSpanSubLabel.setValue(this.setSpanInfo(maxSentIndex+1, pa_rightIndex, 0, 1, currType));
-				rightChildSubSpan.setLabel(rightSpanSubLabel);
-				
-				currentSpan.addChild(leftChildSubSpan);
-				currentSpan.addChild(rightChildSubSpan);
-				constructSpanTree(leftChildSubSpan, currentDependency,leaves);
-				constructSpanTree(rightChildSubSpan, copyLastChildWord,leaves);
+
+                        CoreLabel rightSpanSubLabel = new CoreLabel();
+                rightSpanSubLabel.setValue(this.setSpanInfo(maxSentIndex+1, pa_rightIndex, 0, 1, currType));
+                rightChildSubSpan.setLabel(rightSpanSubLabel);
+
+                currentSpan.addChild(leftChildSubSpan);
+                currentSpan.addChild(rightChildSubSpan);
+                constructSpanTree(leftChildSubSpan, currentDependency,leaves);
+                constructSpanTree(rightChildSubSpan, copyLastChildWord,leaves);
 			}else{
 				Tree firstChildWord = currentDependency.firstChild();
 				Tree copyFirstChildWord = firstChildWord.deepCopy();
