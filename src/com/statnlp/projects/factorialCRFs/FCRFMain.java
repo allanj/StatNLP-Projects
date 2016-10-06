@@ -12,7 +12,7 @@ import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
 import com.statnlp.hybridnetworks.NetworkModel;
 import com.statnlp.neural.NeuralConfigReader;
 
-public class TFMain {
+public class FCRFMain {
 
 	public static String[] entities; 
 	public static int trainNumber = -100;
