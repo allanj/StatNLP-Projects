@@ -24,7 +24,7 @@ public class FCRFMain {
 	public static String nerOut;
 	public static String posOut;
 	public static String[] selectedEntities = {"person","organization","gpe","MISC"};
-	public static String neural_config = "nn-crf-interface/neural_server/neural.config";
+	public static String neural_config = "config/fcrfneural.config";
 	
 	public static void main(String[] args) throws IOException, InterruptedException{
 		// TODO Auto-generated method stub

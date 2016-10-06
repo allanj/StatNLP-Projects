@@ -52,10 +52,10 @@ public class GRMMFeatureManager extends FeatureManager {
 //				String llw = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getName();
 //				String rw = pos<sent.length()-1? sent.get(pos+1).getName():"<PAD>";
 //				String rrw = pos==sent.length()-1? "<PAD>": pos==sent.length()-2? "<PAD>":sent.get(pos+2).getName();
-				String currWord = sent.get(pos).getName();
+//				String currWord = sent.get(pos).getName();
 //				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), Entity.get(eId).getForm(), lw.toLowerCase()+IN_SEP+
 //						currWord.toLowerCase()+IN_SEP+rw.toLowerCase()));
-				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), Entity.get(eId).getForm(), currWord.toLowerCase() ));
+//				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), Entity.get(eId).getForm(), currWord.toLowerCase() ));
 			}
 		}
 		
@@ -63,9 +63,9 @@ public class GRMMFeatureManager extends FeatureManager {
 			String[] fs = sent.get(pos).getFS();
 			for(String f: fs)
 				featureList.add(this._param_g.toFeature(network, FEATYPE.grmm.name(), Tag.get(eId).getForm(), f));
-//			String currWord = sent.get(pos).getName();
-//			if(NetworkConfig.USE_NEURAL_FEATURES)
-//				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), Tag.get(eId).getForm(), currWord.toLowerCase()));
+			String currWord = sent.get(pos).getName();
+			if(NetworkConfig.USE_NEURAL_FEATURES)
+				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), Tag.get(eId).getForm(), currWord.toLowerCase()));
 		}
 		
 //		if(NetworkConfig.USE_NEURAL_FEATURES && (nodeArr[1]==NODE_TYPES.ENODE_HYP.ordinal() || nodeArr[1]==NODE_TYPES.TNODE_HYP.ordinal())){
