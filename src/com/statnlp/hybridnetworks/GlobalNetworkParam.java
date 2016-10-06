@@ -100,7 +100,7 @@ public class GlobalNetworkParam implements Serializable{
 	protected int totalNumInsts;
 	
 	/** Neural CRF socket server controller  */
-	protected NNCRFGlobalNetworkParam _nnController;	
+	protected NNCRFGlobalNetworkParam[] _nnControllers;	
 	/** The weights that some of them will be replaced by neural net if NNCRF is enabled. */
 	private transient double[] concatWeights, concatCounts;
 	
@@ -335,8 +335,13 @@ public class GlobalNetworkParam implements Serializable{
 		this._version = 0;
 		if(!NetworkConfig.USE_NEURAL_FEATURES)
 			this._opt = this._optFactory.create(this._weights.length, getFeatureIntMap());
-		else
-			this._opt =  this._optFactory.create(_nnController.getNonNeuralAndInternalNeuralSize(), getFeatureIntMap());
+		else{
+			int weightSize = 0;
+			for(NNCRFGlobalNetworkParam controller: _nnControllers){
+				weightSize += this.countFeatures() - controller.getUsedNNWeightSize() + controller.getNNWeightSize();
+			}
+			this._opt =  this._optFactory.create(weightSize, getFeatureIntMap());
+		}
 		this._locked = true;
 		
 		System.err.println(this._size+" features.");
@@ -367,12 +372,15 @@ public class GlobalNetworkParam implements Serializable{
 		
 		// initialize NN params and gradParams
 		if (NetworkConfig.USE_NEURAL_FEATURES) {
-			_nnController = new NNCRFGlobalNetworkParam(this);
-			_nnController.setRemoteNN(new RemoteNN(NetworkConfig.OPTIMIZE_NEURAL));
-			_nnController.initializeInternalNeuralWeights();
-//			if(NeuralConfig.NUM_LAYER == 0 && NeuralConfig.EMBEDDING_SIZE.get(0)==0){
-//				_nnController.setInternalNeuralWeights(_weights);
-//			}
+			_nnControllers = new NNCRFGlobalNetworkParam[NetworkConfig.NUM_NEURAL_NETS];
+			for(NNCRFGlobalNetworkParam controller: _nnControllers){
+				controller = new NNCRFGlobalNetworkParam(this);
+				controller.setRemoteNN(new RemoteNN(NetworkConfig.OPTIMIZE_NEURAL));
+				controller.initializeInternalNeuralWeights();
+			}
+//			_nnController = new NNCRFGlobalNetworkParam(this);
+//			_nnController.setRemoteNN(new RemoteNN(NetworkConfig.OPTIMIZE_NEURAL));
+//			_nnController.initializeInternalNeuralWeights();
 			
 		}
 		
@@ -402,8 +410,13 @@ public class GlobalNetworkParam implements Serializable{
 		this._version = 0;
 		if(!NetworkConfig.USE_NEURAL_FEATURES)
 			this._opt = this._optFactory.create(this._weights.length, getFeatureIntMap());
-		else
-			this._opt =  this._optFactory.create(_nnController.getNonNeuralAndInternalNeuralSize(), getFeatureIntMap());
+		else{
+			int weightSize = 0;
+			for(NNCRFGlobalNetworkParam controller: _nnControllers){
+				weightSize += this.countFeatures() - controller.getUsedNNWeightSize() + controller.getNNWeightSize();
+			}
+			this._opt =  this._optFactory.create(weightSize, getFeatureIntMap());
+		}
 		this._locked = true;
 		
 		System.err.println(this._size+" features.");
@@ -751,7 +764,7 @@ public class GlobalNetworkParam implements Serializable{
 		//always add to _counts the NEGATION of the term g(x)'s gradient.
 	}
 	
-	public NNCRFGlobalNetworkParam getNNCRFController(){return this._nnController;}
+	public NNCRFGlobalNetworkParam[] getNNCRFControllers(){return this._nnControllers;}
 	
 	public void setInstsNum(int number){
 		this.totalNumInsts = number;
@@ -770,7 +783,7 @@ public class GlobalNetworkParam implements Serializable{
 		out.writeInt(this._size);
 		out.writeInt(this._fixedFeaturesSize);
 		out.writeBoolean(this._locked);
-		out.writeObject(this._nnController);
+		out.writeObject(this._nnControllers);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -782,7 +795,7 @@ public class GlobalNetworkParam implements Serializable{
 		this._fixedFeaturesSize = in.readInt();
 		this._locked = in.readBoolean();
 		if(in.available() > 0)
-			this._nnController = (NNCRFGlobalNetworkParam)in.readObject();
+			this._nnControllers = (NNCRFGlobalNetworkParam[])in.readObject();
 		//this._nnController.setRemoteNN(new RemoteNN());
 	}
 	

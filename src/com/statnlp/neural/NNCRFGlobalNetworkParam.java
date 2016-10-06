@@ -134,6 +134,9 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 		return numNotNN+_nnSize;
 	}
 	
+	public int getUsedNNWeightSize(){return this._usedNNSize;}
+	public int getNNWeightSize(){return this._nnSize;}
+	
 	public void getNonNeuralAndInternalNeuralWeights(double[] concatWeights, double[] concatCounts) {
 		int size = param_G.countFeatures();
 		int numNotNN = size - _usedNNSize;
