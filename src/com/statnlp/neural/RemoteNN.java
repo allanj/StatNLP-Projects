@@ -11,8 +11,6 @@ import org.msgpack.value.IntegerValue;
 import org.msgpack.value.Value;
 import org.zeromq.ZMQ;
 
-import com.statnlp.hybridnetworks.NetworkConfig;
-
 public class RemoteNN {
 	private boolean DEBUG = false;
 	
@@ -24,10 +22,18 @@ public class RemoteNN {
 	// Reference to controller instance for updating weights and getting gradients
 	private NNCRFInterface controller;
 	
+	// whether to use CRF's optimizer to optimize internal neural parameters
+	private boolean optimizeNeural;
+	
 	public RemoteNN() {
+		this(false);
+	}
+	
+	public RemoteNN(boolean optimizeNeural) {
 		context = ZMQ.context(1);
 		requester = context.socket(ZMQ.REQ);
 		requester.connect(serverAddress);
+		this.optimizeNeural = optimizeNeural;
 	}
 	
 	public void setController(NNCRFInterface controller) {
@@ -75,16 +81,17 @@ public class RemoteNN {
 	}
 	
 	public double[] initNetwork(List<Integer> numInputList, List<Integer> inputDimList, List<String> wordList,
-						   List<String> embeddingList, List<Integer> embSizeList,
+						   String lang, List<String> embeddingList, List<Integer> embSizeList,
 						   int outputDim, List<List<Integer>> vocab) {
 		MessageBufferPacker packer = MessagePack.newDefaultBufferPacker();
 		try {
-			packer.packMapHeader(15);
+			packer.packMapHeader(16);
 			packer.packString("cmd").packString("init");
 			
 			packList(packer, "numInputList", numInputList);
 			packList(packer, "inputDimList", inputDimList);
 			packList(packer, "wordList", wordList);
+			packer.packString("lang").packString(lang);
 			packList(packer, "embedding", embeddingList);
 			packList(packer, "embSizeList", embSizeList);
 			packer.packString("outputDim").packInt(outputDim);
@@ -101,7 +108,7 @@ public class RemoteNN {
 			requester.send(packer.toByteArray(), 0);
 			byte[] reply = requester.recv(0);
 			double[] nnInternalWeights = null;
-			if(NetworkConfig.OPTIMIZE_NEURAL) {
+			if(optimizeNeural) {
 				MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(reply);
 				int size = unpacker.unpackArrayHeader();
 				nnInternalWeights = new double[size];
@@ -123,13 +130,13 @@ public class RemoteNN {
 	
 	public void forwardNetwork(boolean training) {
 		MessageBufferPacker packer = MessagePack.newDefaultBufferPacker();
-		int mapSize = NetworkConfig.OPTIMIZE_NEURAL? 3:2;
+		int mapSize = optimizeNeural? 3:2;
 		try {
 			packer.packMapHeader(mapSize);
 			packer.packString("cmd").packString("fwd");
 			packer.packString("training").packBoolean(training);
 			
-			if(NetworkConfig.OPTIMIZE_NEURAL) {
+			if(optimizeNeural) {
 				double[] nnInternalWeights = controller.getInternalNeuralWeights();
 				packer.packString("weights");
 				packer.packArrayHeader(nnInternalWeights.length);
@@ -178,7 +185,7 @@ public class RemoteNN {
 			
 			byte[] reply = requester.recv(0);
 			MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(reply);
-			if(NetworkConfig.OPTIMIZE_NEURAL) {
+			if(optimizeNeural) {
 				int size = unpacker.unpackArrayHeader();
 				double[] counts = new double[size];
 				for (int i = 0; i < counts.length; i++) {
@@ -195,6 +202,42 @@ public class RemoteNN {
 		}
 		
 		
+	}
+	
+	public void saveNetwork(String prefix) {
+		try {
+			MessageBufferPacker packer = MessagePack.newDefaultBufferPacker();
+			packer.packMapHeader(2);
+			packer.packString("cmd").packString("save");
+			packer.packString("savePrefix").packString(prefix);
+			packer.close();
+			requester.send(packer.toByteArray(), 0);
+			
+			byte[] reply = requester.recv(0);
+			if (DEBUG) {
+				System.out.println("Save returns " + new String(reply));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadNetwork(String prefix) {
+		try {
+			MessageBufferPacker packer = MessagePack.newDefaultBufferPacker();
+			packer.packMapHeader(2);
+			packer.packString("cmd").packString("load");
+			packer.packString("savePrefix").packString(prefix);
+			packer.close();
+			requester.send(packer.toByteArray(), 0);
+			
+			byte[] reply = requester.recv(0);
+			if (DEBUG) {
+				System.out.println("Save returns " + new String(reply));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void cleanUp() {

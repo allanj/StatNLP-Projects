@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.concurrent.Callable;
 
 import com.statnlp.commons.types.Instance;
+import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
 
 public class LocalNetworkLearnerThread extends Thread implements Callable<Void> {
 	
@@ -46,6 +47,13 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 	
 	/** Prepare the list of instance ids for the batch selection */
 	private HashSet<Integer> chargeInstsIds = null;
+	/** Prepare the list of training inst ids **/
+	private HashSet<Integer> trainInstsIds = null;
+	
+	
+	/** whether message is passing or not. default: false. */
+	private boolean messagePassing = false;
+	
 	
 	/**
 	 * Construct a new learner thread using current networks (if cached) or builder (if not cached),
@@ -159,8 +167,26 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 		for(int i = 0; i< this._instances.length; i++){
 			if(NetworkConfig.USE_BATCH_TRAINING && !this.chargeInstsIds.contains(this._instances[i].getInstanceId()) && !this.chargeInstsIds.contains(-this._instances[i].getInstanceId()) )
 				continue;
+			if(this.trainInstsIds != null && !this.trainInstsIds.contains(this._instances[i].getInstanceId()) && !this.trainInstsIds.contains(-this._instances[i].getInstanceId()))
+				continue;
 			Network network = this.getNetwork(i);
-			network.train();
+			if(NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD){
+				for(int curr=0; curr<NetworkConfig.NUM_STRUCTS; curr++){
+					for(int other=0; other<NetworkConfig.NUM_STRUCTS; other++){
+						if(other==curr) continue;
+						network.removeKthStructure(other);
+					}
+//					System.out.println("current structure:"+curr);
+					if(messagePassing) network.inference();
+					else network.train();
+					network.saveKthStructureScore(curr); //save to the new score structures.
+				}
+				//the old then should be equals to the new.
+				//the new should create a new one.
+				network.renewCurrMarginals();
+				//if after each training iteration, clear all the things.
+				if(!messagePassing) network.clearMaginalsMap();
+			}else network.train();
 		}
 	}
 	
@@ -193,5 +219,15 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 	public void setInstanceIdSet(HashSet<Integer> set){
 		this.chargeInstsIds = set;
 	}
+	public void setTrainInstanceIdSet(HashSet<Integer> set){
+		this.trainInstsIds = set;
+	}
 	
+	public void setMessagePassing(){
+		this.messagePassing = true;
+	}
+	
+	public void unsetMessagePassing(){
+		this.messagePassing = false;
+	}
 }

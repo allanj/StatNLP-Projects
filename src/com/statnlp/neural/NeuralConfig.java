@@ -8,6 +8,7 @@ public class NeuralConfig {
 	public static String NEURAL_SERVER_PREFIX = "tcp://";
 	public static String NEURAL_SERVER_ADDRESS = "172.18.240.32";
 	
+	public static String LANGUAGE = "en";
 	public static List<String> EMBEDDING = (List<String>) Arrays.asList("none");
 	public static List<Integer> EMBEDDING_SIZE = (List<Integer>) Arrays.asList(100);
 	public static int NUM_LAYER = 0;

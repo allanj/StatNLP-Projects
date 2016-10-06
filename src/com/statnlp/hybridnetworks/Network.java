@@ -18,9 +18,11 @@ package com.statnlp.hybridnetworks;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import com.statnlp.commons.types.Instance;
+import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
 
 
 /**
@@ -91,6 +93,16 @@ public abstract class Network implements Serializable, HyperGraph{
 	private Network _labeledNetwork;
 	/** The unlabeled version of this network, if exists, null otherwise */
 	private Network _unlabeledNetwork;
+	
+	/** store the information of removal of each node **/
+	protected transient boolean[] isVisible;
+		
+	/** preset inside score, from the outside to inside score. <index, value> **/
+	private transient HashMap<Integer, Double> currMarginals;
+	protected transient HashMap<Integer, Double> newMarginals;
+	
+	/** The current structure that the network is using*/
+	protected int currentStructure; 
 	
 	/**
 	 * Default constructor. Note that the network constructed using this default constructor is lacking 
@@ -348,6 +360,20 @@ public abstract class Network implements Serializable, HyperGraph{
 	}
 	
 	/**
+	 * Inference in the Network without updating the parameters
+	 */
+	public void inference(){
+		if(this._weight == 0)
+			return;
+		if(NetworkConfig.MODEL_TYPE.USE_SOFTMAX){
+			this.inside();
+			this.outside();
+		} else { // Use real max
+			this.max();
+		}
+	}
+	
+	/**
 	 * Train the network
 	 */
 	public void train(){
@@ -370,7 +396,9 @@ public abstract class Network implements Serializable, HyperGraph{
 		this._inside = this.getInsideSharedArray();
 		Arrays.fill(this._inside, 0.0);
 		for(int k=0; k<this.countNodes(); k++){
-			this.inside(k);
+			if(NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && currMarginals!=null && currMarginals.containsKey(k))
+				this._inside[k] = currMarginals.get(k);
+			else this.inside(k);
 		}
 		
 		if(this.getInside()==Double.NEGATIVE_INFINITY){
@@ -424,21 +452,7 @@ public abstract class Network implements Serializable, HyperGraph{
 			objective = this.getMax() * this._weight;
 		}
 		this._param.addObj(objective);
-//		this._param.addObj(computeEdges());
 	}
-	
-//	public double computeEdges(){
-//		int numEdges = 0;
-//		if(!this.getInstance().isLabeled()){
-//			for(int k=1; k<this.countNodes(); k++){
-//				numEdges += this.getChildren(k).length;
-//			}
-//
-//			SemiCRFMain.debug[this.getInstance().size()] += numEdges;
-//			SemiCRFMain.debugNum[this.getInstance().size()] ++;
-//		}
-//		return numEdges*1.0;
-//	}
 	
 	/**
 	 * Goes through each nodes in the network to gather list of features
@@ -455,7 +469,11 @@ public abstract class Network implements Serializable, HyperGraph{
 		this._max = this.getMaxSharedArray();
 		this._max_paths = this.getMaxPathSharedArray();
 		for(int k=0; k<this.countNodes(); k++){
-			this.max(k);
+			if(NetworkConfig.INFERENCE == InferenceType.MEAN_FIELD && currMarginals.containsKey(k)){
+				_max[k] = currMarginals.get(k);
+				this._max_paths[k] = new int[]{};
+			}
+			else this.max(k);
 		}
 	}
 	
@@ -654,7 +672,6 @@ public abstract class Network implements Serializable, HyperGraph{
 	protected void touch(int k){
 		if(this.isRemoved(k))
 			return;
-		
 		int[][] childrenList_k = this.getChildren(k);
 		for(int children_k_index = 0; children_k_index < childrenList_k.length; children_k_index++){
 			int[] children_k = childrenList_k[children_k_index];
@@ -991,6 +1008,47 @@ public abstract class Network implements Serializable, HyperGraph{
 		return sb.toString();
 	}
 	
+	/**
+	 * To check if the node is visible
+	 * @return
+	 */
+	public boolean[] getVisible(){
+		return this.isVisible;
+	}
+	
+	
+	/**Abstract methods for mean-field inference.
+	 * 
+	 * Not really abstract methods here since other projects do not implement due to old version.
+	 * **/
+	/**
+	 * Only required when we used the mean-field inference method.
+	 * Need to implemented in user's own network. No need to implement if not using mean-field inference.
+	 */
+	public void removeKthStructure(int kthStructure){}
+	/**
+	 * Only required when we used the mean-field inference method.
+	 * Need to implemented in user's own network. No need to implement if not using mean-field inference.
+	 */
+	public void saveKthStructureScore(int kthStructure){}
+	
+	public void clearMaginalsMap(){
+		this.currMarginals = new HashMap<Integer, Double>();
+		this.newMarginals = new HashMap<Integer, Double>();
+	}
+	
+	public void renewCurrMarginals(){
+		this.currMarginals = this.newMarginals;
+		this.newMarginals = new HashMap<Integer, Double>();
+	}
+	
+	public void setStructure(int structure){
+		this.currentStructure = structure;
+	}
+	
+	public int getStructure(){
+		return this.currentStructure;
+	}
 }
 
 

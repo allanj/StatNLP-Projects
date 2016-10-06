@@ -231,7 +231,7 @@ public class LocalNetworkParam implements Serializable{
 														|| NetworkConfig.NUM_THREADS == 1
 														|| !NetworkConfig.BUILD_FEATURES_FROM_LABELED_ONLY
 														|| this._isFinalized);
-		if(shouldCache){
+  		if(shouldCache){
 			if(this._cache == null){
 				this._cache = new FeatureArray[this._numNetworks][][];
 			}

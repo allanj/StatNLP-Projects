@@ -234,9 +234,10 @@ public abstract class TableLookupNetwork extends Network{
 	
 	/**
 	 * Remove the node k from the network.
+	 * allan change to isVisible
 	 */
 	public void remove(int k){
-		this._nodes[k] = -1;
+		this.isVisible[k] = false;
 		if (this._inside!=null){
 			this._inside[k] = Double.NEGATIVE_INFINITY;
 		}
@@ -249,7 +250,14 @@ public abstract class TableLookupNetwork extends Network{
 	 * Check if the node k is removed from the network.
 	 */
 	public boolean isRemoved(int k){
-		return this._nodes[k] == -1;
+		return !this.isVisible[k];
+	}
+	
+	/**
+	 * Check if the node k is removed from the network.
+	 */
+	public void recover(int k){
+		this.isVisible[k] = true;
 	}
 	
 	/**
@@ -356,10 +364,12 @@ public abstract class TableLookupNetwork extends Network{
 			values.add(node_ids.next());
 		}
 		this._nodes = new long[this._children_tmp.keySet().size()];
+		this.isVisible = new boolean[this._nodes.length];
 		HashMap<Long, Integer> nodesValue2IdMap = new HashMap<Long, Integer>();
 		Collections.sort(values);
 		for(int k = 0 ; k<values.size(); k++){
 			this._nodes[k] = values.get(k);
+			this.isVisible[k] = true;
 			nodesValue2IdMap.put(this._nodes[k], k);
 		}
 		

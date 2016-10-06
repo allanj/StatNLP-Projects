@@ -7,23 +7,25 @@ public class WordToken extends InputToken{
 	
 	private String tag;
 	private String aTag;
-	private int headIndex; //for debug
+	private int headIndex; 
 	private String entity;
 	private String depLabel;
 	
+	private String[] fs; //feature string, useless for general purpose.
+	
 	public WordToken(String name) {
 		super(name);
-		this.tag = null;
+		this.tag = "";
 		this.headIndex = -1;
-		this.entity = null;
-		this.aTag = null;
+		this.entity = "O";
+		this.aTag = "";
 	}
 	
 	public WordToken(String name, String tag) {
 		super(name);
 		this.tag = tag;
 		this.headIndex = -1;
-		this.entity = null;
+		this.entity = "O";
 		this.aTag = tag.substring(0, 1);
 	}
 	
@@ -31,7 +33,7 @@ public class WordToken extends InputToken{
 		super(name);
 		this.tag = tag;
 		this.headIndex = headIndex;
-		this.entity = null;
+		this.entity = "O";
 		this.aTag = tag.substring(0, 1);
 	}
 	
@@ -40,7 +42,6 @@ public class WordToken extends InputToken{
 		this.tag = tag;
 		this.headIndex = headIndex;
 		this.entity = entity;
-		this.depLabel=null;
 		this.aTag = tag.substring(0, 1);
 	}
 	
@@ -104,9 +105,10 @@ public class WordToken extends InputToken{
 	
 	@Override
 	public String toString() {
-		if(tag!=null && entity!=null) return "Word:"+this._name+"/"+tag+","+headIndex+","+entity;
+		if(!tag.equals("")) return "Word:"+this._name+"/"+tag+","+headIndex+","+entity;
 		return "WORD:"+this._name;
 	}
 	
-	
+	public String[] getFS(){return this.fs;}
+	public void setFS(String[] fs){this.fs = fs;}
 }

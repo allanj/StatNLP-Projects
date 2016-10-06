@@ -34,6 +34,7 @@ import com.statnlp.neural.RemoteNN;
 import com.statnlp.commons.ml.opt.MathsVector;
 import com.statnlp.commons.ml.opt.Optimizer;
 import com.statnlp.commons.ml.opt.OptimizerFactory;
+import com.statnlp.commons.types.Instance;
 
 //TODO: other optimization and regularization methods. Such as the L1 regularization.
 
@@ -102,6 +103,8 @@ public class GlobalNetworkParam implements Serializable{
 	protected NNCRFGlobalNetworkParam _nnController;	
 	/** The weights that some of them will be replaced by neural net if NNCRF is enabled. */
 	private transient double[] concatWeights, concatCounts;
+	
+	private final String DUMP_TYPE = "test";  
 	
 	public GlobalNetworkParam(){
 		this(OptimizerFactory.getLBFGSFactory());
@@ -365,7 +368,7 @@ public class GlobalNetworkParam implements Serializable{
 		// initialize NN params and gradParams
 		if (NetworkConfig.USE_NEURAL_FEATURES) {
 			_nnController = new NNCRFGlobalNetworkParam(this);
-			_nnController.setRemoteNN(new RemoteNN());
+			_nnController.setRemoteNN(new RemoteNN(NetworkConfig.OPTIMIZE_NEURAL));
 			_nnController.initializeInternalNeuralWeights();
 //			if(NeuralConfig.NUM_LAYER == 0 && NeuralConfig.EMBEDDING_SIZE.get(0)==0){
 //				_nnController.setInternalNeuralWeights(_weights);
@@ -373,8 +376,9 @@ public class GlobalNetworkParam implements Serializable{
 			
 		}
 		
-		this.resetCountsAndObj();
-		
+		/** Must prepare the feature map before reset counts and obj
+		 * The reset will use feature2rep.
+		 * **/
 		this._feature2rep = new String[this._size][];
 		Iterator<String> types = this._featureIntMap.keySet().iterator();
 		while(types.hasNext()){
@@ -392,6 +396,9 @@ public class GlobalNetworkParam implements Serializable{
 				}
 			}
 		}
+		this.resetCountsAndObj();
+		/**********/
+		
 		this._version = 0;
 		if(!NetworkConfig.USE_NEURAL_FEATURES)
 			this._opt = this._optFactory.create(this._weights.length, getFeatureIntMap());
@@ -463,6 +470,11 @@ public class GlobalNetworkParam implements Serializable{
 			}
 			return input2id.get(input);
 		}
+		
+		Instance inst = network.getInstance();
+		int instId = inst.getInstanceId();
+		boolean isTestInst = instId > 0 && !inst.isLabeled() || !inst.getLabeledInstance().isLabeled();
+		if (isTestInst && !type.equals(NetworkConfig.NEURAL_FEATURE_TYPE)) type = DUMP_TYPE;
 		
 		if(!featureIntMap.containsKey(type)){
 			featureIntMap.put(type, new HashMap<String, HashMap<String, Integer>>());
@@ -709,6 +721,13 @@ public class GlobalNetworkParam implements Serializable{
 			}
 		}
 		
+		for(int k = 0; k < this._size; k++) {
+			if(_feature2rep[k][0].equals(DUMP_TYPE)) {
+				this._weights[k] = 0;
+				this._counts[k] = 0;
+			}
+		}
+		
 		this._obj = 0.0;
 		//for regularization
 		if(this.isDiscriminative() && this._kappa > 0){
@@ -762,7 +781,8 @@ public class GlobalNetworkParam implements Serializable{
 		this._size = in.readInt();
 		this._fixedFeaturesSize = in.readInt();
 		this._locked = in.readBoolean();
-		this._nnController = (NNCRFGlobalNetworkParam)in.readObject();
+		if(in.available() > 0)
+			this._nnController = (NNCRFGlobalNetworkParam)in.readObject();
 		//this._nnController.setRemoteNN(new RemoteNN());
 	}
 	

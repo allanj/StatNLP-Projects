@@ -17,6 +17,7 @@
 package com.statnlp.hybridnetworks;
 
 import com.statnlp.commons.types.Instance;
+import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
 
 public class LocalNetworkDecoderThread extends Thread{
 	
@@ -67,27 +68,51 @@ public class LocalNetworkDecoderThread extends Thread{
 	}
 	
 	public void max(){
-		long time = 0;
-		long start = -1;
+		long time = System.currentTimeMillis();
 		this._instances_output = new Instance[this._instances_input.length];
 		for(int k = 0; k<this._instances_input.length; k++){
-			Network network = this._compiler.compileAndStore(k, this._instances_input[k], this._param);
-			start = System.currentTimeMillis();
-			this._instances_output[k] = this.max(network, k);
-			time += System.currentTimeMillis() - start;
+//			System.err.println("Thread "+this._threadId+"\t"+k);
+			this._instances_output[k] = this.max(this._instances_input[k], k);
 		}
-		System.err.println("Decoding time [excluding network compiling] for thread "+this._threadId+" = "+ time/1000.0 +" secs.");
+		time = System.currentTimeMillis() - time;
+		System.err.println("Decoding time for thread "+this._threadId+" = "+ time/1000.0 +" secs.");
 	}
 	
-	public Instance max(Network network, int networkId){
-		//Network network = this._compiler.compileAndStore(networkId, instance, this._param);
+	public Instance max(Instance instance, int networkId){
+		Network network = this._compiler.compileAndStore(networkId, instance, this._param);
 		if(!_cacheParam){
 			this._param.disableCache();
 		}
-		network.max();
-		if(NetworkConfig.MAX_MARGINAL_DECODING){
+		if(NetworkConfig.INFERENCE == InferenceType.MEAN_FIELD){
+			for(int it=0;it<NetworkConfig.MF_ROUND;it++){
+				for(int curr=0; curr<NetworkConfig.NUM_STRUCTS; curr++){
+					for(int other=0; other<NetworkConfig.NUM_STRUCTS; other++){
+						if(curr==other) continue;
+						network.removeKthStructure(other);
+					}
+					network.inference();
+					network.saveKthStructureScore(curr);
+				}
+				network.renewCurrMarginals();
+			}
+			Instance inst = null;
+			for(int curr=0; curr<NetworkConfig.NUM_STRUCTS; curr++){
+				for(int other=0; other<NetworkConfig.NUM_STRUCTS; other++){
+					if(curr==other) continue;
+					network.removeKthStructure(other);
+				}
+				network.max();
+				network.setStructure(curr);
+				inst = this._compiler.decompile(network);
+			}
+			return inst;
+		}else if(NetworkConfig.MAX_MARGINAL_DECODING){
 			network.marginal();
+		}else{
+			network.max();
+			return this._compiler.decompile(network);
 		}
+		
 //		System.err.println("max="+network.getMax());
 		return this._compiler.decompile(network);
 	}

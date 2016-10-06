@@ -18,7 +18,9 @@ public class NeuralConfigReader {
 				NeuralConfig.NEURAL_SERVER_ADDRESS = info[1];
 			} else if(info[0].equals("serverPort")) {
 				NeuralConfig.NEURAL_SERVER_PORT= Integer.parseInt(info[1]);
-			} else if(info[0].equals("wordEmbedding")) {
+			} else if(info[0].equals("lang")) {
+				NeuralConfig.LANGUAGE = info[1];
+			} else if(info[0].equals("wordEmbedding")) {  //senna glove polygot
 				NeuralConfig.EMBEDDING = new ArrayList<String>();
 				for (int i = 1; i < info.length; i++) {
 					NeuralConfig.EMBEDDING.add(info[i]);
@@ -32,11 +34,11 @@ public class NeuralConfigReader {
 				NeuralConfig.NUM_LAYER = Integer.parseInt(info[1]);
 			} else if(info[0].equals("hiddenSize")) {
 				NeuralConfig.HIDDEN_SIZE = Integer.parseInt(info[1]);
-			} else if(info[0].equals("activation")) {
+			} else if(info[0].equals("activation")) { //tanh, relu, identity, hardtanh
 				NeuralConfig.ACTIVATION = info[1];
 			} else if(info[0].equals("dropout")) {
 				NeuralConfig.DROPOUT = Double.parseDouble(info[1]);
-			} else if(info[0].equals("optimizer")) {
+			} else if(info[0].equals("optimizer")) {  //adagrad, adam, sgd , none(be careful with the config in statnlp)
 				NeuralConfig.OPTIMIZER = info[1];
 			} else if(info[0].equals("learningRate")) {
 				NeuralConfig.LEARNING_RATE = Double.parseDouble(info[1]);

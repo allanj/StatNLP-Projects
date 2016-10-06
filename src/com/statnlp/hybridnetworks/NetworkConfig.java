@@ -16,6 +16,7 @@
  */
 package com.statnlp.hybridnetworks;
 
+
 public class NetworkConfig {
 	
 	/**
@@ -183,10 +184,28 @@ public class NetworkConfig {
 	public static boolean USE_NEURAL_FEATURES = false;
 	/** Regularized the neural features in CRF or not. set to false then can be done by dropout***/
 	public static boolean REGULARIZE_NEURAL_FEATURES = false;
-	/** If true: Optimized the neural net in CRF **/
-	public static boolean OPTIMIZE_NEURAL = false;   //false means not update the neural network parameters in CRF.
+	/** If true: Optimized the neural net in CRF. optimizer in neural config must be set to none **/
+	public static boolean OPTIMIZE_NEURAL = false;   //false means not update the neural network parameters in CRF. false is faster
 	/** false: the feature is the word itself. true: word is the indexed word **/
 	public static boolean IS_INDEXED_NEURAL_FEATURES = false;
+	/** Randomly choose the batch at every iteration. (false may give better result)**/
+	public static boolean RANDOM_BATCH = false;
+	
+	public static String NEURAL_FEATURE_TYPE = "neural";
 	
 	
+	
+	public static enum InferenceType {
+		MEAN_FIELD,
+		FORWARD_BACKWARD;
+		private InferenceType(){
+			
+		}
+	}
+	
+	public static InferenceType INFERENCE = InferenceType.FORWARD_BACKWARD;
+	
+	/**For mean-field inference..***/
+	public static int MF_ROUND = 10;
+	public static int NUM_STRUCTS = 2;
 }
