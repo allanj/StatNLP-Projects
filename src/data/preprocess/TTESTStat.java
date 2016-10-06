@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.statnlp.commons.crf.RAWF;
-import com.statnlp.dp.utils.DPConfig;
+import com.statnlp.projects.dep.utils.DPConfig;
 
 /**
  * Compare two system.
