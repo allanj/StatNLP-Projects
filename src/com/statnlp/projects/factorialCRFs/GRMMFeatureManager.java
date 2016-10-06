@@ -40,9 +40,8 @@ public class GRMMFeatureManager extends FeatureManager {
 		
 		int eId = nodeArr[2];
 		//System.err.println(Arrays.toString(nodeArr));
-		//int[] child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[0]));
 		
-		//int childPos = child[0]-1;
+		
 		if(nodeArr[1]==NODE_TYPES.ENODE_HYP.ordinal() ){
 			String[] fs = sent.get(pos).getFS();
 			for(String f: fs)
@@ -52,10 +51,14 @@ public class GRMMFeatureManager extends FeatureManager {
 //				String llw = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getName();
 //				String rw = pos<sent.length()-1? sent.get(pos+1).getName():"<PAD>";
 //				String rrw = pos==sent.length()-1? "<PAD>": pos==sent.length()-2? "<PAD>":sent.get(pos+2).getName();
-//				String currWord = sent.get(pos).getName();
+				String currWord = sent.get(pos).getName();
 //				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), Entity.get(eId).getForm(), lw.toLowerCase()+IN_SEP+
 //						currWord.toLowerCase()+IN_SEP+rw.toLowerCase()));
 //				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), Entity.get(eId).getForm(), currWord.toLowerCase() ));
+				/**Use collapsed features**/
+				int[] tag_child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[1]));
+				int tag_child_id = tag_child[2];
+				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), Entity.get(eId).getForm()+"&"+Tag.get(tag_child_id).getForm(), currWord.toLowerCase() ));
 			}
 		}
 		
@@ -64,8 +67,12 @@ public class GRMMFeatureManager extends FeatureManager {
 			for(String f: fs)
 				featureList.add(this._param_g.toFeature(network, FEATYPE.grmm.name(), Tag.get(eId).getForm(), f));
 			String currWord = sent.get(pos).getName();
-			if(NetworkConfig.USE_NEURAL_FEATURES)
-				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), Tag.get(eId).getForm(), currWord.toLowerCase()));
+			if(NetworkConfig.USE_NEURAL_FEATURES){
+				//featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), Tag.get(eId).getForm(), currWord.toLowerCase()));
+				int[] entity_child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[1]));
+				int entity_child_id = entity_child[2];
+				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), Entity.get(entity_child_id).getForm()+"&"+Tag.get(eId).getForm(), currWord.toLowerCase() ));
+			}
 		}
 		
 //		if(NetworkConfig.USE_NEURAL_FEATURES && (nodeArr[1]==NODE_TYPES.ENODE_HYP.ordinal() || nodeArr[1]==NODE_TYPES.TNODE_HYP.ordinal())){

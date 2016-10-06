@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import com.statnlp.commons.ml.opt.OptimizerFactory;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -88,7 +89,7 @@ public class FCRFMain {
 		/****/
 		
 //		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam());
-		GRMMFeatureManager fa = new GRMMFeatureManager(new GlobalNetworkParam());
+		GRMMFeatureManager fa = new GRMMFeatureManager(new GlobalNetworkParam(OptimizerFactory.getLBFGSFactory()));
 		TFNetworkCompiler compiler = new TFNetworkCompiler();
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		TFInstance[] ecrfs = trainInstances.toArray(new TFInstance[trainInstances.size()]);
