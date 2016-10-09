@@ -192,7 +192,7 @@ public class NetworkConfig {
 	public static boolean RANDOM_BATCH = false;
 	
 	public static String NEURAL_FEATURE_TYPE = "neural";
-	public static int NUM_NEURAL_NETS = 1;
+	
 	
 	
 	public static enum InferenceType {
