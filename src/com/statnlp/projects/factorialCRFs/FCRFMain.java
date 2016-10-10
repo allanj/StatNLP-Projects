@@ -88,7 +88,7 @@ public class FCRFMain {
 		NetworkConfig.OPTIMIZE_NEURAL = false;  //false: optimize in neural network
 		NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
 		NetworkConfig.REGULARIZE_NEURAL_FEATURES = false; //true means regularize in the crf part
-		NeuralConfig.NUM_NEURAL_NETS = 1;
+		NeuralConfig.NUM_NEURAL_NETS = 2;
 		/****/
 		
 //		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam());
