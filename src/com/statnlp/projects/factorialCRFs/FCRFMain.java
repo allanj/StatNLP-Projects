@@ -11,6 +11,7 @@ import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
 import com.statnlp.hybridnetworks.NetworkModel;
+import com.statnlp.neural.NeuralConfig;
 import com.statnlp.neural.NeuralConfigReader;
 
 public class FCRFMain {
@@ -86,6 +87,8 @@ public class FCRFMain {
 			NeuralConfigReader.readConfig(neural_config);
 		NetworkConfig.OPTIMIZE_NEURAL = false;  //false: optimize in neural network
 		NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
+		NetworkConfig.REGULARIZE_NEURAL_FEATURES = false; //true means regularize in the crf part
+		NeuralConfig.NUM_NEURAL_NETS = 1;
 		/****/
 		
 //		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam());
@@ -93,7 +96,22 @@ public class FCRFMain {
 		TFNetworkCompiler compiler = new TFNetworkCompiler();
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		TFInstance[] ecrfs = trainInstances.toArray(new TFInstance[trainInstances.size()]);
-		model.train(ecrfs, numIteration);
+		if(NetworkConfig.USE_NEURAL_FEATURES){
+			TFInstance[] allInsts = new TFInstance[trainInstances.size()+testInstances.size()];
+			int i = 0;
+	        for(; i<trainInstances.size(); i++) {
+	        	allInsts[i] = trainInstances.get(i);
+	        }
+	        int lastId = allInsts[i-1].getInstanceId();
+	        for(int j = 0; j<testInstances.size(); j++, i++) {
+	        	allInsts[i] = testInstances.get(j);
+	        	allInsts[i].setInstanceId(lastId+j+1);
+	        	allInsts[i].setUnlabeled();
+	        }
+	        model.train(allInsts, trainInstances.size(), numIteration);
+		}else{
+			model.train(ecrfs, numIteration);
+		}
 		Instance[] predictions = model.decode(testInstances.toArray(new TFInstance[testInstances.size()]));
 //		TFEval.evalNER(predictions, nerOut);
 		TFEval.evalSingleE(predictions);

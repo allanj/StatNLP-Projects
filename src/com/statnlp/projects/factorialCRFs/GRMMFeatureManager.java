@@ -15,7 +15,7 @@ public class GRMMFeatureManager extends FeatureManager {
 
 	private static final long serialVersionUID = 376931974939202432L;
 
-	public enum FEATYPE {grmm, neural};
+	public enum FEATYPE {grmm, neural_1, neural_2};
 //	private String IN_SEP = NeuralConfig.IN_SEP;
 	
 	public GRMMFeatureManager(GlobalNetworkParam param_g) {
@@ -58,7 +58,7 @@ public class GRMMFeatureManager extends FeatureManager {
 				/**Use collapsed features**/
 				int[] tag_child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[1]));
 				int tag_child_id = tag_child[2];
-				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), Entity.get(eId).getForm()+"&"+Tag.get(tag_child_id).getForm(), currWord.toLowerCase() ));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), Entity.get(eId).getForm()+"&"+Tag.get(tag_child_id).getForm(), currWord.toLowerCase() ));
 			}
 		}
 		
@@ -71,7 +71,7 @@ public class GRMMFeatureManager extends FeatureManager {
 				//featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), Tag.get(eId).getForm(), currWord.toLowerCase()));
 				int[] entity_child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[1]));
 				int entity_child_id = entity_child[2];
-				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), Entity.get(entity_child_id).getForm()+"&"+Tag.get(eId).getForm(), currWord.toLowerCase() ));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_2.name(), Entity.get(entity_child_id).getForm()+"&"+Tag.get(eId).getForm(), currWord.toLowerCase() ));
 			}
 		}
 		
