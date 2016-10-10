@@ -474,7 +474,7 @@ public class GlobalNetworkParam implements Serializable{
 		Instance inst = network.getInstance();
 		int instId = inst.getInstanceId();
 		boolean isTestInst = instId > 0 && !inst.isLabeled() || !inst.getLabeledInstance().isLabeled();
-		if (isTestInst && !type.equals(NetworkConfig.NEURAL_FEATURE_TYPE)) type = DUMP_TYPE;
+		if (isTestInst && !type.startsWith(NetworkConfig.NEURAL_FEATURE_TYPE_PREFIX)) type = DUMP_TYPE;
 		
 		if(!featureIntMap.containsKey(type)){
 			featureIntMap.put(type, new HashMap<String, HashMap<String, Integer>>());
