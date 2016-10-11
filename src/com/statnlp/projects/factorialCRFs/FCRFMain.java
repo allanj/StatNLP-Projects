@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.statnlp.commons.ml.opt.OptimizerFactory;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -25,7 +24,6 @@ public class FCRFMain {
 	public static String testFile = "";
 	public static String nerOut;
 	public static String posOut;
-	public static String[] selectedEntities = {"person","organization","gpe","MISC"};
 	public static String neural_config = "config/fcrfneural.config";
 	
 	public static void main(String[] args) throws IOException, InterruptedException{
@@ -49,11 +47,11 @@ public class FCRFMain {
 		/***********DEBUG*****************/
 		trainFile = "data/dat/train.txt";
 		String trainSrcFile = "data/dat/conll1000train.txt";
-		trainNumber = 35;
+		trainNumber = -1;
 		testFile = "data/dat/test.txt";;
 //		String testSrcFile = "data/dat/conll1000test.txt";
-		testFile = trainFile;
-		testNumber = 35;
+//		testFile = trainFile;
+		testNumber = -1;
 		/***************************/
 		
 		System.err.println("[Info] trainingFile: "+TFConfig.CONLL_train);
@@ -135,7 +133,6 @@ public class FCRFMain {
 					case "-testNum": testNumber = Integer.valueOf(args[i+1]); break;
 					case "-iter": numIteration = Integer.valueOf(args[i+1]); break;
 					case "-thread": numThreads = Integer.valueOf(args[i+1]); break;
-					case "-ent": selectedEntities = args[i+1].split(","); break;
 					case "-testFile": testFile = args[i+1]; break;
 					case "-reg": TFConfig.l2val = Double.valueOf(args[i+1]); break;
 					case "-windows":TFConfig.windows = true; break;
@@ -147,7 +144,6 @@ public class FCRFMain {
 			System.err.println("[Info] testNum: "+testNumber);
 			System.err.println("[Info] numIter: "+numIteration);
 			System.err.println("[Info] numThreads: "+numThreads);
-			System.err.println("[Info] Selected Entities: "+Arrays.toString(selectedEntities));
 			System.err.println("[Info] Regularization Parameter: "+TFConfig.l2val);	
 		}
 	}
