@@ -1,9 +1,9 @@
 package com.statnlp.projects.factorialCRFs;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
+import com.statnlp.commons.crf.RAWF;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -46,12 +46,12 @@ public class FCRFMain {
 		List<TFInstance> testInstances = null;
 		/***********DEBUG*****************/
 		trainFile = "data/dat/train.txt";
-		String trainSrcFile = "data/dat/conll1000train.txt";
-		trainNumber = -1;
+//		String trainSrcFile = "data/dat/conll1000train.txt";
+		trainNumber = 1000;
 		testFile = "data/dat/test.txt";;
 //		String testSrcFile = "data/dat/conll1000test.txt";
 //		testFile = trainFile;
-		testNumber = -1;
+		testNumber = 500;
 		/***************************/
 		
 		System.err.println("[Info] trainingFile: "+TFConfig.CONLL_train);
@@ -111,7 +111,12 @@ public class FCRFMain {
 		}else{
 			model.train(ecrfs, numIteration);
 		}
+//		fa.pw.close();
+//		fa.pw = RAWF.writer("data/dat/grmmtest.txt");
+//		for(TFInstance inst: testInstances) inst.setLabeled(); //only for debug purpose
 		Instance[] predictions = model.decode(testInstances.toArray(new TFInstance[testInstances.size()]));
+//		fa.pw.close();
+
 //		TFEval.evalNER(predictions, nerOut);
 		TFEval.evalSingleE(predictions);
 		TFEval.evalPOS(predictions, posOut);
