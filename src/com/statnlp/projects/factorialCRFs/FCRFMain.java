@@ -47,12 +47,13 @@ public class FCRFMain {
 		List<TFInstance> trainInstances = null;
 		List<TFInstance> testInstances = null;
 		/***********DEBUG*****************/
-		trainFile = "data/dat/conll2000.train1k.txt";
+		trainFile = "data/dat/train.txt";
 		String trainSrcFile = "data/dat/conll1000train.txt";
-		trainNumber = -1;
-		testFile = "data/dat/conll2000.test1k.txt";;
-		String testSrcFile = "data/dat/conll1000test.txt";
-		testNumber = -1;
+		trainNumber = 35;
+		testFile = "data/dat/test.txt";;
+//		String testSrcFile = "data/dat/conll1000test.txt";
+		testFile = trainFile;
+		testNumber = 35;
 		/***************************/
 		
 		System.err.println("[Info] trainingFile: "+TFConfig.CONLL_train);
@@ -60,11 +61,11 @@ public class FCRFMain {
 		System.err.println("[Info] nerOut: "+nerOut);
 		System.err.println("[Info] posOut: "+posOut);
 		
-//		trainInstances = TFReader.readCONLLData(trainFile, true, trainNumber);
-//		testInstances = TFReader.readCONLLData(testFile, false, testNumber);
+		trainInstances = TFReader.readCONLLData(trainFile, true, trainNumber);
+		testInstances = TFReader.readCONLLData(testFile, false, testNumber);
 		
-		trainInstances = TFReader.readGRMMDataAndWord(trainFile, true, trainNumber, trainSrcFile);
-		testInstances = TFReader.readGRMMDataAndWord(testFile, false, testNumber, testSrcFile);
+//		trainInstances = TFReader.readGRMMDataAndWord(trainFile, true, trainNumber, trainSrcFile);
+//		testInstances = TFReader.readGRMMDataAndWord(testFile, false, testNumber, testSrcFile);
 		
 		System.err.println("entity size:"+Entity.ENTS_INDEX.toString());
 		System.err.println("tag size:"+Tag.TAGS.size());
@@ -82,7 +83,7 @@ public class FCRFMain {
 		
 		
 		/***Neural network Configuration**/
-		NetworkConfig.USE_NEURAL_FEATURES = true; 
+		NetworkConfig.USE_NEURAL_FEATURES = false; 
 		if(NetworkConfig.USE_NEURAL_FEATURES)
 			NeuralConfigReader.readConfig(neural_config);
 		NetworkConfig.OPTIMIZE_NEURAL = false;  //false: optimize in neural network
@@ -91,8 +92,8 @@ public class FCRFMain {
 		NeuralConfig.NUM_NEURAL_NETS = 2;
 		/****/
 		
-//		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam());
-		GRMMFeatureManager fa = new GRMMFeatureManager(new GlobalNetworkParam(OptimizerFactory.getLBFGSFactory()));
+		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam());
+//		GRMMFeatureManager fa = new GRMMFeatureManager(new GlobalNetworkParam(OptimizerFactory.getLBFGSFactory()));
 		TFNetworkCompiler compiler = new TFNetworkCompiler();
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		TFInstance[] ecrfs = trainInstances.toArray(new TFInstance[trainInstances.size()]);
