@@ -31,25 +31,25 @@ public class Chunk implements Serializable{
 	
 	private static final long serialVersionUID = -5006849791095171763L;
 	
-	public static final Map<String, Chunk> Entities = new HashMap<String, Chunk>();
-	public static final Map<Integer, Chunk> Entities_INDEX = new HashMap<Integer, Chunk>();
+	public static final Map<String, Chunk> ChunkLabels = new HashMap<String, Chunk>();
+	public static final Map<Integer, Chunk> ChunkLabels_Index = new HashMap<Integer, Chunk>();
 	
 	public static Chunk get(String form){
-		if(!Entities.containsKey(form)){
-			Chunk label = new Chunk(form, Entities.size());
-			Entities.put(form, label);
-			Entities_INDEX.put(label._id, label);
+		if(!ChunkLabels.containsKey(form)){
+			Chunk label = new Chunk(form, ChunkLabels.size());
+			ChunkLabels.put(form, label);
+			ChunkLabels_Index.put(label._id, label);
 		}
-		return Entities.get(form);
+		return ChunkLabels.get(form);
 	}
 	
 	public static Chunk get(int id){
-		return Entities_INDEX.get(id);
+		return ChunkLabels_Index.get(id);
 	}
 	
 	public static void reset(){
-		Entities.clear();
-		Entities_INDEX.clear();
+		ChunkLabels.clear();
+		ChunkLabels_Index.clear();
 	}
 	
 	private String _form;

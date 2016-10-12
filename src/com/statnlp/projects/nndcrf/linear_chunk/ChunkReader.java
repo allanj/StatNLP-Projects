@@ -39,13 +39,15 @@ public class ChunkReader {
 		ArrayList<WordToken> words = new ArrayList<WordToken>();
 		ArrayList<String> es = new ArrayList<String>();
 		while((line = br.readLine())!=null){
-			if(line.startsWith("#")) continue;
 			if(line.equals("")){
 				WordToken[] wordsArr = new WordToken[words.size()];
 				words.toArray(wordsArr);
 				Sentence sent = new Sentence(wordsArr);
 				ChunkInstance inst = new ChunkInstance(index++,1.0,sent);
-				if(IOBES) encodeIOBES(es);
+				if(IOBES) {
+					encodeIOBES(es);
+					
+				}
 				inst.entities = es;
 				words = new ArrayList<WordToken>();
 				es = new ArrayList<String>();
@@ -79,6 +81,7 @@ public class ChunkReader {
 		if(rawChunk.equals("B-NP") || rawChunk.equals("I-NP") || rawChunk.equals("O")){
 			if(rawChunk.startsWith("B-")) chunk = "B";
 			else if(rawChunk.startsWith("I-")) chunk = "I";
+			else chunk = rawChunk;
 		}else chunk = "O";
 		return chunk;
 	}
@@ -91,17 +94,21 @@ public class ChunkReader {
 				if((i+1)<chunks.size()){
 					if(!chunks.get(i+1).startsWith("I")){
 						chunks.set(i, "S"+curr.substring(1));
+						Chunk.get(chunks.get(i));
 					} //else remains the same
 				}else{
 					chunks.set(i, "S"+curr.substring(1));
+					Chunk.get(chunks.get(i));
 				}
 			}else if(curr.startsWith("I")){
 				if((i+1)<chunks.size()){
 					if(!chunks.get(i+1).startsWith("I")){
 						chunks.set(i, "E"+curr.substring(1));
+						Chunk.get(chunks.get(i));
 					}
 				}else{
 					chunks.set(i, "E"+curr.substring(1));
+					Chunk.get(chunks.get(i));
 				}
 			}
 		}

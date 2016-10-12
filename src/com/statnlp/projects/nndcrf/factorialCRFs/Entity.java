@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author wei_lu
+ * @author allan
+ * Actually this file is the chunk label
  *
  */
 public class Entity implements Serializable{

@@ -22,6 +22,7 @@ public class ChunkMain {
 	public static double adagrad_learningRate = 0.1;
 	public static double l2 = 0.01;
 	public static boolean IOBESencoding = true;
+	public static boolean npchunking = true;
 	
 	//read the conll 2000 dataset.
 	public static String trainPath = "data/conll2000/train.txt";
@@ -41,8 +42,13 @@ public class ChunkMain {
 		List<ChunkInstance> testInstances = null;
 		
 		
-		trainInstances = ChunkReader.readCONLL2000Data(trainPath, true,  trainNumber, true, IOBESencoding);
-		testInstances = ChunkReader.readCONLL2000Data(testFile, false, testNumber, true);
+		/**Debug information**/
+//		testFile = trainPath;
+		/***/
+		
+		
+		trainInstances = ChunkReader.readCONLL2000Data(trainPath, true,  trainNumber, npchunking, IOBESencoding);
+		testInstances = ChunkReader.readCONLL2000Data(testFile, false, testNumber, npchunking);
 		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = l2;
 		NetworkConfig.NUM_THREADS = numThreads;
@@ -55,7 +61,7 @@ public class ChunkMain {
 			//gnp =  new GlobalNetworkParam(OptimizerFactory.);
 		}
 		
-		System.err.println("[Info] "+Chunk.Entities.size()+" entities: "+Chunk.Entities.toString());
+		System.err.println("[Info] "+Chunk.ChunkLabels.size()+" ChunkLabels: "+Chunk.ChunkLabels.toString());
 		
 		ChunkInstance all_instances[] = new ChunkInstance[trainInstances.size()+testInstances.size()];
         int i = 0;
@@ -63,12 +69,14 @@ public class ChunkMain {
             all_instances[i] = trainInstances.get(i);
         }
         int lastId = all_instances[i-1].getInstanceId();
+        int maxSize = 0;
         for(int j = 0; j<testInstances.size(); j++, i++) {
             all_instances[i] = testInstances.get(j);
             all_instances[i].setInstanceId(lastId+j+1);
             all_instances[i].setUnlabeled();
+            maxSize = Math.max(maxSize, all_instances[i].size());
         }
-		
+		System.err.println("max sentence size:"+maxSize);
 		ChunkFeatureManager fa = new ChunkFeatureManager(gnp);
 		ChunkNetworkCompiler compiler = new ChunkNetworkCompiler(IOBESencoding);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
@@ -104,13 +112,16 @@ public class ChunkMain {
 					case "-model": NetworkConfig.MODEL_TYPE = args[i+1].equals("crf")? ModelType.CRF:ModelType.SSVM;   break;
 					case "-neural": if(args[i+1].equals("true")){ 
 											NetworkConfig.USE_NEURAL_FEATURES = true; 
-											NetworkConfig.OPTIMIZE_NEURAL = false;  //false: optimize in neural network
+											NetworkConfig.OPTIMIZE_NEURAL = true;  //false: optimize in neural network
 											NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
+											NetworkConfig.REGULARIZE_NEURAL_FEATURES = true; // Regularized the neural features in CRF or not
 										}
 									break;
 					case "-reg": l2 = Double.valueOf(args[i+1]);  break;
 					case "-lr": adagrad_learningRate = Double.valueOf(args[i+1]); break;
-					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
+					case "-npchunking": npchunking = args[i+1].equals("true")? true:false; break;
+					case "-iobes": IOBESencoding = args[i+1].equals("true")? true:false; break;
+					default: System.err.println("Invalid arguments "+args[i]+", please check usage."); System.exit(0);
 				}
 			}
 			System.err.println("[Info] trainNum: "+trainNumber);

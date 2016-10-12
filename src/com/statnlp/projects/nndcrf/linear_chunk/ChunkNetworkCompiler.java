@@ -45,7 +45,7 @@ public class ChunkNetworkCompiler extends NetworkCompiler{
 	}
 	
 	public long toNode_root(int size){
-		int[] arr = new int[]{size+1,Chunk.Entities.size(),0,0,NODE_TYPES.ROOT.ordinal()};
+		int[] arr = new int[]{size+1,Chunk.ChunkLabels.size(),0,0,NODE_TYPES.ROOT.ordinal()};
 		return NetworkIDMapper.toHybridNodeID(arr);
 	}
 
@@ -94,6 +94,7 @@ public class ChunkNetworkCompiler extends NetworkCompiler{
 		lcrfNetwork.addNode(root);
 		lcrfNetwork.addEdge(root, children);
 		lcrfNetwork.finalizeNetwork();
+//		System.err.println(inst.getOutput().toString());
 		if(!genericUnlabeledNetwork.contains(lcrfNetwork))
 			System.err.println("not contains");
 		return lcrfNetwork;
@@ -115,8 +116,8 @@ public class ChunkNetworkCompiler extends NetworkCompiler{
 		long[] children = new long[]{leaf};
 		lcrfNetwork.addNode(leaf);
 		for(int i=0;i<_size;i++){
-			long[] currentNodes = new long[Chunk.Entities.size()];
-			for(int l=0;l<Chunk.Entities.size();l++){
+			long[] currentNodes = new long[Chunk.ChunkLabels.size()];
+			for(int l=0;l<Chunk.ChunkLabels.size();l++){
 //				if(i==0 && Entity.get(l).getForm().startsWith("I-")){ currentNodes[l]=-1; continue;}
 				long node = toNode(i,l);
 				
