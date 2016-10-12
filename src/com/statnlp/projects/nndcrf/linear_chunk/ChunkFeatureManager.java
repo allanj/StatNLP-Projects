@@ -15,7 +15,7 @@ public class ChunkFeatureManager extends FeatureManager {
 
 	private static final long serialVersionUID = 376931974939202432L;
 
-	public enum FEATYPE {chunk, neural_1, neural_2};
+	public enum FEATYPE {chunk, neural_1};
 	private String OUT_SEP = NeuralConfig.OUT_SEP; 
 	private String IN_SEP = NeuralConfig.IN_SEP;
 	
@@ -50,16 +50,21 @@ public class ChunkFeatureManager extends FeatureManager {
 //		int childPos = child[0]-1;
 		
 		String lw = pos>0? sent.get(pos-1).getName():"<PAD>";
+		String lcaps = capsF(lw);
 		String llw = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getName();
-		String llt = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getTag();
-		String lt = pos>0? sent.get(pos-1).getTag():"<PAD>";
+		String llcaps = capsF(llw);
+//		String llt = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getTag();
+//		String lt = pos>0? sent.get(pos-1).getTag():"<PAD>";
 		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"<PAD>";
-		String rt = pos<sent.length()-1? sent.get(pos+1).getTag():"<PAD>";
+		String rcaps = capsF(rw);
+//		String rt = pos<sent.length()-1? sent.get(pos+1).getTag():"<PAD>";
 		String rrw = pos==sent.length()-1? "<PAD>": pos==sent.length()-2? "<PAD>":sent.get(pos+2).getName();
-		String rrt = pos==sent.length()-1? "<PAD>": pos==sent.length()-2? "<PAD>":sent.get(pos+2).getTag();
+		String rrcaps = capsF(rrw);
+//		String rrt = pos==sent.length()-1? "<PAD>": pos==sent.length()-2? "<PAD>":sent.get(pos+2).getTag();
 		
 		String currWord = inst.getInput().get(pos).getName();
-		String currTag = inst.getInput().get(pos).getTag();
+		String currCaps = capsF(currWord);
+//		String currTag = inst.getInput().get(pos).getTag();
 //		String childWord = childPos>=0? inst.getInput().get(childPos).getName():"STR";
 //		String childTag = childPos>=0? inst.getInput().get(childPos).getTag():"STR";
 		
@@ -69,10 +74,10 @@ public class ChunkFeatureManager extends FeatureManager {
 		String currEn = Chunk.get(eId).getForm();
 		if(NetworkConfig.USE_NEURAL_FEATURES){
 //			featureList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currEn,  currWord));
-//			featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, llw+IN_SEP+lw+IN_SEP+currWord+IN_SEP+rw+IN_SEP+rrw+OUT_SEP+
-//										llt+IN_SEP+lt+IN_SEP+currTag+IN_SEP+rt+IN_SEP+rrt));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, llw.toLowerCase()+IN_SEP+lw.toLowerCase()
-								+IN_SEP+currWord.toLowerCase()+IN_SEP+rw.toLowerCase()+IN_SEP+rrw.toLowerCase()));
+			featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, llw+IN_SEP+lw+IN_SEP+currWord+IN_SEP+rw+IN_SEP+rrw+OUT_SEP+
+										llcaps+IN_SEP+lcaps+IN_SEP+currCaps+IN_SEP+rcaps+IN_SEP+rrcaps));
+//			featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, llw.toLowerCase()+IN_SEP+lw.toLowerCase()
+//								+IN_SEP+currWord.toLowerCase()+IN_SEP+rw.toLowerCase()+IN_SEP+rrw.toLowerCase()));
 		}
 		String prevEntity = Chunk.get(childEId).getForm();
 		featureList.add(this._param_g.toFeature(network,FEATYPE.chunk.name(), currEn,  prevEntity));
@@ -97,5 +102,16 @@ public class ChunkFeatureManager extends FeatureManager {
 		return fa;
 	}
 	
+	
+	private String capsF(String word){
+		String cap = null;
+		if(word.equals("<PAD>")) return "others";
+		if(word.equals(word.toLowerCase())) cap = "all_lowercases";
+		else if(word.equals(word.toUpperCase())) cap = "all_uppercases";
+		else if(word.matches("[A-Z][a-z0-9]*")) cap = "first_upper";
+		else if(word.matches("[a-z0-9]+[A-Z]+.*")) cap = "at_least_one";
+		else cap = "others";
+		return cap;
+	}
 
 }

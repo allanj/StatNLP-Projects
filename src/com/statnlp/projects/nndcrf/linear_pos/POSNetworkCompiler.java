@@ -1,4 +1,4 @@
-package com.statnlp.projects.nndcrf.linear_chunk;
+package com.statnlp.projects.nndcrf.linear_pos;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,25 +9,23 @@ import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
 
-public class ChunkNetworkCompiler extends NetworkCompiler{
+public class POSNetworkCompiler extends NetworkCompiler{
 
 	private static final long serialVersionUID = -2388666010977956073L;
 
 	public enum NODE_TYPES {LEAF,NODE,ROOT};
 	public int _size;
-	public ChunkNetwork genericUnlabeledNetwork;
-	private boolean IOBESencoding;
+	public POSNetwork genericUnlabeledNetwork;
 	
-	public ChunkNetworkCompiler(boolean iobesencoding){
+	public POSNetworkCompiler(){
 		this._size = 150;
 		this.compileUnlabeledInstancesGeneric();
-		this.IOBESencoding = iobesencoding;
 	}
 	
 	@Override
-	public ChunkNetwork compile(int networkId, Instance inst, LocalNetworkParam param) {
+	public POSNetwork compile(int networkId, Instance inst, LocalNetworkParam param) {
 		// TODO Auto-generated method stub
-		ChunkInstance lcrfInstance = (ChunkInstance)inst;
+		POSInstance lcrfInstance = (POSInstance)inst;
 		if(lcrfInstance.isLabeled())
 			return compileLabeledInstances(networkId, lcrfInstance, param);
 		else
@@ -35,7 +33,7 @@ public class ChunkNetworkCompiler extends NetworkCompiler{
 	}
 	
 	public long toNode_leaf(){
-		int[] arr = new int[]{0,Chunk.get("O").getId(), 0,0,NODE_TYPES.LEAF.ordinal()};
+		int[] arr = new int[]{0, POS.get("START").getId(), 0,0,NODE_TYPES.LEAF.ordinal()};
 		return NetworkIDMapper.toHybridNodeID(arr);
 	}
 	
@@ -45,15 +43,15 @@ public class ChunkNetworkCompiler extends NetworkCompiler{
 	}
 	
 	public long toNode_root(int size){
-		int[] arr = new int[]{size, Chunk.ChunkLabels.size(),0,0,NODE_TYPES.ROOT.ordinal()};
+		int[] arr = new int[]{size, POS.get("END").getId(),0,0,NODE_TYPES.ROOT.ordinal()};
 		return NetworkIDMapper.toHybridNodeID(arr);
 	}
 
 	@Override
-	public ChunkInstance decompile(Network network) {
-		ChunkNetwork lcrfNetwork = (ChunkNetwork)network;
-		ChunkInstance lcrfInstance = (ChunkInstance)lcrfNetwork.getInstance();
-		ChunkInstance result = lcrfInstance.duplicate();
+	public POSInstance decompile(Network network) {
+		POSNetwork lcrfNetwork = (POSNetwork)network;
+		POSInstance lcrfInstance = (POSInstance)lcrfNetwork.getInstance();
+		POSInstance result = lcrfInstance.duplicate();
 		ArrayList<String> prediction = new ArrayList<String>();
 		
 		
@@ -65,11 +63,8 @@ public class ChunkNetworkCompiler extends NetworkCompiler{
 			long child = lcrfNetwork.getNode(child_k);
 			rootIdx = child_k;
 			int tagID = NetworkIDMapper.toHybridNodeArray(child)[1];
-			String resEntity = Chunk.get(tagID).getForm();
-			//assume it's the IOBES encoding.
-			if(resEntity.startsWith("S")) resEntity = "B"+resEntity.substring(1);
-			if(resEntity.startsWith("E")) resEntity = "I"+resEntity.substring(1);
-			prediction.add(0, resEntity);
+			String resPOS = POS.get(tagID).getForm();
+			prediction.add(0, resPOS);
 		}
 		
 		result.setPrediction(prediction);
@@ -78,13 +73,13 @@ public class ChunkNetworkCompiler extends NetworkCompiler{
 	}
 	
 
-	public ChunkNetwork compileLabeledInstances(int networkId, ChunkInstance inst, LocalNetworkParam param){
-		ChunkNetwork lcrfNetwork = new ChunkNetwork(networkId, inst,param, this);
+	public POSNetwork compileLabeledInstances(int networkId, POSInstance inst, LocalNetworkParam param){
+		POSNetwork lcrfNetwork = new POSNetwork(networkId, inst,param, this);
 		long leaf = toNode_leaf();
 		long[] children = new long[]{leaf};
 		lcrfNetwork.addNode(leaf);
 		for(int i=0;i<inst.size();i++){
-			long node = toNode(i, Chunk.get(inst.getOutput().get(i)).getId());
+			long node = toNode(i, POS.get(inst.getOutput().get(i)).getId());
 			lcrfNetwork.addNode(node);
 			long[] currentNodes = new long[]{node};
 			lcrfNetwork.addEdge(node, children);
@@ -100,58 +95,29 @@ public class ChunkNetworkCompiler extends NetworkCompiler{
 		return lcrfNetwork;
 	}
 	
-	public ChunkNetwork compileUnlabeledInstances(int networkId, ChunkInstance inst, LocalNetworkParam param){
+	public POSNetwork compileUnlabeledInstances(int networkId, POSInstance inst, LocalNetworkParam param){
 		
 		long[] allNodes = genericUnlabeledNetwork.getAllNodes();
 		long root = toNode_root(inst.size());
 		int rootIdx = Arrays.binarySearch(allNodes, root);
-		ChunkNetwork lcrfNetwork = new ChunkNetwork(networkId, inst,allNodes,genericUnlabeledNetwork.getAllChildren() , param, rootIdx+1, this);
+		POSNetwork lcrfNetwork = new POSNetwork(networkId, inst,allNodes,genericUnlabeledNetwork.getAllChildren() , param, rootIdx+1, this);
 		return lcrfNetwork;
 	}
 	
 	public void compileUnlabeledInstancesGeneric(){
-		ChunkNetwork lcrfNetwork = new ChunkNetwork();
+		POSNetwork lcrfNetwork = new POSNetwork();
 		
 		long leaf = toNode_leaf();
 		long[] children = new long[]{leaf};
 		lcrfNetwork.addNode(leaf);
 		for(int i=0;i<_size;i++){
-			long[] currentNodes = new long[Chunk.ChunkLabels.size()];
-			for(int l=0;l<Chunk.ChunkLabels.size();l++){
-//				if(i==0 && Entity.get(l).getForm().startsWith("I-")){ currentNodes[l]=-1; continue;}
+			long[] currentNodes = new long[POS.POSLabels.size()-2];
+			for(int l=0;l<POS.POSLabels.size();l++){
+				if(l==POS.get("START").getId()) continue;
+				if(l==POS.get("END").getId()) continue;
 				long node = toNode(i,l);
-				
-				String currEntity = Chunk.get(l).getForm();
 				for(long child: children){
 					if(child==-1) continue;
-					int[] childArr = NetworkIDMapper.toHybridNodeArray(child);
-					String childEntity = Chunk.get(childArr[1]).getForm();
-					
-					
-					if(childEntity.startsWith("I")){
-						if(currEntity.startsWith("I") && !childEntity.substring(1).equals(currEntity.substring(1))) continue;
-						if(currEntity.startsWith("E") && !childEntity.substring(1).equals(currEntity.substring(1))) continue;
-						if(IOBESencoding && (currEntity.startsWith("O") || currEntity.startsWith("B") || currEntity.startsWith("S")  ) ) continue;
-						
-					}else if(childEntity.equals("O")){
-						if(currEntity.startsWith("I") || currEntity.startsWith("E")) continue;
-						
-					}else if(childEntity.startsWith("B")){
-						if(currEntity.startsWith("I")  && !childEntity.substring(1).equals(currEntity.substring(1)) ) continue;
-						if(currEntity.startsWith("E")  && !childEntity.substring(1).equals(currEntity.substring(1)) ) continue;
-						if(IOBESencoding && ( currEntity.equals("O") || currEntity.equals("B") || currEntity.equals("S") )  ) continue;
-						
-					}else if(childEntity.startsWith("E")){
-						if(currEntity.startsWith("I") || currEntity.startsWith("E")) continue;
-						
-					}else if(childEntity.startsWith("S")){
-						if(currEntity.startsWith("I") || currEntity.startsWith("E")) continue;
-						
-					}else{
-						throw new RuntimeException("Unknown type "+childEntity+" in network compilation");
-						
-					}
-					
 					if(lcrfNetwork.contains(child)){
 						lcrfNetwork.addNode(node);
 						lcrfNetwork.addEdge(node, new long[]{child});
