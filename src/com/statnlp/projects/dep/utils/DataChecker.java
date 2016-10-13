@@ -230,7 +230,7 @@ public class DataChecker {
 	/**
 	 * Similar to check Joint method, but only check whether its incomplete return a boolean value
 	 * @param sent: just check for one sentence.
-	 * @param entities
+	 * @param tags
 	 */
 	public static ArrayList<EntitySpan> checkAllIncomplete(Sentence sent){
 		int start = 0; int end = -1;
