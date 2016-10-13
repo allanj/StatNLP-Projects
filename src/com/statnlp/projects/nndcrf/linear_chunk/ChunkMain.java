@@ -23,6 +23,8 @@ public class ChunkMain {
 	public static double l2 = 0.01;
 	public static boolean IOBESencoding = true;
 	public static boolean npchunking = true;
+	public static boolean cascade  = false;
+	public static int windowSize = 5; //by default the neural feature window size is 5.
 	
 	//read the conll 2000 dataset.
 	public static String trainPath = "data/conll2000/train.txt";
@@ -34,9 +36,9 @@ public class ChunkMain {
 	public static void main(String[] args) throws IOException, InterruptedException{
 		
 		processArgs(args);
-		System.err.println("[Info] trainingFile: "+trainPath);
-		System.err.println("[Info] testFile: "+testFile);
-		System.err.println("[Info] nerOut: "+nerOut);
+		System.out.println("[Info] trainingFile: "+trainPath);
+		System.out.println("[Info] testFile: "+testFile);
+		System.out.println("[Info] nerOut: "+nerOut);
 		
 		List<ChunkInstance> trainInstances = null;
 		List<ChunkInstance> testInstances = null;
@@ -61,7 +63,7 @@ public class ChunkMain {
 			//gnp =  new GlobalNetworkParam(OptimizerFactory.);
 		}
 		
-		System.err.println("[Info] "+Chunk.ChunkLabels.size()+" ChunkLabels: "+Chunk.ChunkLabels.toString());
+		System.out.println("[Info] "+Chunk.ChunkLabels.size()+" ChunkLabels: "+Chunk.ChunkLabels.toString());
 		
 		ChunkInstance all_instances[] = new ChunkInstance[trainInstances.size()+testInstances.size()];
         int i = 0;
@@ -76,8 +78,8 @@ public class ChunkMain {
             all_instances[i].setUnlabeled();
             maxSize = Math.max(maxSize, all_instances[i].size());
         }
-		System.err.println("max sentence size:"+maxSize);
-		ChunkFeatureManager fa = new ChunkFeatureManager(gnp);
+		System.out.println("max sentence size:"+maxSize);
+		ChunkFeatureManager fa = new ChunkFeatureManager(gnp, cascade, windowSize);
 		ChunkNetworkCompiler compiler = new ChunkNetworkCompiler(IOBESencoding);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		ChunkInstance[] ecrfs = trainInstances.toArray(new ChunkInstance[trainInstances.size()]);
@@ -106,7 +108,7 @@ public class ChunkMain {
 					case "-iter": 		numIteration = Integer.valueOf(args[i+1]); break;   //default:100;
 					case "-thread": 	numThreads = Integer.valueOf(args[i+1]); break;   //default:5
 					case "-testFile": 	testFile = args[i+1]; break;        
-					case "-windows":	CConfig.windows = args[i+1].equals("true")? true:false; break;            //default: false (is using windows system to run the evaluation script)
+					case "-windows":	CConfig.windows = args[i+1].equals("true")? true:false; break;  //default: false (is using windows system to run the evaluation script)
 					case "-batch": 		NetworkConfig.USE_BATCH_TRAINING = true;
 										NetworkConfig.BATCH_SIZE = Integer.valueOf(args[i+1]); break;
 					case "-model": 		NetworkConfig.MODEL_TYPE = args[i+1].equals("crf")? ModelType.CRF:ModelType.SSVM;   break;
@@ -121,14 +123,16 @@ public class ChunkMain {
 					case "-lr": 		adagrad_learningRate = Double.valueOf(args[i+1]); break; //enable only if using adagrad optimization
 					case "-npchunking": npchunking = args[i+1].equals("true")? true:false; break;
 					case "-iobes": 		IOBESencoding = args[i+1].equals("true")? true:false; break;
+					case "-cascade": 	cascade = args[i+1].equals("true")? true:false; break; //means that using the POS tagging generated from the first CRF.
+					case "-wsize": 	 	windowSize = Integer.valueOf(args[i+1]); break; //the window size of neural feature.
 					default: 			System.err.println("Invalid arguments "+args[i]+", please check usage."); System.exit(0);
 				}
 			}
-			System.err.println("[Info] trainNum: "+trainNumber);
-			System.err.println("[Info] testNum: "+testNumber);
-			System.err.println("[Info] numIter: "+numIteration);
-			System.err.println("[Info] numThreads: "+numThreads);
-			System.err.println("[Info] Regularization Parameter: "+l2);
+			System.out.println("[Info] trainNum: "+trainNumber);
+			System.out.println("[Info] testNum: "+testNumber);
+			System.out.println("[Info] numIter: "+numIteration);
+			System.out.println("[Info] numThreads: "+numThreads);
+			System.out.println("[Info] Regularization Parameter: "+l2);
 		}
 	}
 }
