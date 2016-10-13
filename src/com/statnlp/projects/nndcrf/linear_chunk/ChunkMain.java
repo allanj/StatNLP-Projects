@@ -101,27 +101,27 @@ public class ChunkMain {
 		}else{
 			for(int i=0;i<args.length;i=i+2){
 				switch(args[i]){
-					case "-trainNum": trainNumber = Integer.valueOf(args[i+1]); break;   //default: all 
-					case "-testNum": testNumber = Integer.valueOf(args[i+1]); break;    //default:all
-					case "-iter": numIteration = Integer.valueOf(args[i+1]); break;   //default:100;
-					case "-thread": numThreads = Integer.valueOf(args[i+1]); break;   //default:5
-					case "-testFile": testFile = args[i+1]; break;        
-					case "-windows":CConfig.windows = true; break;            //default: false (is using windows system to run the evaluation script)
-					case "-batch": NetworkConfig.USE_BATCH_TRAINING = true;
-									NetworkConfig.BATCH_SIZE = Integer.valueOf(args[i+1]); break;
-					case "-model": NetworkConfig.MODEL_TYPE = args[i+1].equals("crf")? ModelType.CRF:ModelType.SSVM;   break;
-					case "-neural": if(args[i+1].equals("true")){ 
+					case "-trainNum": 	trainNumber = Integer.valueOf(args[i+1]); break;   //default: all 
+					case "-testNum": 	testNumber = Integer.valueOf(args[i+1]); break;    //default:all
+					case "-iter": 		numIteration = Integer.valueOf(args[i+1]); break;   //default:100;
+					case "-thread": 	numThreads = Integer.valueOf(args[i+1]); break;   //default:5
+					case "-testFile": 	testFile = args[i+1]; break;        
+					case "-windows":	CConfig.windows = args[i+1].equals("true")? true:false; break;            //default: false (is using windows system to run the evaluation script)
+					case "-batch": 		NetworkConfig.USE_BATCH_TRAINING = true;
+										NetworkConfig.BATCH_SIZE = Integer.valueOf(args[i+1]); break;
+					case "-model": 		NetworkConfig.MODEL_TYPE = args[i+1].equals("crf")? ModelType.CRF:ModelType.SSVM;   break;
+					case "-neural": 	if(args[i+1].equals("true")){ 
 											NetworkConfig.USE_NEURAL_FEATURES = true; 
 											NetworkConfig.OPTIMIZE_NEURAL = true;  //false: optimize in neural network
 											NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
 											NetworkConfig.REGULARIZE_NEURAL_FEATURES = true; // Regularized the neural features in CRF or not
 										}
-									break;
-					case "-reg": l2 = Double.valueOf(args[i+1]);  break;
-					case "-lr": adagrad_learningRate = Double.valueOf(args[i+1]); break;
+										break;
+					case "-reg": 		l2 = Double.valueOf(args[i+1]);  break;
+					case "-lr": 		adagrad_learningRate = Double.valueOf(args[i+1]); break; //enable only if using adagrad optimization
 					case "-npchunking": npchunking = args[i+1].equals("true")? true:false; break;
-					case "-iobes": IOBESencoding = args[i+1].equals("true")? true:false; break;
-					default: System.err.println("Invalid arguments "+args[i]+", please check usage."); System.exit(0);
+					case "-iobes": 		IOBESencoding = args[i+1].equals("true")? true:false; break;
+					default: 			System.err.println("Invalid arguments "+args[i]+", please check usage."); System.exit(0);
 				}
 			}
 			System.err.println("[Info] trainNum: "+trainNumber);
