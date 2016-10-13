@@ -15,7 +15,17 @@ public class ChunkFeatureManager extends FeatureManager {
 
 	private static final long serialVersionUID = 376931974939202432L;
 
-	public enum FEATYPE {chunk, neural_1};
+	public enum FEATYPE {word, 
+		word_l, 
+		word_ll, 
+		word_r, 
+		word_rr, 
+		cap, 
+		cap_l, 
+		cap_ll, 
+		cap_r, 
+		cap_rr, 
+		chunk, neural_1};
 	private String OUT_SEP = NeuralConfig.OUT_SEP; 
 	private String IN_SEP = NeuralConfig.IN_SEP;
 	
@@ -72,16 +82,42 @@ public class ChunkFeatureManager extends FeatureManager {
 		
 		
 		String currEn = Chunk.get(eId).getForm();
+		
+		
+		/**Simple word features**/
+		featureList.add(this._param_g.toFeature(network, FEATYPE.word.name(), 	currEn,  currWord));
+		featureList.add(this._param_g.toFeature(network, FEATYPE.word_l.name(), currEn,  lw));
+		featureList.add(this._param_g.toFeature(network, FEATYPE.word_ll.name(),currEn,  llw));
+		featureList.add(this._param_g.toFeature(network, FEATYPE.word_r.name(), currEn,  rw));
+		featureList.add(this._param_g.toFeature(network, FEATYPE.word_rr.name(),currEn,  rrw));
+		
+		/**Simple shape features**/
+		featureList.add(this._param_g.toFeature(network, FEATYPE.cap.name(), 	currEn,  currCaps));
+		featureList.add(this._param_g.toFeature(network, FEATYPE.cap_l.name(), 	currEn,  lcaps));
+		featureList.add(this._param_g.toFeature(network, FEATYPE.cap_ll.name(), currEn,  llcaps));
+		featureList.add(this._param_g.toFeature(network, FEATYPE.cap_r.name(), 	currEn,  rcaps));
+		featureList.add(this._param_g.toFeature(network, FEATYPE.cap_rr.name(),	currEn,  rrcaps));
+		
+		
+		/** Neural features if neural network is enabled**/
 		if(NetworkConfig.USE_NEURAL_FEATURES){
 //			featureList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currEn,  currWord));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, llw+IN_SEP+lw+IN_SEP+currWord+IN_SEP+rw+IN_SEP+rrw+OUT_SEP+
-										llcaps+IN_SEP+lcaps+IN_SEP+currCaps+IN_SEP+rcaps+IN_SEP+rrcaps));
+			featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, llw.toLowerCase()+IN_SEP+
+																					lw.toLowerCase()+IN_SEP+
+																					currWord.toLowerCase()+IN_SEP+
+																					rw.toLowerCase()+IN_SEP+
+																					rrw.toLowerCase()+OUT_SEP+
+																					llcaps+IN_SEP+lcaps+IN_SEP+currCaps+IN_SEP+rcaps+IN_SEP+rrcaps));
 //			featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, llw.toLowerCase()+IN_SEP+lw.toLowerCase()
 //								+IN_SEP+currWord.toLowerCase()+IN_SEP+rw.toLowerCase()+IN_SEP+rrw.toLowerCase()));
 		}
+		
+		
+		
+		
+		/** transition feature. from the JMLR paper**/
 		String prevEntity = Chunk.get(childEId).getForm();
 		featureList.add(this._param_g.toFeature(network,FEATYPE.chunk.name(), currEn,  prevEntity));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.chunk.name(), currEn,  currWord));
 					
 
 		
