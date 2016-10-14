@@ -23,8 +23,10 @@ public class ChunkMain {
 	public static double l2 = 0.01;
 	public static boolean IOBESencoding = true;
 	public static boolean npchunking = true;
-	public static boolean cascade  = false;
+	public static boolean cascade  = false; //by default it's not a cascaded CRF.
+	public static boolean basicFeatures = true; //the simple word/caps features. default should be true;
 	public static int windowSize = 5; //by default the neural feature window size is 5.
+	public static OptimizerFactory optimizer = OptimizerFactory.getLBFGSFactory();
 	
 	//read the conll 2000 dataset.
 	public static String trainPath = "data/conll2000/train.txt";
@@ -56,7 +58,7 @@ public class ChunkMain {
 		NetworkConfig.NUM_THREADS = numThreads;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		
-		GlobalNetworkParam gnp = new GlobalNetworkParam(OptimizerFactory.getLBFGSFactory());
+		GlobalNetworkParam gnp = new GlobalNetworkParam(optimizer);
 		
 		if(NetworkConfig.USE_NEURAL_FEATURES){
 			NeuralConfigReader.readConfig(neural_config);
@@ -79,7 +81,7 @@ public class ChunkMain {
             maxSize = Math.max(maxSize, all_instances[i].size());
         }
 		System.out.println("max sentence size:"+maxSize);
-		ChunkFeatureManager fa = new ChunkFeatureManager(gnp, cascade, windowSize);
+		ChunkFeatureManager fa = new ChunkFeatureManager(gnp, basicFeatures, cascade, windowSize);
 		ChunkNetworkCompiler compiler = new ChunkNetworkCompiler(IOBESencoding);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		ChunkInstance[] ecrfs = trainInstances.toArray(new ChunkInstance[trainInstances.size()]);
@@ -110,7 +112,10 @@ public class ChunkMain {
 					case "-testFile": 	testFile = args[i+1]; break;        
 					case "-windows":	CConfig.windows = args[i+1].equals("true")? true:false; break;  //default: false (is using windows system to run the evaluation script)
 					case "-batch": 		NetworkConfig.USE_BATCH_TRAINING = true;
-										NetworkConfig.BATCH_SIZE = Integer.valueOf(args[i+1]); break;
+										NetworkConfig.BATCH_SIZE = Integer.valueOf(args[i+1]); 
+										NetworkConfig.RANDOM_BATCH = false;
+										optimizer = OptimizerFactory.getGradientDescentFactory(0.01);
+										break;
 					case "-model": 		NetworkConfig.MODEL_TYPE = args[i+1].equals("crf")? ModelType.CRF:ModelType.SSVM;   break;
 					case "-neural": 	if(args[i+1].equals("true")){ 
 											NetworkConfig.USE_NEURAL_FEATURES = true; 
@@ -123,8 +128,9 @@ public class ChunkMain {
 					case "-lr": 		adagrad_learningRate = Double.valueOf(args[i+1]); break; //enable only if using adagrad optimization
 					case "-npchunking": npchunking = args[i+1].equals("true")? true:false; break;
 					case "-iobes": 		IOBESencoding = args[i+1].equals("true")? true:false; break;
-					case "-cascade": 	cascade = args[i+1].equals("true")? true:false; break; //means that using the POS tagging generated from the first CRF.
-					case "-wsize": 	 	windowSize = Integer.valueOf(args[i+1]); break; //the window size of neural feature.
+					case "-basicf": 	basicFeatures = args[i+1].equals("true")? true:false; break;
+					case "-cascade": 	cascade = args[i+1].equals("true")? true:false; break; //default: false. means that using the POS tagging generated from the first CRF.
+					case "-wsize": 	 	windowSize = Integer.valueOf(args[i+1]); break; //default: 5. the window size of neural feature.
 					default: 			System.err.println("Invalid arguments "+args[i]+", please check usage."); System.exit(0);
 				}
 			}

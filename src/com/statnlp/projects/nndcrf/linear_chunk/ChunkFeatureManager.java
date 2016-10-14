@@ -36,11 +36,13 @@ public class ChunkFeatureManager extends FeatureManager {
 	
 	private boolean cascade;
 	private int windowSize;
+	private boolean basicFeatures;
 	
-	public ChunkFeatureManager(GlobalNetworkParam param_g, boolean cascade, int windowSize) {
+	public ChunkFeatureManager(GlobalNetworkParam param_g, boolean basicFeatures, boolean cascade, int windowSize) {
 		super(param_g);
 		this.cascade = cascade;
 		this.windowSize = windowSize;
+		this.basicFeatures = basicFeatures;
 	}
 	
 	
@@ -85,20 +87,22 @@ public class ChunkFeatureManager extends FeatureManager {
 		
 		String currEn = Chunk.get(eId).getForm();
 		
+		if(basicFeatures){
+			/**Simple word features**/
+			featureList.add(this._param_g.toFeature(network, FEATYPE.word.name(), 	currEn,  currWord));
+			featureList.add(this._param_g.toFeature(network, FEATYPE.word_l.name(), currEn,  lw));
+			featureList.add(this._param_g.toFeature(network, FEATYPE.word_ll.name(),currEn,  llw));
+			featureList.add(this._param_g.toFeature(network, FEATYPE.word_r.name(), currEn,  rw));
+			featureList.add(this._param_g.toFeature(network, FEATYPE.word_rr.name(),currEn,  rrw));
+			
+			/**Simple shape features**/
+			featureList.add(this._param_g.toFeature(network, FEATYPE.cap.name(), 	currEn,  currCaps));
+			featureList.add(this._param_g.toFeature(network, FEATYPE.cap_l.name(), 	currEn,  lcaps));
+			featureList.add(this._param_g.toFeature(network, FEATYPE.cap_ll.name(), currEn,  llcaps));
+			featureList.add(this._param_g.toFeature(network, FEATYPE.cap_r.name(), 	currEn,  rcaps));
+			featureList.add(this._param_g.toFeature(network, FEATYPE.cap_rr.name(),	currEn,  rrcaps));
+		}
 		
-		/**Simple word features**/
-		featureList.add(this._param_g.toFeature(network, FEATYPE.word.name(), 	currEn,  currWord));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.word_l.name(), currEn,  lw));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.word_ll.name(),currEn,  llw));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.word_r.name(), currEn,  rw));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.word_rr.name(),currEn,  rrw));
-		
-		/**Simple shape features**/
-		featureList.add(this._param_g.toFeature(network, FEATYPE.cap.name(), 	currEn,  currCaps));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.cap_l.name(), 	currEn,  lcaps));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.cap_ll.name(), currEn,  llcaps));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.cap_r.name(), 	currEn,  rcaps));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.cap_rr.name(),	currEn,  rrcaps));
 		
 		/**Cascade approach using the predicted Tag from the first Model (CRF/Brill)**/
 		if(cascade){
