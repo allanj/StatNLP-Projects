@@ -20,6 +20,9 @@ public class POSMain {
 	public static int numThreads = 5;
 	public static double adagrad_learningRate = 0.1;
 	public static double l2 = 0.01;
+	public static boolean cascade  = false; //by default it's not a cascaded CRF.
+	public static boolean basicFeatures = true; //the simple word/caps features. default should be true;
+	public static int windowSize = 5; //by default the neural feature window size is 5.
 	
 	//read the conll 2000 dataset.
 	public static String trainPath = "data/conll2000/train.txt";
@@ -74,7 +77,7 @@ public class POSMain {
             maxSize = Math.max(maxSize, all_instances[i].size());
         }
 		System.err.println("max sentence size:"+maxSize);
-		POSFeatureManager fa = new POSFeatureManager(gnp);
+		POSFeatureManager fa = new POSFeatureManager(gnp, basicFeatures, cascade, windowSize);
 		POSNetworkCompiler compiler = new POSNetworkCompiler();
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		POSInstance[] ecrfs = trainInstances.toArray(new POSInstance[trainInstances.size()]);
@@ -115,6 +118,9 @@ public class POSMain {
 									break;
 					case "-reg": l2 = Double.valueOf(args[i+1]);  break;
 					case "-lr": adagrad_learningRate = Double.valueOf(args[i+1]); break;
+					case "-basicf": 	basicFeatures = args[i+1].equals("true")? true:false; break;
+					case "-cascade": 	cascade = args[i+1].equals("true")? true:false; break; //default: false. means that using the POS tagging generated from the first CRF.
+					case "-wsize": 	 	windowSize = Integer.valueOf(args[i+1]); break; //default: 5. the window size of neural feature.
 					default: System.err.println("Invalid arguments "+args[i]+", please check usage."); System.exit(0);
 				}
 			}
