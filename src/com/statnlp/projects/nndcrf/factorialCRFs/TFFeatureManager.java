@@ -90,13 +90,13 @@ public class TFFeatureManager extends FeatureManager {
 			//must be in the ne chain and not tag in e node
 			addEntityFeatures(featureList, network, sent, pos, eId);
 			//false: means it's NE structure
-			addJointFeatures(featureList, network, sent, pos, eId, parent_k, children_k, false);
+			//addJointFeatures(featureList, network, sent, pos, eId, parent_k, children_k, false);
 			
 		}
 		
 		if(nodeArr[1]==NODE_TYPES.TNODE.ordinal()){
 			addPOSFeatures(featureList, network, sent, pos, eId);
-			addJointFeatures(featureList, network, sent, pos, eId, parent_k, children_k, true);
+			//addJointFeatures(featureList, network, sent, pos, eId, parent_k, children_k, true);
 		}
 		
 		ArrayList<Integer> finalList = new ArrayList<Integer>();
@@ -158,37 +158,37 @@ public class TFFeatureManager extends FeatureManager {
 			String currEn = Entity.get(eId).getForm();
 			
 			featureList.add(this._param_g.toFeature(network,FEATYPE.entity_currWord.name(), 	currEn,	currWord));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.entity_leftWord1.name(), 	currEn,	lw));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.entity_leftWord2.name(), 	currEn,	l2w));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.entity_leftWord3.name(), 	currEn,	l3w));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.entity_rightWord1.name(), 	currEn,	rw));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.entity_rightWord2.name(), 	currEn,	r2w));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.entity_rightWord3.name(), 	currEn,	r3w));
-			
-			String[] pats = new String[]{"[A-Z][a-z]+", "[A-Z]", "[A-Z]+", "[A-Z]+[a-z]+[A-Z]+[a-z]+", ".*[0-9].*"};
-			Pattern r = null; 
-			Matcher m = null; 
-			for(int pt=0; pt<pats.length; pt++){
-				r = Pattern.compile(pats[pt]);
-				m = r.matcher(currWord);
-				switch(pt){
-				case 0:
-					if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.entity_type1.name(), currEn, "Type1"));
-					break;
-				case 1:
-					if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.entity_type2.name(), currEn, "Type1"));
-					break;
-				case 2:
-					if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.entity_type3.name(), currEn, "Type3"));
-					break;
-				case 3:
-					if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.entity_type4.name(), currEn, "Type4"));
-					break;
-				case 4:
-					if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.entity_type5.name(), currEn, "Type5"));
-					break;
-				}
-			}
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity_leftWord1.name(), 	currEn,	lw));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity_leftWord2.name(), 	currEn,	l2w));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity_leftWord3.name(), 	currEn,	l3w));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity_rightWord1.name(), 	currEn,	rw));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity_rightWord2.name(), 	currEn,	r2w));
+//			featureList.add(this._param_g.toFeature(network,FEATYPE.entity_rightWord3.name(), 	currEn,	r3w));
+//			
+//			String[] pats = new String[]{"[A-Z][a-z]+", "[A-Z]", "[A-Z]+", "[A-Z]+[a-z]+[A-Z]+[a-z]+", ".*[0-9].*"};
+//			Pattern r = null; 
+//			Matcher m = null; 
+//			for(int pt=0; pt<pats.length; pt++){
+//				r = Pattern.compile(pats[pt]);
+//				m = r.matcher(currWord);
+//				switch(pt){
+//				case 0:
+//					if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.entity_type1.name(), currEn, "Type1"));
+//					break;
+//				case 1:
+//					if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.entity_type2.name(), currEn, "Type1"));
+//					break;
+//				case 2:
+//					if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.entity_type3.name(), currEn, "Type3"));
+//					break;
+//				case 3:
+//					if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.entity_type4.name(), currEn, "Type4"));
+//					break;
+//				case 4:
+//					if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.entity_type5.name(), currEn, "Type5"));
+//					break;
+//				}
+//			}
 			if(NetworkConfig.USE_NEURAL_FEATURES){
 				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), Entity.get(eId).getForm(), lw.toLowerCase()+IN_SEP+
 						currWord.toLowerCase()+IN_SEP+rw.toLowerCase()));
@@ -211,38 +211,38 @@ public class TFFeatureManager extends FeatureManager {
 		
 		
 		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_currWord.name(), 	currTag,	currWord));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_leftWord1.name(), 	currTag,	prevWord));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_leftWord2.name(), 	currTag,	p2w));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_leftWord3.name(), 	currTag,	p3w));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord1.name(), 	currTag,	nextWord));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord2.name(), 	currTag,	n2w));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord3.name(), 	currTag,	n3w));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_leftWord1.name(), 	currTag,	prevWord));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_leftWord2.name(), 	currTag,	p2w));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_leftWord3.name(), 	currTag,	p3w));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord1.name(), 	currTag,	nextWord));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord2.name(), 	currTag,	n2w));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord3.name(), 	currTag,	n3w));
 		
 		
-		String[] pats = new String[]{"[A-Z][a-z]+", "[A-Z]", "[A-Z]+", "[A-Z]+[a-z]+[A-Z]+[a-z]+", ".*[0-9].*"};
-		Pattern r = null; 
-		Matcher m = null; 
-		for(int pt=0; pt<pats.length; pt++){
-			r = Pattern.compile(pats[pt]);
-			m = r.matcher(currWord);
-			switch(pt){
-			case 0:
-				if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.tag_type1.name(), currTag, "Type1"));
-				break;
-			case 1:
-				if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.tag_type2.name(), currTag, "Type2"));
-				break;
-			case 2:
-				if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.tag_type3.name(), currTag, "Type3"));
-				break;
-			case 3:
-				if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.tag_type4.name(), currTag, "Type4"));
-				break;
-			case 4:
-				if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.tag_type5.name(), currTag, "Type5"));
-				break;
-			}
-		}
+//		String[] pats = new String[]{"[A-Z][a-z]+", "[A-Z]", "[A-Z]+", "[A-Z]+[a-z]+[A-Z]+[a-z]+", ".*[0-9].*"};
+//		Pattern r = null; 
+//		Matcher m = null; 
+//		for(int pt=0; pt<pats.length; pt++){
+//			r = Pattern.compile(pats[pt]);
+//			m = r.matcher(currWord);
+//			switch(pt){
+//			case 0:
+//				if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.tag_type1.name(), currTag, "Type1"));
+//				break;
+//			case 1:
+//				if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.tag_type2.name(), currTag, "Type2"));
+//				break;
+//			case 2:
+//				if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.tag_type3.name(), currTag, "Type3"));
+//				break;
+//			case 3:
+//				if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.tag_type4.name(), currTag, "Type4"));
+//				break;
+//			case 4:
+//				if(m.find()) featureList.add(this._param_g.toFeature(network,FEATYPE.tag_type5.name(), currTag, "Type5"));
+//				break;
+//			}
+//		}
 		
 		if(NetworkConfig.USE_NEURAL_FEATURES){
 			featureList.add(this._param_g.toFeature(network, FEATYPE.neural_2.name(), currTag, prevWord.toLowerCase()+IN_SEP+
@@ -265,44 +265,62 @@ public class TFFeatureManager extends FeatureManager {
 		TFNetwork tfnetwork = (TFNetwork)network;
 		if(children_k.length!=1)
 			throw new RuntimeException("The joint features should only have one children also");
-		String currWord = sent.get(pos).getName();
-		int[] k_child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[0]));
-		String currTag = paTchildE? Tag.get(paId).getForm():Tag.get(k_child[2]).getForm();
-		String currEn = paTchildE? Entity.get(k_child[2]).getForm():Entity.get(paId).getForm();
+		String currLabel = paTchildE? Tag.get(paId).getForm():Entity.get(paId).getForm();
+		int jointFeatureIdx = -1; 
+		//the joint feature here is always string (entityLabel, tagLabel);
 		
-		int jointFeatureIdx = this._param_g.toFeature(network,FEATYPE.joint.name(), currEn+"&"+currTag, currWord);
-		featureList.add(jointFeatureIdx);
-		if(jointFeatureIdx!=-1){
-			//get the destination node.
-			int[] arr = null;
-			int nodeType = -1;
-			int labelId = -1;
-			if(paTchildE){
-				nodeType = NODE_TYPES.ENODE.ordinal();
-				labelId = Entity.get(sent.get(pos).getEntity()).getId();
-			}else{
-				nodeType = NODE_TYPES.TNODE.ordinal();
+		
+		int[] arr = null;
+		int nodeType = -1;
+		int labelId = -1;
+		if(!paTchildE){
+			//current it's NE structure, need to refer to Tag node.
+			nodeType = NODE_TYPES.TNODE.ordinal();
+			if(network.getInstance().isLabeled()){
+				String tag =  sent.get(pos).getTag();
+				jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), currLabel, tag);
+				featureList.add(jointFeatureIdx);
 				labelId = Tag.get(sent.get(pos).getTag()).getId();
+				arr = new int[]{pos+1, nodeType, labelId,0,0};
+				addDstNode(tfnetwork, jointFeatureIdx, parent_k, arr);
+				
+			}else{
+				for(int t=0;t<Tag.TAGS_INDEX.size();t++){
+					String tag =  Tag.get(t).getForm();
+					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), currLabel, tag);
+					featureList.add(jointFeatureIdx);
+					arr = new int[]{pos+1, nodeType, t, 0, 0};
+					addDstNode(tfnetwork, jointFeatureIdx, parent_k, arr);
+				}
 			}
 			
+		}else{
+			//current it's POS structure, need to refer to Entity node
+			nodeType = NODE_TYPES.ENODE.ordinal();
 			if(network.getInstance().isLabeled()){
-				
-				arr = new int[]{pos+1, nodeType, labelId,0,0};
-				long dstNode = NetworkIDMapper.toHybridNodeID(arr);
-				int dstNodeIdx = Arrays.binarySearch(tfnetwork.getAllNodes(), dstNode);
-				network.putJointFeature(jointFeatureIdx, parent_k, dstNodeIdx);
-			}
-			else{
+				String entity = sent.get(pos).getEntity();
+				jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), entity, currLabel);
+				labelId = Entity.get(sent.get(pos).getEntity()).getId();
+				arr = new int[]{pos+1, nodeType, labelId,0 ,0};
+				addDstNode(tfnetwork, jointFeatureIdx, parent_k, arr);
+			}else{
 				for(int e=0;e<Entity.ENTS_INDEX.size(); e++){
-					arr = new int[]{pos+1, nodeType, labelId,0,0};
-					long dstNode = NetworkIDMapper.toHybridNodeID(arr);
-					int dstNodeIdx = Arrays.binarySearch(tfnetwork.getAllNodes(), dstNode);
-					network.putJointFeature(jointFeatureIdx, parent_k, dstNodeIdx);
+					String entity = Entity.get(e).getForm();
+					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), entity, currLabel);
+					arr = new int[]{pos+1, nodeType, e, 0, 0};
+					addDstNode(tfnetwork, jointFeatureIdx, parent_k, arr);
 				}
-					
 			}
 		}
+			
 		
 	}
-
+	
+	private void addDstNode(TFNetwork network, int jointFeatureIdx, int parent_k, int[] dstArr){
+		long dstNode = NetworkIDMapper.toHybridNodeID(dstArr);
+		int dstNodeIdx = Arrays.binarySearch(network.getAllNodes(), dstNode);
+		network.putJointFeature(jointFeatureIdx, parent_k, dstNodeIdx);
+	}
+	
+	
 }

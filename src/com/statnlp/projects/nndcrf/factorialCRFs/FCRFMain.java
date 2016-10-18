@@ -44,13 +44,13 @@ public class FCRFMain {
 		List<TFInstance> trainInstances = null;
 		List<TFInstance> testInstances = null;
 		/***********DEBUG*****************/
-		trainFile = "data/conll2000/train.txt";
+		trainFile = "data/conll2000/debug.txt";
 //		String trainSrcFile = "data/dat/conll1000train.txt";
-		trainNumber = 500;
-		testFile = "data/conll2000/test.txt";;
+		trainNumber = 1;
+		testFile = "data/conll2000/debug.txt";;
 //		String testSrcFile = "data/dat/conll1000test.txt";
 //		testFile = trainFile;
-		testNumber = 100;
+		testNumber = 20;
 		/***************************/
 		
 		System.err.println("[Info] trainingFile: "+TFConfig.CONLL_train);
