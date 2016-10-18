@@ -179,7 +179,6 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 //					System.out.println("current structure:"+curr);
 					if(messagePassing) network.inference();
 					else network.train();
-					network.saveKthStructureScore(curr); //save to the new score structures.
 				}
 			}else network.train();
 		}

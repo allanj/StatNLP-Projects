@@ -91,7 +91,6 @@ public class LocalNetworkDecoderThread extends Thread{
 						network.removeKthStructure(other);
 					}
 					network.inference();
-					network.saveKthStructureScore(curr);
 				}
 			}
 			Instance inst = null;

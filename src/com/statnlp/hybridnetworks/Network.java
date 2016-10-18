@@ -344,7 +344,7 @@ public abstract class Network implements Serializable, HyperGraph{
 	 */
 	public void marginal(){
 		this._marginal = getMarginalSharedArray();
-		Arrays.fill(this._marginal, Double.NEGATIVE_INFINITY);
+		//Arrays.fill(this._marginal, Double.NEGATIVE_INFINITY);
 		for(int k=0; k<this.countNodes(); k++){
 			this.marginal(k);
 		}
@@ -357,7 +357,7 @@ public abstract class Network implements Serializable, HyperGraph{
 	 */
 	protected void marginal(int k){
 		if(this.isRemoved(k)){
-			this._marginal[k] = Double.NEGATIVE_INFINITY;
+			//this._marginal[k] = Double.NEGATIVE_INFINITY;
 			return;
 		}
 		//since inside and outside are in log space
@@ -516,7 +516,7 @@ public abstract class Network implements Serializable, HyperGraph{
 				inside = Double.NEGATIVE_INFINITY;
 			} else {
 				FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
-				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) ?
+				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) && _marginal!=null  ?
 						 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this._marginal):fa.getScore(this._param);
 				if(NetworkConfig.MODEL_TYPE.USE_COST){
 					score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
@@ -540,7 +540,7 @@ public abstract class Network implements Serializable, HyperGraph{
 			if(ignoreflag) continue;
 			
 			FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
-			double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) ?
+			double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) && _marginal!=null ?
 		 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this._marginal):fa.getScore(this._param);
 			if(NetworkConfig.MODEL_TYPE.USE_COST){
 				score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
@@ -586,7 +586,7 @@ public abstract class Network implements Serializable, HyperGraph{
 				continue;
 			
 			FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
-			double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) ?
+			double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k)&& _marginal!=null ?
 		 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this._marginal):fa.getScore(this._param);
 			if(NetworkConfig.MODEL_TYPE.USE_COST){
 				score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
@@ -649,7 +649,7 @@ public abstract class Network implements Serializable, HyperGraph{
 			
 			FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
 			if(NetworkConfig.MODEL_TYPE.USE_SOFTMAX){
-				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) ?
+				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k)&& _marginal!=null ?
 			 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this._marginal):fa.getScore(this._param);
 				if(NetworkConfig.MODEL_TYPE.USE_COST){
 					score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
@@ -719,7 +719,7 @@ public abstract class Network implements Serializable, HyperGraph{
 					inside = Double.NEGATIVE_INFINITY;
 				} else {
 					FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
-					double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) ?
+					double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) && _marginal!=null ?
 				 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this._marginal):fa.getScore(this._param);
 					if(NetworkConfig.MODEL_TYPE.USE_COST){
 						try{
@@ -750,7 +750,7 @@ public abstract class Network implements Serializable, HyperGraph{
 					continue;
 				
 				FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
-				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) ?
+				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) && _marginal!=null?
 			 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this._marginal):fa.getScore(this._param);
 				if(NetworkConfig.MODEL_TYPE.USE_COST){
 					try{
@@ -783,7 +783,7 @@ public abstract class Network implements Serializable, HyperGraph{
 					continue;
 				
 				FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
-				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) ?
+				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) && _marginal!=null ?
 			 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this._marginal):fa.getScore(this._param);
 				if(NetworkConfig.MODEL_TYPE.USE_COST){
 					try{
@@ -844,7 +844,7 @@ public abstract class Network implements Serializable, HyperGraph{
 			int currMaxPath[][] = new int[TOPK][children_k.length]; //topk and (l-best, r-best)
 			
 			FeatureArray fa = this._param.extract(this, nodeIdx, children_k, children_k_index);
-			double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(nodeIdx) ?
+			double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(nodeIdx) && _marginal!=null ?
 		 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(nodeIdx), this._marginal):fa.getScore(this._param);
 			double firstBest = score;
 			for(int child_k : children_k){
@@ -1039,11 +1039,6 @@ public abstract class Network implements Serializable, HyperGraph{
 	 * Need to implemented in user's own network. No need to implement if not using mean-field inference.
 	 */
 	public void removeKthStructure(int kthStructure){}
-	/**
-	 * Only required when we used the mean-field inference method.
-	 * Need to implemented in user's own network. No need to implement if not using mean-field inference.
-	 */
-	public void saveKthStructureScore(int kthStructure){}
 	
 	
 	public void setStructure(int structure){

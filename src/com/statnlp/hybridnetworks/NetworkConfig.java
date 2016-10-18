@@ -206,6 +206,6 @@ public class NetworkConfig {
 	public static InferenceType INFERENCE = InferenceType.FORWARD_BACKWARD;
 	
 	/**For mean-field inference..***/
-	public static int MF_ROUND = 10;
+	public static int MF_ROUND = 4;
 	public static int NUM_STRUCTS = 2;
 }

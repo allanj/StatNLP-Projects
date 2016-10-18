@@ -186,7 +186,7 @@ public class FeatureArray implements Serializable{
 		this._score = 0.0;
 		for(int f : this.getCurrent()){
 			if(f!=-1){
-				double featureValue = fIdx2DstNode.containsKey(f)? marginals[fIdx2DstNode.get(f)]:1.0;
+				double featureValue = fIdx2DstNode.containsKey(f)? Math.exp(marginals[fIdx2DstNode.get(f)]):1.0;
 				_score += param.getWeight(f) * featureValue;
 			}
 		}
