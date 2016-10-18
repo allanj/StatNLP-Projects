@@ -286,6 +286,7 @@ public class TFFeatureManager extends FeatureManager {
 			}
 			
 			if(network.getInstance().isLabeled()){
+				
 				arr = new int[]{pos+1, nodeType, labelId,0,0};
 				long dstNode = NetworkIDMapper.toHybridNodeID(arr);
 				int dstNodeIdx = Arrays.binarySearch(tfnetwork.getAllNodes(), dstNode);

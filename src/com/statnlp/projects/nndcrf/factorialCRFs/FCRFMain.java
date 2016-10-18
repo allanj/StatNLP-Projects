@@ -44,10 +44,10 @@ public class FCRFMain {
 		List<TFInstance> trainInstances = null;
 		List<TFInstance> testInstances = null;
 		/***********DEBUG*****************/
-		trainFile = "data/dat/train.txt";
+		trainFile = "data/conll2000/train.txt";
 //		String trainSrcFile = "data/dat/conll1000train.txt";
 		trainNumber = 500;
-		testFile = "data/dat/test.txt";;
+		testFile = "data/conll2000/test.txt";;
 //		String testSrcFile = "data/dat/conll1000test.txt";
 //		testFile = trainFile;
 		testNumber = 100;
@@ -80,7 +80,7 @@ public class FCRFMain {
 		
 		
 		/***Neural network Configuration**/
-		NetworkConfig.USE_NEURAL_FEATURES = true; 
+		NetworkConfig.USE_NEURAL_FEATURES = false; 
 		if(NetworkConfig.USE_NEURAL_FEATURES)
 			NeuralConfigReader.readConfig(neural_config);
 		NetworkConfig.OPTIMIZE_NEURAL = false;  //false: optimize in neural network
