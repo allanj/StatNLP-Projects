@@ -166,6 +166,8 @@ public class FeatureArray implements Serializable{
 	/**
 	 * Get the marginal score using the marginal score as feature value
 	 * @param param
+	 * @param <featureIdx, targetNode> map, the target node is the corresponding node.
+	 * @param marginals score array, serve as being the feature value. 
 	 * @return
 	 */
 	public double getScore_MF_Version(LocalNetworkParam param, HashMap<Integer, Integer> fIdx2DstNode, double[] marginals){

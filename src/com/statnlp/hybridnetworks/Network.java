@@ -516,7 +516,8 @@ public abstract class Network implements Serializable, HyperGraph{
 				inside = Double.NEGATIVE_INFINITY;
 			} else {
 				FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
-				double score = fa.getScore(this._param);
+				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) ?
+						 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this._marginal):fa.getScore(this._param);
 				if(NetworkConfig.MODEL_TYPE.USE_COST){
 					score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
 				}
@@ -539,7 +540,8 @@ public abstract class Network implements Serializable, HyperGraph{
 			if(ignoreflag) continue;
 			
 			FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
-			double score = fa.getScore(this._param);
+			double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) ?
+		 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this._marginal):fa.getScore(this._param);
 			if(NetworkConfig.MODEL_TYPE.USE_COST){
 				score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
 			}
@@ -584,7 +586,8 @@ public abstract class Network implements Serializable, HyperGraph{
 				continue;
 			
 			FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
-			double score = fa.getScore(this._param);
+			double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) ?
+		 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this._marginal):fa.getScore(this._param);
 			if(NetworkConfig.MODEL_TYPE.USE_COST){
 				score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
 			}
@@ -646,7 +649,8 @@ public abstract class Network implements Serializable, HyperGraph{
 			
 			FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
 			if(NetworkConfig.MODEL_TYPE.USE_SOFTMAX){
-				double score = fa.getScore(this._param); // w*f
+				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) ?
+			 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this._marginal):fa.getScore(this._param);
 				if(NetworkConfig.MODEL_TYPE.USE_COST){
 					score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
 				}
@@ -715,7 +719,8 @@ public abstract class Network implements Serializable, HyperGraph{
 					inside = Double.NEGATIVE_INFINITY;
 				} else {
 					FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
-					double score = fa.getScore(this._param);
+					double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) ?
+				 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this._marginal):fa.getScore(this._param);
 					if(NetworkConfig.MODEL_TYPE.USE_COST){
 						try{
 							score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
@@ -745,7 +750,8 @@ public abstract class Network implements Serializable, HyperGraph{
 					continue;
 				
 				FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
-				double score = fa.getScore(this._param);
+				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) ?
+			 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this._marginal):fa.getScore(this._param);
 				if(NetworkConfig.MODEL_TYPE.USE_COST){
 					try{
 						score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
@@ -777,7 +783,8 @@ public abstract class Network implements Serializable, HyperGraph{
 					continue;
 				
 				FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
-				double score = fa.getScore(this._param);
+				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k) ?
+			 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this._marginal):fa.getScore(this._param);
 				if(NetworkConfig.MODEL_TYPE.USE_COST){
 					try{
 						score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
@@ -837,7 +844,8 @@ public abstract class Network implements Serializable, HyperGraph{
 			int currMaxPath[][] = new int[TOPK][children_k.length]; //topk and (l-best, r-best)
 			
 			FeatureArray fa = this._param.extract(this, nodeIdx, children_k, children_k_index);
-			double score = fa.getScore(this._param);
+			double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(nodeIdx) ?
+		 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(nodeIdx), this._marginal):fa.getScore(this._param);
 			double firstBest = score;
 			for(int child_k : children_k){
 				firstBest += this._max_k[child_k][0];

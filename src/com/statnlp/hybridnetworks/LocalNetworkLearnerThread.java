@@ -181,11 +181,6 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 					else network.train();
 					network.saveKthStructureScore(curr); //save to the new score structures.
 				}
-				//the old then should be equals to the new.
-				//the new should create a new one.
-				network.renewCurrMarginals();
-				//if after each training iteration, clear all the things.
-				if(!messagePassing) network.clearMaginalsMap();
 			}else network.train();
 		}
 	}

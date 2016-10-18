@@ -93,7 +93,6 @@ public class LocalNetworkDecoderThread extends Thread{
 					network.inference();
 					network.saveKthStructureScore(curr);
 				}
-				network.renewCurrMarginals();
 			}
 			Instance inst = null;
 			for(int curr=0; curr<NetworkConfig.NUM_STRUCTS; curr++){
