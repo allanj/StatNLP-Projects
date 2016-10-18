@@ -1,6 +1,7 @@
 package com.statnlp.projects.nndcrf.factorialCRFs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,7 +77,7 @@ public class TFFeatureManager extends FeatureManager {
 		ArrayList<Integer> featureList = new ArrayList<Integer>();
 		
 		int pos = nodeArr[0]-1;
-		if(pos<0 || pos >= inst.size() || nodeArr[1]==NODE_TYPES.TAG_IN_E.ordinal() || nodeArr[1]==NODE_TYPES.E_IN_TAG.ordinal())
+		if(pos<0 || pos >= inst.size())
 			return FeatureArray.EMPTY;
 		
 		int eId = nodeArr[2];
@@ -85,14 +86,15 @@ public class TFFeatureManager extends FeatureManager {
 		
 		//int childPos = child[0]-1;
 		
-		if(nodeArr[1]==NODE_TYPES.ENODE_HYP.ordinal()){
+		if(nodeArr[1]==NODE_TYPES.ENODE.ordinal()){
 			//must be in the ne chain and not tag in e node
 			addEntityFeatures(featureList, network, sent, pos, eId);
+			//false: means it's NE structure
 			addJointFeatures(featureList, network, sent, pos, eId, parent_k, children_k, false);
 			
 		}
 		
-		if(nodeArr[1]==NODE_TYPES.TNODE_HYP.ordinal()){
+		if(nodeArr[1]==NODE_TYPES.TNODE.ordinal()){
 			addPOSFeatures(featureList, network, sent, pos, eId);
 			addJointFeatures(featureList, network, sent, pos, eId, parent_k, children_k, true);
 		}
@@ -248,14 +250,23 @@ public class TFFeatureManager extends FeatureManager {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param featureList
+	 * @param network
+	 * @param sent
+	 * @param pos
+	 * @param paId
+	 * @param parent_k
+	 * @param children_k
+	 * @param paTchildE: false means the current structure is NE structure.
+	 */
 	private void addJointFeatures(ArrayList<Integer> featureList, Network network, Sentence sent, int pos, int paId, int parent_k, int[] children_k, boolean paTchildE){
-		int[] first_child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[0]));
-		if(first_child[2]!=paId)
-			throw new RuntimeException("These two should be the same");
-		if(children_k.length!=2)
-			throw new RuntimeException("The joint features should only have two children");
+		TFNetwork tfnetwork = (TFNetwork)network;
+		if(children_k.length!=1)
+			throw new RuntimeException("The joint features should only have one children also");
 		String currWord = sent.get(pos).getName();
-		int[] k_child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[1]));
+		int[] k_child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[0]));
 		String currTag = paTchildE? Tag.get(paId).getForm():Tag.get(k_child[2]).getForm();
 		String currEn = paTchildE? Entity.get(k_child[2]).getForm():Entity.get(paId).getForm();
 		
@@ -263,7 +274,32 @@ public class TFFeatureManager extends FeatureManager {
 		featureList.add(jointFeatureIdx);
 		if(jointFeatureIdx!=-1){
 			//get the destination node.
-			network.putJointFeature(jointFeatureIdx, parent_k, dstNode);
+			int[] arr = null;
+			int nodeType = -1;
+			int labelId = -1;
+			if(paTchildE){
+				nodeType = NODE_TYPES.ENODE.ordinal();
+				labelId = Entity.get(sent.get(pos).getEntity()).getId();
+			}else{
+				nodeType = NODE_TYPES.TNODE.ordinal();
+				labelId = Tag.get(sent.get(pos).getTag()).getId();
+			}
+			
+			if(network.getInstance().isLabeled()){
+				arr = new int[]{pos+1, nodeType, labelId,0,0};
+				long dstNode = NetworkIDMapper.toHybridNodeID(arr);
+				int dstNodeIdx = Arrays.binarySearch(tfnetwork.getAllNodes(), dstNode);
+				network.putJointFeature(jointFeatureIdx, parent_k, dstNodeIdx);
+			}
+			else{
+				for(int e=0;e<Entity.ENTS_INDEX.size(); e++){
+					arr = new int[]{pos+1, nodeType, labelId,0,0};
+					long dstNode = NetworkIDMapper.toHybridNodeID(arr);
+					int dstNodeIdx = Arrays.binarySearch(tfnetwork.getAllNodes(), dstNode);
+					network.putJointFeature(jointFeatureIdx, parent_k, dstNodeIdx);
+				}
+					
+			}
 		}
 		
 	}

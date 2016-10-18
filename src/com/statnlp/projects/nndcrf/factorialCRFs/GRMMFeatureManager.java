@@ -36,14 +36,14 @@ public class GRMMFeatureManager extends FeatureManager {
 		ArrayList<Integer> featureList = new ArrayList<Integer>();
 		
 		int pos = nodeArr[0]-1;
-		if(pos<0 || pos >= inst.size() || nodeArr[1]==NODE_TYPES.TAG_IN_E.ordinal() || nodeArr[1]==NODE_TYPES.E_IN_TAG.ordinal())
+		if(pos<0 || pos >= inst.size() )
 			return FeatureArray.EMPTY;
 		
 		int eId = nodeArr[2];
 		//System.err.println(Arrays.toString(nodeArr));
 		
 		
-		if(nodeArr[1]==NODE_TYPES.ENODE_HYP.ordinal() ){
+		if(nodeArr[1]==NODE_TYPES.ENODE.ordinal() ){
 			String[] fs = sent.get(pos).getFS();
 			for(String f: fs)
 				featureList.add(this._param_g.toFeature(network, FEATYPE.grmm.name(), Entity.get(eId).getForm(), f));
@@ -63,7 +63,7 @@ public class GRMMFeatureManager extends FeatureManager {
 			}
 		}
 		
-		if(nodeArr[1]==NODE_TYPES.TNODE_HYP.ordinal()){
+		if(nodeArr[1]==NODE_TYPES.TNODE.ordinal()){
 			String[] fs = sent.get(pos).getFS();
 			for(String f: fs)
 				featureList.add(this._param_g.toFeature(network, FEATYPE.grmm.name(), Tag.get(eId).getForm(), f));
