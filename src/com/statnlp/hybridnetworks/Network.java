@@ -43,6 +43,8 @@ public abstract class Network implements Serializable, HyperGraph{
 	protected static double[][] insideSharedArray = new double[NetworkConfig.NUM_THREADS][]; // TODO: The value of NetworkConfig.NUM_THREADS might change after first access to Network class 
 	/** The working array for each thread for calculating outside scores */
 	protected static double[][] outsideSharedArray = new double[NetworkConfig.NUM_THREADS][];
+	/** The working array for each thread for calculating marginal scores */
+	protected static double[][] marginalSharedArray = new double[NetworkConfig.NUM_THREADS][];
 	/** The working array for each thread for calculating max scores */
 	protected static double[][] maxSharedArray = new double[NetworkConfig.NUM_THREADS][];
 	/** The working array for each thread for calculating cost */
@@ -97,9 +99,8 @@ public abstract class Network implements Serializable, HyperGraph{
 	/** store the information of removal of each node **/
 	protected transient boolean[] isVisible;
 		
-	/** preset inside score, from the outside to inside score. <index, value> **/
-	private transient HashMap<Integer, Double> currMarginals;
-	protected transient HashMap<Integer, Double> newMarginals;
+	/** The (srcNode, (featureIdx, destination node)) map for mean-field inference. (local feature index in the sense of Parallel touching)**/
+	protected transient HashMap<Integer, HashMap<Integer, Integer>> src2fIdx2Dst;
 	
 	/** The current structure that the network is using*/
 	protected int currentStructure; 
@@ -148,6 +149,12 @@ public abstract class Network implements Serializable, HyperGraph{
 		if(outsideSharedArray[this._threadId] == null || this.countNodes() > outsideSharedArray[this._threadId].length)
 			outsideSharedArray[this._threadId] = new double[this.countNodes()];
 		return outsideSharedArray[this._threadId];
+	}
+	
+	protected double[] getMarginalSharedArray(){
+		if(marginalSharedArray[this._threadId] == null || this.countNodes() > marginalSharedArray[this._threadId].length)
+			marginalSharedArray[this._threadId] = new double[this.countNodes()];
+		return marginalSharedArray[this._threadId];
 	}
 
 	protected double[] getMaxSharedArray(){
@@ -324,15 +331,22 @@ public abstract class Network implements Serializable, HyperGraph{
 	
 
 	/**
-	 * Calculate the marginal score for all nodes
+	 * Calculate insideOutside then the marginal score for all nodes 
+	 */
+	public void marginalize(){
+		this.inside();
+		this.outside();
+		marginal();
+	}
+	
+	/**
+	 * Calculate the marginal score for all nodes 
 	 */
 	public void marginal(){
-		this._marginal = new double[this.countNodes()];
-		double sum = this.sum();
-		this.outside();
+		this._marginal = getMarginalSharedArray();
 		Arrays.fill(this._marginal, Double.NEGATIVE_INFINITY);
 		for(int k=0; k<this.countNodes(); k++){
-			this.marginal(k,sum);
+			this.marginal(k);
 		}
 	}
 	
@@ -341,13 +355,13 @@ public abstract class Network implements Serializable, HyperGraph{
 	 * Calculate the marginal score at the specific node
 	 * @param k
 	 */
-	protected void marginal(int k, double sum){
+	protected void marginal(int k){
 		if(this.isRemoved(k)){
 			this._marginal[k] = Double.NEGATIVE_INFINITY;
 			return;
 		}
 		//since inside and outside are in log space
-		this._marginal[k] = this._inside[k] + this._outside[k] - sum;
+		this._marginal[k] = this._inside[k] + this._outside[k] - this.getInside();
 	}
 	
 	/**
@@ -368,6 +382,10 @@ public abstract class Network implements Serializable, HyperGraph{
 		if(NetworkConfig.MODEL_TYPE.USE_SOFTMAX){
 			this.inside();
 			this.outside();
+			if(NetworkConfig.INFERENCE == InferenceType.MEAN_FIELD){
+				 //save the marginal score;
+				this.marginal();
+			}
 		} else { // Use real max
 			this.max();
 		}
@@ -376,15 +394,8 @@ public abstract class Network implements Serializable, HyperGraph{
 	/**
 	 * Train the network
 	 */
-	public void train(){
-		if(this._weight == 0)
-			return;
-		if(NetworkConfig.MODEL_TYPE.USE_SOFTMAX){
-			this.inside();
-			this.outside();
-		} else { // Use real max
-			this.max();
-		}
+	public void train(){ 
+		inference();
 		this.updateGradient();
 		this.updateObjective();
 	}
@@ -396,9 +407,7 @@ public abstract class Network implements Serializable, HyperGraph{
 		this._inside = this.getInsideSharedArray();
 		Arrays.fill(this._inside, 0.0);
 		for(int k=0; k<this.countNodes(); k++){
-			if(NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && currMarginals!=null && currMarginals.containsKey(k))
-				this._inside[k] = currMarginals.get(k);
-			else this.inside(k);
+			this.inside(k);
 		}
 		
 		if(this.getInside()==Double.NEGATIVE_INFINITY){
@@ -469,11 +478,7 @@ public abstract class Network implements Serializable, HyperGraph{
 		this._max = this.getMaxSharedArray();
 		this._max_paths = this.getMaxPathSharedArray();
 		for(int k=0; k<this.countNodes(); k++){
-			if(NetworkConfig.INFERENCE == InferenceType.MEAN_FIELD && currMarginals.containsKey(k)){
-				_max[k] = currMarginals.get(k);
-				this._max_paths[k] = new int[]{};
-			}
-			else this.max(k);
+			this.max(k);
 		}
 	}
 	
@@ -1032,15 +1037,6 @@ public abstract class Network implements Serializable, HyperGraph{
 	 */
 	public void saveKthStructureScore(int kthStructure){}
 	
-	public void clearMaginalsMap(){
-		this.currMarginals = new HashMap<Integer, Double>();
-		this.newMarginals = new HashMap<Integer, Double>();
-	}
-	
-	public void renewCurrMarginals(){
-		this.currMarginals = this.newMarginals;
-		this.newMarginals = new HashMap<Integer, Double>();
-	}
 	
 	public void setStructure(int structure){
 		this.currentStructure = structure;
@@ -1048,6 +1044,19 @@ public abstract class Network implements Serializable, HyperGraph{
 	
 	public int getStructure(){
 		return this.currentStructure;
+	}
+	
+	public void putJointFeature(int srcNode, int fIdx,  int dstNode){
+		if(fIdx==-1)
+			throw new RuntimeException("The feature idx is -1?");
+		if(this.src2fIdx2Dst==null) src2fIdx2Dst = new HashMap<Integer, HashMap<Integer, Integer>>();
+		if(src2fIdx2Dst.containsKey(srcNode)){
+			src2fIdx2Dst.get(srcNode).put(fIdx, dstNode);
+		}else{
+			HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+			map.put(fIdx, dstNode);
+			src2fIdx2Dst.put(srcNode, map);
+		}
 	}
 }
 

@@ -88,13 +88,13 @@ public class TFFeatureManager extends FeatureManager {
 		if(nodeArr[1]==NODE_TYPES.ENODE_HYP.ordinal()){
 			//must be in the ne chain and not tag in e node
 			addEntityFeatures(featureList, network, sent, pos, eId);
-			addJointFeatures(featureList, network, sent, pos, eId, children_k, false);
+			addJointFeatures(featureList, network, sent, pos, eId, parent_k, children_k, false);
 			
 		}
 		
 		if(nodeArr[1]==NODE_TYPES.TNODE_HYP.ordinal()){
 			addPOSFeatures(featureList, network, sent, pos, eId);
-			addJointFeatures(featureList, network, sent, pos, eId, children_k, true);
+			addJointFeatures(featureList, network, sent, pos, eId, parent_k, children_k, true);
 		}
 		
 		ArrayList<Integer> finalList = new ArrayList<Integer>();
@@ -248,7 +248,7 @@ public class TFFeatureManager extends FeatureManager {
 		}
 	}
 	
-	private void addJointFeatures(ArrayList<Integer> featureList, Network network, Sentence sent, int pos, int paId, int[] children_k, boolean paTchildE){
+	private void addJointFeatures(ArrayList<Integer> featureList, Network network, Sentence sent, int pos, int paId, int parent_k, int[] children_k, boolean paTchildE){
 		int[] first_child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[0]));
 		if(first_child[2]!=paId)
 			throw new RuntimeException("These two should be the same");
@@ -258,7 +258,13 @@ public class TFFeatureManager extends FeatureManager {
 		int[] k_child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[1]));
 		String currTag = paTchildE? Tag.get(paId).getForm():Tag.get(k_child[2]).getForm();
 		String currEn = paTchildE? Entity.get(k_child[2]).getForm():Entity.get(paId).getForm();
-		featureList.add(this._param_g.toFeature(network,FEATYPE.joint.name(), currEn+"&"+currTag, currWord));
+		
+		int jointFeatureIdx = this._param_g.toFeature(network,FEATYPE.joint.name(), currEn+"&"+currTag, currWord);
+		featureList.add(jointFeatureIdx);
+		if(jointFeatureIdx!=-1){
+			//get the destination node.
+			network.putJointFeature(jointFeatureIdx, parent_k, dstNode);
+		}
 		
 	}
 

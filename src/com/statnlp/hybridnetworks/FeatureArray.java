@@ -17,6 +17,7 @@
 package com.statnlp.hybridnetworks;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 public class FeatureArray implements Serializable{
 	
@@ -141,6 +142,12 @@ public class FeatureArray implements Serializable{
 		return this._score;
 	}
 	
+	/**
+	 * Compute the score using the parameter and the feature array
+	 * @param param
+	 * @param fs
+	 * @return
+	 */
 	private double computeScore(LocalNetworkParam param, int[] fs){
 		if(!this._isLocal != param.isGlobalMode()) {
 			throw new RuntimeException("This FeatureArray is local? "+this._isLocal+"; The param is "+param.isGlobalMode());
@@ -153,6 +160,35 @@ public class FeatureArray implements Serializable{
 			}
 		}
 		return score;
+	}
+	
+	
+	/**
+	 * Get the marginal score using the marginal score as feature value
+	 * @param param
+	 * @return
+	 */
+	public double getScore_MF_Version(LocalNetworkParam param, HashMap<Integer, Integer> fIdx2DstNode, double[] marginals){
+		if(this == NEGATIVE_INFINITY){
+			return this._score;
+		}
+		if(!this._isLocal != param.isGlobalMode()) {
+			throw new RuntimeException("This FeatureArray is local? "+this._isLocal+"; The param is "+param.isGlobalMode());
+		}
+		
+		//if the score is negative infinity, it means disabled.
+		if(this._score == Double.NEGATIVE_INFINITY){
+			return this._score;
+		}
+		
+		this._score = 0.0;
+		for(int f : this.getCurrent()){
+			if(f!=-1){
+				double featureValue = fIdx2DstNode.containsKey(f)? marginals[fIdx2DstNode.get(f)]:1.0;
+				_score += param.getWeight(f) * featureValue;
+			}
+		}
+		return this._score;
 	}
 	
 	//returns the number of elements in the feature array
