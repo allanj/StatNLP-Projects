@@ -18,6 +18,8 @@ package com.statnlp.hybridnetworks;
 
 import static com.statnlp.commons.Utils.print;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -405,5 +407,6 @@ public abstract class NetworkModel implements Serializable{
 		
 		return results;
 	}
+	
 	
 }
