@@ -100,7 +100,7 @@ public abstract class Network implements Serializable, HyperGraph{
 	protected transient boolean[] isVisible;
 		
 	/** The (srcNode, (featureIdx, destination node)) map for mean-field inference. (local feature index in the sense of Parallel touching)**/
-	protected transient HashMap<Integer, HashMap<Integer, Integer>> src2fIdx2Dst;
+	protected transient HashMap<Integer, HashMap<Integer, Integer>> src2fIdx2Dst = new HashMap<Integer, HashMap<Integer, Integer>>();
 	
 	/** The current structure that the network is using*/
 	protected int currentStructure; 

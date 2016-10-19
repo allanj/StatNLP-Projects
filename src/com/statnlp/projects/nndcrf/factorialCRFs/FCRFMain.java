@@ -51,9 +51,11 @@ public class FCRFMain {
 //		String testSrcFile = "data/dat/conll1000test.txt";
 //		testFile = trainFile;
 		testNumber = 20;
+		numIteration = 3;
+//		numThreads = 1;
 		/***************************/
 		
-		System.err.println("[Info] trainingFile: "+TFConfig.CONLL_train);
+		System.err.println("[Info] trainingFile: "+trainFile);
 		System.err.println("[Info] testFile: "+testFile);
 		System.err.println("[Info] nerOut: "+nerOut);
 		System.err.println("[Info] posOut: "+posOut);

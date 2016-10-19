@@ -164,7 +164,7 @@ public abstract class NetworkModel implements Serializable{
 		//finalize the features.
 		this._fm.getParam_G().lockIt();
 		nnController = this._fm.getParam_G()._nnController;
-		//debug:print features
+		//debug:print features, delete this later// by allan
 		for(String[] f: this._fm.getParam_G()._feature2rep)
 			System.out.println(Arrays.toString(f));
 		
