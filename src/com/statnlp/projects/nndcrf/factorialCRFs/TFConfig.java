@@ -2,12 +2,12 @@ package com.statnlp.projects.nndcrf.factorialCRFs;
 
 public class TFConfig {
 
-	public static String CONLL_train = "data/dat/train.txt";
-	public static String CONLL_test = "data/dat/test.txt";
-	public static String CONLL_dev = "data/dat/dev.txt";
+	public static String CONLL_train = "data/conll2000/train.txt";
+	public static String CONLL_test = "data/conll2000/test.txt";
+	public static String CONLL_dev = "data/conll2000/dev.txt";
 	
-	public static String nerOut = "data/dat/nerOut.txt";
-	public static String posOut = "data/dat/posOut.txt";
+	public static String nerOut = "data/conll2000/output/nerOut.txt";
+	public static String posOut = "data/conll2000/output/posOut.txt";
 	
 	public static String dataType = "conll";
 	

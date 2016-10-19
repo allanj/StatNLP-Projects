@@ -280,7 +280,7 @@ public class TFFeatureManager extends FeatureManager {
 				String tag =  sent.get(pos).getTag();
 				jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), currLabel, tag);
 				featureList.add(jointFeatureIdx);
-				labelId = Tag.get(sent.get(pos).getTag()).getId();
+				labelId = Tag.get(tag).getId();
 				arr = new int[]{pos+1, nodeType, labelId,0,0};
 //				System.out.println("label:"+jointFeatureIdx);
 				addDstNode(tfnetwork, jointFeatureIdx, parent_k, arr);

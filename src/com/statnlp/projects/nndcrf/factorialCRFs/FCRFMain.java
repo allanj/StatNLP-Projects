@@ -3,6 +3,7 @@ package com.statnlp.projects.nndcrf.factorialCRFs;
 import java.io.IOException;
 import java.util.List;
 
+import com.statnlp.commons.ml.opt.OptimizerFactory;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -46,12 +47,12 @@ public class FCRFMain {
 		/***********DEBUG*****************/
 		trainFile = "data/conll2000/debug.txt";
 //		String trainSrcFile = "data/dat/conll1000train.txt";
-		trainNumber = 1;
+		trainNumber = 20;
 		testFile = "data/conll2000/debug.txt";;
 //		String testSrcFile = "data/dat/conll1000test.txt";
 //		testFile = trainFile;
 		testNumber = 20;
-		numIteration = 3;
+		numIteration = 6;
 //		numThreads = 1;
 		/***************************/
 		
@@ -91,7 +92,7 @@ public class FCRFMain {
 		NeuralConfig.NUM_NEURAL_NETS = 2;
 		/****/
 		
-		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam());
+		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam(OptimizerFactory.getGradientDescentFactory(1)));
 //		GRMMFeatureManager fa = new GRMMFeatureManager(new GlobalNetworkParam(OptimizerFactory.getLBFGSFactory()));
 		TFNetworkCompiler compiler = new TFNetworkCompiler();
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);

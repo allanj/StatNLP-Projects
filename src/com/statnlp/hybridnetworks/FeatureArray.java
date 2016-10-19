@@ -170,7 +170,7 @@ public class FeatureArray implements Serializable{
 	 * @param marginals score array, serve as being the feature value. 
 	 * @return
 	 */
-	public double getScore_MF_Version(LocalNetworkParam param, HashMap<Integer, Integer> fIdx2DstNode, double[] marginals){
+	public double getScore_MF_Version(LocalNetworkParam param, HashMap<Integer, Integer> fIdx2DstNode, HashMap<Integer, Double> marginalMap){
 		if(this == NEGATIVE_INFINITY){
 			return this._score;
 		}
@@ -186,7 +186,7 @@ public class FeatureArray implements Serializable{
 		this._score = 0.0;
 		for(int f : this.getCurrent()){
 			if(f!=-1){
-				double featureValue = fIdx2DstNode.containsKey(f)? Math.exp(marginals[fIdx2DstNode.get(f)]):1.0;
+				double featureValue = fIdx2DstNode.containsKey(f)? marginalMap.containsKey(fIdx2DstNode.get(f))?Math.exp(marginalMap.get(fIdx2DstNode.get(f))):0.0:1.0;
 				_score += param.getWeight(f) * featureValue;
 			}
 		}

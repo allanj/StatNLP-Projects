@@ -18,8 +18,6 @@ package com.statnlp.hybridnetworks;
 
 import static com.statnlp.commons.Utils.print;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -166,9 +164,6 @@ public abstract class NetworkModel implements Serializable{
 		//finalize the features.
 		this._fm.getParam_G().lockIt();
 		nnController = this._fm.getParam_G()._nnController;
-		//debug:print features, delete this later// by allan
-		for(String[] f: this._fm.getParam_G()._feature2rep)
-			System.out.println(Arrays.toString(f));
 		
 		if(NetworkConfig.BUILD_FEATURES_FROM_LABELED_ONLY && NetworkConfig.CACHE_FEATURES_DURING_TRAINING){
 			touch(insts, true); // Touch again to cache the features, both in labeled and unlabeled
@@ -235,7 +230,6 @@ public abstract class NetworkModel implements Serializable{
 				if(NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD){
 					for(int threadId=0; threadId<this._numThreads; threadId++) this._learners[threadId].setMessagePassing();
 					for(int smallIt=0;smallIt<NetworkConfig.MF_ROUND; smallIt++){
-						System.out.println("### MF iteration:"+smallIt);
 						List<Future<Void>> results = pool.invokeAll(callables);
 						for(Future<Void> result: results){
 							try{

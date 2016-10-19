@@ -180,6 +180,7 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 					if(messagePassing) network.inference();
 					else network.train();
 				}
+				if(!messagePassing) network.clearMarginalMap();
 			}else network.train();
 		}
 	}

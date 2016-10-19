@@ -21,7 +21,7 @@ public class TFNetworkCompiler extends NetworkCompiler{
 	public TFNetwork genericUnlabeledNetwork;
 	
 	public TFNetworkCompiler(){
-		this._size = 2;
+		this._size = 150;
 		this.compileUnlabeledInstancesGeneric();
 	}
 	
