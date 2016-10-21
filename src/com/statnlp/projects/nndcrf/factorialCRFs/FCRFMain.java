@@ -45,14 +45,17 @@ public class FCRFMain {
 		List<TFInstance> trainInstances = null;
 		List<TFInstance> testInstances = null;
 		/***********DEBUG*****************/
-		trainFile = "data/conll2000/debug.txt";
+		trainFile = "data/conll2000/train.txt";
 //		String trainSrcFile = "data/dat/conll1000train.txt";
-		trainNumber = 20;
-		testFile = "data/conll2000/debug.txt";;
+		trainNumber = 100;
+		testFile = "data/conll2000/test.txt";;
 //		String testSrcFile = "data/dat/conll1000test.txt";
-//		testFile = trainFile;
-		testNumber = 20;
-		numIteration = 6;
+		testFile = trainFile;
+		testNumber = 100;
+		numIteration = 500;
+
+		OptimizerFactory optimzer = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(0.1);
+		optimzer = OptimizerFactory.getLBFGSFactory();
 //		numThreads = 1;
 		/***************************/
 		
@@ -92,7 +95,7 @@ public class FCRFMain {
 		NeuralConfig.NUM_NEURAL_NETS = 2;
 		/****/
 		
-		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam(OptimizerFactory.getGradientDescentFactory(1)));
+		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam(optimzer));
 //		GRMMFeatureManager fa = new GRMMFeatureManager(new GlobalNetworkParam(OptimizerFactory.getLBFGSFactory()));
 		TFNetworkCompiler compiler = new TFNetworkCompiler();
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
