@@ -143,8 +143,19 @@ public abstract class NetworkModel implements Serializable{
 		
 		Instance[][] insts = this.splitInstancesForTrain();
 		
+		
+		/**
+		 * pre compile the network
+		 * In mean-field, we need to pre compile because we need the 
+		 * unlabeled network information in feature extraction process for the labeled network.
+		 */
+		NetworkConfig.PRE_COMPILE_NETWORKS = NetworkConfig.INFERENCE == InferenceType.MEAN_FIELD? true:false;
+		if(NetworkConfig.PRE_COMPILE_NETWORKS){
+			preCompileNetworks(insts);
+		}
+		boolean keepExistingThreads = NetworkConfig.PRE_COMPILE_NETWORKS? true:false;
 		// The first touch
-		touch(insts, false);
+		touch(insts, keepExistingThreads);
 		
 		for(int threadId=0; threadId<this._numThreads; threadId++){
 			if(NetworkConfig.BUILD_FEATURES_FROM_LABELED_ONLY){
@@ -287,6 +298,19 @@ public abstract class NetworkModel implements Serializable{
 		}
 	}
 
+	private void preCompileNetworks(Instance[][] insts) throws InterruptedException{
+		for(int threadId = 0; threadId < this._numThreads; threadId++){
+			this._learners[threadId] = new LocalNetworkLearnerThread(threadId, this._fm, insts[threadId], this._compiler, -1);
+			this._learners[threadId].setPrecompile();
+			this._learners[threadId].start();
+		}
+		for(int threadId = 0; threadId < this._numThreads; threadId++){
+			this._learners[threadId].join();
+			this._learners[threadId].unsetPrecompile();
+		}	
+		System.err.println("Finish precompile the networks.");
+	}
+	
 	private void touch(Instance[][] insts, boolean keepExisting) throws InterruptedException {
 		if(!NetworkConfig.PARALLEL_FEATURE_EXTRACTION || NetworkConfig.NUM_THREADS == 1){
 			for(int threadId = 0; threadId<this._numThreads; threadId++){
@@ -312,7 +336,12 @@ public abstract class NetworkModel implements Serializable{
 				this._learners[threadId].join();
 				this._learners[threadId].setUnTouch();
 			}
-			if(!keepExisting){
+			
+			if(NetworkConfig.PRE_COMPILE_NETWORKS || !keepExisting){
+				//this one is because in the first touch, we don't have the exisiting threads if not precompile network. 
+				//So we merge in first feature extraction.
+				//If precompile network, we keep exisiting threads. But we still need to merge features because
+				//it is still the first touch. That's why we have the "OR" operation here.
 				this._fm.mergeSubFeaturesToGlobalFeatures();
 			}
 		}

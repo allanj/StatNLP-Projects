@@ -72,7 +72,6 @@ public class TFFeatureManager extends FeatureManager {
 		Sentence sent = inst.getInput();
 		long node = network.getNode(parent_k);
 		int[] nodeArr = NetworkIDMapper.toHybridNodeArray(node);
-		
 		FeatureArray fa = null;
 		ArrayList<Integer> featureList = new ArrayList<Integer>();
 		
@@ -272,48 +271,27 @@ public class TFFeatureManager extends FeatureManager {
 		
 		int[] arr = null;
 		int nodeType = -1;
-		int labelId = -1;
 		if(!paTchildE){
 			//current it's NE structure, need to refer to Tag node.
 			nodeType = NODE_TYPES.TNODE.ordinal();
-			if(network.getInstance().isLabeled()){
-				String tag =  sent.get(pos).getTag();
+			for(int t=0;t<Tag.TAGS_INDEX.size();t++){
+				String tag =  Tag.get(t).getForm();
 				jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), currLabel, tag);
 				featureList.add(jointFeatureIdx);
-				labelId = Tag.get(tag).getId();
-				arr = new int[]{pos+1, nodeType, labelId,0,0};
-//				System.out.println("label:"+jointFeatureIdx);
+				arr = new int[]{pos+1, nodeType, t, 0, 0};
 				addDstNode(tfnetwork, jointFeatureIdx, parent_k, arr);
-				
-			}else{
-				for(int t=0;t<Tag.TAGS_INDEX.size();t++){
-					String tag =  Tag.get(t).getForm();
-					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), currLabel, tag);
-					featureList.add(jointFeatureIdx);
-					arr = new int[]{pos+1, nodeType, t, 0, 0};
-//					System.out.println("unlabel:"+jointFeatureIdx);
-					addDstNode(tfnetwork, jointFeatureIdx, parent_k, arr);
-				}
 			}
 			
 		}else{
 			//current it's POS structure, need to refer to Entity node
 			nodeType = NODE_TYPES.ENODE.ordinal();
-			if(network.getInstance().isLabeled()){
-				String entity = sent.get(pos).getEntity();
+			for(int e=0;e<Entity.ENTS_INDEX.size(); e++){
+				String entity = Entity.get(e).getForm();
 				jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), entity, currLabel);
-				labelId = Entity.get(sent.get(pos).getEntity()).getId();
-				arr = new int[]{pos+1, nodeType, labelId,0 ,0};
-//				System.out.println("label:"+jointFeatureIdx);
+				featureList.add(jointFeatureIdx);
+				arr = new int[]{pos+1, nodeType, e, 0, 0};
+//				System.out.println("unlabel:"+jointFeatureIdx);
 				addDstNode(tfnetwork, jointFeatureIdx, parent_k, arr);
-			}else{
-				for(int e=0;e<Entity.ENTS_INDEX.size(); e++){
-					String entity = Entity.get(e).getForm();
-					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), entity, currLabel);
-					arr = new int[]{pos+1, nodeType, e, 0, 0};
-//					System.out.println("unlabel:"+jointFeatureIdx);
-					addDstNode(tfnetwork, jointFeatureIdx, parent_k, arr);
-				}
 			}
 		}
 			
@@ -321,9 +299,11 @@ public class TFFeatureManager extends FeatureManager {
 	}
 	
 	private void addDstNode(TFNetwork network, int jointFeatureIdx, int parent_k, int[] dstArr){
-		long dstNode = NetworkIDMapper.toHybridNodeID(dstArr);
-		int dstNodeIdx = Arrays.binarySearch(network.getAllNodes(), dstNode);
-		network.putJointFeature(parent_k, jointFeatureIdx, dstNodeIdx);
+		long unlabeledDstNode = NetworkIDMapper.toHybridNodeID(dstArr);
+		TFNetwork unlabeledNetwork = (TFNetwork)network.getUnlabeledNetwork();
+		int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
+//		System.out.println("The dst node idx in unlabeled network is:"+unlabeledDstNodeIdx);
+		network.putJointFeature(parent_k, jointFeatureIdx, unlabeledDstNodeIdx);
 	}
 	
 	

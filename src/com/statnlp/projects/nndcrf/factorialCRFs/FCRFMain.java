@@ -51,8 +51,11 @@ public class FCRFMain {
 		testFile = "data/conll2000/test.txt";;
 //		String testSrcFile = "data/dat/conll1000test.txt";
 		testFile = trainFile;
-		testNumber = 100;
+		testNumber = 10;
 		numIteration = 500;
+		NetworkConfig.NUM_STRUCTS = 2;
+		NetworkConfig.MF_ROUND = 3;
+	
 
 		OptimizerFactory optimzer = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(0.1);
 		optimzer = OptimizerFactory.getLBFGSFactory();
@@ -83,6 +86,7 @@ public class FCRFMain {
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		NetworkConfig.BUILD_FEATURES_FROM_LABELED_ONLY = false;
 		NetworkConfig.INFERENCE = InferenceType.MEAN_FIELD;
+		
 		
 		
 		/***Neural network Configuration**/

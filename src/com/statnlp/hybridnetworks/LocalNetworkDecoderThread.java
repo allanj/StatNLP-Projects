@@ -90,7 +90,7 @@ public class LocalNetworkDecoderThread extends Thread{
 						if(curr==other) continue;
 						network.removeKthStructure(other);
 					}
-					network.inference();
+					network.inference(true);
 				}
 			}
 			Instance inst = null;
