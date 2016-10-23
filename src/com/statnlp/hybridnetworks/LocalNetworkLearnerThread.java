@@ -193,7 +193,7 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 						network.removeKthStructure(other);
 					}
 //					System.out.println("current structure:"+curr);
-					if(messagePassing) network.inference(true);
+					if(messagePassing)  network.inference(true);
 					else network.train();
 				}
 				//only the unlabeled network needs the marginal map.

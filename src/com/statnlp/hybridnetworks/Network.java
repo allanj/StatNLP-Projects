@@ -348,11 +348,6 @@ public abstract class Network implements Serializable, HyperGraph{
 					&& !this.isRemoved(k) &&  src2fIdx2Dst.containsKey(k)){
 				marginalMap.put(k, _marginal[k]);
 			}
-			/**
-			if(this.getInstance().isLabeled() && !this.isRemoved(k))
-				if(Math.abs(Math.exp(_marginal[k]) - 1.0)>0.001)
-					throw new RuntimeException("for labeled network, marginal should be 1");
-			**/
 		}
 	}
 	
