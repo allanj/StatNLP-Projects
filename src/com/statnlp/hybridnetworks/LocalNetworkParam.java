@@ -151,6 +151,7 @@ public class LocalNetworkParam implements Serializable{
 	 */
 	public double getWeight(int featureID){
 		if(this.isGlobalMode()){
+			//note that during testing, it is global mode.
 			return this._fm.getParam_G().getWeight(featureID);
 		} else {
 			//so _fs[featureID] must be the global feature Index

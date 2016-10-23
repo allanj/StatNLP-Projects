@@ -84,6 +84,9 @@ public class LocalNetworkDecoderThread extends Thread{
 			this._param.disableCache();
 		}
 		if(NetworkConfig.INFERENCE == InferenceType.MEAN_FIELD){
+			//initialize the joint feature map and also the marginal score map.
+			network.initJointFeatureMap();
+			network.clearMarginalMap();
 			for(int it=0;it<NetworkConfig.MF_ROUND;it++){
 				for(int curr=0; curr<NetworkConfig.NUM_STRUCTS; curr++){
 					for(int other=0; other<NetworkConfig.NUM_STRUCTS; other++){

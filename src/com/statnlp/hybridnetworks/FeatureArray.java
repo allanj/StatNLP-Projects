@@ -186,6 +186,8 @@ public class FeatureArray implements Serializable{
 		this._score = 0.0;
 		for(int f : this.getCurrent()){
 			if(f!=-1){
+				//note that in training, f is the local feature index.
+				//in testing, f is the global feature index
 				double featureValue = fIdx2DstNode.containsKey(f)? marginalMap.containsKey(fIdx2DstNode.get(f))?Math.exp(marginalMap.get(fIdx2DstNode.get(f))):0.0:1.0;
 				_score += param.getWeight(f) * featureValue;
 			}

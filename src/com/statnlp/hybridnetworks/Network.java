@@ -102,7 +102,7 @@ public abstract class Network implements Serializable, HyperGraph{
 	**/
 	protected transient HashMap<Integer, HashMap<Integer, Integer>> src2fIdx2Dst;
 	/** The marginal map used in mean-field inference. To save the marginal score of the unlabeled network.**/
-	protected transient HashMap<Integer, Double> marginalMap;
+	protected transient HashMap<Integer, Double> marginalMap = new HashMap<Integer, Double>();
 	
 	/** The current structure that the network is using*/
 	protected int currentStructure; 
@@ -348,7 +348,11 @@ public abstract class Network implements Serializable, HyperGraph{
 					&& !this.isRemoved(k) &&  src2fIdx2Dst.containsKey(k)){
 				marginalMap.put(k, _marginal[k]);
 			}
-				
+			/**
+			if(this.getInstance().isLabeled() && !this.isRemoved(k))
+				if(Math.abs(Math.exp(_marginal[k]) - 1.0)>0.001)
+					throw new RuntimeException("for labeled network, marginal should be 1");
+			**/
 		}
 	}
 	
