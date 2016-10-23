@@ -47,19 +47,17 @@ public class FCRFMain {
 		/***********DEBUG*****************/
 		trainFile = "data/conll2000/train.txt";
 //		String trainSrcFile = "data/dat/conll1000train.txt";
-		trainNumber = 100;
+		trainNumber = 500;
 		testFile = "data/conll2000/test.txt";;
 //		String testSrcFile = "data/dat/conll1000test.txt";
-		testFile = trainFile;
-		testNumber = 10;
-		numIteration = 500;
+		testNumber = 500;
+		numIteration = 100;
 		NetworkConfig.NUM_STRUCTS = 2;
-		NetworkConfig.MF_ROUND = 3;
+		NetworkConfig.MF_ROUND = 4;
 	
 
 		OptimizerFactory optimzer = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(0.1);
 		optimzer = OptimizerFactory.getLBFGSFactory();
-//		numThreads = 1;
 		/***************************/
 		
 		System.err.println("[Info] trainingFile: "+trainFile);
