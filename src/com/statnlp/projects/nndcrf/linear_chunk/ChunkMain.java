@@ -52,7 +52,7 @@ public class ChunkMain {
 		
 		
 		trainInstances = ChunkReader.readCONLL2000Data(trainPath, true,  trainNumber, npchunking, IOBESencoding);
-		testInstances = ChunkReader.readCONLL2000Data(testFile, false, testNumber, npchunking);
+		testInstances = ChunkReader.readCONLL2000Data(testFile, false, testNumber, npchunking, false, cascade); //not IOBES encoding
 		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = l2;
 		NetworkConfig.NUM_THREADS = numThreads;

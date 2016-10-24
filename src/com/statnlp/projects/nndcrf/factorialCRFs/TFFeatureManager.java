@@ -42,7 +42,8 @@ public class TFFeatureManager extends FeatureManager {
 		tag_cap_ll, 
 		tag_cap_r, 
 		tag_cap_rr, 
-		joint,
+		entity_joint,
+		tag_joint,
 		neural_1,
 		neural_2};
 	
@@ -237,7 +238,7 @@ public class TFFeatureManager extends FeatureManager {
 			nodeType = NODE_TYPES.TNODE.ordinal();
 			for(int t=0;t<Tag.TAGS_INDEX.size();t++){
 				String tag =  Tag.get(t).getForm();
-				jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), currLabel, tag);
+				jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.entity_joint.name(), currLabel, tag);
 				featureList.add(jointFeatureIdx);
 				arr = new int[]{pos+1, nodeType, t, 0, 0};
 				addDstNode(tfnetwork, jointFeatureIdx, parent_k, arr);
@@ -248,7 +249,7 @@ public class TFFeatureManager extends FeatureManager {
 			nodeType = NODE_TYPES.ENODE.ordinal();
 			for(int e=0;e<Entity.ENTS_INDEX.size(); e++){
 				String entity = Entity.get(e).getForm();
-				jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), entity, currLabel);
+				jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.tag_joint.name(), currLabel, entity);
 				featureList.add(jointFeatureIdx);
 				arr = new int[]{pos+1, nodeType, e, 0, 0};
 //				System.out.println("unlabel:"+jointFeatureIdx);

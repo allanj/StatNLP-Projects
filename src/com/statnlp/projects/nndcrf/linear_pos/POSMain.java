@@ -94,8 +94,8 @@ public class POSMain {
 	
 	public static void processArgs(String[] args){
 		if(args[0].equals("-h") || args[0].equals("help") || args[0].equals("-help") ){
-			System.err.println("Linear-Chain CRF Version: Joint DEPENDENCY PARSING and Entity Recognition TASK: ");
-			System.err.println("\t usage: java -jar dpe.jar -trainNum -1 -testNum -1 -thread 5 -iter 100 -pipe true");
+			System.err.println("Linear-Chain CRF for POS tagging task: ");
+			System.err.println("\t usage: java -jar pos.jar -trainNum -1 -testNum -1 -thread 5 -iter 100 -pipe true");
 			System.err.println("\t put numTrainInsts/numTestInsts = -1 if you want to use all the training/testing instances");
 			System.exit(0);
 		}else{

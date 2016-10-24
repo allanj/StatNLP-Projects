@@ -47,15 +47,16 @@ public class FCRFMain {
 		List<TFInstance> trainInstances = null;
 		List<TFInstance> testInstances = null;
 		/***********DEBUG*****************/
-//		trainFile = "data/conll2000/train.txt";
+		trainFile = "data/conll2000/train.txt";
 ////		String trainSrcFile = "data/dat/conll1000train.txt";
-//		trainNumber = 500;
-//		testFile = "data/conll2000/test.txt";;
+		trainNumber = 500;
+		testFile = "data/conll2000/test.txt";;
 ////		String testSrcFile = "data/dat/conll1000test.txt";
-//		testNumber = 500;
-//		numIteration = 100;
-//		NetworkConfig.NUM_STRUCTS = 2;
-//		NetworkConfig.MF_ROUND = 4;
+		testNumber = 500;
+		numIteration = 100;
+		NetworkConfig.NUM_STRUCTS = 2;
+		NetworkConfig.MF_ROUND = 2;
+		useJointFeatures = true;
 //	
 //
 //		optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(0.1);
@@ -127,7 +128,7 @@ public class FCRFMain {
 		Instance[] predictions = model.decode(testInstances.toArray(new TFInstance[testInstances.size()]));
 //		fa.pw.close();
 
-//		TFEval.evalNER(predictions, nerOut);
+		TFEval.evalNER(predictions, nerOut);
 		TFEval.evalSingleE(predictions);
 		TFEval.evalPOS(predictions, posOut);
 		TFEval.evalSingleJoint(predictions);

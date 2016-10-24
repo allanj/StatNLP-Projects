@@ -13,12 +13,17 @@ public class ChunkReader {
 
 	public static List<ChunkInstance> readCONLL2000Data(String path, boolean setLabel, int number) throws IOException{
 		//NPchunking and , IOB encoding
-		return readCONLL2000Data(path, setLabel, number, true, false); 
+		return readCONLL2000Data(path, setLabel, number, true, false, false); 
 	}
 	
 	public static List<ChunkInstance> readCONLL2000Data(String path, boolean setLabel, int number, boolean npchunk) throws IOException{
-		//IOB encoding
-		return readCONLL2000Data(path, setLabel, number, npchunk, false); 
+		//default: IOB encoding
+		return readCONLL2000Data(path, setLabel, number, npchunk, false, false); 
+	}
+	
+	
+	public static List<ChunkInstance> readCONLL2000Data(String path, boolean setLabel, int number, boolean npchunk, boolean IOBES) throws IOException{
+		return readCONLL2000Data(path, setLabel, number, npchunk, IOBES, false); 
 	}
 	
 	/**
@@ -31,7 +36,9 @@ public class ChunkReader {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List<ChunkInstance> readCONLL2000Data(String path, boolean setLabel, int number, boolean npchunk, boolean IOBES) throws IOException{
+	public static List<ChunkInstance> readCONLL2000Data(String path, boolean setLabel, int number, boolean npchunk, boolean IOBES, boolean cascade) throws IOException{
+		if(setLabel && cascade)
+			throw new RuntimeException("labeled instance, shouldn't use predicted POS tag");
 		BufferedReader br = RAWF.reader(path);
 		String line = null;
 		List<ChunkInstance> insts = new ArrayList<ChunkInstance>();
@@ -58,10 +65,12 @@ public class ChunkReader {
 				continue;
 			}
 			String[] values = line.split(" ");
-			String chunk = npchunk? getNPChunk(values[2]):values[2];
+			String rawChunk = values[2];
+			String posTag = cascade? values[3]:values[1];
+			String word = values[0];
+			String chunk = npchunk? getNPChunk(rawChunk):rawChunk;
 			Chunk.get(chunk);
-			
-			words.add(new WordToken(values[0], values[1], -1, chunk));
+			words.add(new WordToken(word, posTag, -1, chunk));
 			es.add(chunk);
 		}
 		br.close();
