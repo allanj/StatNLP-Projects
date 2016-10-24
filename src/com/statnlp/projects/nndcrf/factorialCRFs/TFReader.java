@@ -19,7 +19,6 @@ public class TFReader {
 		ArrayList<WordToken> words = new ArrayList<WordToken>();
 		ArrayList<String> es = new ArrayList<String>();
 		while((line = br.readLine())!=null){
-			if(line.startsWith("#")) continue;
 			if(line.equals("")){
 				WordToken[] wordsArr = new WordToken[words.size()];
 				words.toArray(wordsArr);
