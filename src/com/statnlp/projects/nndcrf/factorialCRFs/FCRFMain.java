@@ -25,6 +25,8 @@ public class FCRFMain {
 	public static String nerOut;
 	public static String posOut;
 	public static String neural_config = "config/fcrfneural.config";
+	public static OptimizerFactory optimizer = OptimizerFactory.getLBFGSFactory();
+	public static boolean useJointFeatures = true;
 	
 	public static void main(String[] args) throws IOException, InterruptedException{
 		// TODO Auto-generated method stub
@@ -45,19 +47,19 @@ public class FCRFMain {
 		List<TFInstance> trainInstances = null;
 		List<TFInstance> testInstances = null;
 		/***********DEBUG*****************/
-		trainFile = "data/conll2000/train.txt";
-//		String trainSrcFile = "data/dat/conll1000train.txt";
-		trainNumber = 500;
-		testFile = "data/conll2000/test.txt";;
-//		String testSrcFile = "data/dat/conll1000test.txt";
-		testNumber = 500;
-		numIteration = 100;
-		NetworkConfig.NUM_STRUCTS = 2;
-		NetworkConfig.MF_ROUND = 4;
-	
-
-		OptimizerFactory optimzer = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(0.1);
-		optimzer = OptimizerFactory.getLBFGSFactory();
+//		trainFile = "data/conll2000/train.txt";
+////		String trainSrcFile = "data/dat/conll1000train.txt";
+//		trainNumber = 500;
+//		testFile = "data/conll2000/test.txt";;
+////		String testSrcFile = "data/dat/conll1000test.txt";
+//		testNumber = 500;
+//		numIteration = 100;
+//		NetworkConfig.NUM_STRUCTS = 2;
+//		NetworkConfig.MF_ROUND = 4;
+//	
+//
+//		optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(0.1);
+//		testFile = trainFile;
 		/***************************/
 		
 		System.err.println("[Info] trainingFile: "+trainFile);
@@ -83,6 +85,7 @@ public class FCRFMain {
 		NetworkConfig.NUM_THREADS = numThreads;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		NetworkConfig.BUILD_FEATURES_FROM_LABELED_ONLY = false;
+		NetworkConfig.NUM_STRUCTS = 2;
 		NetworkConfig.INFERENCE = InferenceType.MEAN_FIELD;
 		
 		
@@ -97,7 +100,7 @@ public class FCRFMain {
 		NeuralConfig.NUM_NEURAL_NETS = 2;
 		/****/
 		
-		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam(optimzer));
+		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam(optimizer), useJointFeatures);
 //		GRMMFeatureManager fa = new GRMMFeatureManager(new GlobalNetworkParam(OptimizerFactory.getLBFGSFactory()));
 		TFNetworkCompiler compiler = new TFNetworkCompiler();
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
@@ -147,8 +150,10 @@ public class FCRFMain {
 					case "-thread": numThreads = Integer.valueOf(args[i+1]); break;
 					case "-testFile": testFile = args[i+1]; break;
 					case "-reg": TFConfig.l2val = Double.valueOf(args[i+1]); break;
-					case "-windows":TFConfig.windows = true; break;
-					case "-mfround":NetworkConfig.MF_ROUND = Integer.valueOf(args[i+1]); break;
+					case "-windows":TFConfig.windows = args[i+1].equals("true")? true:false; break;
+					case "-mfround":NetworkConfig.MF_ROUND = Integer.valueOf(args[i+1]);
+									if(NetworkConfig.MF_ROUND==0) useJointFeatures = false;
+									break;
 					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 				}
 			}
