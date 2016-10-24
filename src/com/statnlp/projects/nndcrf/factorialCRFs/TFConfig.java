@@ -15,4 +15,11 @@ public class TFConfig {
 	
 	public static boolean windows = false;
 	
+	public static enum TASK{
+		NER,
+		TAGGING,
+		JOINT;
+	}
+	
+	public static TASK task = TASK.JOINT;
 }

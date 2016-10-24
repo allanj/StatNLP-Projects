@@ -12,6 +12,7 @@ import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
 import com.statnlp.hybridnetworks.NetworkModel;
 import com.statnlp.neural.NeuralConfig;
 import com.statnlp.neural.NeuralConfigReader;
+import com.statnlp.projects.nndcrf.factorialCRFs.TFConfig.TASK;
 
 public class FCRFMain {
 
@@ -27,6 +28,9 @@ public class FCRFMain {
 	public static String neural_config = "config/fcrfneural.config";
 	public static OptimizerFactory optimizer = OptimizerFactory.getLBFGSFactory();
 	public static boolean useJointFeatures = true;
+	public static TASK task = TASK.JOINT;
+	public static boolean IOBESencoding = true;
+	public static boolean npchunking = true;
 	
 	public static void main(String[] args) throws IOException, InterruptedException{
 		// TODO Auto-generated method stub
@@ -47,16 +51,16 @@ public class FCRFMain {
 		List<TFInstance> trainInstances = null;
 		List<TFInstance> testInstances = null;
 		/***********DEBUG*****************/
-		trainFile = "data/conll2000/train.txt";
-////		String trainSrcFile = "data/dat/conll1000train.txt";
-		trainNumber = 500;
-		testFile = "data/conll2000/test.txt";;
-////		String testSrcFile = "data/dat/conll1000test.txt";
-		testNumber = 500;
-		numIteration = 100;
-		NetworkConfig.NUM_STRUCTS = 2;
-		NetworkConfig.MF_ROUND = 2;
-		useJointFeatures = true;
+//		trainFile = "data/conll2000/train.txt";
+//		trainNumber = 100;
+//		testFile = "data/conll2000/test.txt";;
+//		testNumber = 100;
+//		numIteration = 100;
+////		testFile = trainFile;
+//		NetworkConfig.NUM_STRUCTS = 2;
+//		NetworkConfig.MF_ROUND = 2;
+//		useJointFeatures = true;
+//		task = TASK.JOINT;
 //	
 //
 //		optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(0.1);
@@ -67,18 +71,17 @@ public class FCRFMain {
 		System.err.println("[Info] testFile: "+testFile);
 		System.err.println("[Info] nerOut: "+nerOut);
 		System.err.println("[Info] posOut: "+posOut);
+		System.err.println("[Info] task: "+task.toString());
 		
-		trainInstances = TFReader.readCONLLData(trainFile, true, trainNumber);
-		testInstances = TFReader.readCONLLData(testFile, false, testNumber);
+		trainInstances = TFReader.readCONLLData(trainFile, true, trainNumber, npchunking, IOBESencoding, task);
+		testInstances = TFReader.readCONLLData(testFile, false, testNumber, npchunking, false, task);
+		Entity.lock();
+		Tag.lock();
 		
-//		trainInstances = TFReader.readGRMMDataAndWord(trainFile, true, trainNumber, trainSrcFile);
-//		testInstances = TFReader.readGRMMDataAndWord(testFile, false, testNumber, testSrcFile);
 		
 		System.err.println("entity size:"+Entity.ENTS_INDEX.toString());
 		System.err.println("tag size:"+Tag.TAGS.size());
 		System.err.println("tag size:"+Tag.TAGS_INDEX.toString());
-//		Formatter.ner2Text(trainInstances, "data/testRandom2.txt");
-//		System.exit(0);
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
 		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
@@ -87,7 +90,7 @@ public class FCRFMain {
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		NetworkConfig.BUILD_FEATURES_FROM_LABELED_ONLY = false;
 		NetworkConfig.NUM_STRUCTS = 2;
-		NetworkConfig.INFERENCE = InferenceType.MEAN_FIELD;
+		NetworkConfig.INFERENCE = task==TASK.JOINT? InferenceType.MEAN_FIELD:InferenceType.FORWARD_BACKWARD;
 		
 		
 		
@@ -102,8 +105,7 @@ public class FCRFMain {
 		/****/
 		
 		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam(optimizer), useJointFeatures);
-//		GRMMFeatureManager fa = new GRMMFeatureManager(new GlobalNetworkParam(OptimizerFactory.getLBFGSFactory()));
-		TFNetworkCompiler compiler = new TFNetworkCompiler();
+		TFNetworkCompiler compiler = new TFNetworkCompiler(task,IOBESencoding);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		TFInstance[] ecrfs = trainInstances.toArray(new TFInstance[trainInstances.size()]);
 		if(NetworkConfig.USE_NEURAL_FEATURES){
@@ -122,16 +124,18 @@ public class FCRFMain {
 		}else{
 			model.train(ecrfs, numIteration);
 		}
-//		fa.pw.close();
-//		fa.pw = RAWF.writer("data/dat/grmmtest.txt");
-//		for(TFInstance inst: testInstances) inst.setLabeled(); //only for debug purpose
+		
 		Instance[] predictions = model.decode(testInstances.toArray(new TFInstance[testInstances.size()]));
-//		fa.pw.close();
-
-		TFEval.evalNER(predictions, nerOut);
-		TFEval.evalSingleE(predictions);
-		TFEval.evalPOS(predictions, posOut);
-		TFEval.evalSingleJoint(predictions);
+		/**Evaluation part**/
+		if(task == TASK.NER || task == TASK.JOINT){
+			TFEval.evalNER(predictions, nerOut);
+			TFEval.evalSingleE(predictions);
+		}
+		if(task == TASK.TAGGING || task == TASK.JOINT){
+			TFEval.evalPOS(predictions, posOut);
+		}
+		if(task == TASK.JOINT)
+			TFEval.evalSingleJoint(predictions);
 	}
 
 	
@@ -155,6 +159,13 @@ public class FCRFMain {
 					case "-mfround":NetworkConfig.MF_ROUND = Integer.valueOf(args[i+1]);
 									if(NetworkConfig.MF_ROUND==0) useJointFeatures = false;
 									break;
+					case "-task": 
+						if(args[i+1].equals("ner"))  task = TASK.NER;
+						else if (args[i+1].equals("tagging")) task  = TASK.TAGGING;
+						else if (args[i+1].equals("joint"))  task  = TASK.JOINT;
+						else throw new RuntimeException("Unknown task:"+args[i+1]+"?"); break;
+					case "-iobes": 		IOBESencoding = args[i+1].equals("true")? true:false; break;
+					case "-npchunking": npchunking = args[i+1].equals("true")? true:false; break;
 					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 				}
 			}

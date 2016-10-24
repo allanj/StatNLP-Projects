@@ -53,7 +53,6 @@ public class ChunkReader {
 				ChunkInstance inst = new ChunkInstance(index++,1.0,sent);
 				if(IOBES) {
 					encodeIOBES(es);
-					
 				}
 				inst.entities = es;
 				words = new ArrayList<WordToken>();

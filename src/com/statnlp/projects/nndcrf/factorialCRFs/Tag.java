@@ -31,11 +31,14 @@ public class Tag implements Serializable{
 	
 	private static final long serialVersionUID = -5006849791095171763L;
 	
+	private static boolean locked = false;
 	public static final Map<String, Tag> TAGS = new HashMap<String, Tag>();
 	public static final Map<Integer, Tag> TAGS_INDEX = new HashMap<Integer, Tag>();
 	
 	public static Tag get(String form){
 		if(!TAGS.containsKey(form)){
+			if(locked) 
+				throw new RuntimeException("Unknown tag type:"+form);
 			Tag label = new Tag(form, TAGS.size());
 			TAGS.put(form, label);
 			TAGS_INDEX.put(label._id, label);
@@ -43,6 +46,7 @@ public class Tag implements Serializable{
 		return TAGS.get(form);
 	}
 	
+	public static void lock(){locked = true;}
 	public static Tag get(int id){
 		return TAGS_INDEX.get(id);
 	}

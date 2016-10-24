@@ -118,21 +118,16 @@ public class ChunkNetworkCompiler extends NetworkCompiler{
 		for(int i=0;i<_size;i++){
 			long[] currentNodes = new long[Chunk.ChunkLabels.size()];
 			for(int l=0;l<Chunk.ChunkLabels.size();l++){
-//				if(i==0 && Entity.get(l).getForm().startsWith("I-")){ currentNodes[l]=-1; continue;}
 				long node = toNode(i,l);
-				
 				String currEntity = Chunk.get(l).getForm();
 				for(long child: children){
 					if(child==-1) continue;
 					int[] childArr = NetworkIDMapper.toHybridNodeArray(child);
 					String childEntity = Chunk.get(childArr[1]).getForm();
-					
-					
 					if(childEntity.startsWith("I")){
 						if(currEntity.startsWith("I") && !childEntity.substring(1).equals(currEntity.substring(1))) continue;
 						if(currEntity.startsWith("E") && !childEntity.substring(1).equals(currEntity.substring(1))) continue;
 						if(IOBESencoding && (currEntity.startsWith("O") || currEntity.startsWith("B") || currEntity.startsWith("S")  ) ) continue;
-						
 					}else if(childEntity.equals("O")){
 						if(currEntity.startsWith("I") || currEntity.startsWith("E")) continue;
 						
@@ -146,10 +141,8 @@ public class ChunkNetworkCompiler extends NetworkCompiler{
 						
 					}else if(childEntity.startsWith("S")){
 						if(currEntity.startsWith("I") || currEntity.startsWith("E")) continue;
-						
 					}else{
 						throw new RuntimeException("Unknown type "+childEntity+" in network compilation");
-						
 					}
 					
 					if(lcrfNetwork.contains(child)){

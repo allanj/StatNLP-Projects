@@ -95,7 +95,7 @@ public class ChunkFeatureManager extends FeatureManager {
 			featureList.add(this._param_g.toFeature(network, FEATYPE.word_r.name(), currEn,  rw));
 			featureList.add(this._param_g.toFeature(network, FEATYPE.word_rr.name(),currEn,  rrw));
 			
-			/**Simple shape features**/
+			/**Simple caps features**/
 			featureList.add(this._param_g.toFeature(network, FEATYPE.cap.name(), 	currEn,  currCaps));
 			featureList.add(this._param_g.toFeature(network, FEATYPE.cap_l.name(), 	currEn,  lcaps));
 			featureList.add(this._param_g.toFeature(network, FEATYPE.cap_ll.name(), currEn,  llcaps));

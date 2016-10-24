@@ -43,7 +43,11 @@ public class POSMain {
 		
 		
 		/**Debug information**/
-//		testFile = trainPath;
+//		trainPath = "data/conll2000/train.txt";
+//		trainNumber = 100;
+//		testFile = "data/conll2000/test.txt";;
+//		testNumber = 100;
+//		numIteration = 100;
 		/***/
 		
 		

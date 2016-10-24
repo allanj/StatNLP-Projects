@@ -31,18 +31,22 @@ import java.util.Map;
 public class Entity implements Serializable{
 	
 	private static final long serialVersionUID = -5006849791095171763L;
-	
+	private static boolean locked = false;
 	public static final Map<String, Entity> ENTS = new HashMap<String, Entity>();
 	public static final Map<Integer, Entity> ENTS_INDEX = new HashMap<Integer, Entity>();
 	
 	public static Entity get(String form){
 		if(!ENTS.containsKey(form)){
+			if(locked) 
+				throw new RuntimeException("Unknown entity type:"+form);
 			Entity label = new Entity(form, ENTS.size());
 			ENTS.put(form, label);
 			ENTS_INDEX.put(label._id, label);
 		}
 		return ENTS.get(form);
 	}
+	
+	public static void lock(){locked = true;} 
 	
 	public static Entity get(int id){
 		return ENTS_INDEX.get(id);

@@ -19,12 +19,10 @@ public class TFInstance extends Instance {
 	public TFInstance(int instanceId, double weight, Sentence sent) {
 		super(instanceId, weight);
 		this.sentence = sent;
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public int size() {
-		// TODO Auto-generated method stub
 		return this.sentence.length();
 	}
 
@@ -49,19 +47,14 @@ public class TFInstance extends Instance {
 
 	@Override
 	public void removeOutput() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void removePrediction() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public Sentence getInput() {
-		
 		return this.sentence;
 	}
 
@@ -85,7 +78,6 @@ public class TFInstance extends Instance {
 
 	@Override
 	public boolean hasPrediction() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

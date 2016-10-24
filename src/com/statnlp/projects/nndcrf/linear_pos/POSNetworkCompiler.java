@@ -57,7 +57,6 @@ public class POSNetworkCompiler extends NetworkCompiler{
 		
 		long root = toNode_root(lcrfInstance.size());
 		int rootIdx = Arrays.binarySearch(lcrfNetwork.getAllNodes(),root);
-		//System.err.println(rootIdx+" final score:"+network.getMax(rootIdx));
 		for(int i=0;i<lcrfInstance.size();i++){
 			int child_k = lcrfNetwork.getMaxPath(rootIdx)[0];
 			long child = lcrfNetwork.getNode(child_k);
