@@ -47,7 +47,7 @@ public class POSMain {
 //		trainNumber = 100;
 //		testFile = "data/conll2000/test.txt";;
 //		testNumber = 100;
-//		numIteration = 100;
+//		numIteration = 500;
 		/***/
 		
 		

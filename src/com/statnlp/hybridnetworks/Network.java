@@ -325,16 +325,6 @@ public abstract class Network implements Serializable, HyperGraph{
 		return this._max_k_path_listbest[nodeIdx][k];
 	}
 	
-
-	/**
-	 * Calculate insideOutside then the marginal score for all nodes 
-	 */
-	public void marginalize(){
-		this.inside();
-		this.outside();
-		marginal();
-	}
-	
 	/**
 	 * Calculate the marginal score for all nodes 
 	 */
@@ -1071,6 +1061,8 @@ public abstract class Network implements Serializable, HyperGraph{
 		if(fIdx==-1)
 			throw new RuntimeException("The feature idx is -1?");
 		if(src2fIdx2Dst.containsKey(srcNode)){
+			if(this.getInstance().isLabeled() && src2fIdx2Dst.get(srcNode).containsKey(fIdx))
+				throw new RuntimeException("repeated?");
 			src2fIdx2Dst.get(srcNode).put(fIdx, dstNode);
 		}else{
 			HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();

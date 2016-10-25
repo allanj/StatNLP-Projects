@@ -47,11 +47,11 @@ public class ChunkMain {
 		
 		
 		/**Debug information**/
-//		trainPath = "data/conll2000/train.txt";
-//		trainNumber = 100;
-//		testFile = "data/conll2000/test.txt";;
-//		testNumber = 100;
-//		numIteration = 100;
+		trainPath = "data/conll2000/train.txt";
+		trainNumber = 100;
+		testFile = "data/conll2000/test.txt";;
+		testNumber = 100;
+		numIteration = 500;
 		/***/
 		
 		

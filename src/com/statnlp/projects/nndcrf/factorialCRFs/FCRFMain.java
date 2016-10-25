@@ -51,20 +51,16 @@ public class FCRFMain {
 		List<TFInstance> trainInstances = null;
 		List<TFInstance> testInstances = null;
 		/***********DEBUG*****************/
-//		trainFile = "data/conll2000/train.txt";
-//		trainNumber = 100;
-//		testFile = "data/conll2000/test.txt";;
-//		testNumber = 100;
-//		numIteration = 100;
-////		testFile = trainFile;
-//		NetworkConfig.NUM_STRUCTS = 2;
-//		NetworkConfig.MF_ROUND = 2;
-//		useJointFeatures = true;
-//		task = TASK.JOINT;
-//	
-//
-//		optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(0.1);
+		trainFile = "data/conll2000/train.txt";
+		trainNumber = 100;
+		testFile = "data/conll2000/test.txt";;
+		testNumber = 100;
+		numIteration = 500;
 //		testFile = trainFile;
+		NetworkConfig.NUM_STRUCTS = 2;
+		NetworkConfig.MF_ROUND = 4;
+		useJointFeatures = true;
+		task = TASK.JOINT;
 		/***************************/
 		
 		System.err.println("[Info] trainingFile: "+trainFile);
