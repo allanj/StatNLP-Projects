@@ -32,6 +32,7 @@ public class FCRFMain {
 	public static TASK task = TASK.JOINT;
 	public static boolean IOBESencoding = true;
 	public static boolean npchunking = true;
+	public static boolean cascade = false;
 	
 	public static void main(String[] args) throws IOException, InterruptedException{
 		// TODO Auto-generated method stub
@@ -54,13 +55,14 @@ public class FCRFMain {
 		/***********DEBUG*****************/
 //		trainFile = "data/conll2000/train.txt";
 //		trainNumber = 100;
-//		testFile = "data/conll2000/test.txt";;
+//		testFile = "data/conll2000/debug.txt";;
 //		testNumber = 100;
 //		numIteration = 500;
 //		testFile = trainFile;
 //		NetworkConfig.MF_ROUND = 2;
 //		useJointFeatures = true;
-//		task = TASK.JOINT;
+//		task = TASK.TAGGING;
+//		cascade = true;
 //		optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaM(0.001, 0.9, 0.999, 10e-8);
 		/***************************/
 		
@@ -71,7 +73,7 @@ public class FCRFMain {
 		System.err.println("[Info] task: "+task.toString());
 		
 		trainInstances = TFReader.readCONLLData(trainFile, true, trainNumber, npchunking, IOBESencoding, task);
-		testInstances = TFReader.readCONLLData(testFile, false, testNumber, npchunking, false, task);
+		testInstances = TFReader.readCONLLData(testFile, false, testNumber, npchunking, false, task, cascade);
 		Entity.lock();
 		Tag.lock();
 		
@@ -101,7 +103,7 @@ public class FCRFMain {
 		NeuralConfig.NUM_NEURAL_NETS = 2;
 		/****/
 		
-		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam(optimizer), useJointFeatures);
+		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam(optimizer), useJointFeatures, cascade, task);
 		TFNetworkCompiler compiler = new TFNetworkCompiler(task,IOBESencoding);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		TFInstance[] ecrfs = trainInstances.toArray(new TFInstance[trainInstances.size()]);
@@ -173,13 +175,15 @@ public class FCRFMain {
 							i=i+1;
 						}else if(args[i+1].equals("adam")){
 							if(args[i+2].startsWith("-")) {System.err.println("Please specify the learning rate for adam.");System.exit(0);}
+							//default should be 1e-3
 							optimizer = GradientDescentOptimizerFactory.getGradientDescentFactoryUsingAdaM(Double.valueOf(args[i+2]), 0.9, 0.999, 10e-8);
 							i=i+1;
 						}else{
 							System.err.println("No optimizer named: "+args[i+1]+"found..");System.exit(0);
 						}
 						break;
-					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
+					case "-cascade": cascade = args[i+1].equals("true")? true:false; break;
+					default: System.err.println("Invalid arguments "+args[i+1]+", please check usage."); System.exit(0);
 				}
 			}
 			System.err.println("[Info] trainNum: "+trainNumber);

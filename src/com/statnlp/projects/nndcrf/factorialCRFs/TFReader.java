@@ -13,6 +13,11 @@ import com.statnlp.projects.nndcrf.factorialCRFs.TFConfig.TASK;
 public class TFReader {
 	
 	public static List<TFInstance> readCONLLData(String path, boolean setLabel, int number, boolean npchunk, boolean IOBES, TASK task) throws IOException{
+		//By default it's not cascaded
+		return readCONLLData(path, setLabel, number, npchunk, IOBES, task, false);
+	}
+	
+	public static List<TFInstance> readCONLLData(String path, boolean setLabel, int number, boolean npchunk, boolean IOBES, TASK task, boolean cascade) throws IOException{
 		BufferedReader br = RAWF.reader(path);
 		String line = null;
 		List<TFInstance> insts = new ArrayList<TFInstance>();
@@ -41,9 +46,19 @@ public class TFReader {
 			String rawChunk = values[2];
 			String pos = values[1];
 			String word = values[0];
+			
+			if(task==TASK.NER && cascade) {
+				pos = values[2];
+				rawChunk = values[3];
+			}
+			if(task==TASK.TAGGING && cascade) {
+				rawChunk = values[3];
+			}
+			
 			String chunk = npchunk? getNPChunk(rawChunk):rawChunk;
 			if(task==TASK.NER || task==TASK.JOINT) Entity.get(chunk);
 			if(task==TASK.TAGGING || task==TASK.JOINT) Tag.get(pos);
+			
 			
 			words.add(new WordToken(word, pos, -1, chunk));
 			es.add(chunk);
