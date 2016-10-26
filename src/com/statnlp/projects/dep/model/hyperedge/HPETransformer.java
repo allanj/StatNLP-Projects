@@ -13,6 +13,7 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.LabeledScoredTreeNode;
 import edu.stanford.nlp.trees.Tree;
 
+
 public class HPETransformer extends Transformer {
 
 	
@@ -22,89 +23,17 @@ public class HPETransformer extends Transformer {
 	public static String O_TYPE = DPConfig.O_TYPE;
 	public static String E_B_PREFIX = DPConfig.E_B_PREFIX;
 	public static String E_I_PREFIX = DPConfig.E_I_PREFIX;
+	public static String EMPTY = DPConfig.EMPTY; //empty type, means normal data structure.
 	
-	/**
-	 * process the entities which are not covered by incomplete span.
-	 * @param sent
-	 * @param incompletes
-	 * @param sentEntities
-	 */
-	private void processInvalid(Sentence sent, ArrayList<EntitySpan> incompletes, String[][] sentEntities){
-		for(EntitySpan e: incompletes){
-			int left = e.getLeft();
-			int right = e.getRight();
-			//set the inside parts
-			for(int i=left;i<=right;i++){
-				int hIndex = sent.get(i).getHeadIndex();
-				if(hIndex>=left && hIndex<=right){
-					int min = Math.min(i, hIndex);
-					sentEntities[min][1] = e.getEntityType();
-					int max = Math.max(i, hIndex);
-					sentEntities[max][0] = e.getEntityType();
-					for(int k=min+1;k<=max-1;k++){
-						sentEntities[k][0] = e.getEntityType();
-						sentEntities[k][1] = e.getEntityType();
-					}
-				}
-			}
-			//set the part that not covered an arc.
-			for(int i=left;i<=right;i++){
-				if(sentEntities[i][0]!=null && sentEntities[i][1]==null) sentEntities[i][1]=ONE;
-				if(sentEntities[i][1]!=null && sentEntities[i][0]==null) sentEntities[i][0]=ONE;
-				if(sentEntities[i][0]==null && sentEntities[i][1]==null){sentEntities[i][0]=ONE; sentEntities[i][1]=e.getEntityType(); }
-			}
-		}
-	}
-	
-	private String[][] getLeavesInfo(Sentence sent){
-		ArrayList<EntitySpan> incompletes = DataChecker.checkAllIncomplete(sent);
-		String[][] sentEntities = new String[sent.length()][2];
-		sentEntities[0][0] = null;
-		sentEntities[0][1] = ONE;
-		for(int i=1;i<sentEntities.length;i++){
-			String type = sent.get(i).getEntity();
-			if(type.equals(O_TYPE)){
-				sentEntities[i][0] = ONE;
-				sentEntities[i][1] = ONE;
-			}
-		}
-		if(incompletes.size()>0){
-			processInvalid(sent, incompletes, sentEntities);
-		}
-		for(int i=1;i<sentEntities.length;i++){
-			if(sentEntities[i][0]!=null && sentEntities[i][1]!=null) continue;
-			String type = sent.get(i).getEntity();
-			if(type.startsWith(E_B_PREFIX)){
-				sentEntities[i][0] = ONE;
-				sentEntities[i][1] = type.substring(2);
-			}else if(type.startsWith(E_I_PREFIX)){
-				sentEntities[i][0] = type.substring(2);
-				if(i<sentEntities.length-1 && sent.get(i+1).getEntity().startsWith(E_I_PREFIX))
-					sentEntities[i][1] = type.substring(2);
-				else sentEntities[i][1] = ONE;
-			}
-		}
-		return sentEntities;
-	}
 
 	@Override
 	public Tree toSpanTree(Tree dependencyRoot, Sentence sentence){
-		boolean haveEntities = false;
-		String[] sentEntities = new String[sentence.length()];
-		for(int i=0;i<sentEntities.length;i++){
-			String type = sentence.get(i).getEntity();
-			sentEntities[i] = type.equals(O_TYPE)? type: type.substring(2);
-			if(!type.equals(O_TYPE))
-				haveEntities = true;
-		}
 		Tree spanTreeERoot = new LabeledScoredTreeNode();
 		CoreLabel label = new CoreLabel();
-		String type = !haveEntities? ONE:OE;
+		String type = EMPTY; //Because the (tree) root node at top contains the left most (leaf) root node.
 		label.setValue(setSpanInfo(0, sentence.length()-1, 1, 1,type));
 		spanTreeERoot.setLabel(label);
-		String[][] leaves = getLeavesInfo(sentence);
-		constructSpanTree(spanTreeERoot,dependencyRoot);
-		//System.err.println(spanTreeERoot.pennString() );
+		constructSpanTree(spanTreeERoot,dependencyRoot, sentence);
 		return spanTreeERoot;
 	}
 	
@@ -244,9 +173,8 @@ public class HPETransformer extends Transformer {
 			}
 		}else{
 			if(pa_direction==1){
-				//complete and right
+				//parent node is complete and right
 				Tree lastChildWord = currentDependency.lastChild();
-				
 				CoreLabel lastChildWordLabel = (CoreLabel)(lastChildWord.label());
 				int lastChildWordIndex = lastChildWordLabel.sentIndex();
 				Tree copyLastChildWord = lastChildWord.deepCopy();
@@ -363,8 +291,24 @@ public class HPETransformer extends Transformer {
 		}
 	}
 
-	
-	
+	/**
+	 * Judge whether a specific span is an entity.
+	 * @param start
+	 * @param end
+	 * @param sent
+	 * @return
+	 */
+	private boolean isEntity(int start, int end, Sentence sent){
+		if(!sent.get(start).getEntity().startsWith("B"))
+			return false;
+		String subEntity = sent.get(start).getEntity().substring(1);
+		//check if every subEntity is the same
+		for(int i=start;i<=end;i++) if(!sent.get(i).getEntity().substring(1).equals(subEntity)) return false;
+		
+		//check if end+1 still have some thing same
+		if(end<(sent.length()-1))
+			return true;
+	}
 	
 	private String setSpanInfo(int start, int end, int direction, int completeness, String type){
 		return new String(start+","+end+","+direction+","+completeness+","+type);
