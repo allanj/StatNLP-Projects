@@ -3,6 +3,7 @@ package com.statnlp.projects.nndcrf.factorialCRFs;
 import java.io.IOException;
 import java.util.List;
 
+import com.statnlp.commons.ml.opt.GradientDescentOptimizerFactory;
 import com.statnlp.commons.ml.opt.OptimizerFactory;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
@@ -51,16 +52,16 @@ public class FCRFMain {
 		List<TFInstance> trainInstances = null;
 		List<TFInstance> testInstances = null;
 		/***********DEBUG*****************/
-		trainFile = "data/conll2000/train.txt";
-		trainNumber = 100;
-		testFile = "data/conll2000/test.txt";;
-		testNumber = 100;
-		numIteration = 500;
+//		trainFile = "data/conll2000/train.txt";
+//		trainNumber = 100;
+//		testFile = "data/conll2000/test.txt";;
+//		testNumber = 100;
+//		numIteration = 500;
 //		testFile = trainFile;
-		NetworkConfig.NUM_STRUCTS = 2;
-		NetworkConfig.MF_ROUND = 4;
-		useJointFeatures = true;
-		task = TASK.JOINT;
+//		NetworkConfig.MF_ROUND = 2;
+//		useJointFeatures = true;
+//		task = TASK.JOINT;
+//		optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaM(0.001, 0.9, 0.999, 10e-8);
 		/***************************/
 		
 		System.err.println("[Info] trainingFile: "+trainFile);
@@ -162,6 +163,22 @@ public class FCRFMain {
 						else throw new RuntimeException("Unknown task:"+args[i+1]+"?"); break;
 					case "-iobes": 		IOBESencoding = args[i+1].equals("true")? true:false; break;
 					case "-npchunking": npchunking = args[i+1].equals("true")? true:false; break;
+					case "-optim": 
+						if(args[i+1].equals("lbfgs"))
+							optimizer = GradientDescentOptimizerFactory.getLBFGSFactory();
+						else if(args[i+1].equals("adagrad")) {
+							//specify the learning rate also 
+							if(args[i+2].startsWith("-")) {System.err.println("Please specify the learning rate for adagrad.");System.exit(0);}
+							optimizer = GradientDescentOptimizerFactory.getGradientDescentFactoryUsingAdaGrad(Double.valueOf(args[i+2]));
+							i=i+1;
+						}else if(args[i+1].equals("adam")){
+							if(args[i+2].startsWith("-")) {System.err.println("Please specify the learning rate for adam.");System.exit(0);}
+							optimizer = GradientDescentOptimizerFactory.getGradientDescentFactoryUsingAdaM(Double.valueOf(args[i+2]), 0.9, 0.999, 10e-8);
+							i=i+1;
+						}else{
+							System.err.println("No optimizer named: "+args[i+1]+"found..");System.exit(0);
+						}
+						break;
 					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 				}
 			}

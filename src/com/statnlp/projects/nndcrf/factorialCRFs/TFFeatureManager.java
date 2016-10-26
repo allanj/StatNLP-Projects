@@ -199,8 +199,8 @@ public class TFFeatureManager extends FeatureManager {
 					featureList.add(jointFeatureIdx);
 					network.putJointFeature(parent_k, jointFeatureIdx, unlabeledDstNodeIdx);
 				}
-					
 			}
+			
 		}else{
 			//current it's POS structure, need to refer to Entity node
 			nodeType = NODE_TYPES.ENODE.ordinal();
@@ -216,6 +216,7 @@ public class TFFeatureManager extends FeatureManager {
 					network.putJointFeature(parent_k, jointFeatureIdx, unlabeledDstNodeIdx);
 				}
 			}
+			
 		}
 			
 		
