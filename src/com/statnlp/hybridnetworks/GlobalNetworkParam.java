@@ -645,7 +645,7 @@ public class GlobalNetworkParam implements Serializable{
     	} catch(ExceptionWithIflag e){
     		throw new NetworkException("Exception with Iflag:"+e.getMessage());
     	}
-    	if(this._opt.name().contains("LBFGS Optimizer") || this._opt.name().contains("Gradient Descent Optimizer")){
+    	if(this._opt.name().contains("LBFGS Optimizer") || this._opt.name().contains("ADAGRAD")){
 	    	double diff = this.getObj()-this.getObj_old();
 	    	if(diff >= 0 && diff < NetworkConfig.OBJTOL){
 	    		done = true;
