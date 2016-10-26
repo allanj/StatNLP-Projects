@@ -33,6 +33,7 @@ public class FCRFMain {
 	public static boolean IOBESencoding = true;
 	public static boolean npchunking = true;
 	public static boolean cascade = false;
+	public static int windowSize = 5;
 	
 	public static void main(String[] args) throws IOException, InterruptedException{
 		// TODO Auto-generated method stub
@@ -103,7 +104,7 @@ public class FCRFMain {
 		NeuralConfig.NUM_NEURAL_NETS = 2;
 		/****/
 		
-		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam(optimizer), useJointFeatures, cascade, task);
+		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam(optimizer), useJointFeatures, cascade, task, windowSize);
 		TFNetworkCompiler compiler = new TFNetworkCompiler(task,IOBESencoding);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		TFInstance[] ecrfs = trainInstances.toArray(new TFInstance[trainInstances.size()]);
@@ -183,6 +184,7 @@ public class FCRFMain {
 						}
 						break;
 					case "-cascade": cascade = args[i+1].equals("true")? true:false; break;
+					case "-wsize": 	 windowSize = Integer.valueOf(args[i+1]); break; //default: 5. the window size of neural feature.
 					default: System.err.println("Invalid arguments "+args[i+1]+", please check usage."); System.exit(0);
 				}
 			}

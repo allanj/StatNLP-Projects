@@ -19,8 +19,10 @@ public class TFFeatureManager extends FeatureManager {
 	private static final long serialVersionUID = 376931974939202432L;
 
 	private boolean useJointFeatures;
-
+	private String OUT_SEP = NeuralConfig.OUT_SEP; 
 	private String IN_SEP = NeuralConfig.IN_SEP;
+	
+	private int windowSize;
 	private boolean cascade;
 	private TASK task;
 	public enum FEATYPE {
@@ -51,11 +53,12 @@ public class TFFeatureManager extends FeatureManager {
 		};
 	
 		
-	public TFFeatureManager(GlobalNetworkParam param_g, boolean useJointFeatures, boolean cascade, TASK task) {
+	public TFFeatureManager(GlobalNetworkParam param_g, boolean useJointFeatures, boolean cascade, TASK task, int windowSize) {
 		super(param_g);
 		this.useJointFeatures = useJointFeatures; 
 		this.cascade = cascade;
 		this.task = task;
+		this.windowSize = windowSize;
 	}
 
 	@Override
@@ -139,13 +142,27 @@ public class TFFeatureManager extends FeatureManager {
 			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_currWord.name(), 	currEn,  currTag));
 			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_leftWord1.name(),  currEn,  lt));
 			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_leftWord2.name(),  currEn,  llt));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_rightWord1.name(),  currEn,  rt));
+			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_rightWord1.name(), currEn,  rt));
 			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_rightWord2.name(), currEn,  rrt));
 		}
 		
 		if(NetworkConfig.USE_NEURAL_FEATURES){
-			featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), Entity.get(eId).getForm(), lw.toLowerCase()+IN_SEP+
-					currWord.toLowerCase()+IN_SEP+rw.toLowerCase()));
+			if(windowSize == 5)
+				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, llw.toLowerCase()+IN_SEP+
+																						lw.toLowerCase()+IN_SEP+
+																						currWord.toLowerCase()+IN_SEP+
+																						rw.toLowerCase()+IN_SEP+
+																						rrw.toLowerCase()+OUT_SEP+
+																						llcaps+IN_SEP+lcaps+IN_SEP+currCaps+IN_SEP+rcaps+IN_SEP+rrcaps));
+			else if(windowSize == 3)
+				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, lw.toLowerCase()+IN_SEP+
+						currWord.toLowerCase()+IN_SEP+
+						rw.toLowerCase()+OUT_SEP+
+						lcaps+IN_SEP+currCaps+IN_SEP+rcaps));
+			else if(windowSize == 1)
+				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, currWord.toLowerCase()+OUT_SEP+currCaps));
+			
+			else throw new RuntimeException("Unknown window size: "+windowSize);
 		}
 	}
 
@@ -191,8 +208,19 @@ public class TFFeatureManager extends FeatureManager {
 		
 		
 		if(NetworkConfig.USE_NEURAL_FEATURES){
-			featureList.add(this._param_g.toFeature(network, FEATYPE.neural_2.name(), currTag, lw.toLowerCase()+IN_SEP+
-					w.toLowerCase()+IN_SEP+rw.toLowerCase() ));
+			if(windowSize==1)
+				featureList.add(this._param_g.toFeature(network,FEATYPE.neural_2.name(), currTag,  w.toLowerCase()+OUT_SEP+caps));
+			else if(windowSize==3)
+				featureList.add(this._param_g.toFeature(network,FEATYPE.neural_2.name(), currTag,  lw.toLowerCase()+IN_SEP+w.toLowerCase()
+																							+IN_SEP+rw.toLowerCase()+OUT_SEP+
+																							lcaps+IN_SEP+caps+IN_SEP+rcaps));
+			else if(windowSize==5)
+				featureList.add(this._param_g.toFeature(network,FEATYPE.neural_2.name(), currTag,  llw.toLowerCase()+IN_SEP+
+																							lw.toLowerCase()+IN_SEP+w.toLowerCase()
+																							+IN_SEP+rw.toLowerCase()+IN_SEP+
+																							rrw.toLowerCase()+OUT_SEP+
+																							llcaps+IN_SEP+lcaps+IN_SEP+caps+IN_SEP+rcaps+IN_SEP+rrcaps));
+			else throw new RuntimeException("Unknown window size: "+windowSize);
 		}
 	}
 	
