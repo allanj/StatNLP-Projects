@@ -42,13 +42,12 @@ public class FCRFMain {
 		testNumber = 2;
 		numThreads = 5;
 		numIteration = 200;
-		processArgs(args);
-		
 		trainFile = TFConfig.CONLL_train;
 		testFile = TFConfig.CONLL_test;
 		nerOut = TFConfig.nerOut;
 		posOut = TFConfig.posOut;
 		
+		processArgs(args);
 	
 		
 		List<TFInstance> trainInstances = null;
@@ -58,7 +57,7 @@ public class FCRFMain {
 //		trainNumber = 100;
 //		testFile = "data/conll2000/debug.txt";;
 //		testNumber = 100;
-//		numIteration = 500;
+//		numIteration = 500;   
 //		testFile = trainFile;
 //		NetworkConfig.MF_ROUND = 2;
 //		useJointFeatures = true;
@@ -139,11 +138,14 @@ public class FCRFMain {
 	}
 
 	
-	
+	/**
+	 * Process the input argument
+	 * @param args: arguments
+	 */
 	public static void processArgs(String[] args){
 		if(args.length>1 && (args[0].equals("-h") || args[0].equals("help") || args[0].equals("-help") )){
 			System.err.println("Factorial CRFs for Joint NP Chunking and POS tagging ");
-			System.err.println("\t usage: java -jar dpe.jar -trainNum -1 -testNum -1 -thread 5 -iter 100 -pipe true");
+			System.err.println("\t usage: java -jar fcrf.jar -trainNum -1 -testNum -1 -thread 5 -iter 100 -pipe true");
 			System.err.println("\t put numTrainInsts/numTestInsts = -1 if you want to use all the training/testing instances");
 			System.exit(0);
 		}else{
@@ -185,6 +187,8 @@ public class FCRFMain {
 						break;
 					case "-cascade": cascade = args[i+1].equals("true")? true:false; break;
 					case "-wsize": 	 windowSize = Integer.valueOf(args[i+1]); break; //default: 5. the window size of neural feature.
+					case "-nerout":  nerOut = args[i+1]; break; //default: name is output/nerout
+					case "-posout":  posOut = args[i+1]; break; //default: name is output/pos_out;
 					default: System.err.println("Invalid arguments "+args[i+1]+", please check usage."); System.exit(0);
 				}
 			}
@@ -195,4 +199,6 @@ public class FCRFMain {
 			System.err.println("[Info] Regularization Parameter: "+TFConfig.l2val);	
 		}
 	}
+	
+	
 }

@@ -53,6 +53,12 @@ public class TFEval {
 		}
 	}
 	
+	/**
+	 * Evaluation of POS tagging result
+	 * @param testInsts
+	 * @param posOut: the output of the pos file: word, trueTag, predTag, trueChunk
+	 * @throws IOException
+	 */
 	public static void evalPOS(Instance[] testInsts, String posOut) throws IOException{
 		PrintWriter pw = RAWF.writer(posOut);
 		int corr = 0;
@@ -65,7 +71,7 @@ public class TFEval {
 				if(sent.get(i).getTag().equals(tPred.get(i)))
 					corr++;
 				total++;
-				pw.write(sent.get(i).getName()+" "+sent.get(i).getTag()+" "+tPred.get(i)+"\n");
+				pw.write(sent.get(i).getName()+" "+sent.get(i).getTag()+" "+tPred.get(i)+" "+sent.get(i).getEntity()+"\n");
 			}
 			pw.write("\n");
 		}
