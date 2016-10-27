@@ -35,6 +35,7 @@ public class FCRFMain {
 	public static boolean cascade = false;
 	public static int windowSize = 5;
 	
+	
 	public static void main(String[] args) throws IOException, InterruptedException{
 		// TODO Auto-generated method stub
 		
@@ -59,9 +60,9 @@ public class FCRFMain {
 //		testNumber = 100;
 //		numIteration = 500;   
 //		testFile = trainFile;
-//		NetworkConfig.MF_ROUND = 0;
-//		useJointFeatures = false;
-//		task = TASK.TAGGING;
+//		NetworkConfig.MF_ROUND = 3;
+//		useJointFeatures = true;
+//		task = TASK.JOINT;
 //		cascade = true;
 //		testFile = "data/conll2000/NP_chunk_final_prediction.txt";
 //		npchunking = true;
@@ -107,7 +108,16 @@ public class FCRFMain {
 		NeuralConfig.NUM_NEURAL_NETS = 2;
 		/****/
 		
-		TFFeatureManager fa = new TFFeatureManager(new GlobalNetworkParam(optimizer), useJointFeatures, cascade, task, windowSize);
+//		ObjectInputStream in = new ObjectInputStream(new FileInputStream("data/conll2000/weight.param"));
+//		try {
+//			debugWeights =(double[])in.readObject();
+//			in.close();
+//		} catch (ClassNotFoundException e) {
+//			e.printStackTrace();
+//		}
+		
+		GlobalNetworkParam param_g = new GlobalNetworkParam(optimizer);
+		TFFeatureManager fa = new TFFeatureManager(param_g, useJointFeatures, cascade, task, windowSize);
 		TFNetworkCompiler compiler = new TFNetworkCompiler(task,IOBESencoding);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		TFInstance[] ecrfs = trainInstances.toArray(new TFInstance[trainInstances.size()]);
@@ -127,6 +137,10 @@ public class FCRFMain {
 		}else{
 			model.train(ecrfs, numIteration);
 		}
+		
+//		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("data/conll2000/weight.param"));
+//		out.writeObject(param_g.getWeights());
+//		out.close();
 		
 		Instance[] predictions = model.decode(testInstances.toArray(new TFInstance[testInstances.size()]));
 		/**Evaluation part**/
