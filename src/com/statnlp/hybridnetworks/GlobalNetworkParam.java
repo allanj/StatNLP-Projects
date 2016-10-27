@@ -146,6 +146,10 @@ public class GlobalNetworkParam implements Serializable{
 		return this._weights;
 	}
 	
+	public void setWeights(double[] newWeights){
+		this._weights = newWeights;
+	}
+	
 	/**
 	 * Return the current number of features
 	 * @see #countFixedFeatures()
