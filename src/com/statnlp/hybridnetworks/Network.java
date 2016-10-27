@@ -102,7 +102,7 @@ public abstract class Network implements Serializable, HyperGraph{
 	**/
 	protected transient HashMap<Integer, HashMap<Integer, Integer>> src2fIdx2Dst;
 	/** The marginal map used in mean-field inference. To save the marginal score of the unlabeled network.**/
-	protected transient HashMap<Integer, Double> marginalMap = new HashMap<Integer, Double>();
+	protected transient HashMap<Integer, Double> marginalMap;
 	
 	/** The current structure that the network is using*/
 	protected int currentStructure; 
