@@ -187,7 +187,7 @@ public class HPETransformer extends Transformer {
 					if(sentIndex<lastChildWordIndex){
 						idsRemove4Copy.add(i);
 					}else{
-						idsRemove4Last.add(i);
+						idsRemove4Last.add(i);		
 					}
 				}
 				for(int j=idsRemove4Last.size()-1;j>=0;j--) lastChildWord.removeChild(idsRemove4Last.get(j));
@@ -195,19 +195,21 @@ public class HPETransformer extends Transformer {
 				Tree leftChildSubSpan = new LabeledScoredTreeNode();
 				Tree rightChildSubSpan = new LabeledScoredTreeNode();
 				
-				boolean isMixed = false;
-				String leftType = leaves[pa_leftIndex][1];
-				for(int i=pa_leftIndex+1;i<=lastChildWordIndex;i++){
-					for(int dir=0;dir<=1;dir++){
-						if(i==lastChildWordIndex && dir==1) continue;
-						if(!leaves[i][dir].equals(leftType)){isMixed = true; break;}
+				Span leftSpan = new Span(pa_leftIndex, lastChildWordIndex);
+				Span rightSpan = new Span(lastChildWordIndex, pa_rightIndex);
+				CoreLabel leftSpanSubLabel = new CoreLabel();
+				if(isEntity(leftSpan, sent)){
+					currType = sent.get(pa_leftIndex).getEntity().substring(2);
+					leftSpanSubLabel.setValue(this.setSpanInfo(pa_leftIndex, lastChildWordIndex, 1, 2, currType));
+					
+				}else{
+					if(isEntity(rightSpan, sent)){
+						
+					}else{
+						
 					}
 				}
-				leftType = isMixed? OE:leftType;
-				currType = leftType;
 				
-				CoreLabel leftSpanSubLabel = new CoreLabel(); 
-				leftSpanSubLabel.setValue(this.setSpanInfo(pa_leftIndex, lastChildWordIndex, 1, 0, currType));
 				leftChildSubSpan.setLabel(leftSpanSubLabel);
 				
 				
@@ -298,16 +300,22 @@ public class HPETransformer extends Transformer {
 	 * @param sent
 	 * @return
 	 */
-	private boolean isEntity(int start, int end, Sentence sent){
+	private boolean isEntity(Span span, Sentence sent){
+		int start = span.leftIndex;
+		int end = span.rightIndex;
 		if(!sent.get(start).getEntity().startsWith("B"))
 			return false;
 		String subEntity = sent.get(start).getEntity().substring(1);
+		
 		//check if every subEntity is the same
-		for(int i=start;i<=end;i++) if(!sent.get(i).getEntity().substring(1).equals(subEntity)) return false;
+		for(int i=start+1;i<=end;i++) {
+			if(!sent.get(i).getEntity().substring(1).equals(subEntity) || !sent.get(i).getEntity().startsWith("I")) return false;
+		}
 		
 		//check if end+1 still have some thing same
-		if(end<(sent.length()-1))
-			return true;
+		if(end<(sent.length()-1) && sent.get(end+1).getEntity().equals( sent.get(end).getEntity()))
+			return false;
+		return true;
 	}
 	
 	private String setSpanInfo(int start, int end, int direction, int completeness, String type){
