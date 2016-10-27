@@ -55,14 +55,15 @@ public class FCRFMain {
 		/***********DEBUG*****************/
 //		trainFile = "data/conll2000/train.txt";
 //		trainNumber = 100;
-//		testFile = "data/conll2000/debug.txt";;
+//		testFile = "data/conll2000/test.txt";;
 //		testNumber = 100;
 //		numIteration = 500;   
 //		testFile = trainFile;
-//		NetworkConfig.MF_ROUND = 2;
-//		useJointFeatures = true;
+//		NetworkConfig.MF_ROUND = 0;
+//		useJointFeatures = false;
 //		task = TASK.TAGGING;
 //		cascade = true;
+//		testFile = "data/conll2000/output/POS_final_prediction.txt";
 //		optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaM(0.001, 0.9, 0.999, 10e-8);
 		/***************************/
 		

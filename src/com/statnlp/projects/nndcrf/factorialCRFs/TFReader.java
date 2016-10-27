@@ -55,7 +55,12 @@ public class TFReader {
 				rawChunk = values[3];
 			}
 			
-			String chunk = npchunk? getNPChunk(rawChunk):rawChunk;
+			String chunk = null;
+			if(task==TASK.TAGGING){
+				chunk = rawChunk;
+			}else if(task==TASK.NER || task==TASK.JOINT ){
+				chunk = npchunk? getNPChunk(rawChunk):rawChunk;
+			}
 			if(task==TASK.NER || task==TASK.JOINT) Entity.get(chunk);
 			if(task==TASK.TAGGING || task==TASK.JOINT) Tag.get(pos);
 			
