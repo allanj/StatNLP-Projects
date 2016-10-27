@@ -63,7 +63,9 @@ public class FCRFMain {
 //		useJointFeatures = false;
 //		task = TASK.TAGGING;
 //		cascade = true;
-//		testFile = "data/conll2000/output/POS_final_prediction.txt";
+//		testFile = "data/conll2000/NP_chunk_final_prediction.txt";
+//		npchunking = true;
+//		testFile = "data/conll2000/POS_final_prediction.txt";
 //		optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaM(0.001, 0.9, 0.999, 10e-8);
 		/***************************/
 		
@@ -74,7 +76,8 @@ public class FCRFMain {
 		System.err.println("[Info] task: "+task.toString());
 		
 		trainInstances = TFReader.readCONLLData(trainFile, true, trainNumber, npchunking, IOBESencoding, task);
-		testInstances = TFReader.readCONLLData(testFile, false, testNumber, npchunking, false, task, cascade);
+		boolean iobesOnTest = task==TASK.TAGGING && cascade? true:false;
+		testInstances = TFReader.readCONLLData(testFile, false, testNumber, npchunking, iobesOnTest, task, cascade);
 		Entity.lock();
 		Tag.lock();
 		

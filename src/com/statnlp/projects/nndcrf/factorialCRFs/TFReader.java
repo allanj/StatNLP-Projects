@@ -57,7 +57,7 @@ public class TFReader {
 			
 			String chunk = null;
 			if(task==TASK.TAGGING){
-				chunk = rawChunk;
+				chunk = npchunk? getNPChunk(rawChunk):rawChunk;
 			}else if(task==TASK.NER || task==TASK.JOINT ){
 				chunk = npchunk? getNPChunk(rawChunk):rawChunk;
 			}
@@ -84,8 +84,8 @@ public class TFReader {
 	private static String getNPChunk(String rawChunk){
 		String chunk = null;
 		if(rawChunk.equals("B-NP") || rawChunk.equals("I-NP") || rawChunk.equals("O")){
-			if(rawChunk.startsWith("B-")) chunk = "B";
-			else if(rawChunk.startsWith("I-")) chunk = "I";
+			if(rawChunk.startsWith("B-")) chunk = "B-NP";
+			else if(rawChunk.startsWith("I-")) chunk = "I-NP";
 			else chunk = rawChunk;
 		}else chunk = "O";
 		return chunk;

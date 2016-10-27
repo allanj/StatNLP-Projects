@@ -134,16 +134,8 @@ public class TFFeatureManager extends FeatureManager {
 		featureList.add(this._param_g.toFeature(network, FEATYPE.entity_cap_rr.name(),	currEn,  rrcaps));
 		
 		if(task == TASK.NER && cascade){
-			String llt = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getTag();
-			String lt = pos>0? sent.get(pos-1).getTag():"<PAD>";
-			String rt = pos<sent.length()-1? sent.get(pos+1).getTag():"<PAD>";
-			String rrt = pos==sent.length()-1? "<PAD>": pos==sent.length()-2? "<PAD>":sent.get(pos+2).getTag();
 			String currTag = sent.get(pos).getTag();
 			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_currWord.name(), 	currEn,  currTag));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_leftWord1.name(),  currEn,  lt));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_leftWord2.name(),  currEn,  llt));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_rightWord1.name(), currEn,  rt));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_rightWord2.name(), currEn,  rrt));
 		}
 		
 		if(NetworkConfig.USE_NEURAL_FEATURES){
@@ -194,16 +186,8 @@ public class TFFeatureManager extends FeatureManager {
 		featureList.add(this._param_g.toFeature(network, FEATYPE.tag_cap_rr.name(),	currTag,  rrcaps));
 		
 		if(task == TASK.TAGGING && cascade){
-			String lchunk = pos>0? sent.get(pos-1).getEntity():"<PAD>";
-			String llchunk = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getEntity();
-			String rchunk = pos<sent.length()-1? sent.get(pos+1).getEntity():"<PAD>";
-			String rrchunk = pos==sent.length()? "<PAD>":pos==sent.length()-1? "<PAD>": pos==sent.length()-2? "<PAD>":sent.get(pos+2).getEntity();
 			String chunk = pos==sent.length()? "<PAD>":sent.get(pos).getEntity();
 			featureList.add(this._param_g.toFeature(network, FEATYPE.entity_currWord.name(),	currTag,  chunk));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.entity_leftWord1.name(),   currTag,  lchunk));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.entity_leftWord2.name(), 	currTag,  llchunk));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.entity_rightWord1.name(),  currTag,  rchunk));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.entity_rightWord2.name(), 	currTag,  rrchunk));
 		}
 		
 		
