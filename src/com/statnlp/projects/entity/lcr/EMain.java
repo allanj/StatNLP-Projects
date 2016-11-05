@@ -2,7 +2,6 @@ package com.statnlp.projects.entity.lcr;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -30,7 +29,6 @@ public class EMain {
 	public static String topKNEROut;
 	public static String nerRes;
 	public static boolean isDev = false;
-	public static String[] selectedEntities = {"person","organization","gpe","MISC"};
 	public static HashSet<String> dataTypeSet;
 	public static boolean topkinput = false;
 	public static String MODEL = "crf";
@@ -44,7 +42,6 @@ public class EMain {
 	
 	
 	public static void main(String[] args) throws IOException, InterruptedException{
-		// TODO Auto-generated method stub
 		
 		trainNumber = 80;
 		testNumber = 2;
@@ -202,7 +199,6 @@ public class EMain {
 					case "-iter": numIteration = Integer.valueOf(args[i+1]); break;
 					case "-thread": numThreads = Integer.valueOf(args[i+1]); break;
 					case "-pipe": isPipe = args[i+1].equals("true")?true:false; break;
-					case "-ent": selectedEntities = args[i+1].split(","); break;
 					case "-testFile": testFile = args[i+1]; break;
 					case "-reg": DPConfig.L2 = Double.valueOf(args[i+1]); break;
 					case "-dev":isDev = args[i+1].equals("true")?true:false; break;
@@ -240,7 +236,6 @@ public class EMain {
 			System.err.println("[Info] numThreads: "+numThreads);
 			System.err.println("[Info] is Pipeline: "+isPipe);
 			System.err.println("[Info] Using development set??: "+isDev);
-			System.err.println("[Info] Selected Entities: "+Arrays.toString(selectedEntities));
 			System.err.println("[Info] Data type: "+DPConfig.dataType);
 			System.err.println("[Info] Regularization Parameter: "+DPConfig.L2);
 			if(isPipe){
