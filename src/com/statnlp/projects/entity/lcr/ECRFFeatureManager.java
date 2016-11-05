@@ -94,20 +94,11 @@ public class ECRFFeatureManager extends FeatureManager {
 		/** Features adapted from Jenny Rose Finkel et.al 2009. (Order follows the table)**/
 		featureList.add(this._param_g.toFeature(network,FEATYPE.word.name(), 		currEn,	currWord));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.prev_word.name(), 	currEn,	lw));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ERW",	currEn+":"+rw));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.tag.name(), 		currEn,	currTag));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.prev_tag.name(), 	currEn,	lt));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ERT",	currEn+":"+rt));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.shape.name(), 		currEn,	currShape));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.prev_shape.name(), 	currEn,	ls));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ERS",	currEn+":"+rs));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELT-T",	currEn+":"+lt+","+currTag));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELS-S",	currEn+":"+ls+","+currShape));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ES-RS",	currEn+":"+currShape+","+rs));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ELW-S",	currEn+":"+lw+","+currShape));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "ES-RW",	currEn+":"+currShape+","+rw));
-		/** 5-word window features **/
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.local.name(), "E-5-word",	currEn+":"+llw+","+lw+","+currWord+","+rw+","+rrw));
+		
 		/****Add some prefix features******/
 		for(int plen = 1;plen<=prefixLength;plen++){
 			if(currWord.length()>=plen){
@@ -120,19 +111,6 @@ public class ECRFFeatureManager extends FeatureManager {
 		/*********Pairwise features********/
 		featureList.add(this._param_g.toFeature(network,FEATYPE.transition.name(), currEn,	prevEntity));
 		
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currW-prevE-currE",	currWord+":"+prevEntity+":"+currEn));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevW-prevE-currE",	lw+":"+prevEntity+":"+currEn));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextW-prevE-currE",	rw+":"+prevEntity+":"+currEn));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "currT-prevE-currE",	currTag+":"+prevEntity+":"+currEn));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-prevE-currE",	lt+":"+prevEntity+":"+currEn));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "nextT-prevE-currE",	rt+":"+prevEntity+":"+currEn));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "prevT-currT-prevE-currE",lt+":"+currTag+":"+prevEntity+":"+currEn));	
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "S-LE-E",		currShape+":"+prevEntity+":"+currEn));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "LS-LE-E",		ls+":"+prevEntity+":"+currEn));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "RS-LE-E",		rs+":"+prevEntity+":"+currEn));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "LS-S-LE-E",		ls+":"+currShape+":"+prevEntity+":"+currEn));
-//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity.name(), "LS-RS-LE-E",	ls+":"+rs+":"+prevEntity+":"+currEn));
-		/** (END) Features adapted from Jenny Rose Finkel et.al 2009 **/
 		
 		
 //		if(true){
