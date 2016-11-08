@@ -250,7 +250,6 @@ public abstract class NetworkModel implements Serializable{
 								throw new RuntimeException(e);
 							}
 						}
-//						System.out.println("Mean-Field iteration "+(smallIt+1));
 					}
 					for(int threadId=0; threadId<this._numThreads; threadId++) this._learners[threadId].unsetMessagePassing();
 				}

@@ -59,12 +59,13 @@ public class MeanFieldTest extends TestCase {
 		NetworkConfig.BUILD_FEATURES_FROM_LABELED_ONLY = false;
 		NetworkConfig.NUM_STRUCTS = 2;
 		NetworkConfig.INFERENCE = InferenceType.MEAN_FIELD;
-		maxIter = 1;
+		maxIter = 100;
 		System.out.println(Entity.ENTS_INDEX.toString());
 		System.out.println(Tag.TAGS_INDEX.toString());
 	}
 	
 	public void testMeanField() throws InterruptedException{
+		NetworkConfig.MF_ROUND = 3;
 		GlobalNetworkParam param_g = new GlobalNetworkParam();
 		TFFeatureManager fa = new TFFeatureManager(param_g, true, false, TASK.JOINT, 3);
 		TFNetworkCompiler compiler = new TFNetworkCompiler(TASK.JOINT, false);

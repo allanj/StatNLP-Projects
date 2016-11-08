@@ -60,14 +60,14 @@ public class FCRFMain {
 //		testNumber = 100;
 //		numIteration = 500;   
 //		testFile = trainFile;
-//		NetworkConfig.MF_ROUND = 3;
+//		NetworkConfig.MF_ROUND = 4;
 //		useJointFeatures = true;
 //		task = TASK.JOINT;
 //		cascade = true;
 //		testFile = "data/conll2000/NP_chunk_final_prediction.txt";
 //		npchunking = true;
 //		testFile = "data/conll2000/POS_final_prediction.txt";
-//		optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaM(0.001, 0.9, 0.999, 10e-8);
+//		optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaM(0.01, 0.9, 0.999, 10e-8);
 		/***************************/
 		
 		System.err.println("[Info] trainingFile: "+trainFile);
@@ -207,7 +207,7 @@ public class FCRFMain {
 					case "-wsize": 	 windowSize = Integer.valueOf(args[i+1]); break; //default: 5. the window size of neural feature.
 					case "-nerout":  nerOut = args[i+1]; break; //default: name is output/nerout
 					case "-posout":  posOut = args[i+1]; break; //default: name is output/pos_out;
-					default: System.err.println("Invalid arguments "+args[i+1]+", please check usage."); System.exit(0);
+					default: System.err.println("Invalid arguments :"+args[i]+", please check usage."); System.exit(0);
 				}
 			}
 			System.err.println("[Info] trainNum: "+trainNumber);
