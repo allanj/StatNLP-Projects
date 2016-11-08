@@ -20,6 +20,4 @@ public class TFConfig {
 		TAGGING,
 		JOINT;
 	}
-	
-	public static TASK task = TASK.JOINT;
 }

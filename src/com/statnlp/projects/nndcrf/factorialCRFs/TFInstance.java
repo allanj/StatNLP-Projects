@@ -60,13 +60,11 @@ public class TFInstance extends Instance {
 
 	@Override
 	public ArrayList<String> getOutput() {
-		// TODO Auto-generated method stub
 		return this.entities;
 	}
 
 	@Override
 	public ArrayList<String> getPrediction() {
-		// TODO Auto-generated method stub
 		return this.predictons;
 	}
 
@@ -103,7 +101,9 @@ public class TFInstance extends Instance {
 		this.tagPredictons = tagPredictons;
 	}
 	
-	
+	public void setEntities(ArrayList<String> entities) {
+		this.entities = entities;
+	}
 	
 
 }

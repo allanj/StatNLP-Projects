@@ -196,6 +196,8 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 					if(messagePassing)  network.inference(true);
 					else network.train();
 				}
+				if(!network.getInstance().isLabeled())
+					System.exit(0);
 				//only the unlabeled network needs the marginal map.
 				if(!messagePassing && !network.getInstance().isLabeled()) network.clearMarginalMap();
 			}else network.train();

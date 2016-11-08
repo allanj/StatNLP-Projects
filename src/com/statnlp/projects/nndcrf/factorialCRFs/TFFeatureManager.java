@@ -122,16 +122,16 @@ public class TFFeatureManager extends FeatureManager {
 		String currCaps = capsF(currWord);
 		
 		featureList.add(this._param_g.toFeature(network,FEATYPE.entity_currWord.name(), 	currEn,	currWord));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity_leftWord1.name(), 	currEn,	lw));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity_leftWord2.name(), 	currEn,	llw));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity_rightWord1.name(), 	currEn,	rw));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.entity_rightWord2.name(), 	currEn,	rrw));
-		
-		featureList.add(this._param_g.toFeature(network, FEATYPE.entity_cap.name(), 	currEn,  currCaps));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.entity_cap_l.name(), 	currEn,  lcaps));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.entity_cap_ll.name(), 	currEn,  llcaps));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.entity_cap_r.name(), 	currEn,  rcaps));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.entity_cap_rr.name(),	currEn,  rrcaps));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity_leftWord1.name(), 	currEn,	lw));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity_leftWord2.name(), 	currEn,	llw));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity_rightWord1.name(), 	currEn,	rw));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.entity_rightWord2.name(), 	currEn,	rrw));
+//		
+//		featureList.add(this._param_g.toFeature(network, FEATYPE.entity_cap.name(), 	currEn,  currCaps));
+//		featureList.add(this._param_g.toFeature(network, FEATYPE.entity_cap_l.name(), 	currEn,  lcaps));
+//		featureList.add(this._param_g.toFeature(network, FEATYPE.entity_cap_ll.name(), 	currEn,  llcaps));
+//		featureList.add(this._param_g.toFeature(network, FEATYPE.entity_cap_r.name(), 	currEn,  rcaps));
+//		featureList.add(this._param_g.toFeature(network, FEATYPE.entity_cap_rr.name(),	currEn,  rrcaps));
 		
 		if(task == TASK.NER && cascade){
 			String llt = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getTag();
@@ -182,16 +182,16 @@ public class TFFeatureManager extends FeatureManager {
 		
 		
 		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_currWord.name(), 	currTag,	w));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_leftWord1.name(), 	currTag,	lw));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_leftWord2.name(), 	currTag,	llw));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord1.name(), 	currTag,	rw));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord2.name(), 	currTag,	rrw));
-		
-		featureList.add(this._param_g.toFeature(network, FEATYPE.tag_cap.name(), 	currTag,  caps));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.tag_cap_l.name(), 	currTag,  lcaps));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.tag_cap_ll.name(), currTag,  llcaps));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.tag_cap_r.name(), 	currTag,  rcaps));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.tag_cap_rr.name(),	currTag,  rrcaps));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_leftWord1.name(), 	currTag,	lw));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_leftWord2.name(), 	currTag,	llw));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord1.name(), 	currTag,	rw));
+//		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord2.name(), 	currTag,	rrw));
+//		
+//		featureList.add(this._param_g.toFeature(network, FEATYPE.tag_cap.name(), 	currTag,  caps));
+//		featureList.add(this._param_g.toFeature(network, FEATYPE.tag_cap_l.name(), 	currTag,  lcaps));
+//		featureList.add(this._param_g.toFeature(network, FEATYPE.tag_cap_ll.name(), currTag,  llcaps));
+//		featureList.add(this._param_g.toFeature(network, FEATYPE.tag_cap_r.name(), 	currTag,  rcaps));
+//		featureList.add(this._param_g.toFeature(network, FEATYPE.tag_cap_rr.name(),	currTag,  rrcaps));
 		
 		if(task == TASK.TAGGING && cascade){
 			String lchunk = pos>0? sent.get(pos-1).getEntity():"<PAD>";

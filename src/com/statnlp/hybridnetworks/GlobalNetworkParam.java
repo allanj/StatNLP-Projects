@@ -478,7 +478,7 @@ public class GlobalNetworkParam implements Serializable{
 		Instance inst = network.getInstance();
 		int instId = inst.getInstanceId();
 		boolean isTestInst = instId > 0 && !inst.isLabeled() || !inst.getLabeledInstance().isLabeled();
-		if (isTestInst && !type.startsWith(NetworkConfig.NEURAL_FEATURE_TYPE_PREFIX)) type = DUMP_TYPE;
+		if (NetworkConfig.USE_NEURAL_FEATURES && isTestInst && !type.startsWith(NetworkConfig.NEURAL_FEATURE_TYPE_PREFIX)) type = DUMP_TYPE;
 		
 		if(!featureIntMap.containsKey(type)){
 			featureIntMap.put(type, new HashMap<String, HashMap<String, Integer>>());
@@ -724,13 +724,15 @@ public class GlobalNetworkParam implements Serializable{
 				}
 			}
 		}
-		
-		for(int k = 0; k < this._size; k++) {
-			if(_feature2rep[k][0].equals(DUMP_TYPE)) {
-				this._weights[k] = 0;
-				this._counts[k] = 0;
+		if (NetworkConfig.USE_NEURAL_FEATURES){
+			for(int k = 0; k < this._size; k++) {
+				if(_feature2rep[k][0].equals(DUMP_TYPE)) {
+					this._weights[k] = 0;
+					this._counts[k] = 0;
+				}
 			}
 		}
+		
 		
 		this._obj = 0.0;
 		//for regularization
