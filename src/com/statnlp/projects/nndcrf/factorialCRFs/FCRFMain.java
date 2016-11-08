@@ -1,6 +1,10 @@
 package com.statnlp.projects.nndcrf.factorialCRFs;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 
 import com.statnlp.commons.ml.opt.GradientDescentOptimizerFactory;
@@ -34,6 +38,9 @@ public class FCRFMain {
 	public static boolean npchunking = true;
 	public static boolean cascade = false;
 	public static int windowSize = 5;
+	public static String modelFile = "data/conll2000/model";
+	public static boolean saveModel = false;
+	public static boolean useExistingModel = false;
 	
 	
 	public static void main(String[] args) throws IOException, InterruptedException{
@@ -67,7 +74,7 @@ public class FCRFMain {
 //		testFile = "data/conll2000/NP_chunk_final_prediction.txt";
 //		npchunking = true;
 //		testFile = "data/conll2000/POS_final_prediction.txt";
-//		optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaM(0.01, 0.9, 0.999, 10e-8);
+//		optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaM(0.1, 0.9, 0.999, 10e-8);
 		/***************************/
 		
 		System.err.println("[Info] trainingFile: "+trainFile);
@@ -108,39 +115,49 @@ public class FCRFMain {
 		NeuralConfig.NUM_NEURAL_NETS = 2;
 		/****/
 		
-//		ObjectInputStream in = new ObjectInputStream(new FileInputStream("data/conll2000/weight.param"));
-//		try {
-//			debugWeights =(double[])in.readObject();
-//			in.close();
-//		} catch (ClassNotFoundException e) {
-//			e.printStackTrace();
-//		}
 		
-		GlobalNetworkParam param_g = new GlobalNetworkParam(optimizer);
+		GlobalNetworkParam param_g = null; 
+		if(useExistingModel){
+			ObjectInputStream in = new ObjectInputStream(new FileInputStream(modelFile));
+			try {
+				param_g = (GlobalNetworkParam)in.readObject();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			in.close();
+		}else{
+			param_g = new GlobalNetworkParam(optimizer);
+		}
 		TFFeatureManager fa = new TFFeatureManager(param_g, useJointFeatures, cascade, task, windowSize);
 		TFNetworkCompiler compiler = new TFNetworkCompiler(task,IOBESencoding);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		TFInstance[] ecrfs = trainInstances.toArray(new TFInstance[trainInstances.size()]);
-		if(NetworkConfig.USE_NEURAL_FEATURES){
-			TFInstance[] allInsts = new TFInstance[trainInstances.size()+testInstances.size()];
-			int i = 0;
-	        for(; i<trainInstances.size(); i++) {
-	        	allInsts[i] = trainInstances.get(i);
-	        }
-	        int lastId = allInsts[i-1].getInstanceId();
-	        for(int j = 0; j<testInstances.size(); j++, i++) {
-	        	allInsts[i] = testInstances.get(j);
-	        	allInsts[i].setInstanceId(lastId+j+1);
-	        	allInsts[i].setUnlabeled();
-	        }
-	        model.train(allInsts, trainInstances.size(), numIteration);
-		}else{
-			model.train(ecrfs, numIteration);
+		
+		if(!useExistingModel){
+			if(NetworkConfig.USE_NEURAL_FEATURES){
+				TFInstance[] allInsts = new TFInstance[trainInstances.size()+testInstances.size()];
+				int i = 0;
+		        for(; i<trainInstances.size(); i++) {
+		        	allInsts[i] = trainInstances.get(i);
+		        }
+		        int lastId = allInsts[i-1].getInstanceId();
+		        for(int j = 0; j<testInstances.size(); j++, i++) {
+		        	allInsts[i] = testInstances.get(j);
+		        	allInsts[i].setInstanceId(lastId+j+1);
+		        	allInsts[i].setUnlabeled();
+		        }
+		        model.train(allInsts, trainInstances.size(), numIteration);
+			}else{
+				model.train(ecrfs, numIteration);
+			}
 		}
 		
-//		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("data/conll2000/weight.param"));
-//		out.writeObject(param_g.getWeights());
-//		out.close();
+		if(saveModel){
+			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
+			out.writeObject(param_g);
+			out.close();
+		}
+		
 		
 		Instance[] predictions = model.decode(testInstances.toArray(new TFInstance[testInstances.size()]));
 		/**Evaluation part**/
@@ -207,6 +224,20 @@ public class FCRFMain {
 					case "-wsize": 	 windowSize = Integer.valueOf(args[i+1]); break; //default: 5. the window size of neural feature.
 					case "-nerout":  nerOut = args[i+1]; break; //default: name is output/nerout
 					case "-posout":  posOut = args[i+1]; break; //default: name is output/pos_out;
+					case "-mode": 	if (args[i+1].equals("train")){
+										//train also test the file
+										useExistingModel = false;
+										saveModel = true;
+										modelFile = args[i+2];
+								  	}else if (args[i+1].equals("test")){
+								  		useExistingModel = true;
+										saveModel = false;
+										modelFile = args[i+2];
+								  	}else{
+										System.err.println("Unknown mode: "+args[i+1]+" found..");System.exit(0);
+									}
+									i = i + 1;
+								break;
 					default: System.err.println("Invalid arguments :"+args[i]+", please check usage."); System.exit(0);
 				}
 			}
