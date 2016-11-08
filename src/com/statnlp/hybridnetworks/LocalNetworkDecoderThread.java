@@ -95,6 +95,7 @@ public class LocalNetworkDecoderThread extends Thread{
 					}
 					network.inference(true);
 				}
+				network.renewCurrentMarginalMap();
 			}
 			Instance inst = null;
 			for(int curr=0; curr<NetworkConfig.NUM_STRUCTS; curr++){
