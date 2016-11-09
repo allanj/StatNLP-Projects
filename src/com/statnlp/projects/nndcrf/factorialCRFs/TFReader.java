@@ -118,4 +118,59 @@ public class TFReader {
 			}
 		}
 	}
+
+
+
+	/**
+	 * The method for reading GRMM data.
+	 * @param path
+	 * @param isLabel
+	 * @param number
+	 * @return
+	 * @throws IOException
+	 */
+	public static List<TFInstance> readGRMMData(String path, boolean isLabel, int number) throws IOException{
+		BufferedReader br = RAWF.reader(path);
+		String line = null;
+		int index =1;
+		List<TFInstance> insts = new ArrayList<TFInstance>();
+		ArrayList<WordToken> words = new ArrayList<WordToken>();
+		ArrayList<String> es = new ArrayList<String>();
+		while((line = br.readLine())!=null){
+			if(line.equals("")){
+				WordToken[] wordsArr = new WordToken[words.size()];
+				words.toArray(wordsArr);
+				Sentence sent = new Sentence(wordsArr);
+				TFInstance inst = new TFInstance(index++,1.0,sent);
+				inst.entities = es;
+				words = new ArrayList<WordToken>();
+				es = new ArrayList<String>();
+				if(isLabel) inst.setLabeled(); else inst.setUnlabeled();
+				insts.add(inst);
+				if(number!=-1 && insts.size()==number) break;
+				continue;
+			}
+			String[] vals = line.split(" ");
+			String tag = vals[0];
+			String entity = vals[1];
+			Entity.get(entity);
+			Tag.get(tag);
+			//the feature string.
+			String[] fs = new String[vals.length-3];
+			for(int i=3;i<vals.length;i++){
+				fs[i-3] = vals[i];
+			}
+			//System.err.println(Arrays.toString(fs));
+			WordToken wt = new WordToken("noname", tag, -1, entity);
+			wt.setFS(fs);
+			words.add(wt);
+			es.add(entity);
+		}
+		
+		br.close();
+		List<TFInstance> myInsts = insts;
+		String type = isLabel? "Training":"Testing";
+		System.err.println(type+" instance, total:"+ myInsts.size()+" Instance. ");
+		return myInsts;
+	}
 }

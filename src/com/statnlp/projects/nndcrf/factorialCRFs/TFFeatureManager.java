@@ -48,6 +48,8 @@ public class TFFeatureManager extends FeatureManager {
 		tag_cap_rr, 
 		entity_joint,
 		tag_joint,
+		entity_joint_2,
+		tag_joint_2,
 		neural_1,
 		neural_2
 		};
@@ -91,7 +93,7 @@ public class TFFeatureManager extends FeatureManager {
 		if(nodeArr[1]==NODE_TYPES.TNODE.ordinal()){
 			if(pos!=inst.size() && eId==(Entity.ENTS.size()+Tag.TAGS.size())) return FeatureArray.EMPTY;
 			addPOSFeatures(featureList, network, sent, pos, eId);
-			if(useJointFeatures)
+			if(useJointFeatures && pos != inst.size())
 				addJointFeatures(featureList, network, sent, pos, eId, parent_k, children_k, true);
 		}
 		
@@ -254,8 +256,8 @@ public class TFFeatureManager extends FeatureManager {
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 				if(unlabeledDstNodeIdx>=0){
 					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.entity_joint.name(), currLabel, tag);
-					featureList.add(jointFeatureIdx);
 					network.putJointFeature(parent_k, jointFeatureIdx, unlabeledDstNodeIdx);
+					featureList.add(jointFeatureIdx);
 				}
 			}
 			

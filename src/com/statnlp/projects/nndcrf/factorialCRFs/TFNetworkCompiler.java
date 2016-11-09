@@ -79,56 +79,57 @@ public class TFNetworkCompiler extends NetworkCompiler{
 	 * @param param
 	 * @return
 	 */
-	public TFNetwork compileLabeledInstances(int networkId, TFInstance inst, LocalNetworkParam param){
-		TFNetwork lcrfNetwork = new TFNetwork(networkId, inst,param);
+	public TFNetwork compileLabeledInstances(int networkId, TFInstance inst, LocalNetworkParam param) {
+		TFNetwork lcrfNetwork = new TFNetwork(networkId, inst, param);
 		long leaf = toNode_leaf();
 		lcrfNetwork.addNode(leaf);
 		long root = toNode_root(inst.size());
 		lcrfNetwork.addNode(root);
-		
-		if(task==TASK.NER || task==TASK.JOINT){
-			//NE chain structure
-			long[] e_children = new long[]{leaf};
-			for(int i=0;i<inst.size();i++){
-				//output is actually the entity.
+
+		if (task == TASK.NER || task == TASK.JOINT) {
+			// NE chain structure
+			long[] e_children = new long[] { leaf };
+			for (int i = 0; i < inst.size(); i++) {
+				// output is actually the entity.
 				int entityId = Entity.ENTS.get(inst.getOutput().get(i)).getId();
-				long e_node = toNode_e(i,entityId);
+				long e_node = toNode_e(i, entityId);
 				lcrfNetwork.addNode(e_node);
-				long[] current_e_Nodes = new long[]{e_node};
+				long[] current_e_Nodes = new long[] { e_node };
 				lcrfNetwork.addEdge(e_node, e_children);
 				e_children = current_e_Nodes;
 			}
 			lcrfNetwork.addEdge(root, e_children);
 		}
-		
-		if(task==TASK.TAGGING || task==TASK.JOINT){
-			//tagging chain structure
-			long[] t_children = new long[]{leaf};
-			for(int i=0;i<inst.size();i++){
+
+		if (task == TASK.TAGGING || task == TASK.JOINT) {
+			// tagging chain structure
+			long[] t_children = new long[] { leaf };
+			for (int i = 0; i < inst.size(); i++) {
 				int posId = Tag.TAGS.get(inst.getInput().get(i).getTag()).getId();
-				long tag_node = toNode_t(i,posId);
+				long tag_node = toNode_t(i, posId);
 				lcrfNetwork.addNode(tag_node);
-				long[] current_t_Nodes = new long[]{tag_node};
+				long[] current_t_Nodes = new long[] { tag_node };
 				lcrfNetwork.addEdge(tag_node, t_children);
 				t_children = current_t_Nodes;
 			}
 			lcrfNetwork.addEdge(root, t_children);
 		}
 		lcrfNetwork.finalizeNetwork();
-		
-		if(!genericUnlabeledNetwork.contains(lcrfNetwork)){
+
+		if (!genericUnlabeledNetwork.contains(lcrfNetwork)) {
 			System.err.println("wrong");
 		}
 		return lcrfNetwork;
 	}
 	
 
-	public TFNetwork compileUnlabeledInstances(int networkId, TFInstance inst, LocalNetworkParam param){
-		
+	public TFNetwork compileUnlabeledInstances(int networkId, TFInstance inst, LocalNetworkParam param) {
+
 		long[] allNodes = genericUnlabeledNetwork.getAllNodes();
 		long root = toNode_root(inst.size());
 		int rootIdx = Arrays.binarySearch(allNodes, root);
-		TFNetwork lcrfNetwork = new TFNetwork(networkId, inst,allNodes,genericUnlabeledNetwork.getAllChildren() , param, rootIdx+1);
+		TFNetwork lcrfNetwork = new TFNetwork(networkId, inst, allNodes, genericUnlabeledNetwork.getAllChildren(),
+				param, rootIdx + 1);
 		return lcrfNetwork;
 	}
 	
