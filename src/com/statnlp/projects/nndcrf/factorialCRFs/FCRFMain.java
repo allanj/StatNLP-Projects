@@ -43,7 +43,6 @@ public class FCRFMain {
 	public static boolean saveModel = false;
 	public static boolean useExistingModel = false;
 	
-	
 	public static void main(String[] args) throws IOException, InterruptedException{
 		// TODO Auto-generated method stub
 		
@@ -66,17 +65,20 @@ public class FCRFMain {
 		trainNumber = 100;
 		testFile = "data/conll2000/test.txt";;
 		testNumber = 100;
-		numIteration = 1000;   
+		numIteration = 400;   
 //		testFile = trainFile;
-		NetworkConfig.MF_ROUND = 0;
+		NetworkConfig.MF_ROUND = 4;
 		useJointFeatures = true;
 		task = TASK.JOINT;
-		IOBESencoding = false;
+		IOBESencoding = true;
+		saveModel = false;
+		modelFile = "data/conll2000/model";
+		useExistingModel = false;
 //		cascade = true;
 //		testFile = "data/conll2000/NP_chunk_final_prediction.txt";
 //		npchunking = true;
 //		testFile = "data/conll2000/POS_final_prediction.txt";
-//		optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaM(0.1, 0.9, 0.999, 10e-8);
+//		optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaM(0.0001, 0.9, 0.999, 10e-8);
 		/***************************/
 		
 		System.err.println("[Info] trainingFile: "+trainFile);
@@ -85,12 +87,12 @@ public class FCRFMain {
 		System.err.println("[Info] posOut: "+posOut);
 		System.err.println("[Info] task: "+task.toString());
 		
-//		trainInstances = TFReader.readCONLLData(trainFile, true, trainNumber, npchunking, IOBESencoding, task);
-//		boolean iobesOnTest = task==TASK.TAGGING && cascade? true:false;
-//		testInstances = TFReader.readCONLLData(testFile, false, testNumber, npchunking, iobesOnTest, task, cascade);
+		trainInstances = TFReader.readCONLLData(trainFile, true, trainNumber, npchunking, IOBESencoding, task);
+		boolean iobesOnTest = task==TASK.TAGGING && cascade? true:false;
+		testInstances = TFReader.readCONLLData(testFile, false, testNumber, npchunking, iobesOnTest, task, cascade);
 		
-		trainInstances = TFReader.readGRMMData("data/conll2000/conll2000.train1k.txt", true, -1);
-		testInstances = TFReader.readGRMMData("data/conll2000/conll2000.test1k.txt", false, -1);
+//		trainInstances = TFReader.readGRMMData("data/conll2000/conll2000.train1k.txt", true, -1);
+//		testInstances = TFReader.readGRMMData("data/conll2000/conll2000.test1k.txt", false, -1);
 		
 		
 		Entity.lock();
@@ -135,9 +137,11 @@ public class FCRFMain {
 		}else{
 			param_g = new GlobalNetworkParam(optimizer);
 		}
+		param_g = new GlobalNetworkParam(optimizer);
+		
 		FeatureManager fa = null;
-//		fa = new TFFeatureManager(param_g, useJointFeatures, cascade, task, windowSize);
-		fa = new GRMMFeatureManager(param_g);
+		fa = new TFFeatureManager(param_g, useJointFeatures, cascade, task, windowSize);
+//		fa = new GRMMFeatureManager(param_g);
 		TFNetworkCompiler compiler = new TFNetworkCompiler(task,IOBESencoding);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		TFInstance[] ecrfs = trainInstances.toArray(new TFInstance[trainInstances.size()]);

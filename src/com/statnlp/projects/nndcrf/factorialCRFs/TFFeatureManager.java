@@ -46,10 +46,7 @@ public class TFFeatureManager extends FeatureManager {
 		tag_cap_ll, 
 		tag_cap_r, 
 		tag_cap_rr, 
-		entity_joint,
-		tag_joint,
-		entity_joint_2,
-		tag_joint_2,
+		joint,
 		neural_1,
 		neural_2
 		};
@@ -248,14 +245,14 @@ public class TFFeatureManager extends FeatureManager {
 		if(!paTchildE){
 			//current it's NE structure, need to refer to Tag node.
 			nodeType = NODE_TYPES.TNODE.ordinal();
-			for(int t=0;t<Tag.TAGS_INDEX.size();t++){
-				String tag =  Tag.get(t).getForm();
-				arr = new int[]{pos+1, nodeType, t};
+			for (int t = 0; t < Tag.TAGS_INDEX.size(); t++) {
+				String tag = Tag.get(t).getForm();
+				arr = new int[] { pos + 1, nodeType, t };
 				long unlabeledDstNode = NetworkIDMapper.toHybridNodeID(arr);
-				TFNetwork unlabeledNetwork = (TFNetwork)network.getUnlabeledNetwork();
+				TFNetwork unlabeledNetwork = (TFNetwork) network.getUnlabeledNetwork();
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
-				if(unlabeledDstNodeIdx>=0){
-					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.entity_joint.name(), currLabel, tag);
+				if (unlabeledDstNodeIdx >= 0) {
+					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), currLabel + "&" + tag, "");
 					network.putJointFeature(parent_k, jointFeatureIdx, unlabeledDstNodeIdx);
 					featureList.add(jointFeatureIdx);
 				}
@@ -271,7 +268,7 @@ public class TFFeatureManager extends FeatureManager {
 				TFNetwork unlabeledNetwork = (TFNetwork)network.getUnlabeledNetwork();
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 				if(unlabeledDstNodeIdx>=0){
-					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.tag_joint.name(), currLabel, entity);
+					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), entity + "&" + currLabel, "");
 					featureList.add(jointFeatureIdx);
 					network.putJointFeature(parent_k, jointFeatureIdx, unlabeledDstNodeIdx);
 				}

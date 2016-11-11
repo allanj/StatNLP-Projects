@@ -119,6 +119,20 @@ public class FeatureArray implements Serializable{
 		}
 	}
 	
+	
+	public void update_MF_Version(LocalNetworkParam param, double count, HashMap<Integer, Integer> fIdx2DstNode, HashMap<Integer, Double> marginalMap){
+		if(this == NEGATIVE_INFINITY){
+			return;
+		}
+		
+		int[] fs_local = this.getCurrent();
+		for (int f_local : fs_local) {
+			double featureValue = fIdx2DstNode.containsKey(f_local) ? marginalMap.containsKey(fIdx2DstNode.get(f_local)) ?
+					 												Math.exp(marginalMap.get(fIdx2DstNode.get(f_local))) : 0.0 : 1.0;
+			param.addCount(f_local, featureValue * count);
+		}
+	}
+	
 	/**
 	 * Return the sum of weights of the features in this array
 	 * @param param
@@ -162,7 +176,6 @@ public class FeatureArray implements Serializable{
 		return score;
 	}
 	
-	
 	/**
 	 * Get the marginal score using the marginal score as feature value
 	 * @param param
@@ -188,7 +201,9 @@ public class FeatureArray implements Serializable{
 			if(f!=-1){
 				//note that in training, f is the local feature index.
 				//in testing, f is the global feature index
-				double featureValue = fIdx2DstNode.containsKey(f)? marginalMap.containsKey(fIdx2DstNode.get(f))? Math.exp(marginalMap.get(fIdx2DstNode.get(f))):0.0:1.0;
+				double featureValue = fIdx2DstNode.containsKey(f)? 
+											marginalMap.containsKey(fIdx2DstNode.get(f))? Math.exp(marginalMap.get(fIdx2DstNode.get(f))) : 0.0 
+											: 1.0;
 				_score += param.getWeight(f) * featureValue;
 			}
 		}
