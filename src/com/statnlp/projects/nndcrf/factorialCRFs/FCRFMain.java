@@ -67,8 +67,8 @@ public class FCRFMain {
 		testNumber = 100;
 		numIteration = 1000;   
 //		testFile = trainFile;
-		NetworkConfig.MF_ROUND = 4;
-		useJointFeatures = true;
+		NetworkConfig.MF_ROUND = 0;
+		useJointFeatures = false;
 		task = TASK.JOINT;
 		IOBESencoding = true;
 		saveModel = false;

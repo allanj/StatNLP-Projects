@@ -24,8 +24,12 @@ public class TFNetworkCompiler extends NetworkCompiler{
 	private boolean IOBESencoding; //useless if using tagging task only
 	
 	public TFNetworkCompiler(TASK task, boolean IOBESencoding){
+		this(task, IOBESencoding, 150);
+	}
+	
+	public TFNetworkCompiler(TASK task, boolean IOBESencoding, int maxSize){
 		this.task = task;
-		this._size = 150;
+		this._size = maxSize;
 		this.IOBESencoding = IOBESencoding;
 		NetworkIDMapper.setCapacity(new int[]{1000, 10, 500});
 		this.compileUnlabeledInstancesGeneric();

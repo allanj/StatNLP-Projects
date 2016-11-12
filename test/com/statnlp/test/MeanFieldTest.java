@@ -7,10 +7,9 @@ import com.statnlp.commons.types.WordToken;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
-import com.statnlp.hybridnetworks.NetworkModel;
 import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
+import com.statnlp.hybridnetworks.NetworkModel;
 import com.statnlp.projects.nndcrf.factorialCRFs.Entity;
-import com.statnlp.projects.nndcrf.factorialCRFs.TFConfig;
 import com.statnlp.projects.nndcrf.factorialCRFs.TFConfig.TASK;
 import com.statnlp.projects.nndcrf.factorialCRFs.TFFeatureManager;
 import com.statnlp.projects.nndcrf.factorialCRFs.TFInstance;
@@ -53,7 +52,7 @@ public class MeanFieldTest extends TestCase {
 		//Setup the configuration
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
 		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
-		NetworkConfig.L2_REGULARIZATION_CONSTANT = TFConfig.l2val;
+		NetworkConfig.L2_REGULARIZATION_CONSTANT = 0;
 		NetworkConfig.NUM_THREADS = 8;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		NetworkConfig.BUILD_FEATURES_FROM_LABELED_ONLY = false;
@@ -65,10 +64,10 @@ public class MeanFieldTest extends TestCase {
 	}
 	
 	public void testMeanField() throws InterruptedException{
-		NetworkConfig.MF_ROUND = 3;
+		NetworkConfig.MF_ROUND = 4;
 		GlobalNetworkParam param_g = new GlobalNetworkParam();
-		TFFeatureManager fa = new TFFeatureManager(param_g, true, false, TASK.JOINT, 3);
-		TFNetworkCompiler compiler = new TFNetworkCompiler(TASK.JOINT, false);
+		TFFeatureManager fa = new TFFeatureManager(param_g, true, false, TASK.JOINT, 3, false);
+		TFNetworkCompiler compiler = new TFNetworkCompiler(TASK.JOINT, false, 2);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		model.train(data, maxIter);
 	}
