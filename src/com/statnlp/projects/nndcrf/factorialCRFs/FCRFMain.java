@@ -62,18 +62,19 @@ public class FCRFMain {
 		List<TFInstance> testInstances = null;
 		/***********DEBUG*****************/
 		trainFile = "data/conll2000/train.txt";
-		trainNumber = 1500;
+		trainNumber = 100;
 		testFile = "data/conll2000/test.txt";;
-		testNumber = 500;
+		testNumber = 100;
 		numIteration = 1000;   
 //		testFile = trainFile;
-		NetworkConfig.MF_ROUND = 8;
+		NetworkConfig.MF_ROUND = 4;
 		useJointFeatures = true;
 		task = TASK.JOINT;
-		IOBESencoding = false;
+		IOBESencoding = true;
 		saveModel = false;
 		modelFile = "data/conll2000/model";
 		useExistingModel = false;
+		TFConfig.l2val = 0.01;
 //		cascade = true;
 //		testFile = "data/conll2000/NP_chunk_final_prediction.txt";
 //		npchunking = true;
@@ -86,13 +87,13 @@ public class FCRFMain {
 		System.err.println("[Info] nerOut: "+nerOut);
 		System.err.println("[Info] posOut: "+posOut);
 		System.err.println("[Info] task: "+task.toString());
+
+		trainInstances = TFReader.readCONLLData(trainFile, true, trainNumber, npchunking, IOBESencoding, task);
+		boolean iobesOnTest = task == TASK.TAGGING && cascade ? true : false;
+		testInstances = TFReader.readCONLLData(testFile, false, testNumber, npchunking, iobesOnTest, task, cascade);
 		
-//		trainInstances = TFReader.readCONLLData(trainFile, true, trainNumber, npchunking, IOBESencoding, task);
-//		boolean iobesOnTest = task==TASK.TAGGING && cascade? true:false;
-//		testInstances = TFReader.readCONLLData(testFile, false, testNumber, npchunking, iobesOnTest, task, cascade);
-		
-		trainInstances = TFReader.readGRMMData("data/conll2000/conll2000.train1k.txt", true, -1);
-		testInstances = TFReader.readGRMMData("data/conll2000/conll2000.test1k.txt", false, -1);
+//		trainInstances = TFReader.readGRMMData("data/conll2000/conll2000.train1k.txt", true, -1);
+//		testInstances = TFReader.readGRMMData("data/conll2000/conll2000.test1k.txt", false, -1);
 		
 		
 		Entity.lock();
@@ -110,7 +111,7 @@ public class FCRFMain {
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		NetworkConfig.BUILD_FEATURES_FROM_LABELED_ONLY = false;
 		NetworkConfig.NUM_STRUCTS = 2;
-		NetworkConfig.INFERENCE = task==TASK.JOINT? InferenceType.MEAN_FIELD:InferenceType.FORWARD_BACKWARD;
+		NetworkConfig.INFERENCE = task == TASK.JOINT ? InferenceType.MEAN_FIELD : InferenceType.FORWARD_BACKWARD;
 		
 		
 		
@@ -140,9 +141,9 @@ public class FCRFMain {
 		param_g = new GlobalNetworkParam(optimizer);
 		
 		FeatureManager fa = null;
-//		fa = new TFFeatureManager(param_g, useJointFeatures, cascade, task, windowSize);
-		fa = new GRMMFeatureManager(param_g);
-		TFNetworkCompiler compiler = new TFNetworkCompiler(task,IOBESencoding);
+		fa = new TFFeatureManager(param_g, useJointFeatures, cascade, task, windowSize, IOBESencoding);
+//		fa = new GRMMFeatureManager(param_g);
+		TFNetworkCompiler compiler = new TFNetworkCompiler(task, IOBESencoding);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		TFInstance[] ecrfs = trainInstances.toArray(new TFInstance[trainInstances.size()]);
 		

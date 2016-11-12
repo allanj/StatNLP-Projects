@@ -25,6 +25,7 @@ public class TFFeatureManager extends FeatureManager {
 	private int windowSize;
 	private boolean cascade;
 	private TASK task;
+	private boolean iobes;
 	public enum FEATYPE {
 		entity_currWord,
 		entity_leftWord1,
@@ -52,12 +53,13 @@ public class TFFeatureManager extends FeatureManager {
 		};
 	
 		
-	public TFFeatureManager(GlobalNetworkParam param_g, boolean useJointFeatures, boolean cascade, TASK task, int windowSize) {
+	public TFFeatureManager(GlobalNetworkParam param_g, boolean useJointFeatures, boolean cascade, TASK task, int windowSize, boolean iobes) {
 		super(param_g);
 		this.useJointFeatures = useJointFeatures; 
 		this.cascade = cascade;
 		this.task = task;
 		this.windowSize = windowSize;
+		this.iobes = iobes;
 	}
 
 	@Override
@@ -77,18 +79,17 @@ public class TFFeatureManager extends FeatureManager {
 			return FeatureArray.EMPTY;
 		
 		
-		
-		if(nodeArr[1]==NODE_TYPES.ENODE.ordinal()){
+		if (nodeArr[1] == NODE_TYPES.ENODE.ordinal()){
 			if(pos==inst.size() || eId==(Entity.ENTS.size()+Tag.TAGS.size())) return FeatureArray.EMPTY;
 			addEntityFeatures(featureList, network, sent, pos, eId);
 			//false: means it's NE structure
 			if(useJointFeatures)
 				addJointFeatures(featureList, network, sent, pos, eId, parent_k, children_k, false);
-			
-		}
-		
-		if(nodeArr[1]==NODE_TYPES.TNODE.ordinal()){
-			if(pos!=inst.size() && eId==(Entity.ENTS.size()+Tag.TAGS.size())) return FeatureArray.EMPTY;
+																
+		} else if (nodeArr[1] == NODE_TYPES.TNODE.ordinal() ){//|| nodeArr[1] == NODE_TYPES.ROOT.ordinal()){
+															//can uncomment this after debugging, we might need to end features for POS tagging	
+			if (pos!=inst.size() && eId==(Entity.ENTS.size()+Tag.TAGS.size() )) return FeatureArray.EMPTY;
+			if (pos==inst.size() && eId!=(Entity.ENTS.size()+Tag.TAGS.size() )) return FeatureArray.EMPTY;
 			addPOSFeatures(featureList, network, sent, pos, eId);
 			if(useJointFeatures && pos != inst.size())
 				addJointFeatures(featureList, network, sent, pos, eId, parent_k, children_k, true);
@@ -166,7 +167,7 @@ public class TFFeatureManager extends FeatureManager {
 	}
 
 	private void addPOSFeatures(ArrayList<Integer> featureList, Network network, Sentence sent, int pos, int tId){
-		String currTag = Tag.get(tId).getForm();
+		String currTag = pos==sent.length()? "<PAD>":Tag.get(tId).getForm();
 		String lw = pos>0? sent.get(pos-1).getName():"<PAD>";
 		String llw = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getName();
 		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"<PAD>";
@@ -264,11 +265,13 @@ public class TFFeatureManager extends FeatureManager {
 			nodeType = NODE_TYPES.ENODE.ordinal();
 			for(int e=0; e<Entity.ENTS_INDEX.size(); e++){
 				String entity = Entity.get(e).getForm();
+				if (this.iobes && pos == sent.length()-1 && (entity.startsWith("B") || entity.startsWith("I")) ) 
+					continue;
 				arr = new int[]{pos+1, nodeType, e};
 				long unlabeledDstNode = NetworkIDMapper.toHybridNodeID(arr);
 				TFNetwork unlabeledNetwork = (TFNetwork)network.getUnlabeledNetwork();
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
-				if(unlabeledDstNodeIdx>=0){
+				if (unlabeledDstNodeIdx >= 0) {
 					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), entity + "&" + currLabel, "");
 					//System.out.println("Joint Feature Index: " + jointFeatureIdx + " [" + entity + "&" + currLabel + "]");
 					featureList.add(jointFeatureIdx);

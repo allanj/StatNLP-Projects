@@ -161,7 +161,7 @@ public class TFNetworkCompiler extends NetworkCompiler{
 						}else if(childEntity.startsWith("B")){
 							if(currEntity.startsWith("I")  && !childEntity.substring(1).equals(currEntity.substring(1)) ) continue;
 							if(currEntity.startsWith("E")  && !childEntity.substring(1).equals(currEntity.substring(1)) ) continue;
-							if(IOBESencoding && ( currEntity.equals("O") || currEntity.equals("B") || currEntity.equals("S") )  ) continue;
+							if(IOBESencoding && ( currEntity.startsWith("O") || currEntity.startsWith("B") || currEntity.startsWith("S") )  ) continue;
 							
 						}else if(childEntity.startsWith("E")){
 							if(currEntity.startsWith("I") || currEntity.startsWith("E")) continue;
@@ -182,6 +182,10 @@ public class TFNetworkCompiler extends NetworkCompiler{
 				}
 				for(long child:currentNodes){
 					if(child==-1) continue;
+					int[] childArr = NetworkIDMapper.toHybridNodeArray(child);
+					String childEntity = i==0? "O":Entity.ENTS_INDEX.get(childArr[2]).getForm(); //i=0; child is the leaf
+					if (IOBESencoding && childEntity.startsWith("B")) continue;
+					if (IOBESencoding && childEntity.startsWith("I")) continue;
 					lcrfNetwork.addEdge(root, new long[]{child});
 				}
 				children = currentNodes;

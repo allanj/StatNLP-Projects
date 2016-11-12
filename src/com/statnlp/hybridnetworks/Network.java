@@ -405,7 +405,7 @@ public abstract class Network implements Serializable, HyperGraph{
 		for(int k=0; k<this.countNodes(); k++){
 			this.inside(k);
 			//if (!this.getInstance().isLabeled() && k == 2 && this._inside[k] != Double.NEGATIVE_INFINITY)
-			//	System.out.println("inside[" + k + "] = " + this._inside[k]);
+//				System.out.println("inside[" + k + "] = " + Arrays.toString(this.getNodeArray(k)));
 		}
 		if(this.getInside()==Double.NEGATIVE_INFINITY){
 			throw new RuntimeException("Error: network (ID="+_networkId+") has zero inside score");
