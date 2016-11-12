@@ -127,8 +127,7 @@ public class FeatureArray implements Serializable{
 		
 		int[] fs_local = this.getCurrent();
 		for (int f_local : fs_local) {
-			double featureValue = fIdx2DstNode.containsKey(f_local) ? marginalMap.containsKey(fIdx2DstNode.get(f_local)) ?
-					 												Math.exp(marginalMap.get(fIdx2DstNode.get(f_local))) : 0.0 : 1.0;
+			double featureValue = fIdx2DstNode.containsKey(f_local) ? Math.exp(marginalMap.get(fIdx2DstNode.get(f_local))): 1.0;
 			param.addCount(f_local, featureValue * count);
 		}
 	}

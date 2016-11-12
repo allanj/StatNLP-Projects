@@ -15,7 +15,7 @@ public class GRMMFeatureManager extends FeatureManager {
 
 	private static final long serialVersionUID = 376931974939202432L;
 
-	public enum FEATYPE {grmm, entity_joint, tag_joint};
+	public enum FEATYPE {grmm, joint};
 	
 	public GRMMFeatureManager(GlobalNetworkParam param_g) {
 		super(param_g);
@@ -85,7 +85,7 @@ public class GRMMFeatureManager extends FeatureManager {
 				TFNetwork unlabeledNetwork = (TFNetwork)network.getUnlabeledNetwork();
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 				if(unlabeledDstNodeIdx>=0){
-					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.entity_joint.name(), currLabel, tag);
+					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), currLabel + " & " + tag, "");
 					network.putJointFeature(parent_k, jointFeatureIdx, unlabeledDstNodeIdx);
 					featureList.add(jointFeatureIdx);
 				}
@@ -101,7 +101,7 @@ public class GRMMFeatureManager extends FeatureManager {
 				TFNetwork unlabeledNetwork = (TFNetwork)network.getUnlabeledNetwork();
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 				if(unlabeledDstNodeIdx>=0){
-					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.tag_joint.name(), currLabel, entity);
+					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), entity + " & " + currLabel, "");
 					featureList.add(jointFeatureIdx);
 					network.putJointFeature(parent_k, jointFeatureIdx, unlabeledDstNodeIdx);
 				}

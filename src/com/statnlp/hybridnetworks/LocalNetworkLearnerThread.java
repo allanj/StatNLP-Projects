@@ -184,11 +184,13 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 				continue;
 			Network network = this.getNetwork(i);
 			if (NetworkConfig.INFERENCE == InferenceType.MEAN_FIELD) {
+				// only the unlabeled network needs the marginal map.
+				if (!network.getInstance().isLabeled())
+					network.clearMarginalMap();
 				for (int smallIt = 0; smallIt < NetworkConfig.MF_ROUND; smallIt++) {
 					for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
 						for (int other = 0; other < NetworkConfig.NUM_STRUCTS; other++) {
-							if (other == curr)
-								continue;
+							if (other == curr) continue;
 							network.removeKthStructure(other);
 						}
 						network.inference(true);
@@ -207,9 +209,7 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 			}else{
 				network.train();
 			}
-			// only the unlabeled network needs the marginal map.
-			if (!network.getInstance().isLabeled())
-				network.clearMarginalMap();
+			
 		}
 	}
 	

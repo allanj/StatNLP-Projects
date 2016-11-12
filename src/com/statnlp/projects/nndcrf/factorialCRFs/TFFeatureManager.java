@@ -253,6 +253,7 @@ public class TFFeatureManager extends FeatureManager {
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 				if (unlabeledDstNodeIdx >= 0) {
 					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), currLabel + "&" + tag, "");
+					//System.out.println("Joint Feature Index: " + jointFeatureIdx + " [" + currLabel + "&" + tag + "]");
 					network.putJointFeature(parent_k, jointFeatureIdx, unlabeledDstNodeIdx);
 					featureList.add(jointFeatureIdx);
 				}
@@ -269,6 +270,7 @@ public class TFFeatureManager extends FeatureManager {
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 				if(unlabeledDstNodeIdx>=0){
 					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), entity + "&" + currLabel, "");
+					//System.out.println("Joint Feature Index: " + jointFeatureIdx + " [" + entity + "&" + currLabel + "]");
 					featureList.add(jointFeatureIdx);
 					network.putJointFeature(parent_k, jointFeatureIdx, unlabeledDstNodeIdx);
 				}

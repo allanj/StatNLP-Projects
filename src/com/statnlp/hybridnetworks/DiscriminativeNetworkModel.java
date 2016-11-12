@@ -56,15 +56,19 @@ public class DiscriminativeNetworkModel extends NetworkModel {
 		for(threadId = 0; threadId<this._numThreads; threadId++){
 			int size = insts_list.get(threadId).size();
 			insts[threadId] = new Instance[size*2];
+			//put a very small modification here:
+			//insts[threadId][i*2] = inst;
+			//insts[threadId][i*2+1] = inst_new;
+			//now we change to update the unlabeled network first.
 			for(int i = 0; i < size; i++){
 				Instance inst = insts_list.get(threadId).get(i);
-				insts[threadId][i*2] = inst;
+				insts[threadId][i*2+1] = inst;
 				Instance inst_new = inst.duplicate();
 				inst_new.setInstanceId(-inst.getInstanceId());
 				inst_new.setWeight(-inst.getWeight());
 				inst_new.setUnlabeled();
 				inst_new.setLabeledInstance(inst);
-				insts[threadId][i*2+1] = inst_new;
+				insts[threadId][i*2] = inst_new;
 			}
 			System.out.println("Thread "+threadId+" has "+insts[threadId].length+" instances.");
 		}

@@ -62,15 +62,15 @@ public class FCRFMain {
 		List<TFInstance> testInstances = null;
 		/***********DEBUG*****************/
 		trainFile = "data/conll2000/train.txt";
-		trainNumber = 100;
+		trainNumber = 1500;
 		testFile = "data/conll2000/test.txt";;
-		testNumber = 100;
-		numIteration = 400;   
+		testNumber = 500;
+		numIteration = 1000;   
 //		testFile = trainFile;
-		NetworkConfig.MF_ROUND = 4;
+		NetworkConfig.MF_ROUND = 8;
 		useJointFeatures = true;
 		task = TASK.JOINT;
-		IOBESencoding = true;
+		IOBESencoding = false;
 		saveModel = false;
 		modelFile = "data/conll2000/model";
 		useExistingModel = false;
@@ -87,12 +87,12 @@ public class FCRFMain {
 		System.err.println("[Info] posOut: "+posOut);
 		System.err.println("[Info] task: "+task.toString());
 		
-		trainInstances = TFReader.readCONLLData(trainFile, true, trainNumber, npchunking, IOBESencoding, task);
-		boolean iobesOnTest = task==TASK.TAGGING && cascade? true:false;
-		testInstances = TFReader.readCONLLData(testFile, false, testNumber, npchunking, iobesOnTest, task, cascade);
+//		trainInstances = TFReader.readCONLLData(trainFile, true, trainNumber, npchunking, IOBESencoding, task);
+//		boolean iobesOnTest = task==TASK.TAGGING && cascade? true:false;
+//		testInstances = TFReader.readCONLLData(testFile, false, testNumber, npchunking, iobesOnTest, task, cascade);
 		
-//		trainInstances = TFReader.readGRMMData("data/conll2000/conll2000.train1k.txt", true, -1);
-//		testInstances = TFReader.readGRMMData("data/conll2000/conll2000.test1k.txt", false, -1);
+		trainInstances = TFReader.readGRMMData("data/conll2000/conll2000.train1k.txt", true, -1);
+		testInstances = TFReader.readGRMMData("data/conll2000/conll2000.test1k.txt", false, -1);
 		
 		
 		Entity.lock();
@@ -140,8 +140,8 @@ public class FCRFMain {
 		param_g = new GlobalNetworkParam(optimizer);
 		
 		FeatureManager fa = null;
-		fa = new TFFeatureManager(param_g, useJointFeatures, cascade, task, windowSize);
-//		fa = new GRMMFeatureManager(param_g);
+//		fa = new TFFeatureManager(param_g, useJointFeatures, cascade, task, windowSize);
+		fa = new GRMMFeatureManager(param_g);
 		TFNetworkCompiler compiler = new TFNetworkCompiler(task,IOBESencoding);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		TFInstance[] ecrfs = trainInstances.toArray(new TFInstance[trainInstances.size()]);
@@ -161,6 +161,7 @@ public class FCRFMain {
 		        }
 		        model.train(allInsts, trainInstances.size(), numIteration);
 			}else{
+				System.out.println("Training Instance size: " + ecrfs.length);
 				model.train(ecrfs, numIteration);
 			}
 		}
