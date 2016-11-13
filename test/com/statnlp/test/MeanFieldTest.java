@@ -11,6 +11,9 @@ import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
 import com.statnlp.hybridnetworks.NetworkModel;
 import com.statnlp.projects.nndcrf.factorialCRFs.Entity;
 import com.statnlp.projects.nndcrf.factorialCRFs.TFConfig.TASK;
+
+import cern.colt.Arrays;
+
 import com.statnlp.projects.nndcrf.factorialCRFs.TFFeatureManager;
 import com.statnlp.projects.nndcrf.factorialCRFs.TFInstance;
 import com.statnlp.projects.nndcrf.factorialCRFs.TFNetworkCompiler;
@@ -70,6 +73,11 @@ public class MeanFieldTest extends TestCase {
 		TFNetworkCompiler compiler = new TFNetworkCompiler(TASK.JOINT, false, 2);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		model.train(data, maxIter);
+		/**Printing the features**/
+		for (int w = 0; w < fa.getParam_G().getWeights().length; w++){
+			System.out.println(w + "\t" + Arrays.toString(fa.getParam_G().getFeatureRep(w)));
+		}
+		/****/
 	}
 	
 }

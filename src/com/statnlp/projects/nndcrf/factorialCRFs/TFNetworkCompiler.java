@@ -269,14 +269,14 @@ public class TFNetworkCompiler extends NetworkCompiler{
 	}
 	
 	public TFInstance decompilePOS(Network network){
-		TFNetwork lcrfNetwork = (TFNetwork)network;
-		TFInstance lcrfInstance = (TFInstance)lcrfNetwork.getInstance();
+		TFNetwork lcrfNetwork = (TFNetwork) network;
+		TFInstance lcrfInstance = (TFInstance) lcrfNetwork.getInstance();
 		TFInstance result = lcrfInstance.duplicate();
 		ArrayList<String> posPrediction = new ArrayList<String>();
 		long root = toNode_root(lcrfInstance.size());
-		int rootIdx = Arrays.binarySearch(lcrfNetwork.getAllNodes(),root);
-		
-		for(int i=0;i<lcrfInstance.size();i++){
+		int rootIdx = Arrays.binarySearch(lcrfNetwork.getAllNodes(), root);
+
+		for (int i = 0; i < lcrfInstance.size(); i++) {
 			int child_k = lcrfNetwork.getMaxPath(rootIdx)[0];
 			long child = lcrfNetwork.getNode(child_k);
 			rootIdx = child_k;

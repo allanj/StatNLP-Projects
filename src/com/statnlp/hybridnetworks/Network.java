@@ -404,8 +404,6 @@ public abstract class Network implements Serializable, HyperGraph{
 		Arrays.fill(this._inside, 0.0);
 		for(int k=0; k<this.countNodes(); k++){
 			this.inside(k);
-			//if (!this.getInstance().isLabeled() && k == 2 && this._inside[k] != Double.NEGATIVE_INFINITY)
-//				System.out.println("inside[" + k + "] = " + Arrays.toString(this.getNodeArray(k)));
 		}
 		if(this.getInside()==Double.NEGATIVE_INFINITY){
 			throw new RuntimeException("Error: network (ID="+_networkId+") has zero inside score");
@@ -515,7 +513,7 @@ public abstract class Network implements Serializable, HyperGraph{
 				FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
 				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k)?
 			 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this.getUnlabeledNetwork().currentMarginalMap):fa.getScore(this._param);
-				if(NetworkConfig.MODEL_TYPE.USE_COST){
+			 	if(NetworkConfig.MODEL_TYPE.USE_COST){
 					score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
 				}
 				for(int child_k : children_k){
