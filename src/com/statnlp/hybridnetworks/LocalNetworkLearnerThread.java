@@ -189,22 +189,15 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 					network.clearMarginalMap();
 					for (int smallIt = 0; smallIt < NetworkConfig.MF_ROUND; smallIt++) {
 						for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
-							for (int other = 0; other < NetworkConfig.NUM_STRUCTS; other++) {
-								if (other == curr) continue;
-								network.removeKthStructure(other);
-							}
+							network.enableKthStructure(curr);
 							network.inference(true);
 						}
-						if (!network.getInstance().isLabeled())
-							network.renewCurrentMarginalMap();
+						network.renewCurrentMarginalMap();
 					}
 				}
 				//update the network
 				for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
-					for (int other = 0; other < NetworkConfig.NUM_STRUCTS; other++) {
-						if (other == curr) continue;
-						network.removeKthStructure(other);
-					}
+					network.enableKthStructure(curr);
 					network.train();
 				}
 			}else{

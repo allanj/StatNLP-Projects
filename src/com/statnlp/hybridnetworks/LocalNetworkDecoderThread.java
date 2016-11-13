@@ -87,22 +87,16 @@ public class LocalNetworkDecoderThread extends Thread{
 			//initialize the joint feature map and also the marginal score map.
 			network.initJointFeatureMap();
 			network.clearMarginalMap();
-			for(int it=0;it<NetworkConfig.MF_ROUND;it++){
-				for(int curr=0; curr<NetworkConfig.NUM_STRUCTS; curr++){
-					for(int other=0; other<NetworkConfig.NUM_STRUCTS; other++){
-						if(curr==other) continue;
-						network.removeKthStructure(other);
-					}
+			for (int it = 0; it < NetworkConfig.MF_ROUND; it++) {
+				for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
+					network.enableKthStructure(curr);
 					network.inference(true);
 				}
 				network.renewCurrentMarginalMap();
 			}
 			Instance inst = null;
-			for(int curr=0; curr<NetworkConfig.NUM_STRUCTS; curr++){
-				for(int other=0; other<NetworkConfig.NUM_STRUCTS; other++){
-					if(curr==other) continue;
-					network.removeKthStructure(other);
-				}
+			for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
+				network.enableKthStructure(curr);
 				network.max();
 				network.setStructure(curr);
 				inst = this._compiler.decompile(network);

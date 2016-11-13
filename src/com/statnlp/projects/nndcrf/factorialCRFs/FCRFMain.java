@@ -66,9 +66,9 @@ public class FCRFMain {
 		testFile = "data/conll2000/test.txt";;
 		testNumber = 100;
 		numIteration = 1000;   
-//		testFile = trainFile;
-		NetworkConfig.MF_ROUND = 0;
-		useJointFeatures = false;
+		testFile = trainFile;
+		NetworkConfig.MF_ROUND = 3;
+		useJointFeatures = true;
 		task = TASK.JOINT;
 		IOBESencoding = true;
 		saveModel = false;

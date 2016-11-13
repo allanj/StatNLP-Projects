@@ -1041,7 +1041,7 @@ public abstract class Network implements Serializable, HyperGraph{
 	 * Only required when we used the mean-field inference method.
 	 * Need to implemented in user's own network. No need to implement if not using mean-field inference.
 	 */
-	public void removeKthStructure(int kthStructure){}
+	public void enableKthStructure(int kthStructure){}
 	
 	/**
 	 * For mean-field inference, set the current structure in this network  
