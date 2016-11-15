@@ -1,4 +1,0 @@
-Confidence NN B-NP B-NP 
-in IN I-NP B-NP
-the DT B-NP I-NP
-

@@ -1,4 +1,8 @@
 /target/
 .settings/
-
+data/allanprocess/*
+data/conll2000/*
+data/conll2003/*
+data/ontonotes/*
+data/semeval10t1/*
 *.jar
