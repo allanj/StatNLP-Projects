@@ -35,7 +35,7 @@ public class Init {
 			set.add("p25");
 			set.add("pri");
 			set.add("voa");
-		}else if(dataset.equals("semeval10t1")){
+		}else if(dataset.equals("semeval10t1") || dataset.equals("conll2003")){
 			
 		}else
 			throw new RuntimeException("unknow dataset name:"+dataset);

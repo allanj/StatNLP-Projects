@@ -79,7 +79,7 @@ public class SemiCRFMain {
 				case "-reg": l2 = Double.valueOf(args[i+1]);  break;
 				case "-lr": AdaGrad_Learning_Rate = Double.valueOf(args[i+1]); break;
 				case "-adagrad": useAdaGrad = args[i+1].equals("true")? true:false;break;
-				case "-nonmarkov": if(args[i+1].equals("true")) nonMarkov = true; else nonMarkov= false; break;
+				case "-nonmarkov": if(args[i+1].equals("true")) nonMarkov = true; else nonMarkov = false; break;
 				case "-depf": if(args[i+1].equals("true")) depFeature = true; else depFeature= false; break;
 //				case "-useincom": useIncompleteSpan = args[i+1].equals("true")? true:false;break;
 //				case "-usedepnet": useDepNet = args[i+1].equals("true")? true:false;break;
