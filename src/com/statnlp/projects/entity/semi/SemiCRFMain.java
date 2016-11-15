@@ -46,7 +46,7 @@ public class SemiCRFMain {
 	public static String testSuff = "test";
 	public static String train_filename = "data/alldata/nbc/ecrf.train.MISC.txt";
 	public static String test_filename = "data/alldata/nbc/ecrf.test.MISC.txt";
-	public static String extention = "model0";
+	public static String extention = "semi";
 	/** true means using the predicted dependency features.. if not used dep features, this option does not matter**/
 	public static boolean isPipe = false; 
 	public static boolean ignore = false;
@@ -118,8 +118,8 @@ public class SemiCRFMain {
 		String depStruct = isPipe? "pred":"gold";
 		boolean model1 = false;
 		boolean model2 = false;
-		if(extention.equals("model1")) { model1 = true; useDepNet = true; }
-		else if(extention.equals("model2")) {model2 = true; useDepNet = true;}
+		if(extention.equals("dgm-s")) { model1 = true; useDepNet = true; }
+		else if(extention.equals("dgm")) {model2 = true; useDepNet = true;}
 		System.out.println("[Info] Current Model Extention:"+extention);
 		System.out.println("[Info] Cross Validation:"+cross_validation);
 		System.out.println("[Info] Ignore those not fit in "+extention+":"+ignore);
@@ -357,10 +357,10 @@ public class SemiCRFMain {
 				} else {
 					instance.setUnlabeled();
 				}
-				if(isLabeled && ignore && extention.equals("model2") && checkConnected(instance)>0){
+				if(isLabeled && ignore && extention.equals("dgm") && checkConnected(instance)>0){
 					//do nothing. just don't add, ignore those invalid.
 					
-				}else if(isLabeled && ignore && extention.equals("model1") && EntityChecker.checkAllIncomplete(instance.input).size()>0){
+				}else if(isLabeled && ignore && extention.equals("dgm-s") && EntityChecker.checkAllIncomplete(instance.input).size()>0){
 					//do nothing
 				}else{
 					instanceId++;
