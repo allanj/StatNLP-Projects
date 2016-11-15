@@ -50,7 +50,8 @@ public class StanfordRecognizer {
 			for(int i=0;i<sent.length();i++){
 				oneSent[i] = sent.get(i).getName();
 			}
-			List<CoreLabel> rawWords = null;//Sentence.toCoreLabelList(oneSent);
+			List<CoreLabel> rawWords = new ArrayList<CoreLabel>();
+			//TODO: error here. rawWords has nothing inside.
 			rawWords.get(0).setTag("NNP");
 			rawWords.get(1).setTag("VBZ");
 			rawWords.get(2).setTag("NNP");
@@ -100,7 +101,6 @@ public class StanfordRecognizer {
 				words.add(new WordToken(values[1], tag,headIndex));
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.err.println("Total:"+ data.size()+" Instance read by Recognizer. ");

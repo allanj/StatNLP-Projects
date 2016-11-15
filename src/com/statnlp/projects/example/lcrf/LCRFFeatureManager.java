@@ -8,18 +8,18 @@ import com.statnlp.hybridnetworks.NetworkIDMapper;
 
 public class LCRFFeatureManager extends FeatureManager {
 
+	private static final long serialVersionUID = -2130363148516987713L;
+
 	public enum FEATYPE {EMIS,TRAN};
 	
 	public LCRFFeatureManager(GlobalNetworkParam param_g) {
 		super(param_g);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	protected FeatureArray extract_helper(Network network, int parent_k, int[] children_k) {
-		// TODO Auto-generated method stub
 		LCRFInstance lcrfInstance = ((LCRFInstance)network.getInstance());
-		int instanceID = lcrfInstance.getInstanceId();
+		//int instanceID = lcrfInstance.getInstanceId();
 		long node = network.getNode(parent_k);
 		int[] nodeArr = NetworkIDMapper.toHybridNodeArray(node);
 		

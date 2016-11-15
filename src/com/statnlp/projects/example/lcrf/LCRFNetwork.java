@@ -5,6 +5,7 @@ import com.statnlp.hybridnetworks.TableLookupNetwork;
 
 public class LCRFNetwork extends TableLookupNetwork{
 
+	private static final long serialVersionUID = 7324278731748338128L;
 	int _numNodes = -1;
 	
 	public LCRFNetwork(){

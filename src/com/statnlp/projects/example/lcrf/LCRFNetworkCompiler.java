@@ -13,6 +13,11 @@ import com.statnlp.hybridnetworks.NetworkIDMapper;
 
 public class LCRFNetworkCompiler extends NetworkCompiler{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1674061394842216446L;
+
 	public enum NODE_TYPES {LEAF,NODE,ROOT};
 	public List<Label> _labels;
 	public int _size;

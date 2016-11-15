@@ -24,6 +24,7 @@ public class LCRFInstance extends Instance {
 		return this.words.size();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public LCRFInstance duplicate() {
 		LCRFInstance lcrfInstance = new LCRFInstance(this._instanceId, this._weight);

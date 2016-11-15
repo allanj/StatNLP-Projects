@@ -3,7 +3,7 @@ package com.statnlp.projects.entity.semi;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 
-import com.statnlp.projects.entity.lcr2d.E2DNetworkCompiler.NODE_TYPES;
+import com.statnlp.projects.entity.semi.SemiCRFNetworkCompiler.NodeType;
 import com.statnlp.ui.visualize.VisualizationViewerEngine;
 import com.statnlp.ui.visualize.type.VNode;
 import com.statnlp.ui.visualize.type.VisualizeGraph;
@@ -47,7 +47,7 @@ public class SemiViewer extends VisualizationViewerEngine {
 			int[] ids = node.ids;
 			
 			int color_index = -1;
-			if(ids[1]==NODE_TYPES.LEAF.ordinal() || ids[1]==NODE_TYPES.ROOT.ordinal())
+			if(ids[1]==NodeType.LEAF.ordinal() || ids[1]==NodeType.ROOT.ordinal())
 				color_index = 0;
 			else 
 				color_index = 1;
@@ -68,12 +68,12 @@ public class SemiViewer extends VisualizationViewerEngine {
 			
 			double x = pos;
 			double y = tagId;
-			if(ids[1]==NODE_TYPES.LEAF.ordinal()){
+			if(ids[1]==NodeType.LEAF.ordinal()){
 				x-=3;
 				y+=5;
 			}
 			
-			if(ids[1]==NODE_TYPES.ROOT.ordinal()){
+			if(ids[1]==NodeType.ROOT.ordinal()){
 				x+=0.5;
 			}
 				
