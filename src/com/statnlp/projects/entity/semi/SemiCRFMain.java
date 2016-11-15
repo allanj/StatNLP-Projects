@@ -94,6 +94,8 @@ public class SemiCRFMain {
 				case "-dataset": dataset = args[i+1]; break;
 				case "-cv": cross_validation = args[i+1].equals("true")?true:false; 
 							break;//cross validation
+				case "-trainFile": train_filename = args[i+1]; break;
+				case "-testFile": test_filename = args[i+1]; break;
 				default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 			}
 		}
