@@ -8,7 +8,7 @@ This package contains the work implemented using the [**StatNLP**](http://statnl
 
 ### Current projects in this package
 
-- [Dependency-guided Named Entity Recognition](#dgm)
+- [Dependency-guided Named Entity Recognition](#dependency-guided-named-entity-recognition)
   - associated with the paper _Efficient Dependency-Guided Named Entity Recognition_, to be appeared in AAAI 2017
 - Dependency Parsing
 - Named Entity Recognition with Linear-chain CRFs and semi-Markov CRFs.
@@ -25,7 +25,7 @@ To run the code in Eclipse, simply import the project (i.e. pom.xml) into your e
 
 
 
-#### <a name="dgm" />Dependency-guided Named Entity Recognition
+#### Dependency-guided Named Entity Recognition
 
 The model locates in package ```com.statnlp.projects.entity.semi```, you can run the DGM model directly from the ```SemiCRFMain``` class. There are some configuration you may want to set beforehand. 
 
@@ -44,7 +44,7 @@ The model locates in package ```com.statnlp.projects.entity.semi```, you can run
 
 ##### Data
 
-In the paper, we use the Broadcast News portion in the OntoNotes 5.0 dataset. You can access [OntoNotes 5.0](https://catalog.ldc.upenn.edu/LDC2013T19) in LDC to download it. We have the preprocessing code in ```data.preproecess``` to help you preprocess the raw data obtained from LDC. 
+In the paper, we use the Broadcast News portion in the OntoNotes 5.0 dataset. You can access [OntoNotes 5.0](https://catalog.ldc.upenn.edu/LDC2013T19) in LDC to download it. We have the preprocessing code in ```data.preproecess``` to help you preprocess the raw data obtained from LDC. We support the CoNLL-X format if you want to run other datasets.
 
 ##### Features
 
