@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.hybridnetworks.FeatureArray;
+import com.statnlp.hybridnetworks.FeatureBox;
 import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
@@ -17,7 +18,7 @@ public class ECRFFeatureManager extends FeatureManager {
 
 	private static final long serialVersionUID = 376931974939202432L;
 
-	public enum FEATYPE {word,
+	public enum FeaType {word,
 		tag,
 		prev_tag,
 		prev_word,
@@ -29,7 +30,18 @@ public class ECRFFeatureManager extends FeatureManager {
 		head_token,
 		dep_word_label,
 		dep_tag_label,
-		neural};
+		neural
+//		next_word,
+//		word_2_back,
+//		word_2_ahead,
+//		tag_2_back,
+//		tag_2_ahead,
+//		surround_tags,
+//		surround_shapes,
+//		word_n_gram,
+//		left_4,
+//		right_4
+		};
 	protected boolean useDepF; 
 //	private String OUT_SEP = NeuralConfig.OUT_SEP; 
 	private String IN_SEP = NeuralConfig.IN_SEP;
@@ -65,14 +77,18 @@ public class ECRFFeatureManager extends FeatureManager {
 		String lw = pos>0? sent.get(pos-1).getName():"STR";
 		String ls = pos>0? shape(lw):"STR_SHAPE";
 		String lt = pos>0? sent.get(pos-1).getTag():"STR";
-		String llw = pos==0? "STR1": pos==1? "STR":sent.get(pos-2).getName();
-//		String llt = pos==0? "STR1": pos==1? "STR":sent.get(pos-2).getTag();
+		String llw = pos==0? "STR1": pos==1? "STR": sent.get(pos-2).getName();
+		String lllw = pos==0? "STR2": pos==1? "STR1": pos==2? "STR": sent.get(pos-3).getName();
+		String llllw = pos==0? "STR3": pos==1? "STR2": pos==2? "STR1": pos==3? "STR":sent.get(pos-4).getName();
+		String llt = pos==0? "STR1": pos==1? "STR":sent.get(pos-2).getTag();
 		
 		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"END";
-//		String rt = pos<sent.length()-1? sent.get(pos+1).getTag():"END";
+		String rt = pos<sent.length()-1? sent.get(pos+1).getTag():"END";
 //		String rs = pos<sent.length()-1? shape(rw):"END_SHAPE";
 		String rrw = pos==sent.length()-1? "END1": pos==sent.length()-2? "END":sent.get(pos+2).getName();
-//		String rrt = pos==sent.length()-1? "END1": pos==sent.length()-2? "END":sent.get(pos+2).getTag();
+		String rrrw = pos==sent.length()-1? "END2": pos==sent.length()-2? "END1":pos==sent.length()-3? "END": sent.get(pos+3).getName();
+		String rrrrw = pos==sent.length()-1? "END3": pos==sent.length()-2? "END2":pos==sent.length()-3? "END1":pos==sent.length()-4? "END":sent.get(pos+4).getName();
+		String rrt = pos==sent.length()-1? "END1": pos==sent.length()-2? "END":sent.get(pos+2).getTag();
 		
 		String currWord = inst.getInput().get(pos).getName();
 		String currTag = inst.getInput().get(pos).getTag();
@@ -88,28 +104,43 @@ public class ECRFFeatureManager extends FeatureManager {
 		if(NetworkConfig.USE_NEURAL_FEATURES){
 //			featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), currEn, llw+IN_SEP+lw+IN_SEP+currWord+IN_SEP+rw+IN_SEP+rrw+OUT_SEP+
 //																				llt+IN_SEP+lt+IN_SEP+currTag+IN_SEP+rt+IN_SEP+rrt));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), currEn, llw+IN_SEP+lw+IN_SEP+currWord+IN_SEP+rw+IN_SEP+rrw));
+			featureList.add(this._param_g.toFeature(network, FeaType.neural.name(), currEn, llw+IN_SEP+lw+IN_SEP+currWord+IN_SEP+rw+IN_SEP+rrw));
 		}
 		
 		/** Features adapted from Jenny Rose Finkel et.al 2009. (Order follows the table)**/
-		featureList.add(this._param_g.toFeature(network,FEATYPE.word.name(), 		currEn,	currWord));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.prev_word.name(), 	currEn,	lw));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.tag.name(), 		currEn,	currTag));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.prev_tag.name(), 	currEn,	lt));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.shape.name(), 		currEn,	currShape));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.prev_shape.name(), 	currEn,	ls));
+		featureList.add(this._param_g.toFeature(network, FeaType.word.name(), 			currEn,	currWord));
+		featureList.add(this._param_g.toFeature(network, FeaType.prev_word.name(), 		currEn,	lw));
+		featureList.add(this._param_g.toFeature(network, FeaType.tag.name(), 			currEn,	currTag));
+		featureList.add(this._param_g.toFeature(network, FeaType.prev_tag.name(), 		currEn,	lt));
+		featureList.add(this._param_g.toFeature(network, FeaType.shape.name(), 			currEn,	currShape));
+		featureList.add(this._param_g.toFeature(network, FeaType.prev_shape.name(), 	currEn,	ls));
+//		featureList.add(this._param_g.toFeature(network, FeaType.next_word.name(), 		currEn,	rw));
+//		featureList.add(this._param_g.toFeature(network, FeaType.surround_tags.name(), 	currEn,	lt + "-" + rt));
+//		featureList.add(this._param_g.toFeature(network, FeaType.surround_shapes.name(),currEn,	shape(lw) + "-" + shape(rw)));
+		
+		
+		/***Current Word Character n-gram**/
+//		for (int l = 1; l <= currWord.length(); l++) {
+//			for (int s = 0; s <= currWord.length() - l; s++) {
+//				featureList.add(this._param_g.toFeature(network, FeaType.word_n_gram.name() + l, 	currEn,	currWord.substring(s, s+l)));
+//			}
+//		}
+//		featureList.add(this._param_g.toFeature(network, FeaType.left_4.name(), 	currEn,	llllw + " & " + lllw + " & " + llw + " & " + lw));
+//		featureList.add(this._param_g.toFeature(network, FeaType.right_4.name(), currEn,	rw + " & " + rrw + " & " + rrrw + " & " + rrrrw));
+		/****/
+		
 		
 		/****Add some prefix features******/
 		for(int plen = 1;plen<=prefixLength;plen++){
 			if(currWord.length()>=plen){
 				String suff = currWord.substring(currWord.length()-plen, currWord.length());
-				featureList.add(this._param_g.toFeature(network,FEATYPE.suffix.name()+"-"+plen, currEn, suff));
+				featureList.add(this._param_g.toFeature(network, FeaType.suffix.name()+"-"+plen, currEn, suff));
 				String pref = currWord.substring(0,plen);
-				featureList.add(this._param_g.toFeature(network,FEATYPE.prefix.name()+"-"+plen, currEn, pref));
+				featureList.add(this._param_g.toFeature(network, FeaType.prefix.name()+"-"+plen, currEn, pref));
 			}
 		}
 		/*********Pairwise features********/
-		featureList.add(this._param_g.toFeature(network,FEATYPE.transition.name(), currEn,	prevEntity));
+		featureList.add(this._param_g.toFeature(network, FeaType.transition.name(), currEn,	prevEntity));
 		
 		
 		
@@ -122,10 +153,10 @@ public class ECRFFeatureManager extends FeatureManager {
 			String currDepLabel = currHeadIndex>=0? sent.get(currHeadIndex).getDepLabel():"NOLABEL";
 			//This is the features that really help the model: most important features
 			if(currDepLabel==null || currDepLabel.equals("null")) throw new RuntimeException("The depenency label is null?");
-			featureList.add(this._param_g.toFeature(network,FEATYPE.head_word.name(), 		currEn, currWord+"& head:"+currHead));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.head_tag.name(), 		currEn, currTag+"& head:"+currHeadTag)); //the most powerful one
-			featureList.add(this._param_g.toFeature(network,FEATYPE.dep_word_label.name(), 	currEn, currWord+"& head:"+currHead+"& label:"+currDepLabel));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.dep_tag_label.name(), 	currEn, currTag+"& head:"+currHeadTag+"& label:"+currDepLabel));
+			featureList.add(this._param_g.toFeature(network, FeaType.head_word.name(), 		currEn, currWord+"& head:"+currHead));
+			featureList.add(this._param_g.toFeature(network, FeaType.head_tag.name(), 		currEn, currTag+"& head:"+currHeadTag)); //the most powerful one
+			featureList.add(this._param_g.toFeature(network, FeaType.dep_word_label.name(), 	currEn, currWord+"& head:"+currHead+"& label:"+currDepLabel));
+			featureList.add(this._param_g.toFeature(network, FeaType.dep_tag_label.name(), 	currEn, currTag+"& head:"+currHeadTag+"& label:"+currDepLabel));
 			
 		}
 		
@@ -138,7 +169,8 @@ public class ECRFFeatureManager extends FeatureManager {
 		int[] features = new int[finalList.size()];
 		for(int i=0;i<finalList.size();i++) features[i] = finalList.get(i);
 		if(features.length==0) return FeatureArray.EMPTY;
-		fa = new FeatureArray(features);
+//		fa = new FeatureArray(features);
+		fa = new FeatureArray(FeatureBox.getFeatureBox(features, this.getParams_L()[network.getThreadId()]));
 		
 		return fa;
 	}

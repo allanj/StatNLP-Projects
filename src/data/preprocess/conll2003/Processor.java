@@ -128,9 +128,28 @@ public class Processor {
 		output2CoNLLXFormat(sents, outputFile);
 	}
 	
+	public static void outputTextFileOnly(List<Sentence> sents, String outputFile) {
+		PrintWriter pw = null;
+		try {
+			pw = RAWF.writer(outputFile);
+			for (Sentence sent : sents) {
+				for (int p = 0; p < sent.length(); p++) {
+					WordToken wt = sent.get(p);
+					String word = wt.getName();
+					String space = p == 0? "" : " ";
+					pw.print(space + word);
+				}
+				pw.println();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		pw.close();
+	}
+	
 	public static void main(String... args) {
-		processCoNLL2003("data/conll2003/eng.train", "data/conll2003/eng.iob.train");
-		processCoNLL2003("data/conll2003/eng.testa", "data/conll2003/eng.iob.testa");
-		processCoNLL2003("data/conll2003/eng.testb", "data/conll2003/eng.iob.testb");
+		processCoNLL2003("data/conll2003/eng.train", "data/conll2003/eng.train.txt");
+		processCoNLL2003("data/conll2003/eng.testa", "data/conll2003/eng.testa.txt");
+		processCoNLL2003("data/conll2003/eng.testb", "data/conll2003/eng.testb.txt");
 	}
 }
