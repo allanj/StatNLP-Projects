@@ -32,6 +32,7 @@ public class ECRFFeatureManager extends FeatureManager {
 		dep_tag_label,
 		neural
 //		next_word,
+//		next_tag
 //		word_2_back,
 //		word_2_ahead,
 //		tag_2_back,
@@ -115,6 +116,7 @@ public class ECRFFeatureManager extends FeatureManager {
 		featureList.add(this._param_g.toFeature(network, FeaType.shape.name(), 			currEn,	currShape));
 		featureList.add(this._param_g.toFeature(network, FeaType.prev_shape.name(), 	currEn,	ls));
 //		featureList.add(this._param_g.toFeature(network, FeaType.next_word.name(), 		currEn,	rw));
+//		featureList.add(this._param_g.toFeature(network, FeaType.next_tag.name(), 		currEn,	rt));
 //		featureList.add(this._param_g.toFeature(network, FeaType.surround_tags.name(), 	currEn,	lt + "-" + rt));
 //		featureList.add(this._param_g.toFeature(network, FeaType.surround_shapes.name(),currEn,	shape(lw) + "-" + shape(rw)));
 		

@@ -79,7 +79,7 @@ public class DependencyMain {
 		}
 		/****Debug info****/
 //		trainingPath = "data/semeval10t1/small.txt";
-		testFile = "data/semeval10t1/train.conllx";
+		testFile = trainingPath;
 		/****/
 		System.err.println("[Info] DEBUG MODE: "+DPConfig.DEBUG);
 		

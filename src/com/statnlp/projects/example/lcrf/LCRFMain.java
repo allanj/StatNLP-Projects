@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.statnlp.commons.crf.Label;
-import com.statnlp.commons.crf.RAWF;
+import com.statnlp.commons.io.Label;
+import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;

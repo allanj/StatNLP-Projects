@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.statnlp.commons.crf.Label;
+import com.statnlp.commons.io.Label;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;

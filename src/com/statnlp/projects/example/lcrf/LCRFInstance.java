@@ -3,7 +3,7 @@ package com.statnlp.projects.example.lcrf;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.statnlp.commons.crf.Label;
+import com.statnlp.commons.io.Label;
 import com.statnlp.commons.types.Instance;
 
 @SuppressWarnings("serial")

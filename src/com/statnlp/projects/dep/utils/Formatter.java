@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.statnlp.commons.crf.RAWF;
+import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.projects.dep.DependInstance;
 import com.statnlp.projects.entity.lcr.ECRFInstance;

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import com.statnlp.commons.crf.RAWF;
+import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
 import com.statnlp.projects.dep.commons.EntitySpan;

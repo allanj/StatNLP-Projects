@@ -1,4 +1,4 @@
-package com.statnlp.commons.crf;
+package com.statnlp.commons.io;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

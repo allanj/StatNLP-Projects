@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
-import com.statnlp.commons.crf.RAWF;
+import com.statnlp.commons.io.RAWF;
 
 public class MaltParser {
 

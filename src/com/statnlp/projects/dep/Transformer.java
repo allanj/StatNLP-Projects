@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import com.statnlp.commons.crf.RAWF;
+import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.types.Sentence;
 
 import edu.stanford.nlp.ling.CoreLabel;
