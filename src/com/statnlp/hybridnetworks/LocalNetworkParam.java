@@ -20,6 +20,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 //one thread should have one such LocalFeatureMap.
 /**
@@ -63,6 +65,14 @@ public class LocalNetworkParam implements Serializable{
 	
 	//if this is true, then we bypass the local params.
 	protected boolean _globalMode;
+	
+	/**
+	 * For memory-optimized, map an integer array object to a feature array object
+	 * avoid creating duplicate integer array. 
+	 * map<featurebox, index in the {@link #fbList}> {@link #fb2Idx}
+	 * **/
+	protected Map<FeatureBox, Integer> fb2Idx;
+	protected List<FeatureBox> fbList;
 	
 	public LocalNetworkParam(int threadId, FeatureManager fm, int numNetworks){
 		this._threadId = threadId;

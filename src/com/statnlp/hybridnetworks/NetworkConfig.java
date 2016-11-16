@@ -210,4 +210,9 @@ public class NetworkConfig {
 	public static int NUM_STRUCTS = 2;
 	/**Currently only used by Mean-field inference. That's why protected. true if mean-field, false otherwise**/
 	protected static boolean PRE_COMPILE_NETWORKS;
+	
+	/**
+	 * Enable to saving the memory or not
+	 */
+	public static boolean AVOID_DUPLICATE_FEATURES = false;
 }
