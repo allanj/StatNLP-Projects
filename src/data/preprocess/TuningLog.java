@@ -3,7 +3,7 @@ package data.preprocess;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import com.statnlp.commons.crf.RAWF;
+import com.statnlp.commons.io.RAWF;
 
 /**
  * This class is for reading the tuning log to read the best L2 parameter

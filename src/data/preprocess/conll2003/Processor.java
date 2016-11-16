@@ -6,7 +6,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.statnlp.commons.crf.RAWF;
+import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
 
@@ -148,8 +148,8 @@ public class Processor {
 	}
 	
 	public static void main(String... args) {
-		processCoNLL2003("data/conll2003/eng.train", "data/conll2003/eng.train.txt");
-		processCoNLL2003("data/conll2003/eng.testa", "data/conll2003/eng.testa.txt");
-		processCoNLL2003("data/conll2003/eng.testb", "data/conll2003/eng.testb.txt");
+		processCoNLL2003("data/conll2003/eng.train", "data/conll2003/eng.train.iob");
+		processCoNLL2003("data/conll2003/eng.testa", "data/conll2003/eng.testa.iob");
+		processCoNLL2003("data/conll2003/eng.testb", "data/conll2003/eng.testb.iob");
 	}
 }

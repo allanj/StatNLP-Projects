@@ -6,7 +6,7 @@ import java.io.PrintWriter;
 
 import org.maltparser.Malt;
 
-import com.statnlp.commons.crf.RAWF;
+import com.statnlp.commons.io.RAWF;
 
 /**
  * This class uses a malt parser to train and test a dependency models.
