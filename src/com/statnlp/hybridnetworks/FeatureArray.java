@@ -19,13 +19,6 @@ package com.statnlp.hybridnetworks;
 import java.io.Serializable;
 import java.util.HashMap;
 
-/**
- * 
- * FeatureArray Implementation.
- * Remember to modify the toLocal method 
- * if you are not going to save memory and speed using the FeatureBox. 
- *
- */
 public class FeatureArray implements Serializable{
 	
 	private static final long serialVersionUID = 9170537017171193020L;

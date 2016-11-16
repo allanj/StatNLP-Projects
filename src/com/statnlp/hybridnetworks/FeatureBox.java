@@ -1,7 +1,6 @@
 package com.statnlp.hybridnetworks;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -48,15 +47,13 @@ public class FeatureBox implements Serializable {
 		if (!NetworkConfig.AVOID_DUPLICATE_FEATURES) {
 			return fb;
 		}
-		if (param.fb2Idx == null) {
-			param.fb2Idx = new HashMap<>();
-			param.fbList = new ArrayList<>();
+		if (param.fbMap == null) {
+			param.fbMap = new HashMap<>();
 		}
-		if (param.fb2Idx.containsKey(fb)) {
-			return param.fbList.get(param.fb2Idx.get(fb));
+		if (param.fbMap.containsKey(fb)) {
+			return param.fbMap.get(param.fbMap.get(fb));
 		} else{
-			param.fbList.add(fb);
-			param.fb2Idx.put(fb, param.fbList.size()-1);
+			param.fbMap.put(fb, fb);
 			return fb;
 		}
 	}

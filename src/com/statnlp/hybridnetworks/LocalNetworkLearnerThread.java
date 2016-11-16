@@ -187,11 +187,27 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 				// only the unlabeled network needs the marginal map.
 				if (!network.getInstance().isLabeled()){
 					network.clearMarginalMap();
-					for (int smallIt = 0; smallIt < NetworkConfig.MF_ROUND; smallIt++) {
+					boolean prevDone = false;
+					for (int smallIt = 0; smallIt < NetworkConfig.MAX_MF_UPDATES; smallIt++) {
+//						double unlabeledObj = 0;
+//						double labeledObj = 0;
 						for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
 							network.enableKthStructure(curr);
 							network.inference(true);
+//							unlabeledObj += network.getInside() * network._weight;
 						}
+//						for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
+//							network.getLabeledNetwork().enableKthStructure(curr);
+//							network.getLabeledNetwork().inference(false);
+//							labeledObj += network.getLabeledNetwork().getInside() * network.getLabeledNetwork()._weight;
+//						}
+//						System.out.println("SmallIteration " + smallIt + " label : " + labeledObj + " unlabeled: " + unlabeledObj  + " obj: "+ (labeledObj+unlabeledObj));
+						boolean done = network.compareMarginalMap();
+						if (prevDone && done){
+							network.renewCurrentMarginalMap();
+							break;
+						}
+						prevDone = done;
 						network.renewCurrentMarginalMap();
 					}
 				}

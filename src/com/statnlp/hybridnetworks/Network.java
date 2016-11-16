@@ -513,7 +513,9 @@ public abstract class Network implements Serializable, HyperGraph{
 				FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
 				int globalParamVersion = this._param._fm.getParam_G().getVersion();
 				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k)?
-			 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this.getUnlabeledNetwork().currentMarginalMap, globalParamVersion):fa.getScore(this._param, globalParamVersion);
+			 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this.getUnlabeledNetwork().currentMarginalMap, globalParamVersion):
+			 				fa.getScore(this._param, globalParamVersion);
+			 	
 			 	if(NetworkConfig.MODEL_TYPE.USE_COST){
 					score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
 				}
@@ -523,7 +525,7 @@ public abstract class Network implements Serializable, HyperGraph{
 				inside = score;
 			}
 		}
-		
+
 		for(int children_k_index = 1; children_k_index < childrenList_k.length; children_k_index++){
 			int[] children_k = childrenList_k[children_k_index];
 
@@ -538,7 +540,8 @@ public abstract class Network implements Serializable, HyperGraph{
 			FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
 			int globalParamVersion = this._param._fm.getParam_G().getVersion();
 			double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k)?
-		 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this.getUnlabeledNetwork().currentMarginalMap, globalParamVersion):fa.getScore(this._param, globalParamVersion);
+		 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this.getUnlabeledNetwork().currentMarginalMap, globalParamVersion):
+		 				fa.getScore(this._param, globalParamVersion);
 
  			if(NetworkConfig.MODEL_TYPE.USE_COST){
 				score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
@@ -546,7 +549,6 @@ public abstract class Network implements Serializable, HyperGraph{
 			for(int child_k : children_k){
 				score += this._inside[child_k];
 			}
-			
 			inside = sumLog(inside, score);
 		}
 		
@@ -586,7 +588,8 @@ public abstract class Network implements Serializable, HyperGraph{
 			FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
 			int globalParamVersion = this._param._fm.getParam_G().getVersion();
 			double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k)?
-		 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this.getUnlabeledNetwork().currentMarginalMap, globalParamVersion):fa.getScore(this._param, globalParamVersion);
+		 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this.getUnlabeledNetwork().currentMarginalMap, globalParamVersion):
+		 				fa.getScore(this._param, globalParamVersion);
 			if(NetworkConfig.MODEL_TYPE.USE_COST){
 				score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
 			}
@@ -647,10 +650,11 @@ public abstract class Network implements Serializable, HyperGraph{
 			}
 			
 			FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
+			int globalParamVersion = this._param._fm.getParam_G().getVersion();
 			if(NetworkConfig.MODEL_TYPE.USE_SOFTMAX){
-				int globalParamVersion = this._param._fm.getParam_G().getVersion();
 				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k)?
-			 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this.getUnlabeledNetwork().currentMarginalMap, globalParamVersion):fa.getScore(this._param, globalParamVersion);
+			 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this.getUnlabeledNetwork().currentMarginalMap, globalParamVersion):
+			 				fa.getScore(this._param, globalParamVersion);
 				if(NetworkConfig.MODEL_TYPE.USE_COST){
 					score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
 				}
@@ -728,7 +732,8 @@ public abstract class Network implements Serializable, HyperGraph{
 					FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
 					int globalParamVersion = this._param._fm.getParam_G().getVersion();
 					double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k)?
-				 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this.getUnlabeledNetwork().currentMarginalMap, globalParamVersion):fa.getScore(this._param, globalParamVersion);
+				 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this.getUnlabeledNetwork().currentMarginalMap, globalParamVersion):
+				 				fa.getScore(this._param, globalParamVersion);
 					if(NetworkConfig.MODEL_TYPE.USE_COST){
 						try{
 							score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
@@ -760,7 +765,8 @@ public abstract class Network implements Serializable, HyperGraph{
 				FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
 				int globalParamVersion = this._param._fm.getParam_G().getVersion();
 				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k)?
-			 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this.getUnlabeledNetwork().currentMarginalMap, globalParamVersion):fa.getScore(this._param, globalParamVersion);
+			 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this.getUnlabeledNetwork().currentMarginalMap, globalParamVersion):
+			 				fa.getScore(this._param, globalParamVersion);
 				if(NetworkConfig.MODEL_TYPE.USE_COST){
 					try{
 						score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
@@ -794,7 +800,8 @@ public abstract class Network implements Serializable, HyperGraph{
 				FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
 				int globalParamVersion = this._param._fm.getParam_G().getVersion();
 				double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(k)?
-			 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this.getUnlabeledNetwork().currentMarginalMap, globalParamVersion):fa.getScore(this._param, globalParamVersion);
+			 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(k), this.getUnlabeledNetwork().currentMarginalMap, globalParamVersion):
+			 				fa.getScore(this._param, globalParamVersion);
 				if(NetworkConfig.MODEL_TYPE.USE_COST){
 					try{
 						score += this._param.cost(this, k, children_k, children_k_index, this._compiler);
@@ -856,7 +863,8 @@ public abstract class Network implements Serializable, HyperGraph{
 			FeatureArray fa = this._param.extract(this, nodeIdx, children_k, children_k_index);
 			int globalParamVersion = this._param._fm.getParam_G().getVersion();
 			double score = NetworkConfig.INFERENCE==InferenceType.MEAN_FIELD && src2fIdx2Dst.containsKey(nodeIdx)?
-		 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(nodeIdx), this.getUnlabeledNetwork().currentMarginalMap, globalParamVersion):fa.getScore(this._param, globalParamVersion);
+		 			fa.getScore_MF_Version(this._param, src2fIdx2Dst.get(nodeIdx), this.getUnlabeledNetwork().currentMarginalMap, globalParamVersion):
+		 				fa.getScore(this._param, globalParamVersion);
 			double firstBest = score;
 			for(int child_k : children_k){
 				firstBest += this._max_k[child_k][0];
@@ -1105,6 +1113,26 @@ public abstract class Network implements Serializable, HyperGraph{
 	public void renewCurrentMarginalMap(){
 		this.currentMarginalMap = this.newMarginalMap;
 		this.newMarginalMap = new HashMap<>();
+	}
+	
+	/**
+	 * Compare the new and old marginal map
+	 * decide to continue mean-field update or not 
+	 * @return almost equal OR not
+	 */
+	public boolean compareMarginalMap(){
+		if(this.currentMarginalMap == null || this.currentMarginalMap.size() == 0)
+			return false;
+		double diff = 0;
+		for(Integer key: this.newMarginalMap.keySet()){
+			double curr = this.currentMarginalMap.get(key);
+			double newM = this.newMarginalMap.get(key);
+			diff += Math.abs(newM-curr);
+		}
+		diff /= this.newMarginalMap.size();
+		if(diff < 0.0001)
+			return true;
+		return false;
 	}
 }
 
