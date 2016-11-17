@@ -156,7 +156,7 @@ public class FeatureArray implements Serializable{
 			if (fIdx2DstNode.containsKey(f_local)) {
 				int dstNode = fIdx2DstNode.get(f_local);
 				if (marginalMap.containsKey(dstNode))
-					featureValue = marginalMap.get(dstNode);
+					featureValue = Math.exp(marginalMap.get(dstNode));
 				else
 					featureValue = 0.0;
 			}
@@ -242,9 +242,14 @@ public class FeatureArray implements Serializable{
 				if(f!=-1){
 					//note that in training, f is the local feature index.
 					//in testing, f is the global feature index
-					double featureValue = fIdx2DstNode.containsKey(f)? 
-												marginalMap.containsKey(fIdx2DstNode.get(f))? Math.exp(marginalMap.get(fIdx2DstNode.get(f))) : 0.0 
-												: 1.0;
+					double featureValue = 1.0;
+					if (fIdx2DstNode.containsKey(f)) {
+						int dstNode = fIdx2DstNode.get(f);
+						if (marginalMap.containsKey(dstNode))
+							featureValue = Math.exp(marginalMap.get(dstNode));
+						else
+							featureValue = 0.0;
+					}
 					this._fb._currScore += param.getWeight(f) * featureValue;
 				}
 			}
