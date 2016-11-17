@@ -3,7 +3,7 @@ package com.statnlp.projects.dep.model.var;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 
-import com.statnlp.projects.entity.lcr2d.E2DNetworkCompiler.NODE_TYPES;
+import com.statnlp.projects.dep.model.var.LinearCompiler.NODE_TYPES;
 import com.statnlp.ui.visualize.VisualizationViewerEngine;
 import com.statnlp.ui.visualize.type.VNode;
 import com.statnlp.ui.visualize.type.VisualizeGraph;

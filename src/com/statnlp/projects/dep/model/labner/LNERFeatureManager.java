@@ -8,7 +8,6 @@ import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
-import com.statnlp.projects.entity.lcr2d.E2DFeatureManager.FEATYPE;
 
 public class LNERFeatureManager extends FeatureManager {
 
