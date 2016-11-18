@@ -67,7 +67,7 @@ public class MeanFieldTest extends TestCase {
 	}
 	
 	public void testMeanField() throws InterruptedException{
-		NetworkConfig.MF_ROUND = 4;
+		NetworkConfig.MAX_MF_UPDATES = 4;
 		GlobalNetworkParam param_g = new GlobalNetworkParam();
 		TFFeatureManager fa = new TFFeatureManager(param_g, true, false, TASK.JOINT, 3, false);
 		TFNetworkCompiler compiler = new TFNetworkCompiler(TASK.JOINT, false, 2);
