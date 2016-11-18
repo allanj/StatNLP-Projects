@@ -49,3 +49,5 @@ In the paper, we use the Broadcast News portion in the OntoNotes 5.0 dataset. Yo
 ##### Features
 
 You can find the features defined in the ```SemiCRFFeatureManager``` and add more features as you want. 
+- Recent update: the following 5 kinds of dependency features at each position are more powerful than the ones in our paper.
+  - head word, head tag, dependency label, modifier word and modifier tag. Of course, they are all associated with the entity label. Furthermore, the number of modifiers will be different at different position.   

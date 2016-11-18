@@ -44,7 +44,9 @@ public class SemiCRFFeatureManager extends FeatureManager {
 		head_tag,
 		dep_word_label,
 		dep_tag_label,
-		cheat
+		cheat,
+		modifier_word,
+		modifier_tag
 //		left_3,
 //		right_3,
 //		left_3_shape,
@@ -106,15 +108,15 @@ public class SemiCRFFeatureManager extends FeatureManager {
 		String currEn = Label.get(parentLabelId).getForm();
 		
 		String lw = start>0? sent.get(start-1).getName():"STR";
-		String llw = start == 0 ? "STR1" : start == 1 ? "STR" : sent.get(start-2).getName();
-		String llt = start == 0 ? "STR1" : start == 1 ? "STR" : sent.get(start-2).getTag();
-		String lllw = start == 0 ? "STR2" : start == 1 ? "STR1" : start == 2 ? "STR" : sent.get(start-3).getName();
+//		String llw = start == 0 ? "STR1" : start == 1 ? "STR" : sent.get(start-2).getName();
+//		String llt = start == 0 ? "STR1" : start == 1 ? "STR" : sent.get(start-2).getTag();
+//		String lllw = start == 0 ? "STR2" : start == 1 ? "STR1" : start == 2 ? "STR" : sent.get(start-3).getName();
 		String ls = start>0? shape(lw):"STR_SHAPE";
 		String lt = start>0? sent.get(start-1).getTag():"STR";
 		String rw = end<sent.length()-1? sent.get(end+1).getName():"END";
-		String rrw = end == sent.length() - 1? "END1" : end == sent.length() - 2? "END" : sent.get(end+2).getName();
-		String rrt = end == sent.length() - 1? "END1" : end == sent.length() - 2? "END" : sent.get(end+2).getTag();
-		String rrrw = end == sent.length() - 1? "END2" : end == sent.length() - 2? "END1" : end == sent.length() - 3? "END" : sent.get(end+3).getName();
+//		String rrw = end == sent.length() - 1? "END1" : end == sent.length() - 2? "END" : sent.get(end+2).getName();
+//		String rrt = end == sent.length() - 1? "END1" : end == sent.length() - 2? "END" : sent.get(end+2).getTag();
+//		String rrrw = end == sent.length() - 1? "END2" : end == sent.length() - 2? "END1" : end == sent.length() - 3? "END" : sent.get(end+3).getName();
 		String rt = end<sent.length()-1? sent.get(end+1).getTag():"END";
 		String rs = end<sent.length()-1? shape(rw):"END_SHAPE";
 		featureList.add(this._param_g.toFeature(network, FeaType.seg_prev_word.name(), 		currEn,	lw));
@@ -189,7 +191,7 @@ public class SemiCRFFeatureManager extends FeatureManager {
 		
 		/**Add dependency features**/
 		if(this.depFeature){
-			for(int pos=start;pos<=end;pos++){
+			for (int pos = start; pos <= end; pos++) {
 				String currWord = sent.get(pos).getName();
 				String currTag = sent.get(pos).getTag();
 				int currHeadIndex = sent.get(pos).getHeadIndex();
@@ -201,6 +203,19 @@ public class SemiCRFFeatureManager extends FeatureManager {
 				featureList.add(this._param_g.toFeature(network, FeaType.head_tag.name(),	currEn,	currTag+"& head:"+currHeadTag));
 				featureList.add(this._param_g.toFeature(network, FeaType.dep_word_label.name(), 	currEn, currWord+"& head:"+currHead+"& label:"+currDepLabel));
 				featureList.add(this._param_g.toFeature(network, FeaType.dep_tag_label.name(), 	currEn, currTag+"& head:"+currHeadTag+"& label:"+currDepLabel));
+				
+				/**The following set of dependency features are better***/
+//				featureList.add(this._param_g.toFeature(network, FeaType.head_word.name(), 		currEn, currHead));
+//				featureList.add(this._param_g.toFeature(network, FeaType.head_tag.name(), 		currEn, currHeadTag)); //the most powerful one
+//				featureList.add(this._param_g.toFeature(network, FeaType.dep_word_label.name(), currEn, currDepLabel));
+//				for (int p = 0; p < sent.length(); p++){
+//					if (p == pos) continue;
+//					if (sent.get(p).getHeadIndex() == pos) {
+//						featureList.add(this._param_g.toFeature(network, FeaType.modifier_word.name(), 	currEn, sent.get(p).getName()));
+//						featureList.add(this._param_g.toFeature(network, FeaType.modifier_tag.name(), 	currEn, sent.get(p).getTag()));
+//					}
+//				}
+				/*****/
 			}
 			
 		}

@@ -30,7 +30,9 @@ public class ECRFFeatureManager extends FeatureManager {
 		head_token,
 		dep_word_label,
 		dep_tag_label,
-		neural
+		neural,
+		modifier_word,
+		modifier_tag
 //		next_word,
 //		next_tag
 //		word_2_back,
@@ -79,17 +81,17 @@ public class ECRFFeatureManager extends FeatureManager {
 		String ls = pos>0? shape(lw):"STR_SHAPE";
 		String lt = pos>0? sent.get(pos-1).getTag():"STR";
 		String llw = pos==0? "STR1": pos==1? "STR": sent.get(pos-2).getName();
-		String lllw = pos==0? "STR2": pos==1? "STR1": pos==2? "STR": sent.get(pos-3).getName();
-		String llllw = pos==0? "STR3": pos==1? "STR2": pos==2? "STR1": pos==3? "STR":sent.get(pos-4).getName();
-		String llt = pos==0? "STR1": pos==1? "STR":sent.get(pos-2).getTag();
+//		String lllw = pos==0? "STR2": pos==1? "STR1": pos==2? "STR": sent.get(pos-3).getName();
+//		String llllw = pos==0? "STR3": pos==1? "STR2": pos==2? "STR1": pos==3? "STR":sent.get(pos-4).getName();
+//		String llt = pos==0? "STR1": pos==1? "STR":sent.get(pos-2).getTag();
 		
 		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"END";
-		String rt = pos<sent.length()-1? sent.get(pos+1).getTag():"END";
+//		String rt = pos<sent.length()-1? sent.get(pos+1).getTag():"END";
 //		String rs = pos<sent.length()-1? shape(rw):"END_SHAPE";
 		String rrw = pos==sent.length()-1? "END1": pos==sent.length()-2? "END":sent.get(pos+2).getName();
-		String rrrw = pos==sent.length()-1? "END2": pos==sent.length()-2? "END1":pos==sent.length()-3? "END": sent.get(pos+3).getName();
-		String rrrrw = pos==sent.length()-1? "END3": pos==sent.length()-2? "END2":pos==sent.length()-3? "END1":pos==sent.length()-4? "END":sent.get(pos+4).getName();
-		String rrt = pos==sent.length()-1? "END1": pos==sent.length()-2? "END":sent.get(pos+2).getTag();
+//		String rrrw = pos==sent.length()-1? "END2": pos==sent.length()-2? "END1":pos==sent.length()-3? "END": sent.get(pos+3).getName();
+//		String rrrrw = pos==sent.length()-1? "END3": pos==sent.length()-2? "END2":pos==sent.length()-3? "END1":pos==sent.length()-4? "END":sent.get(pos+4).getName();
+//		String rrt = pos==sent.length()-1? "END1": pos==sent.length()-2? "END":sent.get(pos+2).getTag();
 		
 		String currWord = inst.getInput().get(pos).getName();
 		String currTag = inst.getInput().get(pos).getTag();
@@ -160,6 +162,20 @@ public class ECRFFeatureManager extends FeatureManager {
 			featureList.add(this._param_g.toFeature(network, FeaType.dep_word_label.name(), 	currEn, currWord+"& head:"+currHead+"& label:"+currDepLabel));
 			featureList.add(this._param_g.toFeature(network, FeaType.dep_tag_label.name(), 	currEn, currTag+"& head:"+currHeadTag+"& label:"+currDepLabel));
 			
+			/**The following set of dependency features are better***/
+			/*
+			featureList.add(this._param_g.toFeature(network, FeaType.head_word.name(), 		currEn, currHead));
+			featureList.add(this._param_g.toFeature(network, FeaType.head_tag.name(), 		currEn, currHeadTag)); //the most powerful one
+			featureList.add(this._param_g.toFeature(network, FeaType.dep_word_label.name(), 	currEn, currDepLabel));
+			for (int p = 0; p < sent.length(); p++){
+				if (p == pos) continue;
+				if (sent.get(p).getHeadIndex() == pos) {
+					featureList.add(this._param_g.toFeature(network, FeaType.modifier_word.name(), 	currEn, sent.get(p).getName()));
+					featureList.add(this._param_g.toFeature(network, FeaType.modifier_tag.name(), 	currEn, sent.get(p).getTag()));
+				}
+			}
+			*/
+			/*****/
 		}
 		
 		
