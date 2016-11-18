@@ -66,7 +66,7 @@ public class DPConfig {
 	 */
 	public static long randSeed = 1000;
 	
-	public static double L2 = 0.7;
+	public static double L2 = 0.1;
 	
 	public static String[] others = {"plant","fac","loc","product","location",
 			"event","animal","law","game","language","norp","org","disease","substance"};

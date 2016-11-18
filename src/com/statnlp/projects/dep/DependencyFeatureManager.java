@@ -16,7 +16,7 @@ public class DependencyFeatureManager extends FeatureManager {
 
 	private static final long serialVersionUID = 7274939836196010680L;
 
-	public enum FeaType {unigram, bigram,contextual, inbetween, prefix,pipe,label, neural};
+	public enum FeaType {unigram, bigram,contextual, inbetween, prefix,pipe,label, neural_1};
 	protected boolean isPipe;
 	protected boolean labeledDep;
 	protected int windowSize = 1;
@@ -274,13 +274,13 @@ public class DependencyFeatureManager extends FeatureManager {
 				String lw = sent.get(leftIndex).getName();
 				String rw = sent.get(rightIndex).getName();
 				if (windowSize == 1)
-					featureList.add(this._param_g.toFeature(network, FeaType.neural.name(), att, lw + insep + rw));
+					featureList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, lw + insep + rw));
 				else if (windowSize == 3) {
 					String llw = leftIndex == 0? "<PAD>" : sent.get(leftIndex - 1).getName();
 					String lrw = sent.get(leftIndex + 1).getName();
 					String rlw = sent.get(rightIndex - 1).getName();
 					String rrw = rightIndex < sent.length()-1? sent.get(rightIndex+1).getName() : "<PAD>";
-					featureList.add(this._param_g.toFeature(network, FeaType.neural.name(), att, llw + insep + lw + insep + lrw + insep + rlw + insep + rw + insep + rrw));
+					featureList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, llw + insep + lw + insep + lrw + insep + rlw + insep + rw + insep + rrw));
 				} else {
 					throw new RuntimeException("Unknown window size: " + windowSize);
 				}

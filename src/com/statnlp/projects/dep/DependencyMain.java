@@ -10,6 +10,7 @@ import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkModel;
+import com.statnlp.neural.NeuralConfigReader;
 import com.statnlp.projects.dep.commons.DepLabel;
 import com.statnlp.projects.dep.utils.DPConfig;
 import com.statnlp.projects.dep.utils.Init;
@@ -66,7 +67,7 @@ public class DependencyMain {
 		trainingPath = DPConfig.trainingPath;
 		
 		String middle = isDev? ".dev":".test";
-		String modelType = "only";
+		String modelType = "dep";
 		String dpOut = DPConfig.data_prefix+modelType+middle+DPConfig.dp_res_suffix;
 		String topKDepOut = DPConfig.data_prefix+modelType+middle+DPConfig.dp_topk_res_suffix;
 		testFile = isDev? DPConfig.devPath:DPConfig.testingPath;
@@ -79,15 +80,20 @@ public class DependencyMain {
 		}
 		/****Debug info****/
 //		trainingPath = "data/semeval10t1/small.txt";
-		testFile = trainingPath;
+//		testFile = trainingPath;
 		/****/
 		System.err.println("[Info] DEBUG MODE: "+DPConfig.DEBUG);
-		
+		System.err.println("[Info] is pipeline: "+ isPipe);
 		System.err.println("[Info] train path: "+trainingPath);
 		System.err.println("[Info] testFile: "+testFile);
 		System.err.println("[Info] depOut: "+dpOut);
 		System.err.println("[Info] topKDepOut: "+topKDepOut);
+		System.err.println("[Info] Regularization: "+DPConfig.L2);
 		
+		if(NetworkConfig.USE_NEURAL_FEATURES){
+			System.err.println("[Info] Reading the neural configuration....");
+			NeuralConfigReader.readConfig("config/dep.config");
+		}
 		
 		
 		DependencyTransformer trans = new DependencyTransformer();
@@ -97,24 +103,38 @@ public class DependencyMain {
 		boolean checkTestProjective = isDev? true:false;
 		testingInsts =   isPipe? DependencyReader.readFromPipeline(testFile,testNumber,trans, topKinput): 
 								DependencyReader.readCoNLLX(testFile, false,testNumber,trans, checkTestProjective);   //false: not check the projective in testing
-		System.out.println("[Info] Total number of dependency label:"+DepLabel.LABELS.size());
+		System.err.println("[Info] Total number of dependency label:"+DepLabel.LABELS.size());
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
 		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig.NUM_THREADS = numThreads;
 		//0.1 is the best after tunning the parameters
-		NetworkConfig.L2_REGULARIZATION_CONSTANT = 0.1;
+		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //default is 0.1
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		System.err.println("[Info] Regularization Parameter: "+NetworkConfig.L2_REGULARIZATION_CONSTANT);
-		NetworkConfig.USE_NEURAL_FEATURES = false;
-//		NetworkConfig._topKValue = 3;
 		
 		
 		
 		DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(), isPipe, labeledDep, windowSize);
 		DependencyNetworkCompiler dnc = new DependencyNetworkCompiler(labeledDep);
 		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);
-		model.train(trainingInsts, numIteration); 
+		
+		DependInstance all_instances[] = new DependInstance[trainingInsts.length+testingInsts.length];
+        int i = 0;
+        for(; i<trainingInsts.length; i++) {
+            all_instances[i] = trainingInsts[i];
+        }
+        int lastId = all_instances[i-1].getInstanceId();
+        for(int j = 0; j<testingInsts.length; j++, i++) {
+            all_instances[i] = testingInsts[j];
+            all_instances[i].setInstanceId(lastId+j+1);
+            all_instances[i].setUnlabeled();
+        }
+        if(NetworkConfig.USE_NEURAL_FEATURES){
+			model.train(all_instances, trainingInsts.length, numIteration);
+		}else{
+			model.train(trainingInsts, numIteration);
+		}
 		
 		/****************Evaluation Part**************/
 		Instance[] predInsts = model.decode(testingInsts);
@@ -152,7 +172,13 @@ public class DependencyMain {
 					case "-topkinput": topKinput = true; break;
 					case "-las": labeledDep= args[i+1].equals("true")?true:false; break;
 					case "-windowSize": windowSize = Integer.valueOf(args[i+1]); break;
-					default: System.err.println("Invalid arguments, please check usage."); System.err.println(usage);System.exit(0);
+					case "-neural": if(args[i+1].equals("true")){ 
+										NetworkConfig.USE_NEURAL_FEATURES = true; 
+										NetworkConfig.OPTIMIZE_NEURAL = true;  //not optimize in CRF..
+										NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
+										NetworkConfig.REGULARIZE_NEURAL_FEATURES = true; // Regularized the neural features in CRF or not
+									} break;
+					default: System.err.println("Invalid argument " + args[i] + ", please check usage."); System.err.println(usage);System.exit(0);
 				}
 			}
 
