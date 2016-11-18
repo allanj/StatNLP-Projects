@@ -35,7 +35,7 @@ public class DependencyMain {
 	public static HashSet<String> dataTypeSet;
 	public static boolean topKinput = false;
 	public static boolean labeledDep = false;
-	
+	public static int windowSize = 1; //for neural features
 	
 	public static String[] initializeTypeMap(){
 		HashMap<String, Integer> typeMap = new HashMap<String, Integer>();
@@ -111,7 +111,7 @@ public class DependencyMain {
 		
 		
 		
-		DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(), isPipe, labeledDep);
+		DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(), isPipe, labeledDep, windowSize);
 		DependencyNetworkCompiler dnc = new DependencyNetworkCompiler(labeledDep);
 		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);
 		model.train(trainingInsts, numIteration); 
@@ -151,6 +151,7 @@ public class DependencyMain {
 					case "-topk":NetworkConfig._topKValue = Integer.valueOf(args[i+1]); break;
 					case "-topkinput": topKinput = true; break;
 					case "-las": labeledDep= args[i+1].equals("true")?true:false; break;
+					case "-windowSize": windowSize = Integer.valueOf(args[i+1]); break;
 					default: System.err.println("Invalid arguments, please check usage."); System.err.println(usage);System.exit(0);
 				}
 			}
