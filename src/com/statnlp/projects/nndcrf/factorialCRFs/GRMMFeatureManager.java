@@ -9,22 +9,24 @@ import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
-import com.statnlp.projects.nndcrf.factorialCRFs.TFNetworkCompiler.NODE_TYPES;
+import com.statnlp.projects.nndcrf.factorialCRFs.FCRFNetworkCompiler.NODE_TYPES;
 
 public class GRMMFeatureManager extends FeatureManager {
 
 	private static final long serialVersionUID = 376931974939202432L;
 
-	public enum FEATYPE {grmm, joint};
+	public enum FeaType {grmm, joint};
+	private boolean useJointFeatures;
 	
-	public GRMMFeatureManager(GlobalNetworkParam param_g) {
+	public GRMMFeatureManager(GlobalNetworkParam param_g, boolean useJointFeatures) {
 		super(param_g);
+		this.useJointFeatures = useJointFeatures; 
 	}
 	
 	@Override
 	protected FeatureArray extract_helper(Network network, int parent_k, int[] children_k) {
 		
-		TFInstance inst = ((TFInstance)network.getInstance());
+		FCRFInstance inst = ((FCRFInstance)network.getInstance());
 		Sentence sent = inst.getInput();
 		long node = network.getNode(parent_k);
 		int[] nodeArr = NetworkIDMapper.toHybridNodeArray(node);
@@ -42,15 +44,17 @@ public class GRMMFeatureManager extends FeatureManager {
 		if (nodeArr[1] == NODE_TYPES.ENODE.ordinal()) {
 			String[] fs = sent.get(pos).getFS();
 			for (String f : fs)
-				featureList.add(this._param_g.toFeature(network, FEATYPE.grmm.name(), Entity.get(eId).getForm(), f));
-			 addJointFeatures(featureList, network, sent, pos, eId, parent_k, children_k, false);
+				featureList.add(this._param_g.toFeature(network, FeaType.grmm.name(), Chunk.get(eId).getForm(), f));
+			if(useJointFeatures)
+				addJointFeatures(featureList, network, sent, pos, eId, parent_k, children_k, false);
 		}
 
 		if (nodeArr[1] == NODE_TYPES.TNODE.ordinal()) {
 			String[] fs = sent.get(pos).getFS();
 			for (String f : fs)
-				featureList.add(this._param_g.toFeature(network, FEATYPE.grmm.name(), Tag.get(eId).getForm(), f));
-			 addJointFeatures(featureList, network, sent, pos, eId, parent_k, children_k, true);
+				featureList.add(this._param_g.toFeature(network, FeaType.grmm.name(), Tag.get(eId).getForm(), f));
+			if(useJointFeatures)
+				addJointFeatures(featureList, network, sent, pos, eId, parent_k, children_k, true);
 		}
 		
 		ArrayList<Integer> finalList = new ArrayList<Integer>();
@@ -71,7 +75,7 @@ public class GRMMFeatureManager extends FeatureManager {
 		//TFNetwork tfnetwork = (TFNetwork)network;
 		if(children_k.length!=1)
 			throw new RuntimeException("The joint features should only have one children also");
-		String currLabel = paTchildE? Tag.get(paId).getForm():Entity.get(paId).getForm();
+		String currLabel = paTchildE? Tag.get(paId).getForm():Chunk.get(paId).getForm();
 		int jointFeatureIdx = -1; 
 		int[] arr = null;
 		int nodeType = -1;
@@ -82,10 +86,10 @@ public class GRMMFeatureManager extends FeatureManager {
 				String tag =  Tag.get(t).getForm();
 				arr = new int[]{pos+1, nodeType, t};
 				long unlabeledDstNode = NetworkIDMapper.toHybridNodeID(arr);
-				TFNetwork unlabeledNetwork = (TFNetwork)network.getUnlabeledNetwork();
+				FCRFNetwork unlabeledNetwork = (FCRFNetwork)network.getUnlabeledNetwork();
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 				if(unlabeledDstNodeIdx>=0){
-					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), currLabel + " & " + tag, "");
+					jointFeatureIdx = this._param_g.toFeature(network, FeaType.joint.name(), currLabel + " & " + tag, "");
 					network.putJointFeature(parent_k, jointFeatureIdx, unlabeledDstNodeIdx);
 					featureList.add(jointFeatureIdx);
 				}
@@ -94,14 +98,14 @@ public class GRMMFeatureManager extends FeatureManager {
 		}else{
 			//current it's POS structure, need to refer to Entity node
 			nodeType = NODE_TYPES.ENODE.ordinal();
-			for(int e=0; e<Entity.ENTS_INDEX.size(); e++){
-				String entity = Entity.get(e).getForm();
+			for(int e=0; e<Chunk.CHUNKS_INDEX.size(); e++){
+				String entity = Chunk.get(e).getForm();
 				arr = new int[]{pos+1, nodeType, e};
 				long unlabeledDstNode = NetworkIDMapper.toHybridNodeID(arr);
-				TFNetwork unlabeledNetwork = (TFNetwork)network.getUnlabeledNetwork();
+				FCRFNetwork unlabeledNetwork = (FCRFNetwork)network.getUnlabeledNetwork();
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 				if(unlabeledDstNodeIdx>=0){
-					jointFeatureIdx = this._param_g.toFeature(network, FEATYPE.joint.name(), entity + " & " + currLabel, "");
+					jointFeatureIdx = this._param_g.toFeature(network, FeaType.joint.name(), entity + " & " + currLabel, "");
 					featureList.add(jointFeatureIdx);
 					network.putJointFeature(parent_k, jointFeatureIdx, unlabeledDstNodeIdx);
 				}
