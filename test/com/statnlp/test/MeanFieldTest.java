@@ -9,16 +9,14 @@ import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
 import com.statnlp.hybridnetworks.NetworkModel;
-import com.statnlp.projects.nndcrf.factorialCRFs.Entity;
-import com.statnlp.projects.nndcrf.factorialCRFs.TFConfig.TASK;
-
-import cern.colt.Arrays;
-
-import com.statnlp.projects.nndcrf.factorialCRFs.TFFeatureManager;
-import com.statnlp.projects.nndcrf.factorialCRFs.TFInstance;
-import com.statnlp.projects.nndcrf.factorialCRFs.TFNetworkCompiler;
+import com.statnlp.projects.nndcrf.factorialCRFs.Chunk;
+import com.statnlp.projects.nndcrf.factorialCRFs.FCRFConfig.TASK;
+import com.statnlp.projects.nndcrf.factorialCRFs.FCRFFeatureManager;
+import com.statnlp.projects.nndcrf.factorialCRFs.FCRFInstance;
+import com.statnlp.projects.nndcrf.factorialCRFs.FCRFNetworkCompiler;
 import com.statnlp.projects.nndcrf.factorialCRFs.Tag;
 
+import cern.colt.Arrays;
 import junit.framework.TestCase;
 
 public class MeanFieldTest extends TestCase {
@@ -26,7 +24,7 @@ public class MeanFieldTest extends TestCase {
 	/**
 	 * The training data.
 	 */
-	protected TFInstance[] data;
+	protected FCRFInstance[] data;
 	
 	protected int maxIter;
 	
@@ -38,19 +36,19 @@ public class MeanFieldTest extends TestCase {
 		wts[0] = new WordToken("a", "NN", -1, "B-PER");
 		wts[1] = new WordToken("b", "VB", -1, "O");
 		Sentence sent = new Sentence(wts);
-		TFInstance inst = new TFInstance(1, 1.0, sent);
+		FCRFInstance inst = new FCRFInstance(1, 1.0, sent);
 		ArrayList<String> output = new ArrayList<>(2);
 		output.add("B-PER");
 		output.add("O");
-		inst.setEntities(output);
+		inst.setChunks(output);
 		inst.setLabeled();
-		data = new TFInstance[]{inst};
+		data = new FCRFInstance[]{inst};
 		//Initialize the two maps
-		Entity.get("B-PER");
-		Entity.get("O");
+		Chunk.get("B-PER");
+		Chunk.get("O");
 		Tag.get("NN");
 		Tag.get("VB");
-		Entity.lock();
+		Chunk.lock();
 		Tag.lock();
 		//Setup the configuration
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
@@ -62,15 +60,15 @@ public class MeanFieldTest extends TestCase {
 		NetworkConfig.NUM_STRUCTS = 2;
 		NetworkConfig.INFERENCE = InferenceType.MEAN_FIELD;
 		maxIter = 100;
-		System.out.println(Entity.ENTS_INDEX.toString());
+		System.out.println(Chunk.CHUNKS_INDEX.toString());
 		System.out.println(Tag.TAGS_INDEX.toString());
 	}
 	
 	public void testMeanField() throws InterruptedException{
 		NetworkConfig.MAX_MF_UPDATES = 4;
 		GlobalNetworkParam param_g = new GlobalNetworkParam();
-		TFFeatureManager fa = new TFFeatureManager(param_g, true, false, TASK.JOINT, 3, false);
-		TFNetworkCompiler compiler = new TFNetworkCompiler(TASK.JOINT, false, 2);
+		FCRFFeatureManager fa = new FCRFFeatureManager(param_g, true, false, TASK.JOINT, 3, false);
+		FCRFNetworkCompiler compiler = new FCRFNetworkCompiler(TASK.JOINT, false, 2);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		model.train(data, maxIter);
 		/**Printing the features**/
