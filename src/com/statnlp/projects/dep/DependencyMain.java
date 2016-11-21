@@ -175,9 +175,9 @@ public class DependencyMain {
 					case "-windowSize": windowSize = Integer.valueOf(args[i+1]); break;
 					case "-neural": if(args[i+1].equals("true")){ 
 										NetworkConfig.USE_NEURAL_FEATURES = true; 
-										NetworkConfig.OPTIMIZE_NEURAL = true;  //not optimize in CRF..
+										NetworkConfig.OPTIMIZE_NEURAL = true;  //optimize in CRF..
 										NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
-										NetworkConfig.REGULARIZE_NEURAL_FEATURES = true; // Regularized the neural features in CRF or not
+										NetworkConfig.REGULARIZE_NEURAL_FEATURES = false; // Regularized the neural features in CRF or not
 									} break;
 					case "-basicf": basicFeatures = args[i+1].equals("true") ? true : false; break;
 					default: System.err.println("Invalid argument " + args[i] + ", please check usage."); System.err.println(usage);System.exit(0);
@@ -193,6 +193,12 @@ public class DependencyMain {
 			System.err.println("[Info] numThreads: "+numThreads);
 			System.err.println("[Info] is Pipeline: "+isPipe);
 			System.err.println("[Info] Using development set??: "+isDev);
+			System.err.println("[Info] Using neural features: "+ NetworkConfig.USE_NEURAL_FEATURES);
+			if (NetworkConfig.USE_NEURAL_FEATURES) {
+				System.err.println("[Neural Info] Opimizing Neural in CRF ?: "+ NetworkConfig.OPTIMIZE_NEURAL);
+				System.err.println("[Neural Info] Indexed neural features ?: "+ NetworkConfig.IS_INDEXED_NEURAL_FEATURES);
+				System.err.println("[Neural Info] Regularize neural features in CRF ?: "+ NetworkConfig.REGULARIZE_NEURAL_FEATURES);
+			}
 			if(isPipe){
 				System.err.println("[Info] *********PipeLine: from NER res to DP****");
 			}
