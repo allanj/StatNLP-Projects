@@ -102,10 +102,16 @@ public class HPENetworkCompiler extends NetworkCompiler {
 			//eIndex: 1,2,3,4,5,..n
 			for(String e: Label.Labels.keySet()){
 				if(e.equals(EMPTY)) continue;
-				long wordRightNodeE = this.toNodeComp(rightIndex, rightIndex, rightDir, e, 1); 
-				long wordLeftNodeE = this.toNodeComp(rightIndex, rightIndex, leftDir, e, 1);
-				network.addNode(wordRightNodeE);
-				network.addNode(wordLeftNodeE);
+				for (int spanLen = 1; spanLen <= maxEntityLen && (rightIndex - spanLen + 1) > 0; spanLen++) {
+					if (spanLen != 1 && e.equals(OEntity)) continue;
+					Span span = new Span(rightIndex - spanLen + 1, rightIndex, Label.get(e));
+					if (outputMap.containsKey(span)) {
+						long wordRightNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, rightDir, e, spanLen); 
+						long wordLeftNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, leftDir, e, spanLen);
+						network.addNode(wordRightNodeE);
+						network.addNode(wordLeftNodeE);
+					}
+				}
 			}
 			
 			for(int L = 1;L <= rightIndex;L++){
@@ -216,6 +222,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 		network.finalizeNetwork();
 		
 	}
+	
 	public HPENetwork compileUnLabledInstance(int networkId, HPEInstance inst, LocalNetworkParam param){
 		if (this._nodes == null) {
 			this.compileUnlabeled();
@@ -240,10 +247,13 @@ public class HPENetworkCompiler extends NetworkCompiler {
 			//eIndex: 1,2,3,4,5,..n
 			for(String e: Label.Labels.keySet()){
 				if(e.equals(EMPTY)) continue;
-				long wordRightNodeE = this.toNodeComp(rightIndex, rightIndex, rightDir, e, 1); 
-				long wordLeftNodeE = this.toNodeComp(rightIndex, rightIndex, leftDir, e, 1);
-				network.addNode(wordRightNodeE);
-				network.addNode(wordLeftNodeE);
+				for (int spanLen = 1; spanLen <= maxEntityLen && (rightIndex - spanLen + 1) > 0; spanLen++) {
+					if (spanLen != 1 && e.equals(OEntity)) continue;
+					long wordRightNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, rightDir, e, spanLen); 
+					long wordLeftNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, leftDir, e, spanLen);
+					network.addNode(wordRightNodeE);
+					network.addNode(wordLeftNodeE);
+				}
 			}
 			
 			for(int L = 1;L <= rightIndex;L++){
