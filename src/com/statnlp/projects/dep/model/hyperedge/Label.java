@@ -9,9 +9,11 @@ public class Label implements Comparable<Label>, Serializable{
 	private static final long serialVersionUID = -3314363044582374266L;
 	public static final Map<String, Label> Labels = new HashMap<String, Label>();
 	public static final Map<Integer, Label> Label_Index = new HashMap<Integer, Label>();
+	public static boolean locked = false;
 	
 	public static Label get(String form){
 		if(!Labels.containsKey(form)){
+			if (locked) throw new RuntimeException("The label set is locked. cannot add more. ");
 			Label label = new Label(form, Labels.size());
 			Labels.put(form, label);
 			Label_Index.put(label.id, label);
@@ -21,6 +23,13 @@ public class Label implements Comparable<Label>, Serializable{
 	
 	public static Label get(int id){
 		return Label_Index.get(id);
+	}
+	
+	/**
+	 * Lock the label set to make it not add additional labels.
+	 */
+	public static void lock(){
+		locked = true;
 	}
 	
 	public String form;

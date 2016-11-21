@@ -11,14 +11,10 @@ import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkModel;
-import com.statnlp.projects.dep.DependInstance;
-import com.statnlp.projects.dep.DependencyReader;
 import com.statnlp.projects.dep.Evaluator;
-import com.statnlp.projects.dep.Transformer;
-import com.statnlp.projects.dep.model.ModelViewer;
 import com.statnlp.projects.dep.utils.DPConfig;
-import com.statnlp.projects.dep.utils.Init;
 import com.statnlp.projects.dep.utils.DPConfig.MODEL;
+import com.statnlp.projects.dep.utils.Init;
 
 /**
  * This one is modified for the whole named entity version
@@ -90,31 +86,19 @@ public class HPEMain {
 		/************/
 		
 		
-		Transformer tran = new HPETransformer();
 		String decodePath = isDev?devPath:testingPath;
 		System.err.println("[Info] train path: "+trainingPath);
 		System.err.println("[Info] testFile: "+decodePath);
 		System.err.println("[Info] dpRes: "+dpRes);
 		System.err.println("[Info] ner eval: "+nerEval);
 		System.err.println("[Info] joint Res: "+jointRes);
-		DependInstance[] trainingInsts = null;
-		DependInstance[] testingInsts = null;
-		if(dataTypeSet.contains(DPConfig.dataType)){
-			trainingInsts = DependencyReader.readCoNLLX(trainingPath, true,trainNumber,tran, true);
-			testingInsts = DependencyReader.readCoNLLX(decodePath, false,testNumber,tran, false);
-		}else{
-			trainingInsts = DependencyReader.readInstance(trainingPath, true,trainNumber,selectedEntities,tran, false);
-			testingInsts = DependencyReader.readInstance(decodePath, false,testNumber,selectedEntities,tran, false);
-		}
-//		Formatter.semevalToText(trinInsts, "data/"+DPConfig.dataType+"/proj/en.train.txt");
-//		Formatter.semevalToText(devInsts, "data/"+DPConfig.dataType+"/proj/en.devel.txt");
-//		Formatter.semevalToText(tInsts, "data/"+DPConfig.dataType+"/proj/en.test.txt");
-//		System.exit(0);
-//		System.err.println(testingInsts[0].getInput().toString());
-//		DataChecker.checkJoint(trainingInsts, entities);
-//		DataChecker.checkJoint(testingInsts, entities);
-//		DataChecker.checkIncompeteSideType(trainingInsts);
-//		System.exit(0);
+		HPEInstance[] trainingInsts = HPEReader.readCoNLLXData(trainingPath, true, trainNumber, true);;
+		HPEInstance[] testingInsts = HPEReader.readCoNLLXData(decodePath, false, testNumber, false);
+		Label.get(DPConfig.EMPTY);
+		Label.lock();
+		
+		
+		
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
 		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
@@ -123,9 +107,8 @@ public class HPEMain {
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = false;
 		
 		
-		ModelViewer viewer = new ModelViewer(4,entities);
 		HPEFeatureManager hpfm = new HPEFeatureManager(new GlobalNetworkParam(),entities);
-		HPENetworkCompiler dnc = new HPENetworkCompiler(typeMap, viewer);
+		HPENetworkCompiler dnc = new HPENetworkCompiler();
 		NetworkModel model = DiscriminativeNetworkModel.create(hpfm, dnc);
 		model.train(trainingInsts, numIteration); 
 		

@@ -2,6 +2,7 @@ package com.statnlp.projects.dep.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.projects.dep.DependInstance;
@@ -198,6 +199,29 @@ public class DataChecker {
 				int jLargeIndex = Math.max(jHeadLabel.sentIndex(), jModifierLabel.sentIndex());
 				if(iSmallIndex<jSmallIndex && iLargeIndex<jLargeIndex && jSmallIndex<iLargeIndex) return false;
 				if(iSmallIndex>jSmallIndex && jLargeIndex>iSmallIndex && iLargeIndex>jLargeIndex) return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * Using the heads only to check the projectiveness
+	 * @param heads
+	 * @return
+	 */
+	public static boolean checkProjective(List<Integer> heads){
+		for (int i = 0; i < heads.size(); i++) {
+			int ihead = heads.get(i);
+			if (ihead == -1) continue;
+			int iSmallIndex = Math.min(i, ihead);
+			int iLargeIndex = Math.max(i, ihead);
+			for (int j = 0; j < heads.size(); j++) {
+				int jhead = heads.get(j);
+				if (i==j || jhead == -1) continue;
+				int jSmallIndex = Math.min(j, jhead);
+				int jLargeIndex = Math.max(j, jhead);
+				if(iSmallIndex < jSmallIndex && iLargeIndex < jLargeIndex && jSmallIndex < iLargeIndex) return false;
+				if(iSmallIndex > jSmallIndex && jLargeIndex > iSmallIndex && iLargeIndex > jLargeIndex) return false;
 			}
 		}
 		return true;

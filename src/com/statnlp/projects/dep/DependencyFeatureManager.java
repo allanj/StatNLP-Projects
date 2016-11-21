@@ -275,18 +275,18 @@ public class DependencyFeatureManager extends FeatureManager {
 			
 			/** Adding neural features ***/
 			if (NetworkConfig.USE_NEURAL_FEATURES) {
-				String lw = sent.get(leftIndex).getName();
-				String rw = sent.get(rightIndex).getName();
+				String lw = sent.get(leftIndex).getName().toLowerCase();
+				String rw = sent.get(rightIndex).getName().toLowerCase();
 				String lt = sent.get(leftIndex).getTag();
 				String rt = sent.get(rightIndex).getTag();
 				if (windowSize == 1)
 					featureList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, lw + insep + rw + outsep + 
 																									lt + insep + rt));
 				else if (windowSize == 3) {
-					String llw = leftIndex == 0? "<PAD>" : sent.get(leftIndex - 1).getName();
-					String lrw = sent.get(leftIndex + 1).getName();
-					String rlw = sent.get(rightIndex - 1).getName();
-					String rrw = rightIndex < sent.length()-1? sent.get(rightIndex+1).getName() : "<PAD>";
+					String llw = leftIndex == 0? "<PAD>" : sent.get(leftIndex - 1).getName().toLowerCase();
+					String lrw = sent.get(leftIndex + 1).getName().toLowerCase();
+					String rlw = sent.get(rightIndex - 1).getName().toLowerCase();
+					String rrw = rightIndex < sent.length()-1? sent.get(rightIndex+1).getName().toLowerCase() : "<PAD>";
 					String llt = leftIndex == 0? "<PAD>" : sent.get(leftIndex - 1).getTag();
 					String lrt = sent.get(leftIndex + 1).getTag();
 					String rlt = sent.get(rightIndex - 1).getTag();

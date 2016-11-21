@@ -71,6 +71,9 @@ public class DPConfig {
 	public static String[] others = {"plant","fac","loc","product","location",
 			"event","animal","law","game","language","norp","org","disease","substance"};
 	
+	public static enum DIR {left, right};
+	public static enum COMP{incomp, comp};
+	
 	public static String O_TYPE = "O";
 	public static String MISC = "MISC";
 	public static String E_B_PREFIX = "B-";

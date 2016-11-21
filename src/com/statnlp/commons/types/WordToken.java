@@ -6,7 +6,6 @@ public class WordToken extends InputToken{
 	private static final long serialVersionUID = -1296542134339296118L;
 	
 	private String tag;
-	private String aTag;
 	private int headIndex; 
 	private String entity;
 	private String depLabel;
@@ -15,18 +14,11 @@ public class WordToken extends InputToken{
 	
 	public WordToken(String name) {
 		super(name);
-		this.tag = "";
-		this.headIndex = -1;
-		this.entity = "O";
-		this.aTag = "";
 	}
 	
 	public WordToken(String name, String tag) {
 		super(name);
 		this.tag = tag;
-		this.headIndex = -1;
-		this.entity = "O";
-		this.aTag = tag.substring(0, 1);
 	}
 	
 	public WordToken(String name, String tag, int headIndex) {
@@ -34,7 +26,6 @@ public class WordToken extends InputToken{
 		this.tag = tag;
 		this.headIndex = headIndex;
 		this.entity = "O";
-		this.aTag = tag.substring(0, 1);
 	}
 	
 	public WordToken(String name, String tag, int headIndex, String entity) {
@@ -42,7 +33,6 @@ public class WordToken extends InputToken{
 		this.tag = tag;
 		this.headIndex = headIndex;
 		this.entity = entity;
-		this.aTag = tag.substring(0, 1);
 	}
 	
 	public WordToken(String name, String tag, int headIndex, String entity, String depLabel) {
@@ -50,7 +40,6 @@ public class WordToken extends InputToken{
 		this.tag = tag;
 		this.headIndex = headIndex;
 		this.entity = entity;
-		this.aTag = tag.substring(0, 1);
 		this.depLabel = depLabel;
 	}
 	
@@ -60,7 +49,7 @@ public class WordToken extends InputToken{
 	}
 	
 	public String getATag(){
-		return this.aTag;
+		return this.tag.substring(0, 1);
 	}
 	
 	public void setHead(int index){
