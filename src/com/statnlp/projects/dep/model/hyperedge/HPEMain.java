@@ -1,10 +1,7 @@
 package com.statnlp.projects.dep.model.hyperedge;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
@@ -23,9 +20,6 @@ import com.statnlp.projects.dep.utils.Init;
  */
 public class HPEMain {
 	
-	public static String[] entities; 
-	public static String OE = DPConfig.OE;
-	public static String ONE = DPConfig.ONE;
 	public static int trainNumber = -1;
 	public static int testNumber = -1;
 	public static int numIteration = 100;
@@ -34,34 +28,13 @@ public class HPEMain {
 	public static String testingPath;
 	public static String devPath;
 	public static boolean isDev = true;
-	public static String[] selectedEntities = {"person","organization","gpe","MISC"};
 	public static HashSet<String> dataTypeSet;
-	public static HashMap<String, Integer> typeMap;
-	
-	public static String[] initializeHyperEdgeModelTypeMap(String[] selectedEntities){
-		typeMap = new HashMap<String, Integer>();
-		int index = 0;
-		typeMap.put(OE, index++);
-		typeMap.put(ONE, index++);
-		for(int i=0;i<selectedEntities.length;i++){
-			typeMap.put(selectedEntities[i],index++);
-		}
-		String[] entities = new String[typeMap.size()];
-		Iterator<String> iter = typeMap.keySet().iterator();
-		while(iter.hasNext()){
-			String entity = iter.next();
-			entities[typeMap.get(entity)] = entity;
-		}
-		return entities;
-	}
 	
 	public static void main(String[] args) throws InterruptedException, IOException {
 		
 		
 		processArgs(args);
 		dataTypeSet = Init.iniOntoNotesData();
-		//remember the entities returned here contains also OE and ONE
-		entities = initializeHyperEdgeModelTypeMap(selectedEntities);
 		String modelType = MODEL.HYPEREDGE.name();
 		DPConfig.currentModel = modelType;
 		String middle = isDev? ".dev":".test";
@@ -107,7 +80,7 @@ public class HPEMain {
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = false;
 		
 		
-		HPEFeatureManager hpfm = new HPEFeatureManager(new GlobalNetworkParam(),entities);
+		HPEFeatureManager hpfm = new HPEFeatureManager(new GlobalNetworkParam());
 		HPENetworkCompiler dnc = new HPENetworkCompiler();
 		NetworkModel model = DiscriminativeNetworkModel.create(hpfm, dnc);
 		model.train(trainingInsts, numIteration); 
@@ -137,7 +110,6 @@ public class HPEMain {
 					case "-thread": numThreads = Integer.valueOf(args[i+1]); break;
 					case "-train":trainingPath = args[i+1];break;
 					case "-test":testingPath = args[i+1];break;
-					case "-ent": selectedEntities = args[i+1].split(","); break;
 					case "-debug": DPConfig.DEBUG = args[i+1].equals("true")? true:false; break;
 					case "-reg": DPConfig.L2 = Double.parseDouble(args[i+1]); break;
 					case "-dev": isDev = args[i+1].equals("true")? true:false; break;
@@ -158,7 +130,6 @@ public class HPEMain {
 			System.err.println("[Info] numIter: "+numIteration);
 			System.err.println("[Info] numThreads: "+numThreads);
 			
-			System.err.println("[Info] Selected Entities: "+Arrays.toString(selectedEntities));
 			System.err.println("[Info] Regularization Parameter: "+DPConfig.L2);
 			System.err.println("[Info] Using development set??: "+isDev);
 			
