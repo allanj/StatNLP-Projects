@@ -5,4 +5,8 @@ data/conll2000/*
 data/conll2003/*
 data/ontonotes/*
 data/semeval10t1/*
+data/conlleval.pl
+data/dat/*
+.idea/
+run.sh
 *.jar
