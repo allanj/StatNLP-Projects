@@ -37,6 +37,7 @@ public class DependencyMain {
 	public static boolean topKinput = false;
 	public static boolean labeledDep = false;
 	public static int windowSize = 1; //for neural features
+	public static boolean basicFeatures = true;
 	
 	public static String[] initializeTypeMap(){
 		HashMap<String, Integer> typeMap = new HashMap<String, Integer>();
@@ -115,7 +116,7 @@ public class DependencyMain {
 		
 		
 		
-		DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(), isPipe, labeledDep, windowSize);
+		DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(), isPipe, labeledDep, windowSize, basicFeatures);
 		DependencyNetworkCompiler dnc = new DependencyNetworkCompiler(labeledDep);
 		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);
 		
@@ -178,6 +179,7 @@ public class DependencyMain {
 										NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
 										NetworkConfig.REGULARIZE_NEURAL_FEATURES = true; // Regularized the neural features in CRF or not
 									} break;
+					case "-basicf": basicFeatures = args[i+1].equals("true") ? true : false; break;
 					default: System.err.println("Invalid argument " + args[i] + ", please check usage."); System.err.println(usage);System.exit(0);
 				}
 			}
