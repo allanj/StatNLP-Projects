@@ -1,6 +1,8 @@
 package com.statnlp.projects.dep.model.hyperedge;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -370,7 +372,42 @@ public class HPENetworkCompiler extends NetworkCompiler {
 	
 	
 	private List<Span> toOutput(HPENetwork network, HPEInstance inst) {
-		return null;
+		List<Span> prediction = new ArrayList<>();
+		long root = this.toNode_root(inst.size());
+		int rootIdx = Arrays.binarySearch(network.getAllNodes(), root);
+		findBest(network, inst, rootIdx, prediction);
+		Collections.sort(prediction);
+		return prediction;
+	}
+	
+	private void findBest(HPENetwork network, HPEInstance inst, int parent_k, List<Span> prediction) {
+		int[] children_k = network.getMaxPath(parent_k);
+		for (int child_k: children_k) {
+			long node = network.getNode(child_k);
+			int[] nodeArr = NetworkIDMapper.toHybridNodeArray(node);
+			int rightIndex = nodeArr[0];
+			int leftIndex = nodeArr[0] - nodeArr[1];
+			int comp = nodeArr[2];
+			int direction = nodeArr[3];
+			int leftSpanLen = nodeArr[4];
+			int ltId = nodeArr[5];
+			int rightSpanLen = nodeArr[6];
+			int rtId = nodeArr[7];
+			if (comp == COMP.incomp.ordinal()) {
+				Span span;
+				int headIdx;
+				if (direction == leftDir) {
+					//the rule is assigned to nearest member first.
+					headIdx = rightIndex - rightSpanLen + 1;
+					span = new Span(leftIndex, leftIndex + leftSpanLen - 1, Label.get(ltId), headIdx);
+				} else {
+					headIdx = leftIndex + leftSpanLen - 1;
+					span = new Span(rightIndex - rightSpanLen + 1, rightIndex, Label.get(rtId));
+				}
+				prediction.add(span);
+			}
+			findBest(network, inst, child_k, prediction);
+ 		}
 	}
 	 
 
