@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import com.statnlp.commons.ml.opt.OptimizerFactory;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -38,6 +39,7 @@ public class DependencyMain {
 	public static boolean labeledDep = false;
 	public static int windowSize = 1; //for neural features
 	public static boolean basicFeatures = true;
+	static OptimizerFactory optimizer = OptimizerFactory.getLBFGSFactory();;
 	
 	public static String[] initializeTypeMap(){
 		HashMap<String, Integer> typeMap = new HashMap<String, Integer>();
@@ -115,8 +117,7 @@ public class DependencyMain {
 		System.err.println("[Info] Regularization Parameter: "+NetworkConfig.L2_REGULARIZATION_CONSTANT);
 		
 		
-		
-		DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(), isPipe, labeledDep, windowSize, basicFeatures);
+		DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(optimizer), isPipe, labeledDep, windowSize, basicFeatures);
 		DependencyNetworkCompiler dnc = new DependencyNetworkCompiler(labeledDep);
 		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);
 		
@@ -178,8 +179,19 @@ public class DependencyMain {
 										NetworkConfig.OPTIMIZE_NEURAL = true;  //optimize in CRF..
 										NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
 										NetworkConfig.REGULARIZE_NEURAL_FEATURES = false; // Regularized the neural features in CRF or not
-									} break;
+									} break; 
 					case "-basicf": basicFeatures = args[i+1].equals("true") ? true : false; break;
+					case "-optim" : if (args[i+1].equals("lbfgs")) {
+										optimizer = OptimizerFactory.getLBFGSFactory();
+									} else if (args[i+1].equals("adagrad")) {
+										optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaGrad(Double.parseDouble(args[i+2]));
+										i = i + 1;
+									} else if (args[i+1].equals("adam")) {
+										optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaM();
+									} else {
+										throw new RuntimeException ("Unknown optimizer: " + args[i+1]);
+									}
+									break;
 					default: System.err.println("Invalid argument " + args[i] + ", please check usage."); System.err.println(usage);System.exit(0);
 				}
 			}
