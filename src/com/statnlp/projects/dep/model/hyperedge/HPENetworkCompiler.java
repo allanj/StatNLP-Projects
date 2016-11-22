@@ -124,7 +124,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 				//span:[bIndex, rightIndex]
 				
 				for(int complete = 0; complete <= 1; complete++){
-					for(int direction=0;direction<=1;direction++){
+					for (int direction = 0; direction <= 1; direction++) {
 						if (leftIndex == 0 && direction == 0) continue;
 						if (complete == COMP.incomp.ordinal()) {
 							for (int lr = leftIndex; lr < rightIndex && (lr - leftIndex + 1) <= maxEntityLen; lr++) {
@@ -136,26 +136,32 @@ public class HPENetworkCompiler extends NetworkCompiler {
 										for (int rt = 0; rt < Label.Labels.size(); rt++) {
 											if (rt == Label.get(EMPTY).id || (rightSpanLen != 1 && rt == Label.get(OEntity).id)) continue;
 											long parent = this.toNodeIncomp(leftIndex, rightIndex, direction, Label.get(lt).form, leftSpanLen, Label.get(rt).form, rightSpanLen);
-											for (int m = lr; m < rl; m++) {
-												long leftChild = this.toNodeComp(leftIndex, m, rightDir, Label.get(lt).form, leftSpanLen);
-												long rightChild = this.toNodeComp(m + 1, rightIndex, leftDir, Label.get(rt).form, rightSpanLen);
-												Span leftSpan = new Span(leftIndex, m, Label.get(lt));
-												Span rightSpan = new Span(m + 1, rightIndex, Label.get(rt));
-												boolean inOutput = false;
-												if (direction == leftDir) {
-													if (outputMap.containsKey(leftSpan)) {
-														int leftSpanHead = outputMap.get(leftSpan).headIndex;
-														if (leftSpanHead >= (m + 1) || leftSpanHead <= rightIndex) inOutput = true;
-													}
-												} else {
-													if (outputMap.containsKey(rightSpan)) {
-														int rightSpanHead = outputMap.get(rightSpan).headIndex;
-														if (rightSpanHead >= leftIndex || rightSpanHead <= m) inOutput = true;
-													}
+											Span leftSpan = new Span(leftIndex, lr, Label.get(lt));
+											Span rightSpan = new Span(rl, rightIndex, Label.get(rt));
+											boolean inOutput = false;
+											if (direction == leftDir) {
+												if (outputMap.containsKey(leftSpan)) {
+													int leftSpanHead = outputMap.get(leftSpan).headIndex;
+													if (leftSpanHead >= rl || leftSpanHead <= rightIndex) inOutput = true;
 												}
-												if(network.contains(leftChild) && network.contains(rightChild) && inOutput){
-													network.addNode(parent);
-													network.addEdge(parent, new long[]{leftChild, rightChild});
+											} else {
+												if (outputMap.containsKey(rightSpan)) {
+													int rightSpanHead = outputMap.get(rightSpan).headIndex;
+													if (rightSpanHead >= leftIndex || rightSpanHead <= lr) inOutput = true;
+												}
+											}
+											if (inOutput) {
+												for (int m = lr; m < rl; m++) {
+													long leftChild = this.toNodeComp(leftIndex, m, rightDir, Label.get(lt).form, leftSpanLen);
+//													if (leftIndex==0 && m==0) {
+//														System.err.println("at root one.");
+//													}
+													long rightChild = this.toNodeComp(m + 1, rightIndex, leftDir, Label.get(rt).form, rightSpanLen);
+													
+													if(network.contains(leftChild) && network.contains(rightChild)){
+														network.addNode(parent);
+														network.addEdge(parent, new long[]{leftChild, rightChild});
+													}
 												}
 											}
 										}

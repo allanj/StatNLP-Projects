@@ -25,7 +25,7 @@ public class HPEMain {
 	public static String trainingPath;
 	public static String testingPath;
 	public static String devPath;
-	public static boolean isDev = true;
+	public static boolean isDev = false;
 	public static HashSet<String> dataTypeSet;
 	
 	public static void main(String[] args) throws InterruptedException, IOException {
@@ -112,17 +112,12 @@ public class HPEMain {
 					case "-reg": DPConfig.L2 = Double.parseDouble(args[i+1]); break;
 					case "-dev": isDev = args[i+1].equals("true")? true:false; break;
 					case "-windows": DPConfig.windows = true; break;
-					case "-comb": DPConfig.comb = true; break;
 					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
 					case "-rw": DPConfig.weightPath=args[i+1]; DPConfig.readWeight = true;DPConfig.writeWeight = false; break;
 					case "-ww":DPConfig.weightPath=args[i+1]; DPConfig.readWeight = false; DPConfig.writeWeight = true; break;
 					default: System.err.println("Invalid arguments: "+args[i]+", please check usage."); System.err.println(usage);System.exit(0);
 				}
 			}
-			if(DPConfig.comb){
-				DPConfig.changeTrainingPath();
-			}
-			
 			System.err.println("[Info] trainNum: "+trainNumber);
 			System.err.println("[Info] testNum: "+testNumber);
 			System.err.println("[Info] numIter: "+numIteration);

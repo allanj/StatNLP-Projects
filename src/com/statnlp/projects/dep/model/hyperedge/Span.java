@@ -39,6 +39,8 @@ public class Span implements Comparable<Span>, Serializable{
 		this.label = label;
 	}
 	
+	
+	@Override
 	public boolean equals(Object o){
 		if(o instanceof Span){
 			Span s = (Span)o;
@@ -48,6 +50,16 @@ public class Span implements Comparable<Span>, Serializable{
 			return label.equals(s.label);
 		}
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + end;
+		result = prime * result + ((label == null) ? 0 : label.hashCode());
+		result = prime * result + start;
+		return result;
 	}
 
 	@Override
