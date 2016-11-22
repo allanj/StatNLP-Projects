@@ -24,13 +24,13 @@ public class HPENetworkCompiler extends NetworkCompiler {
 	private static final long serialVersionUID = -5080640847287255079L;
 
 	private long[] _nodes;
-	private final int maxSentLen = 140;
-	private final int maxEntityLen = 8;
+	private final int maxSentLen = 50;
+	private final int maxEntityLen = 4;
 	private int[][][] _children;
 	private enum NodeType {normal};
 	public static String EMPTY = DPConfig.EMPTY;
 	
-	private static boolean DEBUG = false;
+	private static boolean DEBUG = true;
 	
 	private int rightDir = DIR.right.ordinal();
 	private int leftDir = DIR.left.ordinal();
@@ -42,7 +42,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 	 */
 	public HPENetworkCompiler() {
 		// rightIndex, rightIndex-leftIndex, completeness, direction, entity type, node type
-		int[] capacity = new  int[]{145, 145, 2, 2, 8, Label.Labels.size(), 8, Label.Labels.size()};
+		int[] capacity = new  int[]{145, 145, 2, 2, 9, Label.Labels.size(), 9, Label.Labels.size(), 1};
 		NetworkIDMapper.setCapacity(capacity);
 	}
 	
@@ -231,7 +231,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 		}
 		long root = this.toNode_root(inst.getInput().length());
 		int rootIdx = Arrays.binarySearch(this._nodes, root);
-		HPENetwork network = new HPENetwork(networkId, inst, this._nodes, this._children, param, rootIdx+1);
+		HPENetwork network = new HPENetwork(networkId, inst, this._nodes, this._children, param, rootIdx + 1);
 		return network;
 	}
 	

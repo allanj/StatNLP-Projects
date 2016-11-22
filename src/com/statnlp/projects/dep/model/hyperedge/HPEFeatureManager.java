@@ -134,16 +134,35 @@ public class HPEFeatureManager extends FeatureManager {
 		if(dist > 10) distBool = "10";
 		String attDist = "&"+att+"&"+distBool;
 		//maybe we can concatenate the whole span.
-		int headIndex = direction == 1? leftIndex:rightIndex;
-		int modifierIndex = direction == 1? rightIndex:leftIndex;
-		String headWord = sent.get(headIndex).getName();
-		String headTag = sent.get(headIndex).getTag();
-		String modifierWord = sent.get(modifierIndex).getName();
-		String modifierTag = sent.get(modifierIndex).getTag();
-		
-		
+		int headIndex = direction == DIR.right.ordinal()? leftIndex : rightIndex - rightSpanLen + 1;
+		int modifierIndex = direction == DIR.right.ordinal()? rightIndex - rightSpanLen + 1 : leftIndex;
 		
 		if(completeness==0){
+			String headWord = sent.get(headIndex).getName();
+			String headTag = sent.get(headIndex).getTag();
+			String modifierWord = sent.get(modifierIndex).getName();
+			String modifierTag = sent.get(modifierIndex).getTag();
+			
+			/**Simple concatenation**/
+			if (direction == DIR.right.ordinal()) {
+				for (int i = leftIndex + 1; i <= leftIndex + leftSpanLen - 1; i++) {
+					headWord += " & " + sent.get(i).getName();
+					headTag += " & " + sent.get(i).getTag();
+				}
+				for (int i = rightIndex - rightSpanLen + 2; i <= rightIndex; i++) {
+					modifierWord += " & " + sent.get(i).getName();
+					modifierTag += " & " + sent.get(i).getTag();
+				}
+			} else {
+				for (int i = leftIndex + 1; i <= leftIndex + leftSpanLen - 1; i++) {
+					modifierWord += " & " + sent.get(i).getName();
+					modifierTag += " & " + sent.get(i).getTag();
+				}
+				for (int i = rightIndex - rightSpanLen + 2; i <= rightIndex; i++) {
+					headWord += " & " + sent.get(i).getName();
+					headTag += " & " + sent.get(i).getTag();
+				}
+			}
 			
 //			if(headWord.length()>5 || modifierWord.length()>5){
 //				int hL = headWord.length();

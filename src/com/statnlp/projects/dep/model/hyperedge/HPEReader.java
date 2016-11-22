@@ -46,6 +46,7 @@ public class HPEReader {
 					originalHeads = new ArrayList<>();
 					originalHeads.add(-1);
 					output = new ArrayList<Span>();
+					continue;
 				}
 				if(isLabeled){
 					instance.setLabeled(); // Important!

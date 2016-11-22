@@ -8,10 +8,8 @@ import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkModel;
-import com.statnlp.projects.dep.Evaluator;
 import com.statnlp.projects.dep.utils.DPConfig;
 import com.statnlp.projects.dep.utils.DPConfig.MODEL;
-import com.statnlp.projects.dep.utils.Init;
 
 /**
  * This one is modified for the whole named entity version
@@ -34,7 +32,6 @@ public class HPEMain {
 		
 		
 		processArgs(args);
-		dataTypeSet = Init.iniOntoNotesData();
 		String modelType = MODEL.HYPEREDGE.name();
 		DPConfig.currentModel = modelType;
 		String middle = isDev? ".dev":".test";
@@ -47,13 +44,13 @@ public class HPEMain {
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
-//		trainingPath = "data/semeval10t1/small.txt";
+		trainingPath = "data/semeval10t1/debug.conllx";
 //		testingPath = "data/semeval10t1/test.txt";
-//		trainNumber = 10;
-//		testNumber = 10;
+		trainNumber = 1;
+		testNumber = 1;
 //		numIteration = 20;
 //		numThreads = 8;
-//		testingPath = trainingPath;
+		testingPath = trainingPath;
 //		DPConfig.readWeight = true;
 //		DPConfig.writeWeight = false;
 		/************/
@@ -68,6 +65,7 @@ public class HPEMain {
 		HPEInstance[] trainingInsts = HPEReader.readCoNLLXData(trainingPath, true, trainNumber, true);;
 		HPEInstance[] testingInsts = HPEReader.readCoNLLXData(decodePath, false, testNumber, false);
 		Label.get(DPConfig.EMPTY);
+		System.err.println("The label set: " + Label.Label_Index.toString());
 		Label.lock();
 		
 		
@@ -88,9 +86,9 @@ public class HPEMain {
 		/****************Evaluation Part**************/
 		System.err.println("*****Evaluation*****");
 		Instance[] predInsts = model.decode(testingInsts);
-		Evaluator.evalDP(predInsts, dpRes);
-		Evaluator.evalNER(predInsts, nerEval);
-		Evaluator.writeJointResult(predInsts, jointRes, modelType);
+//		HPEEval.evalDP(predInsts, dpRes);
+		HPEEval.evalNER(predInsts, nerEval);
+//		HPEEval.writeJointResult(predInsts, jointRes, modelType);
 	}
 	
 	public static void processArgs(String[] args){
