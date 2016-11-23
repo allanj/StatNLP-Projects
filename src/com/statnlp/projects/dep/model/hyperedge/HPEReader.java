@@ -22,11 +22,13 @@ public class HPEReader {
 		ArrayList<HPEInstance> result = new ArrayList<HPEInstance>();
 		ArrayList<WordToken> words = new ArrayList<WordToken>();
 		List<Integer> originalHeads = new ArrayList<>();
+		List<String> originalHeadLabel = new ArrayList<>();
 		Map<Integer, Integer> idx2SpanIdx = new HashMap<>();
 		int maxSentenceLength = -1;
 		int maxEntityLength = -1;
 		words.add(new WordToken(ROOT_WORD, ROOT_TAG));
 		originalHeads.add(-1);
+		originalHeadLabel.add("UNK");
 		ArrayList<Span> output = new ArrayList<Span>();
 		output.add(new Span(0, 0, Label.get("O")));
 		idx2SpanIdx.put(0, output.size()-1);
@@ -52,19 +54,23 @@ public class HPEReader {
 					if (span.length() == 1) {
 						if (originalHeads.get(span.start) != -1){
 							span.headSpan = output.get(idx2SpanIdx.get(originalHeads.get(span.start)));
+							span.depLabel = originalHeadLabel.get(span.start);
 						}
 					} else {
 						int entityHead = -1; 
+						String depLabel = null;
 						//by default select the from the last
 						for(int i = span.end; i >= span.start; i--){
 							if (originalHeads.get(i) < span.start || originalHeads.get(i) > span.end) {
 								entityHead = originalHeads.get(i);
+								depLabel = originalHeadLabel.get(i);
 								break;
 							}
 						}
 						if (entityHead == -1)
 							throw new RuntimeException("The head of entity is -1 ?");
 						span.headSpan = output.get(idx2SpanIdx.get(entityHead));
+						span.depLabel = depLabel;
 					}
 				}
 				
@@ -73,7 +79,9 @@ public class HPEReader {
 					words = new ArrayList<WordToken>();
 					words.add(new WordToken(ROOT_WORD, ROOT_TAG));
 					originalHeads = new ArrayList<>();
+					originalHeadLabel = new ArrayList<>();
 					originalHeads.add(-1);
+					originalHeadLabel.add("UNK");
 					output = new ArrayList<Span>();
 					output.add(new Span(0, 0, Label.get("O")));
 					idx2SpanIdx = new HashMap<>();
@@ -93,7 +101,9 @@ public class HPEReader {
 				output = new ArrayList<Span>();
 				output.add(new Span(0, 0, Label.get("O")));
 				originalHeads = new ArrayList<>();
+				originalHeadLabel = new ArrayList<>();
 				originalHeads.add(-1);
+				originalHeadLabel.add("UNK");
 				idx2SpanIdx = new HashMap<>();
 				idx2SpanIdx.put(0, output.size()-1);
 				prevLabel = null;
@@ -112,6 +122,7 @@ public class HPEReader {
 				if(depLabel.contains("|")) throw new RuntimeException("Mutiple label?");
 				words.add(new WordToken(word, pos));
 				originalHeads.add(headIdx);
+				originalHeadLabel.add(depLabel);
 				Label label = null;
 				if(form.startsWith("B")){
 					if(start != -1){

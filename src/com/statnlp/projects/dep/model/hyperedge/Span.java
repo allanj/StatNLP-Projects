@@ -16,6 +16,7 @@ public class Span implements Comparable<Span>, Serializable{
 	public int end;
 //	public int headIndex;
 	public Span headSpan;
+	public String depLabel;
 
 	/**
 	 * 
@@ -78,7 +79,7 @@ public class Span implements Comparable<Span>, Serializable{
 	
 	public String toString(){
 		if (headSpan != null)
-			return String.format("[%d, %d, %s head-span:(%d, %d)]", start, end, label, headSpan.start, headSpan.end);
+			return String.format("[%d, %d, %s head-span:(%d, %d), %s]", start, end, label, headSpan.start, headSpan.end, depLabel);
 		else
 			return String.format("[%d, %d, %s]", start, end, label);
 	}

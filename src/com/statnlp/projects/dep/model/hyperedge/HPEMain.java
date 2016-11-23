@@ -36,22 +36,22 @@ public class HPEMain {
 		String modelType = MODEL.HYPEREDGE.name();
 		DPConfig.currentModel = modelType;
 		String middle = isDev? ".dev":".test";
-		String dpRes = DPConfig.data_prefix+modelType+middle+DPConfig.dp_res_suffix; 
-		String nerEval = DPConfig.data_prefix+modelType+middle+DPConfig.ner_eval_suffix;
-		String jointRes = DPConfig.data_prefix+modelType+middle+DPConfig.joint_res_suffix;
+		String dpRes = DPConfig.data_prefix + modelType+middle+DPConfig.dp_res_suffix; 
+		String nerEval = DPConfig.data_prefix + modelType+middle+DPConfig.ner_eval_suffix;
+		String jointRes = DPConfig.data_prefix + modelType+middle+DPConfig.joint_res_suffix;
 		trainingPath = DPConfig.trainingPath;
 		testingPath = DPConfig.testingPath;
 		devPath = DPConfig.devPath;
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
-//		trainingPath = "data/semeval10t1/debug.conllx";
-//		testingPath = "data/semeval10t1/test.txt";
-		trainNumber = 100;
-		testNumber = 100;
+		trainingPath = "data/allanprocess/voa/train.conllx";
+		testingPath = "data/allanprocess/voa/test.conllx";
+		trainNumber = -1;
+		testNumber = -1;
 //		numIteration = 20;
 //		numThreads = 8;
-		testingPath = trainingPath;
+//		testingPath = trainingPath;
 //		DPConfig.readWeight = true;
 //		DPConfig.writeWeight = false;
 		/************/
