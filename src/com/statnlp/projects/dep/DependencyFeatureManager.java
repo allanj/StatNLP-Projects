@@ -20,20 +20,22 @@ public class DependencyFeatureManager extends FeatureManager {
 	protected boolean isPipe;
 	protected boolean labeledDep;
 	protected boolean basicFeature = true; 
+	protected boolean entityFeature = false;
 	protected int windowSize = 1;
 	protected String insep = NeuralConfig.IN_SEP;
 	protected String outsep = NeuralConfig.OUT_SEP;
 	
 	public DependencyFeatureManager(GlobalNetworkParam param_g, boolean isPipe, boolean labeledDep, int windowSize) {
-		this(param_g, isPipe, labeledDep, windowSize, true);
+		this(param_g, isPipe, labeledDep, windowSize, true, false);
 	}
 	
-	public DependencyFeatureManager(GlobalNetworkParam param_g, boolean isPipe, boolean labeledDep, int windowSize, boolean basicFeature) {
+	public DependencyFeatureManager(GlobalNetworkParam param_g, boolean isPipe, boolean labeledDep, int windowSize, boolean basicFeature, boolean entityFeature) {
 		super(param_g);
 		this.isPipe = isPipe;
 		this.labeledDep = labeledDep;
 		this.windowSize = windowSize;
 		this.basicFeature = basicFeature;
+		this.entityFeature = entityFeature;
 	}
 	
 	
@@ -261,14 +263,13 @@ public class DependencyFeatureManager extends FeatureManager {
 					featureList.add(this._param_g.toFeature(network, FeaType.inbetween.name(), "inbetween-4", leftA+","+sent.get(i).getATag()+","+rightA));
 				}
 				
-				if(isPipe){
-					String leftE = sent.get(leftIndex).getEntity().substring(0, 1);
-					String llE = leftIndex>1? sent.get(leftIndex-1).getEntity().substring(0, 1):"STR";
-					String rightE = sent.get(rightIndex).getEntity().substring(0, 1);
-					String rrE = rightIndex<sent.length()-1? sent.get(rightIndex+1).getEntity().substring(0, 1):"END";
-					
-					featureList.add(this._param_g.toFeature(network, FeaType.pipe.name(), "dep-all",  leftE+":"+llE+":"+rightE+":"+rrE));
-					featureList.add(this._param_g.toFeature(network, FeaType.pipe.name(), "dep",	leftE+":"+rightE));
+				if(isPipe || entityFeature){
+					String he = sent.get(headIndex).getEntity();
+					he = he.length() > 1? he.substring(2) : he;
+					String me = sent.get(modifierIndex).getEntity();
+					me = me.length() > 1? me.substring(2) : me;
+					featureList.add(this._param_g.toFeature(network, FeaType.pipe.name(), "entity",  he+":"+me+":"+headTag+":"+modifierTag));
+					featureList.add(this._param_g.toFeature(network, FeaType.pipe.name(), "entity-word",	he+":"+me+":"+headWord+":"+modifierWord));
 				}
 			}
 			

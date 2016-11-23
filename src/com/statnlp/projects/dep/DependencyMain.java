@@ -25,21 +25,22 @@ import com.statnlp.projects.dep.utils.Init;
  */
 public class DependencyMain {
 	
-	public static String[] entities; 
-	public static int trainNumber = 20;
-	public static int testNumber = 20;
-	public static int numIteration = 300;
-	public static int numThreads = 5;
-	public static String testFile;
-	public static boolean isPipe = false;
-	public static String trainingPath;
-	public static boolean isDev = false;
-	public static HashSet<String> dataTypeSet;
-	public static boolean topKinput = false;
-	public static boolean labeledDep = false;
-	public static int windowSize = 1; //for neural features
-	public static boolean basicFeatures = true;
-	static OptimizerFactory optimizer = OptimizerFactory.getLBFGSFactory();;
+	protected static String[] entities; 
+	protected static int trainNumber = 20;
+	protected static int testNumber = 20;
+	protected static int numIteration = 300;
+	protected static int numThreads = 5;
+	protected static String testFile;
+	protected static boolean isPipe = false;
+	protected static String trainingPath;
+	protected static boolean isDev = false;
+	protected static HashSet<String> dataTypeSet;
+	protected static boolean topKinput = false;
+	protected static boolean labeledDep = false;
+	protected static int windowSize = 1; //for neural features
+	protected static boolean basicFeatures = true;
+	protected static OptimizerFactory optimizer = OptimizerFactory.getLBFGSFactory();
+	protected static boolean entityFeature = false;
 	
 	public static String[] initializeTypeMap(){
 		HashMap<String, Integer> typeMap = new HashMap<String, Integer>();
@@ -117,7 +118,7 @@ public class DependencyMain {
 		System.err.println("[Info] Regularization Parameter: "+NetworkConfig.L2_REGULARIZATION_CONSTANT);
 		
 		
-		DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(optimizer), isPipe, labeledDep, windowSize, basicFeatures);
+		DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(optimizer), isPipe, labeledDep, windowSize, basicFeatures, entityFeature);
 		DependencyNetworkCompiler dnc = new DependencyNetworkCompiler(labeledDep);
 		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);
 		
@@ -181,6 +182,7 @@ public class DependencyMain {
 										NetworkConfig.REGULARIZE_NEURAL_FEATURES = false; // Regularized the neural features in CRF or not
 									} break; 
 					case "-basicf": basicFeatures = args[i+1].equals("true") ? true : false; break;
+					case "-entityf": entityFeature = args[i+1].equals("true") ? true : false; break;
 					case "-optim" : if (args[i+1].equals("lbfgs")) {
 										optimizer = OptimizerFactory.getLBFGSFactory();
 									} else if (args[i+1].equals("adagrad")) {
