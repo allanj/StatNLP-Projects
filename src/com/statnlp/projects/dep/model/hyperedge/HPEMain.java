@@ -8,6 +8,7 @@ import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkModel;
+import com.statnlp.projects.dep.model.hyperedge.stat.Analyzer;
 import com.statnlp.projects.dep.utils.DPConfig;
 import com.statnlp.projects.dep.utils.DPConfig.MODEL;
 
@@ -44,10 +45,10 @@ public class HPEMain {
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
-		trainingPath = "data/semeval10t1/debug.conllx";
+//		trainingPath = "data/semeval10t1/debug.conllx";
 //		testingPath = "data/semeval10t1/test.txt";
-		trainNumber = 1;
-		testNumber = 1;
+		trainNumber = 100;
+		testNumber = 100;
 //		numIteration = 20;
 //		numThreads = 8;
 		testingPath = trainingPath;
@@ -66,16 +67,23 @@ public class HPEMain {
 		HPEInstance[] testingInsts = HPEReader.readCoNLLXData(decodePath, false, testNumber, false);
 		Label.get(DPConfig.EMPTY);
 		System.err.println("The label set: " + Label.Label_Index.toString());
+		
+		//debug
 		Label.lock();
 		
-		
+		//debug:
+//		System.err.println("checking training");
+//		Analyzer.checkMultiwordsHead(trainingInsts);
+//		System.err.println("checking testing");
+//		Analyzer.checkMultiwordsHead(testingInsts);
+//		System.exit(0);
 		
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
 		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig.NUM_THREADS = numThreads;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //DPConfig.L2;
-		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = false;
+		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		
 		
 		HPEFeatureManager hpfm = new HPEFeatureManager(new GlobalNetworkParam());

@@ -14,7 +14,8 @@ public class Span implements Comparable<Span>, Serializable{
 	public Label label;
 	public int start;
 	public int end;
-	public int headIndex;
+//	public int headIndex;
+	public Span headSpan;
 
 	/**
 	 * 
@@ -22,13 +23,13 @@ public class Span implements Comparable<Span>, Serializable{
 	 * @param end: inclusive
 	 * @param label
 	 */
-	public Span(int start, int end, Label label, int headIndex) {
+	public Span(int start, int end, Label label, Span headSpan) {
 		if(start>end)
 			throw new RuntimeException("Start cannot be larger than end");
 		this.start = start;
 		this.end = end;
 		this.label = label;
-		this.headIndex = headIndex;
+		this.headSpan = headSpan;
 	}
 	
 	public Span(int start, int end, Label label) {
@@ -37,6 +38,10 @@ public class Span implements Comparable<Span>, Serializable{
 		this.start = start;
 		this.end = end;
 		this.label = label;
+	}
+	
+	public int length() {
+		return this.end - this.start + 1;
 	}
 	
 	
@@ -72,7 +77,10 @@ public class Span implements Comparable<Span>, Serializable{
 	}
 	
 	public String toString(){
-		return String.format("%d,%d head:%d, %s", start, end, headIndex, label);
+		if (headSpan != null)
+			return String.format("[%d, %d, %s head-span:(%d, %d)]", start, end, label, headSpan.start, headSpan.end);
+		else
+			return String.format("[%d, %d, %s]", start, end, label);
 	}
 	
 }

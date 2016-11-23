@@ -68,30 +68,38 @@ public class HPEEval {
 			List<Span> prediction = inst.getPrediction();
 			List<Span> output = inst.getOutput();
 			Sentence sent = inst.getInput();
-			String[] outputE = new String[sent.length()-1];
-			String[] predictionE = new String[sent.length()-1];
+			String[] outputE = new String[sent.length()];
+			String[] predictionE = new String[sent.length()];
 			for (int i = 0; i < output.size(); i++) {
 				Span span = output.get(i); 
 				for (int p = span.start; p <= span.end; p++) {
-					if (p == span.start) {
-						outputE[p] = "B-" + span.label.form;
-					}else{
-						outputE[p] = "I-" + span.label.form;
+					if (!span.label.form.equals("O")) {
+						if (p == span.start) {
+							outputE[p] = "B-" + span.label.form;
+						}else{
+							outputE[p] = "I-" + span.label.form;
+						}
+					} else {
+						outputE[p] = span.label.form;
 					}
 				}
 			}
 			for (int i = 0; i < prediction.size(); i++) {
 				Span span = prediction.get(i); 
 				for (int p = span.start; p <= span.end; p++) {
-					if (p == span.start) {
-						predictionE[p] = "B-" + span.label.form;
-					}else{
-						predictionE[p] = "I-" + span.label.form;
+					if (!span.label.form.equals("O")) {
+						if (p == span.start) {
+							predictionE[p] = "B-" + span.label.form;
+						}else{
+							predictionE[p] = "I-" + span.label.form;
+						}
+					} else {
+						predictionE[p] = span.label.form;
 					}
 				}
 			}
-			for (int i = 0; i < outputE.length; i++) {
-				pw.write(sent.get(i+1).getName()+" "+sent.get(i+1).getTag()+" "+outputE[i]+" "+predictionE[i]+"\n");
+			for (int i = 1; i < outputE.length; i++) {
+				pw.write(sent.get(i).getName()+" "+sent.get(i).getTag()+" "+outputE[i]+" "+predictionE[i]+"\n");
 			}
 			pw.write("\n");
 		}

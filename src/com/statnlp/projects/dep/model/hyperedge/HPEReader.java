@@ -3,7 +3,9 @@ package com.statnlp.projects.dep.model.hyperedge;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.types.Sentence;
@@ -20,9 +22,14 @@ public class HPEReader {
 		ArrayList<HPEInstance> result = new ArrayList<HPEInstance>();
 		ArrayList<WordToken> words = new ArrayList<WordToken>();
 		List<Integer> originalHeads = new ArrayList<>();
+		Map<Integer, Integer> idx2SpanIdx = new HashMap<>();
+		int maxSentenceLength = -1;
+		int maxEntityLength = -1;
 		words.add(new WordToken(ROOT_WORD, ROOT_TAG));
 		originalHeads.add(-1);
 		ArrayList<Span> output = new ArrayList<Span>();
+		output.add(new Span(0, 0, Label.get("O")));
+		idx2SpanIdx.put(0, output.size()-1);
 		int instanceId = 1;
 		int start = -1;
 		int end = 0;
@@ -32,12 +39,34 @@ public class HPEReader {
 			if(line.length() == 0){
 				end = words.size()-1;
 				if(start != -1){
-					createSpan(output, start, end, prevLabel, originalHeads);
+					createSpan(output, start, end, prevLabel, idx2SpanIdx);
+					maxEntityLength = Math.max(maxEntityLength, output.get(output.size()-1).length());
 				}
+				start = -1;
 				WordToken[] wtArr = new WordToken[words.size()];
 				HPEInstance instance = new HPEInstance(instanceId, 1.0, new Sentence(words.toArray(wtArr)));
 				instance.input.setRecognized();
 				instance.output = output;
+				//assign span with head span
+				for (Span span: instance.output) {
+					if (span.length() == 1) {
+						if (originalHeads.get(span.start) != -1){
+							span.headSpan = output.get(idx2SpanIdx.get(originalHeads.get(span.start)));
+						}
+					} else {
+						int entityHead = -1; 
+						//by default select the from the last
+						for(int i = span.end; i >= span.start; i--){
+							if (originalHeads.get(i) < span.start || originalHeads.get(i) > span.end) {
+								entityHead = originalHeads.get(i);
+								break;
+							}
+						}
+						if (entityHead == -1)
+							throw new RuntimeException("The head of entity is -1 ?");
+						span.headSpan = output.get(idx2SpanIdx.get(entityHead));
+					}
+				}
 				
 				boolean projectiveness = DataChecker.checkProjective(originalHeads);
 				if(checkProjective && !projectiveness) {
@@ -46,6 +75,9 @@ public class HPEReader {
 					originalHeads = new ArrayList<>();
 					originalHeads.add(-1);
 					output = new ArrayList<Span>();
+					output.add(new Span(0, 0, Label.get("O")));
+					idx2SpanIdx = new HashMap<>();
+					idx2SpanIdx.put(0, output.size()-1);
 					continue;
 				}
 				if(isLabeled){
@@ -55,11 +87,15 @@ public class HPEReader {
 				}
 				instanceId++;
 				result.add(instance);
+				maxSentenceLength = Math.max(maxSentenceLength, instance.size());
 				words = new ArrayList<WordToken>();
 				words.add(new WordToken(ROOT_WORD, ROOT_TAG));
 				output = new ArrayList<Span>();
+				output.add(new Span(0, 0, Label.get("O")));
 				originalHeads = new ArrayList<>();
 				originalHeads.add(-1);
+				idx2SpanIdx = new HashMap<>();
+				idx2SpanIdx.put(0, output.size()-1);
 				prevLabel = null;
 				start = -1;
 				end = 0;
@@ -80,7 +116,8 @@ public class HPEReader {
 				if(form.startsWith("B")){
 					if(start != -1){
 						end = index - 1;
-						createSpan(output, start, end, prevLabel, originalHeads);
+						createSpan(output, start, end, prevLabel, idx2SpanIdx);
+						maxEntityLength = Math.max(maxEntityLength, output.get(output.size()-1).length());
 					}
 					start = index;
 					label = Label.get(form.substring(2));
@@ -90,10 +127,12 @@ public class HPEReader {
 				} else if(form.startsWith("O")){
 					if(start != -1){
 						end = index - 1;
-						createSpan(output, start, end, prevLabel, originalHeads);
+						createSpan(output, start, end, prevLabel, idx2SpanIdx);
+						maxEntityLength = Math.max(maxEntityLength, output.get(output.size()-1).length());
 					}
 					start = -1;
-					createSpan(output, index, index, Label.get("O"), originalHeads);
+					createSpan(output, index, index, Label.get("O"), idx2SpanIdx);
+					maxEntityLength = Math.max(maxEntityLength, output.get(output.size()-1).length());
 					label = Label.get("O");
 				}
 				prevLabel = label;
@@ -101,32 +140,29 @@ public class HPEReader {
 		}
 		br.close();
 		String type = isLabeled? "train":"test";
-		System.out.println("[Info] number of "+type+" instances:"+result.size());
+		System.err.println("[Info] number of "+type+" instances:"+result.size());
+		System.err.println("[Info] max sentence length: " + maxSentenceLength);
+		System.err.println("[Info] max entity length: " + maxEntityLength);
 		return result.toArray(new HPEInstance[result.size()]);
 	}
 	
- 	private static void createSpan(List<Span> output, int start, int end, Label label, List<Integer> originalHeads){
-		if(label==null){
+ 	private static void createSpan(List<Span> output, int start, int end, Label label, Map<Integer, Integer> idx2SpanIdx){
+		if (label == null) {
 			throw new RuntimeException("The label is null");
 		}
-		if(start>end){
+		if (start > end) {
 			throw new RuntimeException("start cannot be larger than end");
 		}
-		if(label.form.equals("O")){
-			for(int i = start; i <= end; i++){
-				output.add(new Span(i, i, label, originalHeads.get(i)));
+		if (label.form.equals("O")) {
+			for (int i = start; i <= end; i++) {
+				output.add(new Span(i, i, label));
+				idx2SpanIdx.put(i, output.size()-1);
 			}
 		} else {
-			int entityHead = -1;
-			for(int i = start; i <= end; i++){
-				if (originalHeads.get(i) < start || originalHeads.get(i) > end) {
-					entityHead = originalHeads.get(i);
-					break;
-				}
+			output.add(new Span(start, end, label));
+			for (int i = start; i <= end; i++) {
+				idx2SpanIdx.put(i, output.size()-1);
 			}
-			if (entityHead == -1)
-				throw new RuntimeException("The head of entity is -1 ?");
-			output.add(new Span(start, end, label, entityHead));
 		}
 	}
 }

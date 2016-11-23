@@ -24,8 +24,8 @@ public class HPENetworkCompiler extends NetworkCompiler {
 	private static final long serialVersionUID = -5080640847287255079L;
 
 	private long[] _nodes;
-	private final int maxSentLen = 50;
-	private final int maxEntityLen = 4;
+	private final int maxSentLen = 57;
+	private final int maxEntityLen = 7;
 	private int[][][] _children;
 	private enum NodeType {normal};
 	public static String EMPTY = DPConfig.EMPTY;
@@ -140,22 +140,17 @@ public class HPENetworkCompiler extends NetworkCompiler {
 											Span rightSpan = new Span(rl, rightIndex, Label.get(rt));
 											boolean inOutput = false;
 											if (direction == leftDir) {
-												if (outputMap.containsKey(leftSpan)) {
-													int leftSpanHead = outputMap.get(leftSpan).headIndex;
-													if (leftSpanHead >= rl || leftSpanHead <= rightIndex) inOutput = true;
+												if (outputMap.containsKey(leftSpan) && outputMap.get(leftSpan).headSpan.equals(rightSpan)) {
+													inOutput = true;
 												}
 											} else {
-												if (outputMap.containsKey(rightSpan)) {
-													int rightSpanHead = outputMap.get(rightSpan).headIndex;
-													if (rightSpanHead >= leftIndex || rightSpanHead <= lr) inOutput = true;
+												if (outputMap.containsKey(rightSpan) && outputMap.get(rightSpan).headSpan.equals(leftSpan) ) {
+													inOutput = true;
 												}
 											}
 											if (inOutput) {
 												for (int m = lr; m < rl; m++) {
 													long leftChild = this.toNodeComp(leftIndex, m, rightDir, Label.get(lt).form, leftSpanLen);
-//													if (leftIndex==0 && m==0) {
-//														System.err.println("at root one.");
-//													}
 													long rightChild = this.toNodeComp(m + 1, rightIndex, leftDir, Label.get(rt).form, rightSpanLen);
 													
 													if(network.contains(leftChild) && network.contains(rightChild)){
@@ -279,9 +274,18 @@ public class HPENetworkCompiler extends NetworkCompiler {
 								int leftSpanLen = lr - leftIndex + 1;
 								for (int rl = rightIndex; rl > lr && (rightIndex - rl + 1) <= maxEntityLen; rl--) {
 									int rightSpanLen = rightIndex - rl + 1;
+									if (leftSpanLen > 4 && rightSpanLen > 4) continue;
+									if (direction == DIR.right.ordinal() && rightSpanLen > 2 && leftSpanLen > 4) continue;
+									if (direction == DIR.right.ordinal() && rightSpanLen > 1 && leftSpanLen > 6) continue;
+									if (direction == DIR.right.ordinal() && rightSpanLen > 0 && leftSpanLen > 8) continue;
+									if (direction == DIR.left.ordinal() && leftSpanLen > 2 && rightSpanLen > 4) continue;
+									if (direction == DIR.left.ordinal() && leftSpanLen > 1 && rightSpanLen > 6) continue;
+									if (direction == DIR.left.ordinal() && leftSpanLen > 0 && rightSpanLen > 8) continue;
 									for (int lt = 0; lt < Label.Labels.size(); lt++) {
+										if (leftSpanLen > 2 && rightSpanLen > 2 && (lt != Label.get("person").id && lt != Label.get("organization").id)  ) continue; 
 										if (lt == Label.get(EMPTY).id || (leftSpanLen != 1 && lt == Label.get(OEntity).id)) continue;
 										for (int rt = 0; rt < Label.Labels.size(); rt++) {
+											if (leftSpanLen > 2 && rightSpanLen > 2 && (rt != Label.get("person").id && rt != Label.get("organization").id)  ) continue;
 											if (rt == Label.get(EMPTY).id || (rightSpanLen != 1 && rt == Label.get(OEntity).id)) continue;
 											long parent = this.toNodeIncomp(leftIndex, rightIndex, direction, Label.get(lt).form, leftSpanLen, Label.get(rt).form, rightSpanLen);
 											for (int m = lr; m < rl; m++) {
@@ -401,14 +405,10 @@ public class HPENetworkCompiler extends NetworkCompiler {
 			int rtId = nodeArr[7];
 			if (comp == COMP.incomp.ordinal()) {
 				Span span;
-				int headIdx;
 				if (direction == leftDir) {
-					//the rule is assigned to nearest member first.
-					headIdx = rightIndex - rightSpanLen + 1;
-					span = new Span(leftIndex, leftIndex + leftSpanLen - 1, Label.get(ltId), headIdx);
+					span = new Span(leftIndex, leftIndex + leftSpanLen - 1, Label.get(ltId), new Span(rightIndex - rightSpanLen + 1, rightIndex, Label.get(rtId)));
 				} else {
-					headIdx = leftIndex + leftSpanLen - 1;
-					span = new Span(rightIndex - rightSpanLen + 1, rightIndex, Label.get(rtId));
+					span = new Span(rightIndex - rightSpanLen + 1, rightIndex, Label.get(rtId), new Span(leftIndex, leftIndex + leftSpanLen - 1, Label.get(ltId)));
 				}
 				prediction.add(span);
 			}

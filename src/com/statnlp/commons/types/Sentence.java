@@ -68,20 +68,18 @@ public class Sentence extends TokenArray{
 			sb.append(this._tokens[k].getName());
 		}
 		sb.append("\n");
-		for(int k = 0; k<this._tokens.length; k++){
-			if(k!=0) sb.append(' ');
-			WordToken ewt = (WordToken)(this._tokens[k]);
-			sb.append(ewt.getHeadIndex()+" ");
-		}
-		sb.append("\n");
-		if(haveEntityTypes){
-			
-			for(int k = 0; k<this._tokens.length; k++){
-				WordToken ewt = (WordToken)(this._tokens[k]);
-				sb.append(ewt.getEntity()+" ");
-			}
-		}
-		
+//		for(int k = 0; k<this._tokens.length; k++){
+//			if(k!=0) sb.append(' ');
+//			WordToken ewt = (WordToken)(this._tokens[k]);
+//			sb.append(ewt.getHeadIndex()+" ");
+//		}
+//		sb.append("\n");
+//		if(haveEntityTypes){
+//			for(int k = 0; k<this._tokens.length; k++){
+//				WordToken ewt = (WordToken)(this._tokens[k]);
+//				sb.append(ewt.getEntity()+" ");
+//			}
+//		}
 		return sb.toString();
 	}
 
