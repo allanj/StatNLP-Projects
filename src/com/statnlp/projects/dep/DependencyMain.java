@@ -169,7 +169,7 @@ public class DependencyMain {
 					case "-dev":isDev = args[i+1].equals("true")?true:false; break;
 					case "-windows":DPConfig.windows = true; break;
 					case "-comb": DPConfig.comb = true; break;
-					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
+					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(args[i+1]); break;
 					case "-wpath":DPConfig.weightPath=args[i+1]; DPConfig.writeWeight = true; break;
 					case "-topk":NetworkConfig._topKValue = Integer.valueOf(args[i+1]); break;
 					case "-topkinput": topKinput = true; break;
