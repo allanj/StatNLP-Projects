@@ -1,0 +1,39 @@
+package com.statnlp.projects.dep.model.segdep;
+
+
+import com.statnlp.commons.types.Instance;
+
+
+public class SDEval {
+
+	/**
+	 * Evaluate the dependency
+	 * @param testInsts
+	 * @param dpOut, index \t word \t tag \t true entity \t trueHead \t predHead
+	 * @throws IOException
+	 */
+	public static void evalDP(Instance[] testInsts, boolean labeledDep){
+		int dp_corr=0;
+		int dp_total=0;
+		int las_corr = 0;
+		for (int index = 0; index < testInsts.length; index++) {
+			SDInstance inst = (SDInstance)(testInsts[index]);
+			int[] prediction = inst.getPrediction();
+			int[] output = inst.getOutput();
+			for (int i = 1; i < prediction.length; i++) {
+				if (output[i] == prediction[i]) {
+					dp_corr++;
+				}
+				dp_total++;
+			}
+		}
+		System.out.println("**Evaluating Dependency Result**");
+		System.out.println("[Dependency] Correct: "+dp_corr);
+		System.out.println("[Dependency] total: "+dp_total);
+		System.out.println("[Dependency] UAS: "+dp_corr*1.0/dp_total);
+		if(labeledDep) System.out.println("[Dependency] LAS: "+las_corr*1.0/dp_total);
+		System.out.println("*************************");
+	}
+	
+	
+}

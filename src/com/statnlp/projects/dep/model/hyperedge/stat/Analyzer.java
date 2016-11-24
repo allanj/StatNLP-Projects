@@ -1,7 +1,5 @@
 package com.statnlp.projects.dep.model.hyperedge.stat;
 
-import java.util.List;
-
 import com.statnlp.projects.dep.model.hyperedge.HPEInstance;
 import com.statnlp.projects.dep.model.hyperedge.Span;
 
@@ -26,22 +24,4 @@ public class Analyzer {
 		}
 	}
 		
-	private static String[] restoreEntityToken(List<Span> spans, int length) {
-		String[] outputE = new String[length];
-		for (int i = 0; i < spans.size(); i++) {
-			Span span = spans.get(i); 
-			for (int p = span.start; p <= span.end; p++) {
-				if (!span.label.form.equals("O")) {
-					if (p == span.start) {
-						outputE[p] = "B-" + span.label.form;
-					}else{
-						outputE[p] = "I-" + span.label.form;
-					}
-				} else {
-					outputE[p] = span.label.form;
-				}
-			}
-		}
-		return outputE;
-	}
 }
