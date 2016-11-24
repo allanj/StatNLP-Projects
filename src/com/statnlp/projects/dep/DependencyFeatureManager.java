@@ -264,12 +264,9 @@ public class DependencyFeatureManager extends FeatureManager {
 				}
 				
 				if(isPipe || entityFeature){
-					String he = sent.get(headIndex).getEntity();
-					he = he.length() > 1? he.substring(2) : he;
 					String me = sent.get(modifierIndex).getEntity();
-					me = me.length() > 1? me.substring(2) : me;
-					featureList.add(this._param_g.toFeature(network, FeaType.pipe.name(), "entity",  he+":"+me+":"+headTag+":"+modifierTag));
-					featureList.add(this._param_g.toFeature(network, FeaType.pipe.name(), "entity-word",	he+":"+me+":"+headWord+":"+modifierWord));
+					featureList.add(this._param_g.toFeature(network, FeaType.pipe.name(), "entity-memt",  me + " & " + modifierTag));
+					featureList.add(this._param_g.toFeature(network, FeaType.pipe.name(), "entity-memw",  me + " & " + modifierWord));
 				}
 			}
 			
@@ -327,13 +324,12 @@ public class DependencyFeatureManager extends FeatureManager {
 			String suff = i < 1 ? "&"+att : "";
 			suff = "&"+label+suff;
 		 
-		 	featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-W-WP-suff", w+" "+wP+suff));
-		 	featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WP-suff", wP+suff));
-		 	featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WM-WP-suff", wPm1+" "+wP+suff));
-		 
-		 	featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WP-WPT-suff", wP+" "+wPp1+suff));
-		 	featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WM-WP-WPT-suff", wPm1+" "+wP+" "+wPp1+suff));
-		 	featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-W-suff", w+suff));
+			featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-W-WP-suff", w + " " + wP + suff));
+			featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WP-suff", wP + suff));
+			featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WM-WP-suff", wPm1 + " " + wP + suff));
+			featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WP-WPT-suff", wP + " " + wPp1 + suff));
+			featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WM-WP-WPT-suff", wPm1 + " " + wP + " " + wPp1 + suff));
+			featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-W-suff", w + suff));
 		}
 	}
 	
