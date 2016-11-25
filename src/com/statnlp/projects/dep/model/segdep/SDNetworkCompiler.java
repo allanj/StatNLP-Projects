@@ -1,11 +1,6 @@
 package com.statnlp.projects.dep.model.segdep;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
@@ -14,8 +9,6 @@ import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
 import com.statnlp.hybridnetworks.NetworkException;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
-import com.statnlp.projects.dep.commons.DepLabel;
-import com.statnlp.projects.dep.utils.DPConfig;
 import com.statnlp.projects.dep.utils.DPConfig.COMP;
 import com.statnlp.projects.dep.utils.DPConfig.DIR;
 
@@ -25,16 +18,14 @@ public class SDNetworkCompiler extends NetworkCompiler {
 	private static final long serialVersionUID = -5080640847287255079L;
 
 	private long[] _nodes;
-	private final int maxSentLen = 57;
+	private final int maxSentLen = 128;
 	private int[][][] _children;
 	private enum NodeType {normal};
-	public static String EMPTY = DPConfig.EMPTY;
 	
 	private static boolean DEBUG = true;
 	
 	private int rightDir = DIR.right.ordinal();
 	private int leftDir = DIR.left.ordinal();
-	private String OEntity = "O";
 	
 	/**
 	 * Compiler constructor
@@ -248,23 +239,23 @@ public class SDNetworkCompiler extends NetworkCompiler {
 		SDInstance inst = (SDInstance)(hpeNetwork.getInstance());
 		inst = inst.duplicate();
 		if(hpeNetwork.getMax()==Double.NEGATIVE_INFINITY) return inst;
-		List<Span> prediction = this.toOutput(hpeNetwork, inst);
+		int[] prediction = this.toOutput(hpeNetwork, inst);
 		inst.setPrediction(prediction);
 		return inst;
 	}
 	
 	
-	private List<Span> toOutput(SDNetwork network, SDInstance inst) {
-		List<Span> prediction = new ArrayList<>();
+	private int[] toOutput(SDNetwork network, SDInstance inst) {
+		int[] prediction = new int[inst.size()];
+		prediction[0] = -1;  //no head for the leftmost root node
 		long root = this.toNode_root(inst.size());
 		int rootIdx = Arrays.binarySearch(network.getAllNodes(), root);
 		findBest(network, inst, rootIdx, prediction);
-		Collections.sort(prediction);
 		return prediction;
 	}
 	
-	private void findBest(SDNetwork network, SDInstance inst, int parent_k, List<Span> prediction) {
-		int[] children_k = network.getMaxPath(parent_k);
+	private void findBest(SDNetwork network, SDInstance inst, int parent_k, int[] prediction) {
+		int[] children_k = network.getMaxPath( parent_k);
 		for (int child_k: children_k) {
 			long node = network.getNode(child_k);
 			int[] nodeArr = NetworkIDMapper.toHybridNodeArray(node);
@@ -272,18 +263,12 @@ public class SDNetworkCompiler extends NetworkCompiler {
 			int leftIndex = nodeArr[0] - nodeArr[1];
 			int comp = nodeArr[2];
 			int direction = nodeArr[3];
-			int leftSpanLen = nodeArr[4];
-			int ltId = nodeArr[5];
-			int rightSpanLen = nodeArr[6];
-			int rtId = nodeArr[7];
 			if (comp == COMP.incomp.ordinal()) {
-				Span span;
 				if (direction == leftDir) {
-					span = new Span(leftIndex, leftIndex + leftSpanLen - 1, Label.get(ltId), new Span(rightIndex - rightSpanLen + 1, rightIndex, Label.get(rtId)));
+					prediction[leftIndex] = rightIndex;
 				} else {
-					span = new Span(rightIndex - rightSpanLen + 1, rightIndex, Label.get(rtId), new Span(leftIndex, leftIndex + leftSpanLen - 1, Label.get(ltId)));
+					prediction[rightIndex] = leftIndex;
 				}
-				prediction.add(span);
 			}
 			findBest(network, inst, child_k, prediction);
  		}
