@@ -311,12 +311,18 @@ public class SDFeatureManager extends FeatureManager {
 			}
 			/***End of concatenation**/
 			
+			boolean allLongHead  = false;
+			boolean allLongModifier = false;
+			for (int index = headSpan.start; index <= headSpan.end; index++) {
+				  
+			}
+			
 			if (headWord.length() > 5 || modifierWord.length() > 5) {
 				int hL = headWord.length();
 				int mL = modifierWord.length();
 				String preHead = hL > 5 ? headWord.substring(0, 5) : headWord;
 				String preModifier = mL > 5 ? modifierWord.substring(0, 5) : modifierWord;
-				featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "bigram-prefix-all-dist", preHead+","+headTag+","+preModifier+","+modifierTag+attDist));
+				featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "bigram-prefix-all-dist", preHead + "," + headTag+","+preModifier+","+modifierTag+attDist));
 				featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "bigram-prefix-word-dist", preHead+","+preModifier+attDist));
 				featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "bigram-prefix-all", preHead+","+headTag+","+preModifier+","+modifierTag));
 				featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "bigram-prefix-word", preHead+","+preModifier));
