@@ -32,7 +32,7 @@ public class SDMain {
 		
 		
 		processArgs(args);
-		String modelType = MODEL.HYPEREDGE.name();
+		String modelType = MODEL.SegDep.name();
 		DPConfig.currentModel = modelType;
 		String middle = isDev? ".dev":".test";
 		String dpRes = DPConfig.data_prefix + modelType+middle+DPConfig.dp_res_suffix; 
@@ -46,13 +46,11 @@ public class SDMain {
 		/******Debug********/
 		trainingPath = "data/allanprocess/voa/train.conllx";
 		testingPath = "data/allanprocess/voa/test.conllx";
-		trainNumber = -1;
-		testNumber = -1;
-//		numIteration = 20;
-//		numThreads = 8;
+		trainNumber = 1;
+		testNumber = 1;
+		numIteration = 20;
+		numThreads = 4;
 //		testingPath = trainingPath;
-//		DPConfig.readWeight = true;
-//		DPConfig.writeWeight = false;
 		/************/
 		
 		
@@ -98,39 +96,41 @@ public class SDMain {
 	
 	public static void processArgs(String[] args){
 		String usage = "\t usage: java -jar hyperedge.jar -trainNum -1 -testNum -1 -thread 5 -iter 100 -train path -test path";
-		if(args[0].equals("-h") || args[0].equals("help") || args[0].equals("-help") ){
-			System.err.println("UModel Version: Joint DEPENDENCY PARSING and Entity Recognition TASK: ");
-			System.err.println(usage);
-			System.err.println("\t put numTrainInsts/numTestInsts = -1 if you want to use all the training/testing instances");
-			System.err.println("\t By default: trainNum=-1, testNum=-1, thread=2, iter=100");
-			System.exit(0);
-		}else{
-			for(int i=0;i<args.length;i=i+2){
-				switch(args[i]){
-					case "-trainNum": trainNumber = Integer.valueOf(args[i+1]); break;
-					case "-testNum": testNumber = Integer.valueOf(args[i+1]); break;
-					case "-iter": numIteration = Integer.valueOf(args[i+1]); break;
-					case "-thread": numThreads = Integer.valueOf(args[i+1]); break;
-					case "-train":trainingPath = args[i+1];break;
-					case "-test":testingPath = args[i+1];break;
-					case "-debug": DPConfig.DEBUG = args[i+1].equals("true")? true:false; break;
-					case "-reg": DPConfig.L2 = Double.parseDouble(args[i+1]); break;
-					case "-dev": isDev = args[i+1].equals("true")? true:false; break;
-					case "-windows": DPConfig.windows = true; break;
-					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
-					case "-rw": DPConfig.weightPath=args[i+1]; DPConfig.readWeight = true;DPConfig.writeWeight = false; break;
-					case "-ww":DPConfig.weightPath=args[i+1]; DPConfig.readWeight = false; DPConfig.writeWeight = true; break;
-					default: System.err.println("Invalid arguments: "+args[i]+", please check usage."); System.err.println(usage);System.exit(0);
+		if(args.length > 0) {
+			if(args[0].equals("-h") || args[0].equals("help") || args[0].equals("-help") ){
+				System.err.println("UModel Version: Joint DEPENDENCY PARSING and Entity Recognition TASK: ");
+				System.err.println(usage);
+				System.err.println("\t put numTrainInsts/numTestInsts = -1 if you want to use all the training/testing instances");
+				System.err.println("\t By default: trainNum=-1, testNum=-1, thread=2, iter=100");
+				System.exit(0);
+			}else{
+				for(int i=0;i<args.length;i=i+2){
+					switch(args[i]){
+						case "-trainNum": trainNumber = Integer.valueOf(args[i+1]); break;
+						case "-testNum": testNumber = Integer.valueOf(args[i+1]); break;
+						case "-iter": numIteration = Integer.valueOf(args[i+1]); break;
+						case "-thread": numThreads = Integer.valueOf(args[i+1]); break;
+						case "-train":trainingPath = args[i+1];break;
+						case "-test":testingPath = args[i+1];break;
+						case "-debug": DPConfig.DEBUG = args[i+1].equals("true")? true:false; break;
+						case "-reg": DPConfig.L2 = Double.parseDouble(args[i+1]); break;
+						case "-dev": isDev = args[i+1].equals("true")? true:false; break;
+						case "-windows": DPConfig.windows = true; break;
+						case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
+						case "-rw": DPConfig.weightPath=args[i+1]; DPConfig.readWeight = true;DPConfig.writeWeight = false; break;
+						case "-ww":DPConfig.weightPath=args[i+1]; DPConfig.readWeight = false; DPConfig.writeWeight = true; break;
+						default: System.err.println("Invalid arguments: "+args[i]+", please check usage."); System.err.println(usage);System.exit(0);
+					}
 				}
+				System.err.println("[Info] trainNum: "+trainNumber);
+				System.err.println("[Info] testNum: "+testNumber);
+				System.err.println("[Info] numIter: "+numIteration);
+				System.err.println("[Info] numThreads: "+numThreads);
+				
+				System.err.println("[Info] Regularization Parameter: "+DPConfig.L2);
+				System.err.println("[Info] Using development set??: "+isDev);
+				
 			}
-			System.err.println("[Info] trainNum: "+trainNumber);
-			System.err.println("[Info] testNum: "+testNumber);
-			System.err.println("[Info] numIter: "+numIteration);
-			System.err.println("[Info] numThreads: "+numThreads);
-			
-			System.err.println("[Info] Regularization Parameter: "+DPConfig.L2);
-			System.err.println("[Info] Using development set??: "+isDev);
-			
 		}
 	}
 

@@ -14,25 +14,7 @@ public class Span implements Comparable<Span>, Serializable{
 	public Label label;
 	public int start;
 	public int end;
-//	public int headIndex;
-//	public Span headSpan;
-//	public String depLabel;
 
-	/**
-	 * 
-	 * @param start: inclusive
-	 * @param end: inclusive
-	 * @param label
-	 */
-//	public Span(int start, int end, Label label, Span headSpan) {
-//		if(start>end)
-//			throw new RuntimeException("Start cannot be larger than end");
-//		this.start = start;
-//		this.end = end;
-//		this.label = label;
-//		this.headSpan = headSpan;
-//	}
-	
 	public Span(int start, int end, Label label) {
 		if(start>end)
 			throw new RuntimeException("Start cannot be larger than end");
@@ -52,7 +34,6 @@ public class Span implements Comparable<Span>, Serializable{
 			Span s = (Span)o;
 			if(start != s.start) return false;
 			if(end != s.end) return false;
-			//if(headIndex != s.headIndex) return false;
 			return label.equals(s.label);
 		}
 		return false;

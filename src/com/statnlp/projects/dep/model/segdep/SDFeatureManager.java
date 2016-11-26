@@ -33,12 +33,12 @@ public class SDFeatureManager extends FeatureManager {
 		long parent = network.getNode(parent_k);
 		int[] parentArr = NetworkIDMapper.toHybridNodeArray(parent);
 		
-		int leftIndex = parentArr[0] - parentArr[1];
-		int rightIndex = parentArr[0];
+		int leftSpanIndex = parentArr[0] - parentArr[1];
+		int rightSpanIndex = parentArr[0];
 		int completeness = parentArr[2];
 		
 		if (completeness == COMP.incomp.ordinal()) {
-			if (segments.get(leftIndex).length() == 1 && segments.get(rightIndex).length() == 1){
+			if (segments.get(leftSpanIndex).length() == 1 && segments.get(rightSpanIndex).length() == 1){
 				addDepFeatures(featureList, network, parentArr, sent, segments);
 			} else {
 				addSegDepFeatures(featureList, network, parentArr, sent, segments);
