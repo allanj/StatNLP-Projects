@@ -311,39 +311,53 @@ public class SDFeatureManager extends FeatureManager {
 			}
 			/***End of concatenation**/
 			
-			boolean allLongHead  = false;
-			boolean allLongModifier = false;
-			for (int index = headSpan.start; index <= headSpan.end; index++) {
-				  
+			boolean allLongHead  = sent.get(headSpan.start).getName().length() > 5;
+			boolean allLongModifier = sent.get(modifierSpan.start).getName().length() > 5;;
+			for (int index = headSpan.start + 1; index <= headSpan.end; index++) {
+				allLongHead = allLongHead && (sent.get(index).getName().length() > 5 );
 			}
+			for (int index = modifierSpan.start + 1; index <= modifierSpan.end; index++) {
+				allLongModifier = allLongModifier && (sent.get(index).getName().length() > 5 );
+			}
+
 			
-			if (headWord.length() > 5 || modifierWord.length() > 5) {
-				int hL = headWord.length();
-				int mL = modifierWord.length();
-				String preHead = hL > 5 ? headWord.substring(0, 5) : headWord;
-				String preModifier = mL > 5 ? modifierWord.substring(0, 5) : modifierWord;
-				featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "bigram-prefix-all-dist", preHead + "," + headTag+","+preModifier+","+modifierTag+attDist));
-				featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "bigram-prefix-word-dist", preHead+","+preModifier+attDist));
-				featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "bigram-prefix-all", preHead+","+headTag+","+preModifier+","+modifierTag));
-				featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "bigram-prefix-word", preHead+","+preModifier));
-				if (mL > 5) {
-					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "modi-prefix-hTmomoT-dist", headTag+","+preModifier+","+modifierTag+attDist));
-					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "modi-prefix-hTmo-dist", headTag+","+preModifier+attDist));
-					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "modi-prefix-modiall-dist", preModifier+","+modifierTag+attDist));
-					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "modi-prefix-modi-dist", preModifier+attDist));
-					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "modi-prefix-hTmomoT", headTag+","+preModifier+","+modifierTag));
-					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "modi-prefix-hTmo", headTag+","+preModifier));
-					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "modi-prefix-modiall", preModifier+","+modifierTag));
+			if (allLongHead || allLongModifier) {
+				String preHead;
+				if (allLongHead) {
+					preHead = sent.get(headSpan.start).getName().substring(0, 5);
+					for (int index = headSpan.start + 1; index <= headSpan.end; index++) {
+						preHead += " & " + sent.get(index).getName().substring(0, 5);
+					}
+				}else preHead = headWords;
+				String preModifier;
+				if (allLongModifier) {
+					preModifier = sent.get(modifierSpan.start).getName().substring(0, 5);
+					for (int index = modifierSpan.start + 1; index <= modifierSpan.end; index++) {
+						preModifier += " & " + sent.get(index).getName().substring(0, 5);
+					}
+				}else preModifier = modifierWords;
+				featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "bigram-prefix-all-dist", preHead + "," + headTags + "," + preModifier + "," + modifierTags + attDist));
+				featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "bigram-prefix-word-dist", preHead + "," + preModifier + attDist));
+				featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "bigram-prefix-all", preHead + "," + headTags + "," + preModifier + "," + modifierTags));
+				featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "bigram-prefix-word", preHead + "," + preModifier));
+				if (allLongModifier) {
+					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "modi-prefix-hTmomoT-dist", headTags + "," + preModifier + "," + modifierTags + attDist));
+					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "modi-prefix-hTmo-dist", headTags + "," + preModifier + attDist));
+					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "modi-prefix-modiall-dist", preModifier + "," + modifierTags + attDist));
+					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "modi-prefix-modi-dist", preModifier + attDist));
+					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "modi-prefix-hTmomoT", headTags + "," + preModifier + "," + modifierTags));
+					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "modi-prefix-hTmo", headTags + "," + preModifier));
+					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "modi-prefix-modiall", preModifier + "," + modifierTags));
 					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "modi-prefix-modiall", preModifier));
 				}
-				if (hL > 5) {
-					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "head-prefix-hhTmoT-dist", preHead+","+headTag+","+modifierTag+attDist));
-					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "head-prefix-hmoT-dist", preHead+","+modifierTag+attDist));
-					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "head-prefix-hall-dist", preHead+","+headTag+attDist));
-					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "head-prefix-h-dist", preHead+attDist));
-					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "head-prefix-hhTmoT", preHead+","+headTag+","+modifierTag));
-					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "head-prefix-hmoT", preHead+","+modifierTag));
-					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "head-prefix-hall", preHead+","+headTag));
+				if (allLongHead) {
+					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "head-prefix-hhTmoT-dist", preHead + "," + headTags + "," + modifierTags + attDist));
+					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "head-prefix-hmoT-dist", preHead + "," + modifierTags + attDist));
+					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "head-prefix-hall-dist", preHead + "," + headTags + attDist));
+					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "head-prefix-h-dist", preHead + attDist));
+					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "head-prefix-hhTmoT", preHead + "," + headTags + "," + modifierTags));
+					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "head-prefix-hmoT", preHead + "," + modifierTags));
+					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "head-prefix-hall", preHead + "," + headTags));
 					featureList.add(this._param_g.toFeature(network, FeaType.prefix.name(), "head-prefix-h", preHead));
 				}
 			}
@@ -397,67 +411,67 @@ public class SDFeatureManager extends FeatureManager {
 			
 			
 			//l-1,l,r,r+1
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-1-dist", leftMinusTag+","+leftTags+","+rightTags+","+rightPlusTag+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-2-dist", leftMinusTag+","+leftTags+","+rightTags+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-3-dist", leftMinusTag+","+rightTags+","+rightPlusTag+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-4-dist", leftMinusTag+","+leftTags+","+rightPlusTag+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-5-dist", leftTags+","+rightTags+","+rightPlusTag+attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-1-dist", leftMinusTag + "," + leftTags + "," + rightTags + "," + rightPlusTag + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-2-dist", leftMinusTag + "," + leftTags + "," + rightTags + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-3-dist", leftMinusTag + "," + rightTags + "," + rightPlusTag + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-4-dist", leftMinusTag + "," + leftTags + "," + rightPlusTag + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-5-dist", leftTags + "," + rightTags + "," + rightPlusTag + attDist));
 			
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-1", leftMinusTag+","+leftTags+","+rightTags+","+rightPlusTag));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-2", leftMinusTag+","+leftTags+","+rightTags));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-3", leftMinusTag+","+rightTags+","+rightPlusTag));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-4", leftMinusTag+","+leftTags+","+rightPlusTag));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-5", leftTags+","+rightTags+","+rightPlusTag));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-1", leftMinusTag + "," + leftTags + "," + rightTags + "," + rightPlusTag));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-2", leftMinusTag + "," + leftTags + "," + rightTags));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-3", leftMinusTag + "," + rightTags + "," + rightPlusTag));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-4", leftMinusTag + "," + leftTags + "," + rightPlusTag));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-5", leftTags + "," + rightTags + "," + rightPlusTag));
 			
 			
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-1a-dist", leftMinusA+","+leftAs+","+rightAs+","+rightPlusA+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-2a-dist", leftMinusA+","+leftAs+","+rightAs+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-3a-dist", leftMinusA+","+rightAs+","+rightAs+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-4a-dist", leftMinusA+","+leftAs+","+rightPlusA+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-5a-dist", leftAs+","+rightAs+","+rightPlusA+attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-1a-dist", leftMinusA + "," + leftAs + "," + rightAs + "," + rightPlusA + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-2a-dist", leftMinusA + "," + leftAs + "," + rightAs + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-3a-dist", leftMinusA + "," + rightAs + "," + rightAs + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-4a-dist", leftMinusA + "," + leftAs + "," + rightPlusA + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-5a-dist", leftAs + "," + rightAs + "," + rightPlusA + attDist));
 			
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-1a", leftMinusA+","+leftAs+","+rightAs+","+rightPlusA));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-2a", leftMinusA+","+leftAs+","+rightAs));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-3a", leftMinusA+","+rightAs+","+rightAs));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-4a", leftMinusA+","+leftAs+","+rightPlusA));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-5a", leftAs+","+rightAs+","+rightPlusA));
-			
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-1a", leftMinusA + "," + leftAs + "," + rightAs + "," + rightPlusA));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-2a", leftMinusA + "," + leftAs + "," + rightAs));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-3a", leftMinusA + "," + rightAs + "," + rightAs));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-4a", leftMinusA + "," + leftAs + "," + rightPlusA));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-5a", leftAs + "," + rightAs + "," + rightPlusA));
+
 			//l,l+1,r-1,r
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-1-dist", leftTags+","+leftPlusTag+","+rightMinusTag+","+rightTags+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-2-dist", leftTags+","+rightMinusTag+","+rightTags+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-3-dist", leftTags+","+leftPlusTag+","+rightTags+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-4-dist", leftPlusTag+","+rightMinusTag+","+rightTags+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-5-dist", leftTags+","+leftPlusTag+","+rightMinusTag+attDist));
-			
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-1", leftTags+","+leftPlusTag+","+rightMinusTag+","+rightTags));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-2", leftTags+","+rightMinusTag+","+rightTags));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-3", leftTags+","+leftPlusTag+","+rightTags));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-4", leftPlusTag+","+rightMinusTag+","+rightTags));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-5", leftTags+","+leftPlusTag+","+rightMinusTag));
-			
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-1a-dist", leftAs+","+leftPlusA+","+rightMinusA+","+rightAs+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-2a-dist", leftAs+","+rightMinusA+","+rightAs+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-3a-dist", leftAs+","+leftPlusA+","+rightAs+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-4a-dist", leftPlusA+","+rightMinusA+","+rightAs+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-5a-dist", leftAs+","+leftPlusA+","+rightMinusA+attDist));
-			
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-1a", leftAs+","+leftPlusA+","+rightMinusA+","+rightAs));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-2a", leftAs+","+rightMinusA+","+rightAs));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-3a", leftAs+","+leftPlusA+","+rightAs));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-4a", leftPlusA+","+rightMinusA+","+rightAs));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-5a", leftAs+","+leftPlusA+","+rightMinusA));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-1-dist", leftTags + "," + leftPlusTag + "," + rightMinusTag + "," + rightTags + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-2-dist", leftTags + "," + rightMinusTag + "," + rightTags + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-3-dist", leftTags + "," + leftPlusTag + "," + rightTags + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-4-dist", leftPlusTag + "," + rightMinusTag + "," + rightTags + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-5-dist", leftTags + "," + leftPlusTag + "," + rightMinusTag + attDist));
+
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-1", leftTags + "," + leftPlusTag + "," + rightMinusTag + "," + rightTags));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-2", leftTags + "," + rightMinusTag + "," + rightTags));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-3", leftTags + "," + leftPlusTag + "," + rightTags));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-4", leftPlusTag + "," + rightMinusTag + "," + rightTags));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-5", leftTags + "," + leftPlusTag + "," + rightMinusTag));
+
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-1a-dist", leftAs + "," + leftPlusA + "," + rightMinusA + "," + rightAs + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-2a-dist", leftAs + "," + rightMinusA + "," + rightAs + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-3a-dist", leftAs + "," + leftPlusA + "," + rightAs + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-4a-dist", leftPlusA + "," + rightMinusA + "," + rightAs + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-5a-dist", leftAs + "," + leftPlusA + "," + rightMinusA + attDist));
+
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-1a", leftAs + "," + leftPlusA + "," + rightMinusA + "," + rightAs));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-2a", leftAs + "," + rightMinusA + "," + rightAs));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-3a", leftAs + "," + leftPlusA + "," + rightAs));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-4a", leftPlusA + "," + rightMinusA + "," + rightAs));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-2-5a", leftAs + "," + leftPlusA+","+rightMinusA));
 			
 			//l-1,l,r-1,r
-			//l,l+1,r,r+1
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-3-1-dist", leftMinusTag+","+leftTags+","+rightMinusTag+","+rightTags+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-3-1", leftMinusTag+","+leftTags+","+rightMinusTag+","+rightTags));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-3-1a-dist", leftMinusA+","+leftAs+","+rightMinusA+","+rightAs+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-3-1a", leftMinusA+","+leftAs+","+rightMinusA+","+rightAs));
-			
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-4-1-dist", leftTags+","+leftPlusTag+","+rightTags+","+rightPlusTag+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-4-1", leftTags+","+leftPlusTag+","+rightTags+","+rightPlusTag));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-4-1a-dist", leftAs+","+leftPlusA+","+rightAs+","+rightPlusA+attDist));
-			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-4-1a", leftAs+","+leftPlusA+","+rightAs+","+rightPlusA));
+			// l,l+1,r,r+1
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-3-1-dist", leftMinusTag + "," + leftTags + "," + rightMinusTag + "," + rightTags + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-3-1", leftMinusTag + "," + leftTags + "," + rightMinusTag + "," + rightTags));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-3-1a-dist", leftMinusA + "," + leftAs + "," + rightMinusA + "," + rightAs + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-3-1a", leftMinusA + "," + leftAs + "," + rightMinusA + "," + rightAs));
+
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-4-1-dist", leftTags + "," + leftPlusTag + "," + rightTags + "," + rightPlusTag + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-4-1", leftTags + "," + leftPlusTag + "," + rightTags + "," + rightPlusTag));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-4-1a-dist", leftAs + "," + leftPlusA + "," + rightAs + "," + rightPlusA + attDist));
+			featureList.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-4-1a", leftAs + "," + leftPlusA + "," + rightAs + "," + rightPlusA));
 			
 			//currently it's also token level
 			//should be span level also.
