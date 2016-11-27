@@ -46,11 +46,11 @@ public class SDMain {
 		/******Debug********/
 		trainingPath = "data/allanprocess/voa/train.conllx";
 		testingPath = "data/allanprocess/voa/test.conllx";
-		trainNumber = 1;
-		testNumber = 1;
+		trainNumber = 10;
+		testNumber = 10;
 		numIteration = 20;
 		numThreads = 4;
-//		testingPath = trainingPath;
+		testingPath = trainingPath;
 		/************/
 		
 		

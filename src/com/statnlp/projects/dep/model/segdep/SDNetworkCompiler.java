@@ -85,7 +85,7 @@ public class SDNetworkCompiler extends NetworkCompiler {
 		long rootE = this.toNodeComp(0, 0, rightDir);
 		network.addNode(rootE);
 		SDInstance inst = (SDInstance)network.getInstance();
-		for(int rightIndex = 1; rightIndex <= sent.length()-1; rightIndex++){
+		for(int rightIndex = 1; rightIndex <= output.length - 1; rightIndex++){
 			//eIndex: 1,2,3,4,5,..n
 			long wordLeftNode = this.toNodeComp(rightIndex, rightIndex, leftDir);
 			long wordRightNode = this.toNodeComp(rightIndex, rightIndex, rightDir);
@@ -151,7 +151,7 @@ public class SDNetworkCompiler extends NetworkCompiler {
 		if (this._nodes == null) {
 			this.compileUnlabeled();
 		}
-		long root = this.toNode_root(inst.getInput().length());
+		long root = this.toNode_root(inst.segments.size());
 		int rootIdx = Arrays.binarySearch(this._nodes, root);
 		SDNetwork network = new SDNetwork(networkId, inst, this._nodes, this._children, param, rootIdx + 1);
 		return network;
@@ -180,12 +180,11 @@ public class SDNetworkCompiler extends NetworkCompiler {
 				for(int complete = 0; complete <= 1; complete++){
 					for (int direction = 0; direction <= 1; direction++) {
 						if (leftIndex == 0 && direction == 0) continue;
-						if(leftIndex==0 && direction==0) continue;
-						if(complete==0){
+						if (complete == 0) {
 							long parent = this.toNodeIncomp(leftIndex, rightIndex, direction);
 							for (int m = leftIndex; m < rightIndex; m++) {
 								long child_1 = this.toNodeComp(leftIndex, m, rightDir);
-								long child_2 = this.toNodeComp(m+1, rightIndex, leftDir);
+								long child_2 = this.toNodeComp(m + 1, rightIndex, leftDir);
 								if (network.contains(child_1) && network.contains(child_2)) {
 									network.addNode(parent);
 									network.addEdge(parent, new long[]{child_1,child_2});
@@ -195,7 +194,7 @@ public class SDNetworkCompiler extends NetworkCompiler {
 						
 						if (complete == COMP.comp.ordinal() && direction == leftDir) {
 							long parent = this.toNodeComp(leftIndex, rightIndex, leftDir);
-							for(int m=leftIndex;m<rightIndex;m++){
+							for (int m = leftIndex; m < rightIndex; m++) {
 								long child_1 = this.toNodeComp(leftIndex, m, leftDir);
 								long child_2 = this.toNodeIncomp(m, rightIndex, leftDir);
 								if(network.contains(child_1) && network.contains(child_2)){
@@ -246,9 +245,9 @@ public class SDNetworkCompiler extends NetworkCompiler {
 	
 	
 	private int[] toOutput(SDNetwork network, SDInstance inst) {
-		int[] prediction = new int[inst.size()];
+		int[] prediction = new int[inst.segments.size()];
 		prediction[0] = -1;  //no head for the leftmost root node
-		long root = this.toNode_root(inst.size());
+		long root = this.toNode_root(inst.segments.size());
 		int rootIdx = Arrays.binarySearch(network.getAllNodes(), root);
 		findBest(network, inst, rootIdx, prediction);
 		return prediction;

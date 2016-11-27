@@ -36,7 +36,6 @@ public class SDFeatureManager extends FeatureManager {
 		int leftSpanIndex = parentArr[0] - parentArr[1];
 		int rightSpanIndex = parentArr[0];
 		int completeness = parentArr[2];
-		
 		if (completeness == COMP.incomp.ordinal()) {
 			if (segments.get(leftSpanIndex).length() == 1 && segments.get(rightSpanIndex).length() == 1){
 				addDepFeatures(featureList, network, parentArr, sent, segments);

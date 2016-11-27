@@ -149,7 +149,7 @@ public class SDReader {
 		return result.toArray(new SDInstance[result.size()]);
 	}
 	
- 	private static void createSpan(List<Span> output, int start, int end, Label label, Map<Integer, Integer> idx2SpanIdx){
+ 	private static void createSpan(List<Span> segments, int start, int end, Label label, Map<Integer, Integer> idx2SpanIdx){
 		if (label == null) {
 			throw new RuntimeException("The label is null");
 		}
@@ -158,13 +158,13 @@ public class SDReader {
 		}
 		if (label.form.equals("O")) {
 			for (int i = start; i <= end; i++) {
-				output.add(new Span(i, i, label));
-				idx2SpanIdx.put(i, output.size()-1);
+				segments.add(new Span(i, i, label));
+				idx2SpanIdx.put(i, segments.size()-1);
 			}
 		} else {
-			output.add(new Span(start, end, label));
+			segments.add(new Span(start, end, label));
 			for (int i = start; i <= end; i++) {
-				idx2SpanIdx.put(i, output.size()-1);
+				idx2SpanIdx.put(i, segments.size()-1);
 			}
 		}
 	}
