@@ -26,6 +26,7 @@ public class SDMain {
 	public static String testingPath;
 	public static String devPath;
 	public static boolean isDev = false;
+	public static boolean lenOne = false;
 	public static HashSet<String> dataTypeSet;
 	
 	public static void main(String[] args) throws InterruptedException, IOException {
@@ -44,13 +45,14 @@ public class SDMain {
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
-		trainingPath = "data/allanprocess/voa/train.conllx";
-		testingPath = "data/allanprocess/voa/test.conllx";
-		trainNumber = 10;
-		testNumber = 10;
-		numIteration = 20;
-		numThreads = 4;
-		testingPath = trainingPath;
+//		trainingPath = "data/allanprocess/voa/train.conllx";
+//		testingPath = "data/allanprocess/voa/test.conllx";
+//		trainNumber = -1;
+//		testNumber = -1;
+//		numIteration = 500;
+//		numThreads = 8;
+//		testingPath = trainingPath;
+//		lenOne = false;
 		/************/
 		
 		
@@ -60,8 +62,8 @@ public class SDMain {
 		System.err.println("[Info] dpRes: "+dpRes);
 		System.err.println("[Info] ner eval: "+nerEval);
 		System.err.println("[Info] joint Res: "+jointRes);
-		SDInstance[] trainingInsts = SDReader.readCoNLLXData(trainingPath, true, trainNumber, true);;
-		SDInstance[] testingInsts = SDReader.readCoNLLXData(decodePath, false, testNumber, false);
+		SDInstance[] trainingInsts = SDReader.readCoNLLXData(trainingPath, true, trainNumber, true, lenOne);
+		SDInstance[] testingInsts = SDReader.readCoNLLXData(decodePath, false, testNumber, false, lenOne);
 		Label.get(DPConfig.EMPTY);
 		System.err.println("The label set: " + Label.Label_Index.toString());
 		
@@ -91,7 +93,7 @@ public class SDMain {
 		/****************Evaluation Part**************/
 		System.err.println("*****Evaluation*****");
 		Instance[] predInsts = model.decode(testingInsts);
-		SDEval.evalDP(predInsts, false);
+		SDEval.evalDep(predInsts, false);
 	}
 	
 	public static void processArgs(String[] args){
@@ -119,6 +121,7 @@ public class SDMain {
 						case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(); break;
 						case "-rw": DPConfig.weightPath=args[i+1]; DPConfig.readWeight = true;DPConfig.writeWeight = false; break;
 						case "-ww":DPConfig.weightPath=args[i+1]; DPConfig.readWeight = false; DPConfig.writeWeight = true; break;
+						case "-lenone": lenOne = args[i+1].equals("true")? true:false; break;
 						default: System.err.println("Invalid arguments: "+args[i]+", please check usage."); System.err.println(usage);System.exit(0);
 					}
 				}

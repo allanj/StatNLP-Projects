@@ -84,7 +84,7 @@ public class DPConfig {
 	public static String ONE = "ONE";
 	public static String NONE = "NONE";
 	
-	public static enum MODEL { ecrf,HYPEREDGE, DIVIDED, DIVCOPY, SegDep, HYBRID};
+	public static enum MODEL { ecrf,HYPEREDGE, DIVIDED, DIVCOPY, SegDep, LAB, HYBRID};
 	
 	public static boolean DEBUG = false;
 	

@@ -20,7 +20,7 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 	private static final long serialVersionUID = -5080640847287255079L;
 
 	private long[] _nodes;
-	private int maxSentLen = 143;
+	private int maxSentLen = 150;
 	private int[][][] _children;
 	private boolean labeledDep;
 	

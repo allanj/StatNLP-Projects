@@ -17,7 +17,17 @@ public class SDReader {
 	public static String ROOT_WORD = "ROOT";
 	public static String ROOT_TAG = "ROOT";
 
-	public static SDInstance[] readCoNLLXData(String fileName, boolean isLabeled, int number, boolean checkProjective) throws IOException{
+	/**
+	 * Reading the CoNLL-X format data
+	 * @param fileName
+	 * @param isLabeled
+	 * @param number
+	 * @param checkProjective: check the projectiveness or not
+	 * @param lenOne: means if we restrict all segments are with length 1. The label is still without IOBES encoding
+	 * @return
+	 * @throws IOException
+	 */
+	public static SDInstance[] readCoNLLXData(String fileName, boolean isLabeled, int number, boolean checkProjective, boolean lenOne) throws IOException{
 		BufferedReader br = RAWF.reader(fileName);
 		ArrayList<SDInstance> result = new ArrayList<SDInstance>();
 		ArrayList<WordToken> words = new ArrayList<WordToken>();
@@ -39,7 +49,7 @@ public class SDReader {
 			if(line.length() == 0){
 				end = words.size()-1;
 				if(start != -1){
-					createSpan(segments, start, end, prevLabel, idx2SpanIdx);
+					createSpan(segments, start, end, prevLabel, idx2SpanIdx, lenOne);
 					maxEntityLength = Math.max(maxEntityLength, segments.get(segments.size()-1).length());
 				}
 				start = -1;
@@ -119,7 +129,7 @@ public class SDReader {
 				if(form.startsWith("B")){
 					if(start != -1){
 						end = index - 1;
-						createSpan(segments, start, end, prevLabel, idx2SpanIdx);
+						createSpan(segments, start, end, prevLabel, idx2SpanIdx, lenOne);
 						maxEntityLength = Math.max(maxEntityLength, segments.get(segments.size()-1).length());
 					}
 					start = index;
@@ -130,11 +140,11 @@ public class SDReader {
 				} else if(form.startsWith("O")){
 					if(start != -1){
 						end = index - 1;
-						createSpan(segments, start, end, prevLabel, idx2SpanIdx);
+						createSpan(segments, start, end, prevLabel, idx2SpanIdx, lenOne);
 						maxEntityLength = Math.max(maxEntityLength, segments.get(segments.size()-1).length());
 					}
 					start = -1;
-					createSpan(segments, index, index, Label.get("O"), idx2SpanIdx);
+					createSpan(segments, index, index, Label.get("O"), idx2SpanIdx, lenOne);
 					maxEntityLength = Math.max(maxEntityLength, segments.get(segments.size()-1).length());
 					label = Label.get("O");
 				}
@@ -149,7 +159,7 @@ public class SDReader {
 		return result.toArray(new SDInstance[result.size()]);
 	}
 	
- 	private static void createSpan(List<Span> segments, int start, int end, Label label, Map<Integer, Integer> idx2SpanIdx){
+ 	private static void createSpan(List<Span> segments, int start, int end, Label label, Map<Integer, Integer> idx2SpanIdx, boolean lenOne){
 		if (label == null) {
 			throw new RuntimeException("The label is null");
 		}
@@ -162,9 +172,16 @@ public class SDReader {
 				idx2SpanIdx.put(i, segments.size()-1);
 			}
 		} else {
-			segments.add(new Span(start, end, label));
-			for (int i = start; i <= end; i++) {
-				idx2SpanIdx.put(i, segments.size()-1);
+			if (!lenOne) {
+				segments.add(new Span(start, end, label));
+				for (int i = start; i <= end; i++) {
+					idx2SpanIdx.put(i, segments.size()-1);
+				}
+			} else {
+				for (int i = start; i <= end; i++) {
+					segments.add(new Span(i, i, label));
+					idx2SpanIdx.put(i, segments.size()-1);
+				}
 			}
 		}
 	}
