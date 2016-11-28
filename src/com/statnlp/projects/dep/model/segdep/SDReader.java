@@ -25,6 +25,7 @@ public class SDReader {
 	 * @param number
 	 * @param checkProjective: check the projectiveness or not
 	 * @param lenOne: means if we restrict all segments are with length 1. The label is still without IOBES encoding
+	 *               also it select the head for the span starting from the left portion.
 	 * @return
 	 * @throws IOException
 	 */
@@ -69,22 +70,28 @@ public class SDReader {
 						}
 					} else {
 						int entityHead = -1; 
-						int maxDist = -1;
-						List<Integer> ranges = createRanges(originalHeads, span);
+						int[] lrmost = createRanges(originalHeads, span);
 						//by default select the from the left
 						for(int i = span.start; i <= span.end; i++){
 							if (originalHeads.get(i) < span.start || originalHeads.get(i) > span.end) {
-								int dist = originalHeads.get(i) < span.start? span.start - originalHeads.get(i) : originalHeads.get(i) - span.end;
-								if (dist > maxDist) {
-									//if equal, do nothing. means select the one from the left
-									if (originalHeads.get(i) < span.start) {
-										
-									} else {
-										
+								if (originalHeads.get(i) < span.start) {
+									if (originalHeads.get(i) <= lrmost[0]){
+										int iHead = originalHeads.get(i);
+										if (!(originalHeads.get(iHead) >= span.start && originalHeads.get(iHead) <= span.end)){
+											entityHead = originalHeads.get(i);
+											break; //select from the left 
+										}
 									}
-									maxDist = dist;
-									entityHead = originalHeads.get(i);
+								} else {
+									//right hand side
+									if (originalHeads.get(i) >= lrmost[1]){
+										int iHead = originalHeads.get(i);
+										if (!(originalHeads.get(iHead) >= span.start && originalHeads.get(iHead) <= span.end)){
+											entityHead = originalHeads.get(i);
+										}
+									}
 								}
+									
 							}
 						}
 						if (entityHead == -1)
@@ -183,21 +190,22 @@ public class SDReader {
 		return result.toArray(new SDInstance[result.size()]);
 	}
 	
-	
-	private static HashMap<Integer, List<Integer>> createRanges(List<Integer> originalHeads, Span span) {
-		HashMap<Integer, List<Integer>> ranges = new HashMap<Integer, List<Integer>>();
+	//return left most and right most elements. 
+	private static int[] createRanges(List<Integer> originalHeads, Span span) {
+		int[] lrmost = new int[2];
+		Arrays.fill(lrmost, -1);
 		for (int i = 0; i < originalHeads.size(); i++) {
 			int ihead = originalHeads.get(i);
 			if (ihead == -1) continue;
 			int left = i > ihead ? ihead : i;
 			int right = i > ihead ? i : ihead;
 			if(left < span.start && (right >= span.start && right <= span.end)) {
-				
+				lrmost[0] = lrmost[0] == -1 ? left : Math.min(left, lrmost[0]);
 			} else if (right > span.end && (left >= span.start && left <= span.end)) {
-				
+				lrmost[1] = Math.max(right, lrmost[1]);
 			} 
 		}
-		return ranges;
+		return lrmost;
 	}
 	
  	private static void createSpan(List<Span> segments, int start, int end, Label label, Map<Integer, Integer> idx2SpanIdx, boolean lenOne){
