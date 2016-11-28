@@ -3,6 +3,7 @@ package com.statnlp.projects.dep.model.segdep;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,11 +69,22 @@ public class SDReader {
 						}
 					} else {
 						int entityHead = -1; 
-						//by default select the from the last
-						for(int i = span.end; i >= span.start; i--){
+						int maxDist = -1;
+						List<Integer> ranges = createRanges(originalHeads, span);
+						//by default select the from the left
+						for(int i = span.start; i <= span.end; i++){
 							if (originalHeads.get(i) < span.start || originalHeads.get(i) > span.end) {
-								entityHead = originalHeads.get(i);
-								break;
+								int dist = originalHeads.get(i) < span.start? span.start - originalHeads.get(i) : originalHeads.get(i) - span.end;
+								if (dist > maxDist) {
+									//if equal, do nothing. means select the one from the left
+									if (originalHeads.get(i) < span.start) {
+										
+									} else {
+										
+									}
+									maxDist = dist;
+									entityHead = originalHeads.get(i);
+								}
 							}
 						}
 						if (entityHead == -1)
@@ -82,7 +94,19 @@ public class SDReader {
 				}
 				
 				boolean projectiveness = DataChecker.checkProjective(originalHeads);
-				if(checkProjective && !projectiveness) {
+				List<Integer> intList = new ArrayList<Integer>();
+				for (int index = 0; index < instance.output.length; index++)
+				{
+				    intList.add(instance.output[index]);
+				}
+
+				boolean isTree = DataChecker.checkIsTree(intList);
+				if (!isTree) {
+					System.err.println("not tree... " + isLabeled);
+					System.err.println(instance.getInput().toString());
+					System.err.println(Arrays.toString(instance.output));
+				}
+				if(!isTree || (checkProjective && !projectiveness)) {
 					words = new ArrayList<WordToken>();
 					words.add(new WordToken(ROOT_WORD, ROOT_TAG));
 					originalHeads = new ArrayList<>();
@@ -157,6 +181,23 @@ public class SDReader {
 		System.err.println("[Info] max sentence length: " + maxSentenceLength);
 		System.err.println("[Info] max entity length: " + maxEntityLength);
 		return result.toArray(new SDInstance[result.size()]);
+	}
+	
+	
+	private static HashMap<Integer, List<Integer>> createRanges(List<Integer> originalHeads, Span span) {
+		HashMap<Integer, List<Integer>> ranges = new HashMap<Integer, List<Integer>>();
+		for (int i = 0; i < originalHeads.size(); i++) {
+			int ihead = originalHeads.get(i);
+			if (ihead == -1) continue;
+			int left = i > ihead ? ihead : i;
+			int right = i > ihead ? i : ihead;
+			if(left < span.start && (right >= span.start && right <= span.end)) {
+				
+			} else if (right > span.end && (left >= span.start && left <= span.end)) {
+				
+			} 
+		}
+		return ranges;
 	}
 	
  	private static void createSpan(List<Span> segments, int start, int end, Label label, Map<Integer, Integer> idx2SpanIdx, boolean lenOne){
