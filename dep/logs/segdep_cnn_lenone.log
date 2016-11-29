@@ -1,0 +1,633 @@
+Picked up _JAVA_OPTIONS: -Xmx256000m
+[Info] trainNum: -1
+[Info] testNum: -1
+[Info] numIter: 3000
+[Info] numThreads: 63
+[Info] Regularization Parameter: 0.1
+[Info] Using development set??: false
+[Info] Current Model:SegDep
+[Info] train path: data/allanprocess/cnn/train.conllx
+[Info] testFile: data/allanprocess/cnn/test.conllx
+[Info] dpRes: data/allanprocess/cnn/output/SegDep.test.dp.res.txt
+[Info] ner eval: data/allanprocess/cnn/output/SegDep.test.ner.eval.txt
+[Info] joint Res: data/allanprocess/cnn/output/SegDep.test.joint.res.txt
+[Info] number of train instances:4291
+[Info] max sentence length: 81
+[Info] max entity length: 1
+[Info] number of test instances:1440
+[Info] max sentence length: 95
+[Info] max entity length: 1
+The label set: {0=O(0), 1=MISC(1), 2=organization(2), 3=gpe(3), 4=person(4), 5=EMPTY(5)}
+Capacity successfully set to: [500, 500, 5, 5, 10]
+#instances=4291
+Thread 0 has 138 instances.
+Thread 1 has 138 instances.
+Thread 2 has 138 instances.
+Thread 3 has 138 instances.
+Thread 4 has 138 instances.
+Thread 5 has 138 instances.
+Thread 6 has 138 instances.
+Thread 7 has 136 instances.
+Thread 8 has 136 instances.
+Thread 9 has 136 instances.
+Thread 10 has 136 instances.
+Thread 11 has 136 instances.
+Thread 12 has 136 instances.
+Thread 13 has 136 instances.
+Thread 14 has 136 instances.
+Thread 15 has 136 instances.
+Thread 16 has 136 instances.
+Thread 17 has 136 instances.
+Thread 18 has 136 instances.
+Thread 19 has 136 instances.
+Thread 20 has 136 instances.
+Thread 21 has 136 instances.
+Thread 22 has 136 instances.
+Thread 23 has 136 instances.
+Thread 24 has 136 instances.
+Thread 25 has 136 instances.
+Thread 26 has 136 instances.
+Thread 27 has 136 instances.
+Thread 28 has 136 instances.
+Thread 29 has 136 instances.
+Thread 30 has 136 instances.
+Thread 31 has 136 instances.
+Thread 32 has 136 instances.
+Thread 33 has 136 instances.
+Thread 34 has 136 instances.
+Thread 35 has 136 instances.
+Thread 36 has 136 instances.
+Thread 37 has 136 instances.
+Thread 38 has 136 instances.
+Thread 39 has 136 instances.
+Thread 40 has 136 instances.
+Thread 41 has 136 instances.
+Thread 42 has 136 instances.
+Thread 43 has 136 instances.
+Thread 44 has 136 instances.
+Thread 45 has 136 instances.
+Thread 46 has 136 instances.
+Thread 47 has 136 instances.
+Thread 48 has 136 instances.
+Thread 49 has 136 instances.
+Thread 50 has 136 instances.
+Thread 51 has 136 instances.
+Thread 52 has 136 instances.
+Thread 53 has 136 instances.
+Thread 54 has 136 instances.
+Thread 55 has 136 instances.
+Thread 56 has 136 instances.
+Thread 57 has 136 instances.
+Thread 58 has 136 instances.
+Thread 59 has 136 instances.
+Thread 60 has 136 instances.
+Thread 61 has 136 instances.
+Thread 62 has 136 instances.
+...............................................................44701 nodes..
+...........
+Thread 45 touch time: 65.857 secs.
+.........
+Thread 6 touch time: 73.705 secs.
+........
+Thread 10 touch time: 75.753 secs.
+.
+Thread 36 touch time: 76.05 secs.
+
+Thread 8 touch time: 76.161 secs.
+
+Thread 0 touch time: 76.194 secs.
+.
+Thread 4 touch time: 76.542 secs.
+........
+Thread 61 touch time: 77.903 secs.
+
+Thread 7 touch time: 77.945 secs.
+
+Thread 13 touch time: 77.95 secs.
+
+Thread 31 touch time: 77.993 secs.
+.
+Thread 50 touch time: 78.197 secs.
+..
+Thread 37 touch time: 78.581 secs.
+.
+Thread 14 touch time: 78.832 secs.
+
+Thread 9 touch time: 79.098 secs.
+
+Thread 21 touch time: 79.202 secs.
+..
+Thread 29 touch time: 79.363 secs.
+
+Thread 44 touch time: 83.096 secs.
+
+Thread 18 touch time: 83.128 secs.
+
+Thread 27 touch time: 83.383 secs.
+.
+Thread 52 touch time: 83.45 secs.
+
+Thread 26 touch time: 83.515 secs.
+
+Thread 11 touch time: 83.589 secs.
+
+Thread 55 touch time: 83.632 secs.
+.
+Thread 28 touch time: 84.112 secs.
+
+Thread 34 touch time: 84.128 secs.
+.
+Thread 32 touch time: 84.205 secs.
+..
+Thread 60 touch time: 84.378 secs.
+..
+Thread 23 touch time: 85.274 secs.
+
+Thread 30 touch time: 85.327 secs.
+.
+Thread 58 touch time: 85.666 secs.
+
+Thread 49 touch time: 85.741 secs.
+
+Thread 59 touch time: 85.971 secs.
+
+Thread 2 touch time: 86.101 secs.
+.
+Thread 48 touch time: 86.861 secs.
+
+Thread 15 touch time: 86.907 secs.
+
+Thread 35 touch time: 87.154 secs.
+
+Thread 25 touch time: 87.975 secs.
+
+Thread 22 touch time: 88.196 secs.
+
+Thread 53 touch time: 88.453 secs.
+.
+Thread 12 touch time: 88.713 secs.
+
+Thread 16 touch time: 88.9 secs.
+
+Thread 51 touch time: 89.258 secs.
+
+Thread 62 touch time: 89.403 secs.
+
+Thread 20 touch time: 89.792 secs.
+.
+Thread 19 touch time: 90.035 secs.
+
+Thread 43 touch time: 90.031 secs.
+
+Thread 17 touch time: 90.13 secs.
+
+Thread 33 touch time: 90.257 secs.
+.
+Thread 39 touch time: 90.588 secs.
+
+Thread 5 touch time: 90.767 secs.
+
+Thread 47 touch time: 90.914 secs.
+
+Thread 42 touch time: 91.06 secs.
+..
+Thread 1 touch time: 92.644 secs.
+.
+Thread 46 touch time: 92.794 secs.
+
+Thread 57 touch time: 92.94 secs.
+...
+Thread 54 touch time: 93.505 secs.
+
+Thread 41 touch time: 93.61 secs.
+
+Thread 24 touch time: 93.708 secs.
+
+Thread 56 touch time: 93.727 secs.
+
+Thread 3 touch time: 96.564 secs.
+
+Thread 40 touch time: 97.812 secs.
+.
+Thread 38 touch time: 102.371 secs.
+Finalized local param. size:701663
+Finalized local param. size:879433
+Finalized local param. size:757393
+Finalized local param. size:953028
+Finalized local param. size:652214
+Finalized local param. size:917493
+Finalized local param. size:703170
+Finalized local param. size:772550
+Finalized local param. size:737904
+Finalized local param. size:692277
+Finalized local param. size:695394
+Finalized local param. size:806574
+Finalized local param. size:859019
+Finalized local param. size:741295
+Finalized local param. size:704072
+Finalized local param. size:877845
+Finalized local param. size:897805
+Finalized local param. size:895752
+Finalized local param. size:786032
+Finalized local param. size:915272
+Finalized local param. size:849969
+Finalized local param. size:871759
+Finalized local param. size:873878
+Finalized local param. size:784418
+Finalized local param. size:908052
+Finalized local param. size:807270
+Finalized local param. size:772086
+Finalized local param. size:760889
+Finalized local param. size:777791
+Finalized local param. size:772738
+Finalized local param. size:780779
+Finalized local param. size:741217
+Finalized local param. size:738519
+Finalized local param. size:872553
+Finalized local param. size:829042
+Finalized local param. size:819667
+Finalized local param. size:697229
+Finalized local param. size:803146
+Finalized local param. size:1051169
+Finalized local param. size:919075
+Finalized local param. size:1067055
+Finalized local param. size:899496
+Finalized local param. size:951747
+Finalized local param. size:957262
+Finalized local param. size:775107
+Finalized local param. size:646276
+Finalized local param. size:855105
+Finalized local param. size:944878
+Finalized local param. size:944810
+Finalized local param. size:751385
+Finalized local param. size:769768
+Finalized local param. size:865061
+Finalized local param. size:700016
+Finalized local param. size:839431
+Finalized local param. size:942294
+Finalized local param. size:771239
+Finalized local param. size:877689
+Finalized local param. size:817160
+Finalized local param. size:801950
+Finalized local param. size:831028
+Finalized local param. size:838278
+Finalized local param. size:762011
+Finalized local param. size:877101
+17207559 features.
+*************************************************
+  n = 17207559   number of corrections = 4
+       initial values
+ f =  121788.37904022903   gnorm =  56095.258963469554
+*************************************************
+	i	nfn	func			gnorm			steplength
+Iteration 0: Obj=-121788.379040229030 Time=4.717s 0.000000000000 Total time: 4.729s
+	1	2	90453.42981398344	27541.28544873917	1.7826818495502832E-5
+Iteration 1: Obj=-90453.429813983440 Time=4.847s 0.742709858911 Total time: 9.589s
+Iteration 2: Obj=-71427.162834921200 Time=5.062s 0.789656765717 Total time: 14.657s
+Iteration 3: Obj=-55481.912820934440 Time=5.142s 0.776762097483 Total time: 19.806s
+Iteration 4: Obj=-44587.150547628950 Time=5.358s 0.803633982331 Total time: 25.170s
+Iteration 5: Obj=-39925.315503582360 Time=5.326s 0.895444427671 Total time: 30.502s
+Iteration 6: Obj=-36852.665402980020 Time=5.378s 0.923040054616 Total time: 35.885s
+Iteration 7: Obj=-34475.670392695814 Time=5.291s 0.935500051779 Total time: 41.182s
+Iteration 8: Obj=-32094.755449673274 Time=5.759s 0.930939270625 Total time: 46.947s
+Iteration 9: Obj=-29758.765614214810 Time=5.443s 0.927215839388 Total time: 52.396s
+Iteration 10: Obj=-27148.807655714740 Time=5.276s 0.912296162000 Total time: 57.678s
+Iteration 11: Obj=-25189.260731187347 Time=5.368s 0.927821989482 Total time: 63.052s
+Iteration 12: Obj=-24087.022576312378 Time=5.480s 0.956241742597 Total time: 68.537s
+Iteration 13: Obj=-22470.069523465150 Time=5.376s 0.932870364209 Total time: 73.919s
+Iteration 14: Obj=-19987.002479252253 Time=5.264s 0.889494465443 Total time: 79.190s
+Iteration 15: Obj=-19714.605898444974 Time=3.925s 0.986371314003 Total time: 83.121s
+Iteration 16: Obj=-18588.128606378050 Time=5.478s 0.942860775515 Total time: 88.605s
+Iteration 17: Obj=-17314.855223583567 Time=5.482s 0.931500722329 Total time: 94.093s
+Iteration 18: Obj=-16511.282908269310 Time=5.249s 0.953590584216 Total time: 99.348s
+Iteration 19: Obj=-16036.288204368191 Time=5.272s 0.971232114031 Total time: 104.625s
+Iteration 20: Obj=-14998.461237822000 Time=5.224s 0.935282594493 Total time: 109.856s
+Iteration 21: Obj=-14492.061754763921 Time=5.295s 0.966236570870 Total time: 115.156s
+Iteration 22: Obj=-13788.716933782765 Time=5.555s 0.951466890434 Total time: 120.716s
+Iteration 23: Obj=-12595.771133606477 Time=5.461s 0.913483915443 Total time: 126.183s
+Iteration 24: Obj=-11869.400049696653 Time=5.529s 0.942332146543 Total time: 131.718s
+Iteration 25: Obj=-11211.842530066684 Time=5.609s 0.944600610235 Total time: 137.333s
+Iteration 26: Obj=-10650.455809797952 Time=5.244s 0.949929129065 Total time: 142.583s
+Iteration 27: Obj=-9833.092268966215 Time=5.318s 0.923255534277 Total time: 147.907s
+Iteration 28: Obj=-8800.174748703130 Time=5.398s 0.894954965131 Total time: 153.311s
+Iteration 29: Obj=-7969.779285444201 Time=5.371s 0.905638752983 Total time: 158.688s
+Iteration 30: Obj=-7392.839719486869 Time=5.409s 0.927609091131 Total time: 164.102s
+Iteration 31: Obj=-6743.803790586914 Time=5.295s 0.912207493531 Total time: 169.403s
+Iteration 32: Obj=-6136.478236462437 Time=5.392s 0.909943175546 Total time: 174.801s
+Iteration 33: Obj=-11213.561854327916 Time=4.031s 1.827361138136 Total time: 178.838s
+Iteration 34: Obj=-5846.548843540611 Time=5.363s 0.521381958694 Total time: 184.208s
+Iteration 35: Obj=-5191.848534851237 Time=5.284s 0.888019355314 Total time: 189.497s
+Iteration 36: Obj=-4562.801937953339 Time=5.680s 0.878839570786 Total time: 195.183s
+Iteration 37: Obj=-4124.838644063848 Time=5.293s 0.904014397328 Total time: 200.482s
+Iteration 38: Obj=-3830.126804252358 Time=5.293s 0.928551910695 Total time: 205.781s
+Iteration 39: Obj=-3597.931176583808 Time=5.262s 0.939376516879 Total time: 211.048s
+Iteration 40: Obj=-3335.095940034329 Time=5.295s 0.926948231178 Total time: 216.349s
+Iteration 41: Obj=-3094.545986554354 Time=5.271s 0.927873153335 Total time: 221.626s
+Iteration 42: Obj=-2886.411568568540 Time=5.482s 0.932741533365 Total time: 227.114s
+Iteration 43: Obj=-2816.235573327551 Time=5.175s 0.975687460511 Total time: 232.295s
+Iteration 44: Obj=-2738.258546663005 Time=5.369s 0.972311610789 Total time: 237.670s
+Iteration 45: Obj=-2616.737049793938 Time=5.269s 0.955620882835 Total time: 242.945s
+Iteration 46: Obj=-2542.794409145477 Time=5.378s 0.971742426067 Total time: 248.329s
+Iteration 47: Obj=-2518.724838629728 Time=5.303s 0.990534205035 Total time: 253.638s
+Iteration 48: Obj=-2471.884770056892 Time=5.415s 0.981403260946 Total time: 259.059s
+Iteration 49: Obj=-2442.089167969403 Time=5.510s 0.987946201033 Total time: 264.575s
+Iteration 50: Obj=-2413.214421349668 Time=5.257s 0.988176211173 Total time: 269.838s
+Iteration 51: Obj=-2391.362256113099 Time=5.316s 0.990944789223 Total time: 275.161s
+Iteration 52: Obj=-2362.949702583284 Time=5.136s 0.988118674426 Total time: 280.303s
+Iteration 53: Obj=-2319.274236319182 Time=5.296s 0.981516548483 Total time: 285.605s
+Iteration 54: Obj=-2288.746101420610 Time=5.447s 0.986837203458 Total time: 291.058s
+Iteration 55: Obj=-2255.541228656593 Time=5.416s 0.985492111710 Total time: 296.480s
+Iteration 56: Obj=-2205.644829828008 Time=5.299s 0.977878303356 Total time: 301.785s
+Iteration 57: Obj=-2208.286260636297 Time=3.992s 1.001197577585 Total time: 305.783s
+Iteration 58: Obj=-2159.539858165471 Time=5.155s 0.977925686837 Total time: 310.944s
+Iteration 59: Obj=-2124.996775402584 Time=5.383s 0.984004424539 Total time: 316.333s
+Iteration 60: Obj=-2091.141056909909 Time=5.367s 0.984067873004 Total time: 321.706s
+Iteration 61: Obj=-2066.703204899399 Time=5.400s 0.988313628136 Total time: 327.112s
+Iteration 62: Obj=-2022.361783116096 Time=5.441s 0.978544852653 Total time: 332.559s
+Iteration 63: Obj=-1990.123482050678 Time=5.334s 0.984059083130 Total time: 337.900s
+Iteration 64: Obj=-1964.264902960978 Time=5.509s 0.987006545411 Total time: 343.415s
+Iteration 65: Obj=-1911.592889113679 Time=5.348s 0.973184872484 Total time: 348.769s
+Iteration 66: Obj=-1960.447194132185 Time=4.082s 1.025556856429 Total time: 352.856s
+Iteration 67: Obj=-1883.652289362097 Time=5.362s 0.960827863663 Total time: 358.224s
+Iteration 68: Obj=-1851.726262263921 Time=5.421s 0.983050997640 Total time: 363.650s
+Iteration 69: Obj=-1810.665812916463 Time=5.314s 0.977825853538 Total time: 368.970s
+Iteration 70: Obj=-1836.831360958788 Time=4.077s 1.014450788133 Total time: 373.053s
+Iteration 71: Obj=-1783.085095330944 Time=5.298s 0.970739684235 Total time: 378.357s
+Iteration 72: Obj=-1750.198090313259 Time=5.353s 0.981556121408 Total time: 383.715s
+Iteration 73: Obj=-1711.818480174740 Time=5.364s 0.978071276417 Total time: 389.084s
+Iteration 74: Obj=-1677.007390171616 Time=5.147s 0.979664263235 Total time: 394.237s
+Iteration 75: Obj=-1645.625602340957 Time=5.246s 0.981287030687 Total time: 399.489s
+Iteration 76: Obj=-1612.093940356910 Time=5.568s 0.979623760145 Total time: 405.063s
+Iteration 77: Obj=-1583.994857308262 Time=5.330s 0.982569822797 Total time: 410.398s
+Iteration 78: Obj=-1556.584950940777 Time=5.417s 0.982695710001 Total time: 415.820s
+Iteration 79: Obj=-1544.894387281248 Time=5.388s 0.992489607681 Total time: 421.214s
+Iteration 80: Obj=-1525.209086412460 Time=5.380s 0.987257833914 Total time: 426.600s
+Iteration 81: Obj=-1514.514822883161 Time=5.270s 0.992988329519 Total time: 431.876s
+Iteration 82: Obj=-1484.897799869496 Time=5.114s 0.980444547279 Total time: 436.996s
+Iteration 83: Obj=-1462.568837776587 Time=5.323s 0.984962626994 Total time: 442.325s
+Iteration 84: Obj=-1448.668276442617 Time=5.355s 0.990495790027 Total time: 447.686s
+Iteration 85: Obj=-1406.527844112653 Time=5.191s 0.970910916588 Total time: 452.883s
+Iteration 86: Obj=-1382.378119043772 Time=5.385s 0.982830254538 Total time: 458.273s
+Iteration 87: Obj=-1364.802197151698 Time=5.120s 0.987285734887 Total time: 463.399s
+Iteration 88: Obj=-1335.262407661017 Time=5.345s 0.978355992134 Total time: 468.751s
+Iteration 89: Obj=-1298.276272560849 Time=5.453s 0.972300474508 Total time: 474.209s
+Iteration 90: Obj=-1287.412922668052 Time=5.208s 0.991632482144 Total time: 479.423s
+Iteration 91: Obj=-1262.692621613071 Time=5.424s 0.980798467516 Total time: 484.853s
+Iteration 92: Obj=-1245.468595165244 Time=5.309s 0.986359287959 Total time: 490.168s
+Iteration 93: Obj=-1214.142384864686 Time=5.330s 0.974847852108 Total time: 495.503s
+Iteration 94: Obj=-1248.720808943304 Time=4.034s 1.028479710872 Total time: 499.544s
+Iteration 95: Obj=-1197.051658173895 Time=5.381s 0.958622335434 Total time: 504.930s
+Iteration 96: Obj=-1176.028692850131 Time=5.489s 0.982437712541 Total time: 510.425s
+Iteration 97: Obj=-1146.693234731613 Time=5.467s 0.975055491165 Total time: 515.898s
+Iteration 98: Obj=-1147.866586415285 Time=4.028s 1.001023248109 Total time: 519.932s
+Iteration 99: Obj=-1130.504181649134 Time=5.440s 0.984874196207 Total time: 525.378s
+Iteration 100: Obj=-1110.614195656365 Time=5.316s 0.982406092507 Total time: 530.699s
+Iteration 101: Obj=-1089.477489396081 Time=5.371s 0.980968453003 Total time: 536.076s
+Iteration 102: Obj=-1081.570852272392 Time=4.054s 0.992742725572 Total time: 540.135s
+Iteration 103: Obj=-1073.459571685691 Time=5.453s 0.992500463035 Total time: 545.594s
+Iteration 104: Obj=-1055.463718244324 Time=5.474s 0.983235648630 Total time: 551.073s
+Iteration 105: Obj=-1039.796340328646 Time=5.448s 0.985155929432 Total time: 556.527s
+Iteration 106: Obj=-1024.992815662464 Time=5.345s 0.985763053694 Total time: 561.878s
+Iteration 107: Obj=-1002.527682539133 Time=5.245s 0.978082643332 Total time: 567.129s
+Iteration 108: Obj=-1182.689545374098 Time=4.107s 1.179707619024 Total time: 571.242s
+Iteration 109: Obj=-991.956173608911  Time=5.428s 0.838729130133 Total time: 576.675s
+Iteration 110: Obj=-974.875866158154  Time=5.350s 0.982781187410 Total time: 582.030s
+Iteration 111: Obj=-959.170760605372  Time=5.526s 0.983890148379 Total time: 587.561s
+Iteration 112: Obj=-947.262411136006  Time=5.352s 0.987584745117 Total time: 592.919s
+Iteration 113: Obj=-940.157854373808  Time=5.268s 0.992499906384 Total time: 598.193s
+Iteration 114: Obj=-927.949134552723  Time=5.375s 0.987014180901 Total time: 603.574s
+Iteration 115: Obj=-909.966173378370  Time=5.378s 0.980620746866 Total time: 608.957s
+Iteration 116: Obj=-1027.127468679741 Time=4.009s 1.128753462193 Total time: 612.972s
+Iteration 117: Obj=-901.271366546380  Time=5.263s 0.877467884006 Total time: 618.240s
+Iteration 118: Obj=-890.818508507972  Time=5.334s 0.988402096831 Total time: 623.580s
+Iteration 119: Obj=-877.458615447099  Time=5.438s 0.985002676827 Total time: 629.024s
+Iteration 120: Obj=-887.281700698907  Time=4.003s 1.011194927121 Total time: 633.033s
+Iteration 121: Obj=-870.252792705057  Time=5.388s 0.980807777304 Total time: 638.426s
+Iteration 122: Obj=-863.047028155512  Time=5.295s 0.991719917925 Total time: 643.727s
+Iteration 123: Obj=-852.044251416722  Time=5.189s 0.987251243119 Total time: 648.922s
+Iteration 124: Obj=-843.513986920782  Time=5.338s 0.989988472451 Total time: 654.265s
+Iteration 125: Obj=-839.095356052358  Time=5.327s 0.994761638886 Total time: 659.598s
+Iteration 126: Obj=-827.533475730977  Time=5.279s 0.986221017387 Total time: 664.882s
+Iteration 127: Obj=-825.292638942077  Time=5.632s 0.997292149678 Total time: 670.524s
+Iteration 128: Obj=-821.128583016088  Time=5.490s 0.994954449210 Total time: 676.020s
+Iteration 129: Obj=-819.209910566758  Time=5.225s 0.997663371500 Total time: 681.250s
+Iteration 130: Obj=-812.050612842445  Time=5.489s 0.991260728622 Total time: 686.744s
+Iteration 131: Obj=-815.643985522360  Time=4.098s 1.004425059994 Total time: 690.847s
+Iteration 132: Obj=-809.630562023844  Time=5.377s 0.992627391846 Total time: 696.229s
+Iteration 133: Obj=-806.949334057907  Time=5.250s 0.996688331578 Total time: 701.485s
+Iteration 134: Obj=-800.518375962970  Time=5.351s 0.992030530513 Total time: 706.842s
+Iteration 135: Obj=-795.201715845724  Time=5.354s 0.993358478360 Total time: 712.202s
+Iteration 136: Obj=-788.726387527624  Time=5.385s 0.991856999062 Total time: 717.595s
+Iteration 137: Obj=-781.532405735397  Time=5.364s 0.990878989335 Total time: 722.964s
+Iteration 138: Obj=-782.123300286959  Time=4.197s 1.000756071722 Total time: 727.166s
+Iteration 139: Obj=-778.592117624561  Time=5.464s 0.995485133020 Total time: 732.636s
+Iteration 140: Obj=-774.877587253418  Time=5.486s 0.995229170336 Total time: 738.129s
+Iteration 141: Obj=-770.427425967450  Time=5.320s 0.994256949279 Total time: 743.454s
+Iteration 142: Obj=-769.103942463034  Time=5.310s 0.998282143834 Total time: 748.770s
+Iteration 143: Obj=-765.423070718809  Time=5.327s 0.995214077655 Total time: 754.102s
+Iteration 144: Obj=-763.439915360237  Time=5.333s 0.997409072924 Total time: 759.440s
+Iteration 145: Obj=-760.970278034848  Time=5.421s 0.996765118936 Total time: 764.867s
+Iteration 146: Obj=-757.639955556212  Time=5.323s 0.995623584028 Total time: 770.196s
+Iteration 147: Obj=-754.618515555709  Time=5.264s 0.996012037145 Total time: 775.466s
+Iteration 148: Obj=-751.700173024573  Time=5.359s 0.996132691591 Total time: 780.831s
+Iteration 149: Obj=-748.701739426339  Time=5.242s 0.996011130893 Total time: 786.078s
+Iteration 150: Obj=-746.488424358600  Time=5.374s 0.997043796012 Total time: 791.457s
+Iteration 151: Obj=-743.608250336638  Time=5.382s 0.996141703035 Total time: 796.845s
+Iteration 152: Obj=-742.058685360057  Time=5.353s 0.997916154136 Total time: 802.204s
+Iteration 153: Obj=-739.828678577144  Time=5.413s 0.996994837704 Total time: 807.622s
+Iteration 154: Obj=-737.746800257904  Time=5.307s 0.997185999435 Total time: 812.935s
+Iteration 155: Obj=-735.811953738981  Time=5.348s 0.997377356949 Total time: 818.289s
+Iteration 156: Obj=-734.832915937839  Time=5.394s 0.998669445643 Total time: 823.688s
+Iteration 157: Obj=-733.549477213986  Time=5.318s 0.998253427826 Total time: 829.012s
+Iteration 158: Obj=-732.132971201908  Time=5.366s 0.998068970048 Total time: 834.384s
+Iteration 159: Obj=-730.483957863132  Time=5.413s 0.997747658685 Total time: 839.803s
+Iteration 160: Obj=-728.640136909782  Time=5.352s 0.997475891245 Total time: 845.161s
+Iteration 161: Obj=-727.800637591377  Time=5.264s 0.998847854687 Total time: 850.431s
+Iteration 162: Obj=-726.923969832223  Time=5.361s 0.998795456181 Total time: 855.798s
+Iteration 163: Obj=-726.180388554400  Time=5.299s 0.998977085213 Total time: 861.102s
+Iteration 164: Obj=-725.365738143440  Time=5.368s 0.998878170736 Total time: 866.475s
+Iteration 165: Obj=-725.133735248827  Time=5.456s 0.999680157357 Total time: 871.937s
+Iteration 166: Obj=-724.086518609540  Time=5.453s 0.998555829651 Total time: 877.397s
+Iteration 167: Obj=-723.637856270306  Time=5.395s 0.999380374682 Total time: 882.798s
+Iteration 168: Obj=-722.950657090099  Time=5.310s 0.999050354850 Total time: 888.113s
+Iteration 169: Obj=-722.157073893746  Time=5.301s 0.998902299640 Total time: 893.420s
+Iteration 170: Obj=-725.619345335769  Time=4.018s 1.004794346780 Total time: 897.443s
+Iteration 171: Obj=-721.752461472440  Time=5.341s 0.994670919556 Total time: 902.789s
+Iteration 172: Obj=-721.039492622259  Time=5.320s 0.999012169839 Total time: 908.114s
+Iteration 173: Obj=-720.577003233206  Time=5.546s 0.999358579670 Total time: 913.666s
+Iteration 174: Obj=-720.373801846917  Time=5.361s 0.999718001844 Total time: 919.033s
+Iteration 175: Obj=-719.899818567350  Time=5.270s 0.999342031486 Total time: 924.308s
+Iteration 176: Obj=-719.698913379940  Time=5.259s 0.999720926187 Total time: 929.573s
+Iteration 177: Obj=-719.428407402906  Time=5.344s 0.999624140079 Total time: 934.923s
+Iteration 178: Obj=-718.962635746067  Time=5.280s 0.999352580949 Total time: 940.209s
+Iteration 179: Obj=-718.795622028391  Time=5.452s 0.999767701812 Total time: 945.667s
+Iteration 180: Obj=-718.350268306823  Time=5.397s 0.999380416758 Total time: 951.069s
+Iteration 181: Obj=-718.128661557873  Time=5.274s 0.999691505998 Total time: 956.349s
+Iteration 182: Obj=-717.842549379792  Time=5.256s 0.999601586466 Total time: 961.610s
+Iteration 183: Obj=-717.701986557587  Time=5.451s 0.999804187113 Total time: 967.067s
+Iteration 184: Obj=-717.407059814099  Time=5.300s 0.999589067957 Total time: 972.423s
+Iteration 185: Obj=-717.193989755361  Time=5.341s 0.999702999774 Total time: 977.770s
+Iteration 186: Obj=-717.051714540506  Time=5.211s 0.999801622411 Total time: 982.987s
+Iteration 187: Obj=-716.765799231764  Time=5.313s 0.999601262638 Total time: 988.306s
+Iteration 188: Obj=-717.009216202204  Time=3.977s 1.000339604611 Total time: 992.288s
+Iteration 189: Obj=-716.622108177391  Time=5.265s 0.999460107323 Total time: 997.559s
+Iteration 190: Obj=-716.407420397027  Time=5.345s 0.999700417029 Total time: 1002.910s
+Iteration 191: Obj=-716.301314523296  Time=5.381s 0.999851891716 Total time: 1008.296s
+Iteration 192: Obj=-716.174235853710  Time=5.426s 0.999822590484 Total time: 1013.730s
+Iteration 193: Obj=-716.073993117286  Time=5.387s 0.999860030239 Total time: 1019.126s
+Iteration 194: Obj=-715.886033008813  Time=5.344s 0.999737513008 Total time: 1024.475s
+Iteration 195: Obj=-715.750205970865  Time=5.281s 0.999810267233 Total time: 1029.762s
+Iteration 196: Obj=-715.589660282922  Time=5.350s 0.999775695925 Total time: 1035.118s
+Iteration 197: Obj=-715.462251242973  Time=5.361s 0.999821952374 Total time: 1040.485s
+Iteration 198: Obj=-715.395442171721  Time=5.298s 0.999906621109 Total time: 1045.791s
+Iteration 199: Obj=-715.295924360430  Time=5.288s 0.999860891186 Total time: 1051.089s
+Iteration 200: Obj=-715.253175976290  Time=5.476s 0.999940236785 Total time: 1056.570s
+Iteration 201: Obj=-715.107662131310  Time=5.461s 0.999796556171 Total time: 1062.036s
+Iteration 202: Obj=-715.248670638241  Time=4.089s 1.000197185004 Total time: 1066.131s
+Iteration 203: Obj=-715.046334599318  Time=5.355s 0.999717110919 Total time: 1071.492s
+Iteration 204: Obj=-714.979595373360  Time=5.274s 0.999906664474 Total time: 1076.773s
+Iteration 205: Obj=-714.889016430554  Time=5.445s 0.999873312549 Total time: 1082.223s
+Iteration 206: Obj=-714.833211549102  Time=5.358s 0.999921939098 Total time: 1087.586s
+Iteration 207: Obj=-714.800912738978  Time=5.358s 0.999954816299 Total time: 1092.949s
+Iteration 208: Obj=-714.751870520723  Time=5.342s 0.999931390381 Total time: 1098.297s
+Training completes. No significant progress (<objtol) after 208 iterations.
+*****Evaluation*****
+#threads:63
+#instances=1440
+Thread 0 has 23 instances.
+Thread 1 has 23 instances.
+Thread 2 has 23 instances.
+Thread 3 has 23 instances.
+Thread 4 has 23 instances.
+Thread 5 has 23 instances.
+Thread 6 has 23 instances.
+Thread 7 has 23 instances.
+Thread 8 has 23 instances.
+Thread 9 has 23 instances.
+Thread 10 has 23 instances.
+Thread 11 has 23 instances.
+Thread 12 has 23 instances.
+Thread 13 has 23 instances.
+Thread 14 has 23 instances.
+Thread 15 has 23 instances.
+Thread 16 has 23 instances.
+Thread 17 has 23 instances.
+Thread 18 has 23 instances.
+Thread 19 has 23 instances.
+Thread 20 has 23 instances.
+Thread 21 has 23 instances.
+Thread 22 has 23 instances.
+Thread 23 has 23 instances.
+Thread 24 has 23 instances.
+Thread 25 has 23 instances.
+Thread 26 has 23 instances.
+Thread 27 has 23 instances.
+Thread 28 has 23 instances.
+Thread 29 has 23 instances.
+Thread 30 has 23 instances.
+Thread 31 has 23 instances.
+Thread 32 has 23 instances.
+Thread 33 has 23 instances.
+Thread 34 has 23 instances.
+Thread 35 has 23 instances.
+Thread 36 has 23 instances.
+Thread 37 has 23 instances.
+Thread 38 has 23 instances.
+Thread 39 has 23 instances.
+Thread 40 has 23 instances.
+Thread 41 has 23 instances.
+Thread 42 has 23 instances.
+Thread 43 has 23 instances.
+Thread 44 has 23 instances.
+Thread 45 has 23 instances.
+Thread 46 has 23 instances.
+Thread 47 has 23 instances.
+Thread 48 has 23 instances.
+Thread 49 has 23 instances.
+Thread 50 has 23 instances.
+Thread 51 has 23 instances.
+Thread 52 has 23 instances.
+Thread 53 has 23 instances.
+Thread 54 has 22 instances.
+Thread 55 has 22 instances.
+Thread 56 has 22 instances.
+Thread 57 has 22 instances.
+Thread 58 has 22 instances.
+Thread 59 has 22 instances.
+Thread 60 has 22 instances.
+Thread 61 has 22 instances.
+Thread 62 has 22 instances.
+Okay. Decoding started.
+Decoding time for thread 53 = 30.782 secs.
+Decoding time for thread 23 = 30.933 secs.
+Decoding time for thread 46 = 31.013 secs.
+Decoding time for thread 54 = 31.02 secs.
+Decoding time for thread 38 = 31.04 secs.
+Decoding time for thread 37 = 31.071 secs.
+Decoding time for thread 43 = 31.304 secs.
+Decoding time for thread 30 = 31.423 secs.
+Decoding time for thread 39 = 31.723 secs.
+Decoding time for thread 1 = 31.761 secs.
+Decoding time for thread 10 = 31.836 secs.
+Decoding time for thread 0 = 31.997 secs.
+Decoding time for thread 59 = 32.044 secs.
+Decoding time for thread 16 = 32.068 secs.
+Decoding time for thread 58 = 32.17 secs.
+Decoding time for thread 32 = 32.237 secs.
+Decoding time for thread 35 = 32.303 secs.
+Decoding time for thread 50 = 32.306 secs.
+Decoding time for thread 26 = 32.486 secs.
+Decoding time for thread 45 = 32.504 secs.
+Decoding time for thread 2 = 32.548 secs.
+Decoding time for thread 25 = 32.768 secs.
+Decoding time for thread 13 = 32.832 secs.
+Decoding time for thread 47 = 32.911 secs.
+Decoding time for thread 61 = 32.968 secs.
+Decoding time for thread 42 = 32.999 secs.
+Decoding time for thread 36 = 33.012 secs.
+Decoding time for thread 29 = 33.027 secs.
+Decoding time for thread 40 = 33.158 secs.
+Decoding time for thread 11 = 33.161 secs.
+Decoding time for thread 19 = 33.311 secs.
+Decoding time for thread 21 = 33.432 secs.
+Decoding time for thread 52 = 33.44 secs.
+Decoding time for thread 6 = 33.473 secs.
+Decoding time for thread 51 = 33.584 secs.
+Decoding time for thread 49 = 33.634 secs.
+Decoding time for thread 20 = 33.695 secs.
+Decoding time for thread 56 = 33.748 secs.
+Decoding time for thread 44 = 33.773 secs.
+Decoding time for thread 5 = 34.007 secs.
+Decoding time for thread 57 = 34.083 secs.
+Decoding time for thread 24 = 34.342 secs.
+Decoding time for thread 3 = 34.797 secs.
+Decoding time for thread 31 = 34.802 secs.
+Decoding time for thread 18 = 34.87 secs.
+Decoding time for thread 27 = 34.962 secs.
+Decoding time for thread 41 = 35.144 secs.
+Decoding time for thread 12 = 35.273 secs.
+Decoding time for thread 7 = 35.453 secs.
+Decoding time for thread 33 = 35.485 secs.
+Decoding time for thread 8 = 35.493 secs.
+Decoding time for thread 22 = 35.683 secs.
+Decoding time for thread 17 = 35.812 secs.
+Decoding time for thread 4 = 37.092 secs.
+Decoding time for thread 15 = 37.131 secs.
+Decoding time for thread 55 = 37.692 secs.
+Decoding time for thread 34 = 39.293 secs.
+Decoding time for thread 60 = 41.684 secs.
+Decoding time for thread 14 = 42.045 secs.
+Decoding time for thread 62 = 42.131 secs.
+Decoding time for thread 9 = 42.456 secs.
+Decoding time for thread 48 = 43.051 secs.
+Decoding time for thread 28 = 52.028 secs.
+Okay. Decoding done.
+Overall decoding time = 52.032 secs.
+**Evaluating Dependency Result**
+[Dependency] Correct: 17983
+[Dependency] total: 21645
+[Dependency] UAS: 83.08
+[Dependency] Non-Segment Correct: 15568
+[Dependency] Non-Segment total: 18885
+[Dependency] Non-Segment UAS: 82.44
+*************************
