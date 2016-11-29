@@ -84,7 +84,7 @@ public class HPEMain {
 		NetworkConfig.NUM_THREADS = numThreads;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //DPConfig.L2;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
-		
+		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
 		
 		HPEFeatureManager hpfm = new HPEFeatureManager(new GlobalNetworkParam());
 		HPENetworkCompiler dnc = new HPENetworkCompiler();
