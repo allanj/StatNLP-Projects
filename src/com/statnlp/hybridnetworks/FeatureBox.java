@@ -14,14 +14,13 @@ public class FeatureBox implements Serializable {
 	protected int[] _fs;
 //	protected double _totalScore;
 	protected double _currScore;
-	protected boolean _isLocal = false;
+	
 	protected int _version;
 	protected boolean _alwaysChange = false;
 	
 	public FeatureBox(int[] fs) {
 		this._fs = fs;
 		this._version = -1; //the score is not calculated yet.
-		this._isLocal = false;
 	}
 	
 	public int length() {

@@ -25,6 +25,7 @@ public class FeatureArray implements Serializable{
 	
 	private double _totalScore;
 	private FeatureBox _fb;
+	protected boolean _isLocal = false;
 	
 	public static final FeatureArray EMPTY = new FeatureArray(new int[0]);
 	public static final FeatureArray NEGATIVE_INFINITY = new FeatureArray(Double.NEGATIVE_INFINITY);
@@ -49,15 +50,18 @@ public class FeatureArray implements Serializable{
 	public FeatureArray(int[] fs) {
 		this._fb = new FeatureBox(fs);
 		this._next = null;
+		this._isLocal = false;
 	}
 	
 	public FeatureArray(FeatureBox fia) {
 		this(fia, null);
+		this._isLocal = false;
 	}
 	
 	public FeatureArray(FeatureBox fia, FeatureArray next) {
 		this._fb = fia;
 		this._next = next;
+		this._isLocal = false;
 	}
 	
 	public void next(FeatureArray next){
@@ -76,7 +80,7 @@ public class FeatureArray implements Serializable{
 		if(this==NEGATIVE_INFINITY){
 			return this;
 		}
-		if(this._fb._isLocal){
+		if(this._isLocal){
 			return this;
 		}
 		
@@ -114,7 +118,7 @@ public class FeatureArray implements Serializable{
 //			fa = new FeatureArray(fs_local);  //previous usage
 			fa = new FeatureArray(FeatureBox.getFeatureBox(fs_local, param)); //saving memory
 		}
-		fa._fb._isLocal = true;
+		fa._isLocal = true;
 		fa._fb._alwaysChange = this._fb._alwaysChange;
 		return fa;
 	}
@@ -177,8 +181,9 @@ public class FeatureArray implements Serializable{
 			return this._totalScore;
 		}
 		
-		if(!this._fb._isLocal != param.isGlobalMode()) {
-			throw new RuntimeException("This FeatureArray is local? "+this._fb._isLocal+"; The param is "+param.isGlobalMode());
+		if(!this._isLocal != param.isGlobalMode()) {
+			System.err.println(this._next);
+			throw new RuntimeException("This FeatureArray is local? "+this._isLocal+"; The param is "+param.isGlobalMode());
 		}
 		
 		//if the score is negative infinity, it means disabled.
@@ -204,8 +209,8 @@ public class FeatureArray implements Serializable{
 	 * @return
 	 */
 	private double computeScore(LocalNetworkParam param, int[] fs){
-		if(!this._fb._isLocal != param.isGlobalMode()) {
-			throw new RuntimeException("This FeatureArray is local? "+this._fb._isLocal+"; The param is "+param.isGlobalMode());
+		if(!this._isLocal != param.isGlobalMode()) {
+			throw new RuntimeException("This FeatureArray is local? "+this._isLocal+"; The param is "+param.isGlobalMode());
 		}
 		
 		double score = 0.0;
@@ -228,8 +233,8 @@ public class FeatureArray implements Serializable{
 		if(this == NEGATIVE_INFINITY){
 			return this._totalScore;
 		}
-		if(!this._fb._isLocal != param.isGlobalMode()) {
-			throw new RuntimeException("This FeatureArray is local? "+this._fb._isLocal+"; The param is "+param.isGlobalMode());
+		if(!this._isLocal != param.isGlobalMode()) {
+			throw new RuntimeException("This FeatureArray is local? "+this._isLocal+"; The param is "+param.isGlobalMode());
 		}
 		//if the score is negative infinity, it means disabled.
 		if(this._totalScore == Double.NEGATIVE_INFINITY){
