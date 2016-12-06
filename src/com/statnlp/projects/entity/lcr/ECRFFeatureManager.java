@@ -157,23 +157,23 @@ public class ECRFFeatureManager extends FeatureManager {
 			String currDepLabel = currHeadIndex>=0? sent.get(currHeadIndex).getDepLabel():"NOLABEL";
 			//This is the features that really help the model: most important features
 			if(currDepLabel==null || currDepLabel.equals("null")) throw new RuntimeException("The depenency label is null?");
-//			featureList.add(this._param_g.toFeature(network, FeaType.head_word.name(), 		currEn, currWord+"& head:"+currHead));
-//			featureList.add(this._param_g.toFeature(network, FeaType.head_tag.name(), 		currEn, currTag+"& head:"+currHeadTag)); //the most powerful one
-//			featureList.add(this._param_g.toFeature(network, FeaType.dep_word_label.name(), 	currEn, currWord+"& head:"+currHead+"& label:"+currDepLabel));
-//			featureList.add(this._param_g.toFeature(network, FeaType.dep_tag_label.name(), 	currEn, currTag+"& head:"+currHeadTag+"& label:"+currDepLabel));
-//			
+			featureList.add(this._param_g.toFeature(network, FeaType.head_word.name(), 		currEn, currWord+"& head:"+currHead));
+			featureList.add(this._param_g.toFeature(network, FeaType.head_tag.name(), 		currEn, currTag+"& head:"+currHeadTag)); //the most powerful one
+			featureList.add(this._param_g.toFeature(network, FeaType.dep_word_label.name(), 	currEn, currWord+"& head:"+currHead+"& label:"+currDepLabel));
+			featureList.add(this._param_g.toFeature(network, FeaType.dep_tag_label.name(), 	currEn, currTag+"& head:"+currHeadTag+"& label:"+currDepLabel));
+			
 			/**The following set of dependency features are better***/
 			
-			featureList.add(this._param_g.toFeature(network, FeaType.head_word.name(), 		currEn, currHead));
-			featureList.add(this._param_g.toFeature(network, FeaType.head_tag.name(), 		currEn, currHeadTag)); //the most powerful one
-			featureList.add(this._param_g.toFeature(network, FeaType.dep_word_label.name(), 	currEn, currDepLabel));
-			for (int p = 0; p < sent.length(); p++){
-				if (p == pos) continue;
-				if (sent.get(p).getHeadIndex() == pos) {
-					featureList.add(this._param_g.toFeature(network, FeaType.modifier_word.name(), 	currEn, sent.get(p).getName()));
-					featureList.add(this._param_g.toFeature(network, FeaType.modifier_tag.name(), 	currEn, sent.get(p).getTag()));
-				}
-			}
+//			featureList.add(this._param_g.toFeature(network, FeaType.head_word.name(), 		currEn, currHead));
+//			featureList.add(this._param_g.toFeature(network, FeaType.head_tag.name(), 		currEn, currHeadTag)); //the most powerful one
+//			featureList.add(this._param_g.toFeature(network, FeaType.dep_word_label.name(), 	currEn, currDepLabel));
+//			for (int p = 0; p < sent.length(); p++){
+//				if (p == pos) continue;
+//				if (sent.get(p).getHeadIndex() == pos) {
+//					featureList.add(this._param_g.toFeature(network, FeaType.modifier_word.name(), 	currEn, sent.get(p).getName()));
+//					featureList.add(this._param_g.toFeature(network, FeaType.modifier_tag.name(), 	currEn, sent.get(p).getTag()));
+//				}
+//			}
 			
 			/*****/
 		}

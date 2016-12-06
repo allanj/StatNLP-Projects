@@ -195,6 +195,10 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 							}
 						}
 					}
+					if(pos>=0){
+						network.addNode(node);
+						network.addEdge(node, new long[]{toNode_leaf()});
+					}
 				}else{
 					//O label should be with only length 1. actually does not really affect.
 					int prevPos = pos - 1;
@@ -207,19 +211,19 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 							}
 						}
 					}
-				}
-				
-				if(pos>=0){
-					network.addNode(node);
-					network.addEdge(node, new long[]{toNode_leaf()});
+					if(pos==0){
+						network.addNode(node);
+						network.addEdge(node, new long[]{toNode_leaf()});
+					}
 				}
 				currNodes.add(node);
 			}
 			long root = toNode_root(pos+1);
 			network.addNode(root);
 			for(long currNode: currNodes){
-				if(network.contains(currNode))
-					network.addEdge(root, new long[]{currNode});	
+				if(network.contains(currNode)){
+					network.addEdge(root, new long[]{currNode});
+				}	
 			}
 			currNodes = new ArrayList<Long>();
 		}

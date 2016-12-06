@@ -72,8 +72,7 @@ public class HPEFeatureManager extends FeatureManager {
 			if(featureList.get(i)!=-1)
 				finalList.add(featureList.get(i) );
 		}
-		int[] features = new int[finalList.size()];
-		if(features.length==0) return FeatureArray.EMPTY;
+		if(finalList.size()==0) return FeatureArray.EMPTY;
 		//specifically each feature index is a feature.
 		int threadId = network.getThreadId();
 		FeatureArray fa = new FeatureArray(FeatureBox.getFeatureBox(new int[]{finalList.get(0)}, this.getParams_L()[threadId]));

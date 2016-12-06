@@ -8,7 +8,6 @@ import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkModel;
-import com.statnlp.projects.dep.model.hyperedge.stat.Analyzer;
 import com.statnlp.projects.dep.utils.DPConfig;
 import com.statnlp.projects.dep.utils.DPConfig.MODEL;
 
@@ -47,11 +46,11 @@ public class HPEMain {
 		/******Debug********/
 		trainingPath = "data/allanprocess/voa/train.conllx";
 		testingPath = "data/allanprocess/voa/test.conllx";
-		trainNumber = -1;
-		testNumber = -1;
+		trainNumber = 10;
+		testNumber = 10;
 //		numIteration = 20;
 //		numThreads = 8;
-//		testingPath = trainingPath;
+		testingPath = trainingPath;
 //		DPConfig.readWeight = true;
 //		DPConfig.writeWeight = false;
 		/************/

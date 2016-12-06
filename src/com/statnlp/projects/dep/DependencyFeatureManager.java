@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.hybridnetworks.FeatureArray;
+import com.statnlp.hybridnetworks.FeatureBox;
 import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
@@ -45,7 +46,6 @@ public class DependencyFeatureManager extends FeatureManager {
 	@Override
 	protected FeatureArray extract_helper(Network network, int parent_k, int[] children_k) {
 		
-		FeatureArray fa = null;
 		
 		ArrayList<Integer> featureList = new ArrayList<Integer>();
 		
@@ -304,10 +304,16 @@ public class DependencyFeatureManager extends FeatureManager {
 			if(featureList.get(i)!=-1)
 				finalList.add( featureList.get(i) );
 		}
-		int[] features = new int[finalList.size()];
-		for(int i=0;i<finalList.size();i++) features[i] = finalList.get(i);
-		if(features.length==0) return FeatureArray.EMPTY;
-		fa = new FeatureArray(features);
+		if(finalList.size()==0) return FeatureArray.EMPTY;
+		//specifically each feature index is a feature.
+		int threadId = network.getThreadId();
+		FeatureArray fa = new FeatureArray(FeatureBox.getFeatureBox(new int[]{finalList.get(0)}, this.getParams_L()[threadId]));
+		FeatureArray prevFa = fa;
+		for (int i = 1; i < finalList.size(); i++) {
+			FeatureArray curr = new FeatureArray(FeatureBox.getFeatureBox(new int[]{finalList.get(i)}, this.getParams_L()[threadId]));
+			prevFa.next(curr);
+			prevFa = curr;
+		}
 		return fa;
 	}
 	
