@@ -64,12 +64,12 @@ public class FCRFMain {
 		List<FCRFInstance> testInstances = null;
 		/***********DEBUG*****************/
 		trainFile = "data/conll2000/train.txt";
-		trainNumber = 100;
+		trainNumber = 50;
 		testFile = "data/conll2000/test.txt";;
-		testNumber = 1000;
+		testNumber = 50;
 		numIteration = 500;   
 //		testFile = trainFile;
-		NetworkConfig.MAX_MF_UPDATES = 50;
+		NetworkConfig.MAX_MF_UPDATES = 10;
 		useJointFeatures = true;
 		task = TASK.JOINT;
 		IOBESencoding = true;
@@ -99,6 +99,7 @@ public class FCRFMain {
 		
 //		trainInstances = FCRFReader.readGRMMData("data/conll2000/conll2000.train1k.txt", true, -1);
 //		testInstances = FCRFReader.readGRMMData("data/conll2000/conll2000.test1k.txt", false, -1);
+		
 		
 		Chunk.lock();
 		Tag.lock();

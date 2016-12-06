@@ -189,19 +189,20 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 					network.clearMarginalMap();
 					boolean prevDone = false;
 					for (int smallIt = 0; smallIt < NetworkConfig.MAX_MF_UPDATES; smallIt++) {
-//						double unlabeledObj = 0;
-//						double labeledObj = 0;
+//						double[] unlabeledObj = new double[2];
+//						double[] labeledObj = new double[2];
 						for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
 							network.enableKthStructure(curr);
 							network.inference(true);
-//							unlabeledObj += network.getInside() * network._weight;
+//							unlabeledObj[curr] += network.getInside() * network._weight;
+							
 						}
 //						for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
 //							network.getLabeledNetwork().enableKthStructure(curr);
 //							network.getLabeledNetwork().inference(false);
-//							labeledObj += network.getLabeledNetwork().getInside() * network.getLabeledNetwork()._weight;
+//							labeledObj[curr] += network.getLabeledNetwork().getInside() * network.getLabeledNetwork()._weight;
 //						}
-//						System.out.println("SmallIteration " + smallIt + " label : " + labeledObj + " unlabeled: " + unlabeledObj  + " obj: "+ (labeledObj+unlabeledObj));
+//						System.out.println("SmallIteration " + smallIt + " obj 0 : "+ Math.exp(labeledObj[0]+unlabeledObj[0]) + " obj 1 : "+ Math.exp(labeledObj[1]+unlabeledObj[1]));
 						boolean done = network.compareMarginalMap();
 						if (prevDone && done){
 							network.renewCurrentMarginalMap();
