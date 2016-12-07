@@ -46,6 +46,7 @@ public class FCRFMain {
 	public static boolean saveModel = false;
 	/** The option to use existing model **/
 	public static boolean useExistingModel = false;
+	public static int randomSeed = 1234;
 	
 	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException{
 		
@@ -64,10 +65,10 @@ public class FCRFMain {
 		List<FCRFInstance> testInstances = null;
 		/***********DEBUG*****************/
 		trainFile = "data/conll2000/train.txt";
-		trainNumber = 50;
+//		trainNumber = 50;
 		testFile = "data/conll2000/test.txt";;
-		testNumber = 50;
-		numIteration = 500;   
+//		testNumber = 50;
+//		numIteration = 500;   
 //		testFile = trainFile;
 		NetworkConfig.MAX_MF_UPDATES = 10;
 		useJointFeatures = true;
@@ -79,6 +80,7 @@ public class FCRFMain {
 		npchunking = false;
 		FCRFConfig.l2val = 0.01;
 		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
+		NetworkConfig.RANDOM_INIT_FEATURE_SEED = randomSeed;
 //		cascade = true;
 //		testFile = "data/conll2000/NP_chunk_final_prediction.txt";
 //		npchunking = true;
@@ -201,6 +203,7 @@ public class FCRFMain {
 					case "-testNum": testNumber = Integer.valueOf(args[i+1]); break;
 					case "-iter": numIteration = Integer.valueOf(args[i+1]); break;
 					case "-thread": numThreads = Integer.valueOf(args[i+1]); break;
+					case "-seed": randomSeed = Integer.valueOf(args[i+1]); break;
 					case "-testFile": testFile = args[i+1]; break;
 					case "-reg": FCRFConfig.l2val = Double.valueOf(args[i+1]); break;
 					case "-windows":FCRFConfig.windows = args[i+1].equals("true")? true:false; break;
