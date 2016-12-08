@@ -65,12 +65,12 @@ public class FCRFMain {
 		List<FCRFInstance> testInstances = null;
 		/***********DEBUG*****************/
 		trainFile = "data/conll2000/train.txt";
-//		trainNumber = 50;
+		trainNumber = 200;
 		testFile = "data/conll2000/test.txt";;
-//		testNumber = 50;
+		testNumber = 200;
 //		numIteration = 500;   
 //		testFile = trainFile;
-		NetworkConfig.MAX_MF_UPDATES = 10;
+		NetworkConfig.MAX_MF_UPDATES = 50;
 		useJointFeatures = true;
 		task = TASK.JOINT;
 		IOBESencoding = true;
@@ -140,7 +140,6 @@ public class FCRFMain {
 		}
 		
 		FeatureManager fa = null;
-		param_g = new GlobalNetworkParam(optimizer);
 		fa = new FCRFFeatureManager(param_g, useJointFeatures, cascade, task, windowSize, IOBESencoding);
 //		fa = new GRMMFeatureManager(param_g, useJointFeatures);
 		FCRFNetworkCompiler compiler = new FCRFNetworkCompiler(task, IOBESencoding);

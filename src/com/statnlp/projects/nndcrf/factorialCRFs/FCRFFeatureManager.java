@@ -48,10 +48,8 @@ public class FCRFFeatureManager extends FeatureManager {
 		tag_cap_ll, 
 		tag_cap_r, 
 		tag_cap_rr, 
-		joint,
-		joint1,
-		joint2,
-		joint3,
+		e_joint,
+		t_joint,
 		neural_1,
 		neural_2
 		};
@@ -262,12 +260,12 @@ public class FCRFFeatureManager extends FeatureManager {
 		if(children_k.length!=1)
 			throw new RuntimeException("The joint features should only have one children also");
 		String currLabel = paTchildE? Tag.get(paId).getForm():Chunk.get(paId).getForm();
-		int jf0;//, jf1, jf2, jf3;  
+		int jf0, jf1;//, jf2, jf3;  
 		int[] arr = null;
 		int nodeType = -1;
 //		String lw = pos>0? sent.get(pos-1).getName():"<PAD>";
 //		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"<PAD>";
-//		String w = pos==sent.length()? "<PAD>":sent.get(pos).getName();
+		String w = pos==sent.length()? "<PAD>":sent.get(pos).getName();
 		if(!paTchildE){
 			//current it's NE structure, need to refer to Tag node.
 			nodeType = NODE_TYPES.TNODE.ordinal();
@@ -278,7 +276,7 @@ public class FCRFFeatureManager extends FeatureManager {
 				FCRFNetwork unlabeledNetwork = (FCRFNetwork) network.getUnlabeledNetwork();
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 				if (unlabeledDstNodeIdx >= 0) {
-					jf0 = this._param_g.toFeature(network, FEATYPE.joint.name(), currLabel + "&" + tag, "");
+					jf0 = this._param_g.toFeature(network, FEATYPE.e_joint.name(), currLabel + "&" + tag, "");
 //					jf1 = this._param_g.toFeature(network, FEATYPE.joint1.name(), currLabel + "&" + tag, w);
 //					jf2 = this._param_g.toFeature(network, FEATYPE.joint2.name(), currLabel + "&" + tag, lw);
 //					jf3 = this._param_g.toFeature(network, FEATYPE.joint3.name(), currLabel + "&" + tag, rw);
@@ -309,7 +307,7 @@ public class FCRFFeatureManager extends FeatureManager {
 				FCRFNetwork unlabeledNetwork = (FCRFNetwork)network.getUnlabeledNetwork();
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 				if (unlabeledDstNodeIdx >= 0) {
-					jf0 = this._param_g.toFeature(network, FEATYPE.joint.name(), chunk + "&" + currLabel, "");
+					jf0 = this._param_g.toFeature(network, FEATYPE.t_joint.name(), chunk + "&" + currLabel, "");
 //					jf1 = this._param_g.toFeature(network, FEATYPE.joint1.name(), chunk + "&" + currLabel, w);
 //					jf2 = this._param_g.toFeature(network, FEATYPE.joint2.name(), chunk + "&" + currLabel, lw);
 //					jf3 = this._param_g.toFeature(network, FEATYPE.joint3.name(), chunk + "&" + currLabel, rw);
