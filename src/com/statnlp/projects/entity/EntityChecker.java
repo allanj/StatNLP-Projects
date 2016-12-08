@@ -180,6 +180,21 @@ public class EntityChecker {
 		}
 	}
 	
+	/**
+	 * If the span inside or is an entity
+	 * @param sent
+	 * @return
+	 */
+	public static boolean isEntity(Sentence sent, int index_1, int index_2) {
+		int left = Math.min(index_1, index_2);
+		int right = Math.max(index_2, index_1);
+		for (int i = left; i < right; i++) {
+			if (sent.get(i).getEntity().equals("O") || sent.get(i+1).getEntity().equals("O")) return false;
+			if (!sent.get(i).getEntity().substring(1).equals(sent.get(i+1).getEntity().substring(1))) return false;
+		}
+		return true;
+	}
+	
 	public static void main(String[] args) throws IOException{
 //		printAllEntities(DPConfig.ecrftrain);
 //		checkEntityLength("data/alldata/abc/test.output");

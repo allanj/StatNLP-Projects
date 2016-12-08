@@ -9,9 +9,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.ml.opt.OptimizerFactory;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
@@ -155,18 +157,72 @@ public class SemiCRFMain {
 		if(model2){
 			//print some information if using model 2
 			int notConnected = 0;
+			PrintWriter pw = RAWF.writer("data/allanprocess/voa/train.lab");
 			for(SemiCRFInstance inst: trainInstances){
 				notConnected+=checkConnected(inst);
-//				if(checkConnected(inst)>0)
-//					System.out.println(inst.getInput().toString());
+				/**** Only for outside usage.
+				if(checkConnected(inst) == 0) {
+					Sentence input = inst.getInput();
+					String words = input.get(0).getName();
+					String tags = input.get(0).getTag();
+					String heads = "" + (input.get(0).getHeadIndex()+1);
+					String depLabels = input.get(0).getEntity().equals("O") ? input.get(0).getDepLabel().toUpperCase() :
+										//means this one is entity
+										input.get(0).getHeadIndex() == -1 ? input.get(0).getDepLabel().toUpperCase() + "-" + input.get(0).getEntity().substring(2) : 
+											EntityChecker.isEntity(input, 0, input.get(0).getHeadIndex()) ? input.get(0).getEntity().substring(2) : input.get(0).getDepLabel().toUpperCase() + "-" + input.get(0).getEntity().substring(2) ;
+					
+					for (int pos = 1; pos < inst.size(); pos++) {
+						words += "\t" + input.get(pos).getName();
+						tags += "\t" + input.get(pos).getTag();
+						heads += "\t" + (input.get(pos).getHeadIndex()+1);
+						String depLabel = input.get(pos).getEntity().equals("O") ? input.get(pos).getDepLabel().toUpperCase() :
+							//means this one is entity
+							input.get(pos).getHeadIndex() == -1 ? input.get(pos).getDepLabel().toUpperCase() + "-" + input.get(pos).getEntity().substring(2) : 
+								EntityChecker.isEntity(input, pos, input.get(pos).getHeadIndex()) ? input.get(pos).getEntity().substring(2) : input.get(pos).getDepLabel().toUpperCase() + "-" + input.get(pos).getEntity().substring(2) ;
+						depLabels += "\t" + depLabel;
+					}
+					pw.println(words);
+					pw.println(tags);
+					pw.println(depLabels);
+					pw.println(heads);
+					pw.println();
+				}
+				****/
 			}
+			pw.close();
 			System.out.println("isgnore:"+ignore+" not connected entities in train:"+notConnected);
 			notConnected = 0;
+			pw = RAWF.writer("data/allanprocess/voa/test.lab");
 			for(SemiCRFInstance inst: testInstances){
 				notConnected+=checkConnected(inst);
-//				if(checkConnected(inst)>0)
-//					System.out.println(inst.getInput().toString());
+				if(checkConnected(inst) == 0) {
+					Sentence input = inst.getInput();
+					String words = input.get(0).getName();
+					String tags = input.get(0).getTag();
+					String heads = "" + (input.get(0).getHeadIndex()+1);
+					String depLabels = input.get(0).getEntity().equals("O") ? input.get(0).getDepLabel().toUpperCase() :
+										//means this one is entity
+										input.get(0).getHeadIndex() == -1 ? input.get(0).getDepLabel().toUpperCase() + "-" + input.get(0).getEntity().substring(2) : 
+											EntityChecker.isEntity(input, 0, input.get(0).getHeadIndex()) ? input.get(0).getEntity().substring(2) : input.get(0).getDepLabel().toUpperCase() + "-" + input.get(0).getEntity().substring(2) ;
+					
+					for (int pos = 1; pos < inst.size(); pos++) {
+						words += "\t" + input.get(pos).getName();
+						tags += "\t" + input.get(pos).getTag();
+						heads += "\t" + (input.get(pos).getHeadIndex()+1);
+						String depLabel = input.get(pos).getEntity().equals("O") ? input.get(pos).getDepLabel().toUpperCase() :
+							//means this one is entity
+							input.get(pos).getHeadIndex() == -1 ? input.get(pos).getDepLabel().toUpperCase() + "-" + input.get(pos).getEntity().substring(2) : 
+								EntityChecker.isEntity(input, pos, input.get(pos).getHeadIndex()) ? input.get(pos).getEntity().substring(2) : input.get(pos).getDepLabel().toUpperCase() + "-" + input.get(pos).getEntity().substring(2) ;
+						depLabels += "\t" + depLabel;
+					}
+					pw.println(words);
+					pw.println(tags);
+					pw.println(depLabels);
+					pw.println(heads);
+					pw.println();
+				}
 			}
+			pw.close();
 			System.out.println("not connected entities in test:"+notConnected);
 		}
 		if(model1){

@@ -213,6 +213,7 @@ public class DependencyMain {
 			System.err.println("[Info] is Pipeline: "+isPipe);
 			System.err.println("[Info] Using development set??: "+isDev);
 			System.err.println("[Info] Using neural features: "+ NetworkConfig.USE_NEURAL_FEATURES);
+			System.err.println("[Info] Labeled Dependency Parsing?: " + labeledDep);
 			if (NetworkConfig.USE_NEURAL_FEATURES) {
 				System.err.println("[Neural Info] Opimizing Neural in CRF ?: "+ NetworkConfig.OPTIMIZE_NEURAL);
 				System.err.println("[Neural Info] Indexed neural features ?: "+ NetworkConfig.IS_INDEXED_NEURAL_FEATURES);
