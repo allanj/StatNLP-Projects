@@ -70,7 +70,7 @@ public class FCRFMain {
 		testNumber = 200;
 //		numIteration = 500;   
 //		testFile = trainFile;
-		NetworkConfig.MAX_MF_UPDATES = 50;
+//		NetworkConfig.MAX_MF_UPDATES = 50;
 		useJointFeatures = true;
 		task = TASK.JOINT;
 		IOBESencoding = true;

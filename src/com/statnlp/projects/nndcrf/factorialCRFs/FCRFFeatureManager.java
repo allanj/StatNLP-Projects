@@ -48,12 +48,12 @@ public class FCRFFeatureManager extends FeatureManager {
 		tag_cap_ll, 
 		tag_cap_r, 
 		tag_cap_rr, 
-		e_joint,
-		t_joint,
 		e_joint1,
 		t_joint1,
 		e_joint2,
 		t_joint2,
+		e_joint3,
+		t_joint3,
 		neural_1,
 		neural_2
 		};
@@ -264,11 +264,11 @@ public class FCRFFeatureManager extends FeatureManager {
 		if(children_k.length!=1)
 			throw new RuntimeException("The joint features should only have one children also");
 		String currLabel = paTchildE? Tag.get(paId).getForm():Chunk.get(paId).getForm();
-		int jf0, jf1, jf2;//, jf3;  
+		int jf1, jf2, jf3;  
 		int[] arr = null;
 		int nodeType = -1;
 		String lw = pos>0? sent.get(pos-1).getName():"<PAD>";
-//		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"<PAD>";
+		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"<PAD>";
 		String w = pos==sent.length()? "<PAD>":sent.get(pos).getName();
 		if(!paTchildE){
 			//current it's NE structure, need to refer to Tag node.
@@ -283,7 +283,7 @@ public class FCRFFeatureManager extends FeatureManager {
 //					jf0 = this._param_g.toFeature(network, FEATYPE.e_joint.name(), currLabel + "&" + tag, "");
 					jf1 = this._param_g.toFeature(network, FEATYPE.e_joint1.name(), currLabel + "&" + tag, w);
 					jf2 = this._param_g.toFeature(network, FEATYPE.e_joint2.name(), currLabel + "&" + tag, lw);
-//					jf3 = this._param_g.toFeature(network, FEATYPE.joint3.name(), currLabel + "&" + tag, rw);
+					jf3 = this._param_g.toFeature(network, FEATYPE.e_joint3.name(), currLabel + "&" + tag, rw);
 //					if(jf0 != -1){
 //						featureList.add(jf0); network.putJointFeature(parent_k, jf0, unlabeledDstNodeIdx);
 //					}
@@ -293,9 +293,9 @@ public class FCRFFeatureManager extends FeatureManager {
 					if(jf2 != -1){
 						featureList.add(jf2); network.putJointFeature(parent_k, jf2, unlabeledDstNodeIdx);
 					}
-//					if(jf3 != -1){
-//						featureList.add(jf3); network.putJointFeature(parent_k, jf3, unlabeledDstNodeIdx);
-//					}
+					if(jf3 != -1){
+						featureList.add(jf3); network.putJointFeature(parent_k, jf3, unlabeledDstNodeIdx);
+					}
 				}
 			}
 			
@@ -314,7 +314,7 @@ public class FCRFFeatureManager extends FeatureManager {
 //					jf0 = this._param_g.toFeature(network, FEATYPE.t_joint.name(), chunk + "&" + currLabel, "");
 					jf1 = this._param_g.toFeature(network, FEATYPE.t_joint1.name(), chunk + "&" + currLabel, w);
 					jf2 = this._param_g.toFeature(network, FEATYPE.t_joint2.name(), chunk + "&" + currLabel, lw);
-//					jf3 = this._param_g.toFeature(network, FEATYPE.joint3.name(), chunk + "&" + currLabel, rw);
+					jf3 = this._param_g.toFeature(network, FEATYPE.t_joint3.name(), chunk + "&" + currLabel, rw);
 //					if(jf0 != -1){
 //						featureList.add(jf0); network.putJointFeature(parent_k, jf0, unlabeledDstNodeIdx);
 //					}
@@ -324,9 +324,9 @@ public class FCRFFeatureManager extends FeatureManager {
 					if(jf2 != -1){
 						featureList.add(jf2); network.putJointFeature(parent_k, jf2, unlabeledDstNodeIdx);
 					}
-//					if(jf3 != -1){
-//						featureList.add(jf3); network.putJointFeature(parent_k, jf3, unlabeledDstNodeIdx);
-//					}
+					if(jf3 != -1){
+						featureList.add(jf3); network.putJointFeature(parent_k, jf3, unlabeledDstNodeIdx);
+					}
 				}
 			}
 			
