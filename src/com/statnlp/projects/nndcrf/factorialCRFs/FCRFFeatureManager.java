@@ -304,6 +304,12 @@ public class FCRFFeatureManager extends FeatureManager {
 					if(jf3 != -1){
 						featureList.add(jf3); network.putJointFeature(parent_k, jf3, unlabeledDstNodeIdx);
 					}
+					if(jf4 != -1){
+						featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
+					}
+					if(jf5 != -1){
+						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
+					}
 				}
 			}
 			
@@ -336,6 +342,12 @@ public class FCRFFeatureManager extends FeatureManager {
 					}
 					if(jf3 != -1){
 						featureList.add(jf3); network.putJointFeature(parent_k, jf3, unlabeledDstNodeIdx);
+					}
+					if(jf4 != -1){
+						featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
+					}
+					if(jf5 != -1){
+						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
 					}
 				}
 			}
