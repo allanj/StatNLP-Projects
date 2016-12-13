@@ -54,6 +54,10 @@ public class FCRFFeatureManager extends FeatureManager {
 		t_joint2,
 		e_joint3,
 		t_joint3,
+		e_joint4,
+		t_joint4,
+		e_joint5,
+		t_joint5,
 		neural_1,
 		neural_2
 		};
@@ -264,12 +268,14 @@ public class FCRFFeatureManager extends FeatureManager {
 		if(children_k.length!=1)
 			throw new RuntimeException("The joint features should only have one children also");
 		String currLabel = paTchildE? Tag.get(paId).getForm():Chunk.get(paId).getForm();
-		int jf1, jf2, jf3;  
+		int jf1, jf2, jf3, jf4, jf5;  
 		int[] arr = null;
 		int nodeType = -1;
 		String lw = pos>0? sent.get(pos-1).getName():"<PAD>";
+		String llw = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getName();
 		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"<PAD>";
 		String w = pos==sent.length()? "<PAD>":sent.get(pos).getName();
+		String rrw = pos==sent.length()-1? "<PAD>": pos==sent.length()-2? "<PAD>":sent.get(pos+2).getName();
 		if(!paTchildE){
 			//current it's NE structure, need to refer to Tag node.
 			nodeType = NODE_TYPES.TNODE.ordinal();
@@ -284,6 +290,8 @@ public class FCRFFeatureManager extends FeatureManager {
 					jf1 = this._param_g.toFeature(network, FEATYPE.e_joint1.name(), currLabel + "&" + tag, w);
 					jf2 = this._param_g.toFeature(network, FEATYPE.e_joint2.name(), currLabel + "&" + tag, lw);
 					jf3 = this._param_g.toFeature(network, FEATYPE.e_joint3.name(), currLabel + "&" + tag, rw);
+					jf4 = this._param_g.toFeature(network, FEATYPE.e_joint4.name(), currLabel + "&" + tag, llw);
+					jf5 = this._param_g.toFeature(network, FEATYPE.e_joint5.name(), currLabel + "&" + tag, rrw);
 //					if(jf0 != -1){
 //						featureList.add(jf0); network.putJointFeature(parent_k, jf0, unlabeledDstNodeIdx);
 //					}
@@ -315,6 +323,8 @@ public class FCRFFeatureManager extends FeatureManager {
 					jf1 = this._param_g.toFeature(network, FEATYPE.t_joint1.name(), chunk + "&" + currLabel, w);
 					jf2 = this._param_g.toFeature(network, FEATYPE.t_joint2.name(), chunk + "&" + currLabel, lw);
 					jf3 = this._param_g.toFeature(network, FEATYPE.t_joint3.name(), chunk + "&" + currLabel, rw);
+					jf4 = this._param_g.toFeature(network, FEATYPE.t_joint4.name(), chunk + "&" + currLabel, llw);
+					jf5 = this._param_g.toFeature(network, FEATYPE.t_joint5.name(), chunk + "&" + currLabel, rrw);
 //					if(jf0 != -1){
 //						featureList.add(jf0); network.putJointFeature(parent_k, jf0, unlabeledDstNodeIdx);
 //					}

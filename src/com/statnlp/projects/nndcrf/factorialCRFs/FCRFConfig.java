@@ -9,6 +9,9 @@ public class FCRFConfig {
 	public static String nerOut = "data/conll2000/output/nerOut.txt";
 	public static String posOut = "data/conll2000/output/posOut.txt";
 	
+	public static String nerPipeOut = "data/conll2000/output/nerPipeOut.txt";
+	public static String posPipeOut = "data/conll2000/output/posPipeOut.txt";
+	
 	public static String dataType = "conll";
 	
 	public static double l2val = 0.01;

@@ -34,7 +34,7 @@ public class FCRFMain {
 	public static String posOut;
 	public static String neural_config = "config/fcrfneural.config";
 	public static OptimizerFactory optimizer = OptimizerFactory.getLBFGSFactory();
-	public static boolean useJointFeatures = true;
+	public static boolean useJointFeatures = false;
 	public static TASK task = TASK.JOINT;
 	public static boolean IOBESencoding = true;
 	public static boolean npchunking = true;
@@ -65,14 +65,14 @@ public class FCRFMain {
 		List<FCRFInstance> testInstances = null;
 		/***********DEBUG*****************/
 		trainFile = "data/conll2000/train.txt";
-		trainNumber = 200;
+//		trainNumber = 1000;
 		testFile = "data/conll2000/test.txt";;
-		testNumber = 200;
-//		numIteration = 500;   
+//		testNumber = 1000;
+//		numIteration = 1000;   
 //		testFile = trainFile;
 //		NetworkConfig.MAX_MF_UPDATES = 50;
-		useJointFeatures = true;
-		task = TASK.JOINT;
+//		useJointFeatures = true;
+//		task = TASK.JOINT;
 		IOBESencoding = true;
 		saveModel = true;
 		modelFile = "data/conll2000/model";
@@ -87,6 +87,17 @@ public class FCRFMain {
 //		testFile = "data/conll2000/POS_final_prediction.txt";
 //		optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaM(0.0001, 0.9, 0.999, 10e-8);
 		/***************************/
+		
+		if (cascade) {
+			if (task == TASK.TAGGING) {
+				testFile = FCRFConfig.nerOut;
+				posOut = FCRFConfig.posPipeOut;
+			}
+			else if (task == TASK.CHUNKING) {
+				testFile = FCRFConfig.posOut;
+				nerOut = FCRFConfig.nerPipeOut;
+			}
+		}
 		
 		System.err.println("[Info] trainingFile: "+trainFile);
 		System.err.println("[Info] testFile: "+testFile);
@@ -211,8 +222,8 @@ public class FCRFMain {
 									if(NetworkConfig.MAX_MF_UPDATES == 0) useJointFeatures = false;
 									break;
 					case "-task": 
-						if(args[i+1].equals("ner"))  task = TASK.CHUNKING;
-						else if (args[i+1].equals("tagging")) task  = TASK.TAGGING;
+						if(args[i+1].equals("chunk"))  task = TASK.CHUNKING;
+						else if (args[i+1].equals("tag")) task  = TASK.TAGGING;
 						else if (args[i+1].equals("joint"))  task  = TASK.JOINT;
 						else throw new RuntimeException("Unknown task:"+args[i+1]+"?"); break;
 					case "-iobes": 		IOBESencoding = args[i+1].equals("true")? true:false; break;
