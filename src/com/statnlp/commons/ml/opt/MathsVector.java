@@ -56,6 +56,13 @@ public class MathsVector implements Serializable{
 		return v;
 	}
 	
+	public static double l1norm(double[] x){
+		double l1 = 0;
+		for(double u : x)
+			l1 += Math.abs(u);
+		return l1;
+	}
+	
 	public MathsVector(int size){
 		this._v = new double[size];
 	}

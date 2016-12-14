@@ -33,6 +33,7 @@ import com.statnlp.commons.ml.opt.MathsVector;
 import com.statnlp.commons.ml.opt.Optimizer;
 import com.statnlp.commons.ml.opt.OptimizerFactory;
 import com.statnlp.commons.types.Instance;
+import com.statnlp.hybridnetworks.NetworkConfig.REG_TYPE;
 import com.statnlp.neural.NNBackend;
 import com.statnlp.neural.NNCRFGlobalNetworkParam;
 
@@ -120,7 +121,8 @@ public class GlobalNetworkParam implements Serializable{
 		this._isDiscriminative = !NetworkConfig.TRAIN_MODE_IS_GENERATIVE;
 		if(this.isDiscriminative()){
 			this._batchSize = NetworkConfig.BATCH_SIZE;
-			this._kappa = NetworkConfig.L2_REGULARIZATION_CONSTANT;
+			this._kappa = NetworkConfig.REGULARIZATION == REG_TYPE.L2? 
+					NetworkConfig.L2_REGULARIZATION_CONSTANT : NetworkConfig.L1_REGULARIZATION_CONSTANT;
 		}
 		this._featureIntMap = new HashMap<String, HashMap<String, HashMap<String, Integer>>>();
 		this._type2inputMap = new HashMap<String, ArrayList<String>>();
@@ -708,7 +710,12 @@ public class GlobalNetworkParam implements Serializable{
 			if(this.isDiscriminative() && this._kappa > 0 && k>=this._fixedFeaturesSize){
 				if (NetworkConfig.USE_NEURAL_FEATURES && _nnController.isNNFeature(k))
 					continue; //this weight is not really a parameter as it is provided from NN
-				this._counts[k] += 2 * coef * this._kappa * this._weights[k];
+				if (NetworkConfig.REGULARIZATION == REG_TYPE.L2) {
+					this._counts[k] += 2 * coef * this._kappa * this._weights[k];
+				} else {
+					int subg = this._weights[k] >= 0 ? 1:-1;
+					this._counts[k] += coef * this._kappa * subg;
+				}
 			}
 		}
 		if (NetworkConfig.OPTIMIZE_NEURAL && NetworkConfig.USE_NEURAL_FEATURES) {
@@ -719,7 +726,12 @@ public class GlobalNetworkParam implements Serializable{
 				internalNNCounts[k] = 0.0;
 				if(NetworkConfig.REGULARIZE_NEURAL_FEATURES) {
 					if(this.isDiscriminative() && this._kappa > 0){
-						internalNNCounts[k] += 2 * coef * this._kappa * internalNNWeights[k];
+						if (NetworkConfig.REGULARIZATION == REG_TYPE.L2) {
+							internalNNCounts[k] += 2 * coef * this._kappa * internalNNWeights[k];
+						} else { //else REG.L1
+							int subg = this._weights[k] >= 0 ? 1:-1;
+							internalNNCounts[k] += coef * this._kappa * subg;
+						}
 					}
 				}
 			}
@@ -743,12 +755,15 @@ public class GlobalNetworkParam implements Serializable{
 				}
 				for (int k = 0; k < _weights.length; k++) {
 					if (!_nnController.isNNFeature(k)) {
-						this._obj += this._weights[k] * this._weights[k];
+						this._obj += NetworkConfig.REGULARIZATION == REG_TYPE.L2 ?
+								this._weights[k] * this._weights[k] : Math.abs(this._weights[k]);
 					}
 				}
 				this._obj *= - coef * this._kappa; 
 			} else {
-				this._obj += - coef * this._kappa * MathsVector.square(this._weights);
+				double regWeight = NetworkConfig.REGULARIZATION == REG_TYPE.L2 ?
+						MathsVector.square(this._weights) : MathsVector.l1norm(this._weights);
+				this._obj += - coef * this._kappa * regWeight;
 			}
 		}
 		//NOTES:

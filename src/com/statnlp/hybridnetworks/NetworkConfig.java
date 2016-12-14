@@ -71,6 +71,21 @@ public class NetworkConfig {
 	public static double L2_REGULARIZATION_CONSTANT = 0.01;
 	
 	/**
+	 * The L1 regularization parameter
+	 */
+	public static double L1_REGULARIZATION_CONSTANT = 0.01;
+	
+	public static enum REG_TYPE {
+		L1,
+		L2;
+	}
+	
+	/**
+	 * Regularization method. Default: L2
+	 */
+	public static REG_TYPE REGULARIZATION = REG_TYPE.L2;
+	
+	/**
 	 * Network is the core of StatNLP framework.<br>
 	 * This defines the default capacity for defining the nodes of the network<br>
 	 * For more information, see {@link Network}
