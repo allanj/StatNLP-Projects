@@ -32,8 +32,6 @@
 	<classpathentry kind="lib" path="lib/jung2-2_0_1/vecmath-1.3.1.jar"/>
 	<classpathentry kind="lib" path="lib/jung2-2_0_1/wstx-asl-3.2.6.jar"/>
 	<classpathentry kind="lib" path="lib/swing-layout-1.0.3.jar"/>
-	<classpathentry kind="lib" path="lib/json-20140107.jar"/>
-	<classpathentry kind="lib" path="lib/zmq.jar"/>
 	<classpathentry kind="lib" path="lib/stanford-corenlp.jar"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>

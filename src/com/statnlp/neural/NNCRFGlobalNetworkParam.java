@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.statnlp.neural.util.Config.WordEmbedding;
+
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
 
@@ -17,15 +19,15 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 	
 	// "input" and "output" vocab
 	private HashSet<String> inputSet = new HashSet<String>();
-	private List<HashMap<Integer, String>> idx2strOutputList = new ArrayList<HashMap<Integer, String>>();
-	private ArrayList<HashMap<String, Integer>> fieldMapList = new ArrayList<HashMap<String, Integer>>();
+	private HashMap<Integer, String> idx2strOutput = new HashMap<Integer, String>();
+	private List<HashMap<String, Integer>> fieldMapList = new ArrayList<HashMap<String, Integer>>();
 	
 	// maps the index in the flattened ``external'' weights from the NN to corresponding feature index
 	private int[] externalWeightIndex;
 		
 	
 	// reference to External Neural features
-	private List<HashMap<String, HashMap<String, Integer>>> neuralFeatureIntMapList;
+	private HashMap<String, HashMap<String, Integer>> neuralFeatureIntMap;
 	
 	// number of NN features
 	private int _nnSize = 0;
@@ -41,9 +43,7 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 	public NNCRFGlobalNetworkParam(GlobalNetworkParam param_G) {
 		super();
 		this.param_G = param_G;
-		neuralFeatureIntMapList = new ArrayList<HashMap<String, HashMap<String, Integer>>>();
-		for(int i=1;i<=NeuralConfig.NUM_NEURAL_NETS; i++)
-			neuralFeatureIntMapList.add(param_G.getFeatureIntMap().get("neural_"+i));
+		neuralFeatureIntMap = param_G.getFeatureIntMap().get(NetworkConfig.NEURAL_FEATURE_TYPE_PREFIX);
 	}
 	
 	@Override
@@ -54,15 +54,17 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 		List<Integer> inputDimList = new ArrayList<Integer>();//Arrays.asList(idx2strInput.size());
 		List<String> wordList = new ArrayList<String>();
 		String lang = NeuralConfig.LANGUAGE;
-		List<String> embList = NeuralConfig.EMBEDDING;
+		List<WordEmbedding> embList = NeuralConfig.EMBEDDING;
 		List<Integer> embSizeList = NeuralConfig.EMBEDDING_SIZE;
 		List<List<Integer>> vocab = makeVocab(numInputList, inputDimList, wordList);
-		List<Integer> outputDimList = new ArrayList<Integer>();
-		for(HashMap<String, HashMap<String, Integer>> map: neuralFeatureIntMapList){
-			outputDimList.add(map.size());
-		}
+		int outputDim = neuralFeatureIntMap.size();
+		int[] numInputArr = intList2Arr(numInputList);
+		int[] inputDimArr = intList2Arr(inputDimList);
+		WordEmbedding[] embArr = embList.toArray(new WordEmbedding[embList.size()]);
+		int[] embSizeArr = intList2Arr(embSizeList);
 		
-		double[] nnInternalWeights = this.nn.initNetwork(numInputList, inputDimList, wordList, lang, embList, embSizeList, outputDimList, vocab);
+		double[] nnInternalWeights = this.nn.initNetwork(numInputArr, inputDimArr, wordList, 
+				lang, embArr, embSizeArr, outputDim, vocab);
 		if(nnInternalWeights != null) {
 			_nnSize = nnInternalWeights.length;
 		} else {
@@ -176,71 +178,61 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 		List<List<Integer>> vocab = new ArrayList<List<Integer>>();
 		
 		int externalOutputSize = 0;
-		for(HashMap<String, HashMap<String, Integer>> neuralFeatureIntMap : neuralFeatureIntMapList){
-			//the output for different networks shouldnt be overlapped
-			HashMap<Integer, String> idx2strOutput = new HashMap<Integer, String>();
-			for (String output : neuralFeatureIntMap.keySet()) {
-				idx2strOutput.put(idx2strOutput.size(), output);
-				for (String input : neuralFeatureIntMap.get(output).keySet()) {
-					String[] fields = input.split(NeuralConfig.OUT_SEP);
-					if (fieldMapList.isEmpty()) {
-						for(int i=0;i<fields.length;i++) {
-							fieldMapList.add(new HashMap<String, Integer>());
-							String[] elements = fields[i].split(NeuralConfig.IN_SEP);
-							numInputList.add(elements.length);
-							inputDimList.add(0);
-						}
-							
-					}
-					ArrayList<Integer> entry = new ArrayList<Integer>();
+		//the output for different networks shouldnt be overlapped
+		idx2strOutput = new HashMap<Integer, String>();
+		for (String output : neuralFeatureIntMap.keySet()) {
+			idx2strOutput.put(idx2strOutput.size(), output);
+			for (String input : neuralFeatureIntMap.get(output).keySet()) {
+				String[] fields = input.split(NeuralConfig.OUT_SEP);
+				if (fieldMapList.isEmpty()) {
 					for(int i=0;i<fields.length;i++) {
+						fieldMapList.add(new HashMap<String, Integer>());
 						String[] elements = fields[i].split(NeuralConfig.IN_SEP);
-						HashMap<String, Integer> fieldMap = fieldMapList.get(i);
-						for (int j=0;j<elements.length;j++) {
-							if(!fieldMap.containsKey(elements[j])) {
-								int fieldIdx = NetworkConfig.IS_INDEXED_NEURAL_FEATURES? Integer.parseInt(elements[j]):fieldMap.size();
-								fieldMap.put(elements[j], fieldIdx);
-								inputDimList.set(i, inputDimList.get(i)+1);
-								if (NeuralConfig.EMBEDDING.get(i).equals("glove")
-								|| NeuralConfig.EMBEDDING.get(i).equals("polyglot")) {
-									wordList.add(elements[j]);
-								}
-							}
-							entry.add(fieldMap.get(elements[j])+1); // 1-indexing
-						}
-					}
-					if (!inputSet.contains(input)) {
-						inputSet.add(input);
-						vocab.add(entry);
+						numInputList.add(elements.length);
+						inputDimList.add(0);
 					}
 				}
+				ArrayList<Integer> entry = new ArrayList<Integer>();
+				for(int i=0;i<fields.length;i++) {
+					String[] elements = fields[i].split(NeuralConfig.IN_SEP);
+					HashMap<String, Integer> fieldMap = fieldMapList.get(i);
+					for (int j=0;j<elements.length;j++) {
+						if(!fieldMap.containsKey(elements[j])) {
+							int fieldIdx = NetworkConfig.IS_INDEXED_NEURAL_FEATURES? Integer.parseInt(elements[j]):fieldMap.size();
+							fieldMap.put(elements[j], fieldIdx);
+							inputDimList.set(i, inputDimList.get(i)+1);
+							if (NeuralConfig.EMBEDDING.get(i).equals("glove")
+							|| NeuralConfig.EMBEDDING.get(i).equals("polyglot")) {
+								wordList.add(elements[j]);
+							}
+						}
+						entry.add(fieldMap.get(elements[j])); // 0-indexing
+					}
+				}
+				if (!inputSet.contains(input)) {
+					inputSet.add(input);
+					vocab.add(entry);
+				}
 			}
-			idx2strOutputList.add(idx2strOutput);
-			externalOutputSize+=idx2strOutput.size();
 		}
+		externalOutputSize+=idx2strOutput.size();
 
 		externalWeightIndex = new int[externalOutputSize*inputSet.size()];
 		int i = 0;
-		int currSize = 0;
-		for(int k=0; k< idx2strOutputList.size();k++){
-			i=0;
-			HashMap<Integer, String>  idx2strOutput = idx2strOutputList.get(k);
-			for (String input : inputSet) {
-				for (int j = 0; j < idx2strOutput.size(); j++) {
-					String output = idx2strOutput.get(j);
-					Integer idx = neuralFeatureIntMapList.get(k).get(output).get(input);
-					if (idx != null) {
-						externalWeightIndex[currSize+i*idx2strOutput.size()+j] = idx;
-						setNNFeature(idx);
-						_usedNNSize++;
-					} else {
-						externalWeightIndex[currSize+i*idx2strOutput.size()+j] = -1;
-					}
+		for (String input : inputSet) {
+			for (int j = 0; j < idx2strOutput.size(); j++) {
+				String output = idx2strOutput.get(j);
+				Integer idx = neuralFeatureIntMap.get(output).get(input);
+				if (idx != null) {
+					externalWeightIndex[i*idx2strOutput.size()+j] = idx;
+					setNNFeature(idx);
+					_usedNNSize++;
+				} else {
+					externalWeightIndex[i*idx2strOutput.size()+j] = -1;
 				}
-				
-				i++;
 			}
-			currSize += i*idx2strOutput.size();
+			
+			i++;
 		}
 		return vocab;
 	}
@@ -275,4 +267,13 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 		for (int i = 0; i < a.length; i++) ret[i] = a[i];
 		for (int i = 0; i < b.length; i++) ret[i+a.length] = b[i];
 	}
+	
+	private int[] intList2Arr(List<Integer> list) {
+		int[] arr = new int[list.size()];
+		for(int i = 0; i < list.size(); i++) {
+			arr[i] = list.get(i);
+		}
+		return arr;
+	}
+	
 }
