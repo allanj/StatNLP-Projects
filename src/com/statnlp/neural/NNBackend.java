@@ -9,8 +9,6 @@ import org.statnlp.neural.util.Config.WordEmbedding;
 import org.statnlp.neural.util.INDArrayList;
 
 public class NNBackend {
-	private boolean DEBUG = false;
-	
 	// Reference to controller instance for updating weights and getting gradients
 	private NNCRFInterface controller;
 	
@@ -30,14 +28,19 @@ public class NNBackend {
 		mlp = new MultiLayerPerceptron(NeuralConfig.NUM_LAYER, NeuralConfig.HIDDEN_SIZE,
 				NeuralConfig.ACTIVATION, inputDimList, numInputList, embeddingList, 
 				embSizeList, outputDim, true, wordList, NeuralConfig.EMBEDDING_PATH);
-		double[][] vocabArr = new double[vocab.size()][vocab.get(0).size()];
-		for (int r = 0; r < vocabArr.length; r++) {
-			List<Integer> list = vocab.get(r);
-			for (int c = 0; c < vocabArr[0].length; c++) {
-				vocabArr[r][c] = list.get(c);
+		INDArray[] vocabInput = new INDArray[numInputList.length];
+		int startIdx = 0;
+		for (int n = 0; n < numInputList.length; n++) {
+			double[][] vocabArr = new double[vocab.size()][numInputList[n]];
+			for (int j = 0; j < vocab.size(); j++) {
+				for (int k = 0; k < numInputList[n]; k++) {
+					vocabArr[j][k] = vocab.get(j).get(startIdx + k);
+				}
 			}
+			startIdx += numInputList[n];
+			vocabInput[n] = Nd4j.create(vocabArr);
 		}
-		vocabINDArray = new INDArrayList(Nd4j.create(vocabArr));
+		vocabINDArray = new INDArrayList(vocabInput);
 		return getNetworkParameters();
 	}
 	
