@@ -16,7 +16,6 @@ import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
 import com.statnlp.hybridnetworks.NetworkModel;
-import com.statnlp.neural.NeuralConfig;
 import com.statnlp.neural.NeuralConfigReader;
 import com.statnlp.projects.nndcrf.factorialCRFs.FCRFConfig.TASK;
 
@@ -132,13 +131,13 @@ public class FCRFMain {
 		NetworkConfig.INFERENCE = task == TASK.JOINT ? InferenceType.MEAN_FIELD : InferenceType.FORWARD_BACKWARD;
 		
 		/***Neural network Configuration**/
-		NetworkConfig.USE_NEURAL_FEATURES = false; 
+//		NetworkConfig.USE_NEURAL_FEATURES = false; 
 		if(NetworkConfig.USE_NEURAL_FEATURES)
 			NeuralConfigReader.readConfig(neural_config);
-		NetworkConfig.OPTIMIZE_NEURAL = false;  //false: optimize in neural network
-		NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
-		NetworkConfig.REGULARIZE_NEURAL_FEATURES = false; //true means regularize in the crf part
-		NeuralConfig.NUM_NEURAL_NETS = 2;
+//		NetworkConfig.OPTIMIZE_NEURAL = false;  //false: optimize in neural network
+//		NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
+//		NetworkConfig.REGULARIZE_NEURAL_FEATURES = false; //true means regularize in the crf part
+//		NeuralConfig.NUM_NEURAL_NETS = 2;
 		/****/
 		
 		GlobalNetworkParam param_g = null; 
@@ -249,6 +248,13 @@ public class FCRFMain {
 					case "-wsize": 	 windowSize = Integer.valueOf(args[i+1]); break; //default: 5. the window size of neural feature.
 					case "-nerout":  nerOut = args[i+1]; break; //default: name is output/nerout
 					case "-posout":  posOut = args[i+1]; break; //default: name is output/pos_out;
+					case "-neural": if(args[i+1].equals("true")){ 
+										NetworkConfig.USE_NEURAL_FEATURES = true; 
+										NetworkConfig.OPTIMIZE_NEURAL = true;  //false: optimize in neural network
+										NetworkConfig.REGULARIZE_NEURAL_FEATURES = true;
+										NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
+									}
+									break;
 					case "-mode": 	if (args[i+1].equals("train")){
 										//train also test the file
 										useExistingModel = false;
