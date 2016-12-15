@@ -199,8 +199,6 @@ public class NetworkConfig {
 	public static boolean USE_NEURAL_FEATURES = false;
 	/** Regularized the neural features in CRF or not. set to false then can be done by dropout***/
 	public static boolean REGULARIZE_NEURAL_FEATURES = false;
-	/** If true: Optimized the neural net in CRF. optimizer in neural config must be set to none **/
-	public static boolean OPTIMIZE_NEURAL = false;   //false means not update the neural network parameters in CRF. false is faster
 	/** false: the feature is the word itself. true: word is the indexed word **/
 	public static boolean IS_INDEXED_NEURAL_FEATURES = false;
 	/** Randomly choose the batch at every iteration. (false may give better result)**/

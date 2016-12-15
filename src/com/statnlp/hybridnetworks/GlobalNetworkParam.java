@@ -718,7 +718,7 @@ public class GlobalNetworkParam implements Serializable{
 				}
 			}
 		}
-		if (NetworkConfig.OPTIMIZE_NEURAL && NetworkConfig.USE_NEURAL_FEATURES) {
+		if (NetworkConfig.USE_NEURAL_FEATURES) {
 			//reset the internal feature weights here.
 			double[] internalNNWeights = this._nnController.getInternalNeuralWeights();
 			double[] internalNNCounts = this._nnController.getInternalNeuralGradients();
@@ -750,7 +750,7 @@ public class GlobalNetworkParam implements Serializable{
 		//for regularization
 		if(this.isDiscriminative() && this._kappa > 0){
 			if (NetworkConfig.USE_NEURAL_FEATURES) {
-				if(NetworkConfig.OPTIMIZE_NEURAL && NetworkConfig.REGULARIZE_NEURAL_FEATURES) {
+				if(NetworkConfig.REGULARIZE_NEURAL_FEATURES) {
 					this._obj += MathsVector.square(this._nnController.getInternalNeuralWeights());
 				}
 				for (int k = 0; k < _weights.length; k++) {
