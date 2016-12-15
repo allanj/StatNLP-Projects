@@ -182,7 +182,6 @@ public class DependencyMain {
 					case "-windowSize": windowSize = Integer.valueOf(args[i+1]); break;
 					case "-neural": if(args[i+1].equals("true")){ 
 										NetworkConfig.USE_NEURAL_FEATURES = true; 
-										NetworkConfig.OPTIMIZE_NEURAL = true;  //optimize in CRF..
 										NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
 										NetworkConfig.REGULARIZE_NEURAL_FEATURES = false; // Regularized the neural features in CRF or not
 									} break; 
@@ -215,7 +214,6 @@ public class DependencyMain {
 			System.err.println("[Info] Using neural features: "+ NetworkConfig.USE_NEURAL_FEATURES);
 			System.err.println("[Info] Labeled Dependency Parsing?: " + labeledDep);
 			if (NetworkConfig.USE_NEURAL_FEATURES) {
-				System.err.println("[Neural Info] Opimizing Neural in CRF ?: "+ NetworkConfig.OPTIMIZE_NEURAL);
 				System.err.println("[Neural Info] Indexed neural features ?: "+ NetworkConfig.IS_INDEXED_NEURAL_FEATURES);
 				System.err.println("[Neural Info] Regularize neural features in CRF ?: "+ NetworkConfig.REGULARIZE_NEURAL_FEATURES);
 			}
