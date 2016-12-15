@@ -51,7 +51,7 @@ public class ChunkMain {
 		trainNumber = 100;
 		testFile = "data/conll2000/test.txt";;
 		testNumber = 100;
-		numIteration = 500;
+		numIteration = 1000;
 		/***/
 		
 		

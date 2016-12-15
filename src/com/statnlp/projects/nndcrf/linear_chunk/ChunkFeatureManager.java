@@ -30,7 +30,7 @@ public class ChunkFeatureManager extends FeatureManager {
 		tag_ll, 
 		tag_r, 
 		tag_rr, 
-		chunk, neural_1};
+		chunk, neural};
 	private String OUT_SEP = NeuralConfig.OUT_SEP; 
 	private String IN_SEP = NeuralConfig.IN_SEP;
 	
@@ -117,19 +117,19 @@ public class ChunkFeatureManager extends FeatureManager {
 		/** Neural features (5-word window) if neural network is enabled**/
 		if(NetworkConfig.USE_NEURAL_FEATURES){
 			if(windowSize == 5)
-				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, llw.toLowerCase()+IN_SEP+
+				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), currEn, llw.toLowerCase()+IN_SEP+
 																						lw.toLowerCase()+IN_SEP+
 																						currWord.toLowerCase()+IN_SEP+
 																						rw.toLowerCase()+IN_SEP+
 																						rrw.toLowerCase()+OUT_SEP+
 																						llcaps+IN_SEP+lcaps+IN_SEP+currCaps+IN_SEP+rcaps+IN_SEP+rrcaps));
 			else if(windowSize == 3)
-				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, lw.toLowerCase()+IN_SEP+
+				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), currEn, lw.toLowerCase()+IN_SEP+
 						currWord.toLowerCase()+IN_SEP+
 						rw.toLowerCase()+OUT_SEP+
 						lcaps+IN_SEP+currCaps+IN_SEP+rcaps));
 			else if(windowSize == 1)
-				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, currWord.toLowerCase()+OUT_SEP+currCaps));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), currEn, currWord.toLowerCase()+OUT_SEP+currCaps));
 			
 			else throw new RuntimeException("Unknown window size: "+windowSize);
 		}
