@@ -188,7 +188,7 @@ public class FCRFFeatureManager extends FeatureManager {
 						rw.toLowerCase()+OUT_SEP+
 						lcaps+IN_SEP+currCaps+IN_SEP+rcaps));
 			else if(windowSize == 1)
-				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), currEn, currWord.toLowerCase()));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), currEn, currWord.toLowerCase() + OUT_SEP + currCaps));
 			else throw new RuntimeException("Unknown window size: "+windowSize);
 		}
 	}

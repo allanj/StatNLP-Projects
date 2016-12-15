@@ -73,9 +73,9 @@ public class FCRFMain {
 //		useJointFeatures = true;
 //		task = TASK.JOINT;
 		IOBESencoding = true;
-		saveModel = true;
+		saveModel = false;
 		modelFile = "data/conll2000/model";
-		useExistingModel = false;
+		useExistingModel = true;
 		npchunking = false;
 		FCRFConfig.l2val = 0.01;
 		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
@@ -250,7 +250,6 @@ public class FCRFMain {
 					case "-posout":  posOut = args[i+1]; break; //default: name is output/pos_out;
 					case "-neural": if(args[i+1].equals("true")){ 
 										NetworkConfig.USE_NEURAL_FEATURES = true; 
-										NetworkConfig.OPTIMIZE_NEURAL = true;  //false: optimize in neural network
 										NetworkConfig.REGULARIZE_NEURAL_FEATURES = true;
 										NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
 									}
