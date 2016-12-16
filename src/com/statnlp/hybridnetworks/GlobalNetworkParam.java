@@ -751,7 +751,9 @@ public class GlobalNetworkParam implements Serializable{
 		if(this.isDiscriminative() && this._kappa > 0){
 			if (NetworkConfig.USE_NEURAL_FEATURES) {
 				if(NetworkConfig.REGULARIZE_NEURAL_FEATURES) {
-					this._obj += MathsVector.square(this._nnController.getInternalNeuralWeights());
+					double[] internalNeuralWeights = this._nnController.getInternalNeuralWeights();
+					this._obj += NetworkConfig.REGULARIZATION == REG_TYPE.L2 ?
+							MathsVector.square(internalNeuralWeights) : MathsVector.l1norm(internalNeuralWeights);
 				}
 				for (int k = 0; k < _weights.length; k++) {
 					if (!_nnController.isNNFeature(k)) {
