@@ -1,4 +1,4 @@
-package com.statnlp.projects.dep.model.hyperedge;
+package com.statnlp.projects.dep.model.joint;
 
 import java.util.ArrayList;
 
@@ -6,7 +6,7 @@ import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
 
 
-public class HPEInstance extends Instance {
+public class JointInstance extends Instance {
 
 	/**
 	 * Input is a sequence of words and tags. index 0 is root
@@ -20,7 +20,7 @@ public class HPEInstance extends Instance {
 	
 	protected ArrayList<Span> prediction;
 	
-	public HPEInstance(int instanceId, double weight, Sentence input) {
+	public JointInstance(int instanceId, double weight, Sentence input) {
 		super(instanceId, weight);
 		this.input = input;
 	}
@@ -34,8 +34,8 @@ public class HPEInstance extends Instance {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public HPEInstance duplicate() {
-		HPEInstance inst = new HPEInstance(this._instanceId, this._weight, this.input);
+	public JointInstance duplicate() {
+		JointInstance inst = new JointInstance(this._instanceId, this._weight, this.input);
 		if (output==null)
 			inst.output = null;
 		else inst.output = (ArrayList<Span>)output.clone();

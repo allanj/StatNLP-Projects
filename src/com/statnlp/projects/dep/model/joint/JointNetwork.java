@@ -1,23 +1,23 @@
-package com.statnlp.projects.dep.model.hyperedge;
+package com.statnlp.projects.dep.model.joint;
 
 
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.TableLookupNetwork;
 
-public class HPENetwork extends TableLookupNetwork {
+public class JointNetwork extends TableLookupNetwork {
 
 	
 	private static final long serialVersionUID = 991556477287748391L;
 	int _numNodes = -1;
 	
-	public HPENetwork() {
+	public JointNetwork() {
 	}
 
-	public HPENetwork(int networkId, HPEInstance inst, LocalNetworkParam param) {
+	public JointNetwork(int networkId, JointInstance inst, LocalNetworkParam param) {
 		super(networkId, inst, param);
 	}
 
-	public HPENetwork(int networkId, HPEInstance inst, long[] nodes, int[][][] children, LocalNetworkParam param, int numNodes) {
+	public JointNetwork(int networkId, JointInstance inst, long[] nodes, int[][][] children, LocalNetworkParam param, int numNodes) {
 		super(networkId, inst, nodes, children, param);
 		this._numNodes = numNodes;
 	}

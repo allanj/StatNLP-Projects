@@ -1,4 +1,4 @@
-package com.statnlp.projects.dep.model.hyperedge;
+package com.statnlp.projects.dep.model.joint;
 
 import java.io.Serializable;
 import java.util.HashMap;

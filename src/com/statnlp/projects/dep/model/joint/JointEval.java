@@ -1,19 +1,17 @@
-package com.statnlp.projects.dep.model.hyperedge;
+package com.statnlp.projects.dep.model.joint;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
-import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.projects.dep.utils.DPConfig;
 
 
-public class HPEEval {
+public class JointEval {
 
 	
 	
@@ -23,23 +21,19 @@ public class HPEEval {
 	 * @param testInsts
 	 * @param dpOut, index \t word \t tag \t true entity \t trueHead \t predHead
 	 * @throws IOException
+	 * @TODO Not complete yet.
 	 */
 	public static void evalDP(Instance[] testInsts, String dpOut, boolean labeledDep) throws IOException{
 		int dp_corr=0;
 		int dp_total=0;
 		int las_corr = 0;
-		int lastGlobalId = Integer.MIN_VALUE;
-		double max = Double.NEGATIVE_INFINITY;
-		int bestId = -1;
 		PrintWriter pw = RAWF.writer(dpOut);
-		HPEInstance bestInst = null;
 		for (int index = 0; index < testInsts.length; index++) {
-			HPEInstance inst = (HPEInstance)(testInsts[index]);
+			JointInstance inst = (JointInstance)(testInsts[index]);
 			List<Span> prediction = inst.getPrediction();
-			Sentence sent = inst.getInput();
 			for (int i = 0; i < prediction.size(); i++) {
-				Span span = prediction.get(i);
-				
+				//Span span = prediction.get(i);
+				//TODO complete the evaluation
 				dp_total++;
 			}
 			pw.write("\n");
@@ -64,7 +58,7 @@ public class HPEEval {
 	public static void evalNER(Instance[] testInsts, String nerOut) throws IOException{
 		PrintWriter pw = RAWF.writer(nerOut);
 		for(int index=0;index<testInsts.length;index++){
-			HPEInstance inst = (HPEInstance)testInsts[index];
+			JointInstance inst = (JointInstance)testInsts[index];
 			List<Span> prediction = inst.getPrediction();
 			List<Span> output = inst.getOutput();
 			Sentence sent = inst.getInput();

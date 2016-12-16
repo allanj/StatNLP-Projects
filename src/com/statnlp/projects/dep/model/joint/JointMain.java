@@ -1,4 +1,4 @@
-package com.statnlp.projects.dep.model.hyperedge;
+package com.statnlp.projects.dep.model.joint;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -12,11 +12,11 @@ import com.statnlp.projects.dep.utils.DPConfig;
 import com.statnlp.projects.dep.utils.DPConfig.MODEL;
 
 /**
- * This one is modified for the whole named entity version
+ * Joint Dependency Parsing and NER.
  * @author allan_jie
  * @version 2.0
  */
-public class HPEMain {
+public class JointMain {
 	
 	public static int trainNumber = -1;
 	public static int testNumber = -1;
@@ -62,8 +62,8 @@ public class HPEMain {
 		System.err.println("[Info] dpRes: "+dpRes);
 		System.err.println("[Info] ner eval: "+nerEval);
 		System.err.println("[Info] joint Res: "+jointRes);
-		HPEInstance[] trainingInsts = HPEReader.readCoNLLXData(trainingPath, true, trainNumber, true);;
-		HPEInstance[] testingInsts = HPEReader.readCoNLLXData(decodePath, false, testNumber, false);
+		JointInstance[] trainingInsts = JointReader.readCoNLLXData(trainingPath, true, trainNumber, true);;
+		JointInstance[] testingInsts = JointReader.readCoNLLXData(decodePath, false, testNumber, false);
 		Label.get(DPConfig.EMPTY);
 		System.err.println("The label set: " + Label.Label_Index.toString());
 		
@@ -85,8 +85,8 @@ public class HPEMain {
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
 		
-		HPEFeatureManager hpfm = new HPEFeatureManager(new GlobalNetworkParam());
-		HPENetworkCompiler dnc = new HPENetworkCompiler();
+		JointFeatureManager hpfm = new JointFeatureManager(new GlobalNetworkParam());
+		JointNetworkCompiler dnc = new JointNetworkCompiler();
 		NetworkModel model = DiscriminativeNetworkModel.create(hpfm, dnc);
 		model.train(trainingInsts, numIteration); 
 		
@@ -94,7 +94,7 @@ public class HPEMain {
 		System.err.println("*****Evaluation*****");
 		Instance[] predInsts = model.decode(testingInsts);
 //		HPEEval.evalDP(predInsts, dpRes);
-		HPEEval.evalNER(predInsts, nerEval);
+		JointEval.evalNER(predInsts, nerEval);
 //		HPEEval.writeJointResult(predInsts, jointRes, modelType);
 	}
 	

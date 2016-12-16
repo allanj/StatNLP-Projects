@@ -1,4 +1,4 @@
-package com.statnlp.projects.dep.model.hyperedge;
+package com.statnlp.projects.dep.model.joint;
 
 import java.util.ArrayList;
 
@@ -12,7 +12,7 @@ import com.statnlp.hybridnetworks.NetworkIDMapper;
 import com.statnlp.projects.dep.utils.DPConfig;
 import com.statnlp.projects.dep.utils.DPConfig.DIR;
 
-public class HPEFeatureManager extends FeatureManager {
+public class JointFeatureManager extends FeatureManager {
 
 	private static final long serialVersionUID = 7274939836196010680L;
 
@@ -22,7 +22,7 @@ public class HPEFeatureManager extends FeatureManager {
 	public static String O_TYPE = DPConfig.O_TYPE;
 	
 	
-	public HPEFeatureManager(GlobalNetworkParam param_g) {
+	public JointFeatureManager(GlobalNetworkParam param_g) {
 		super(param_g);
 	}
 	
@@ -33,7 +33,7 @@ public class HPEFeatureManager extends FeatureManager {
 		
 		ArrayList<Integer> featureList = new ArrayList<Integer>();
 		
-		HPEInstance di = (HPEInstance)network.getInstance();
+		JointInstance di = (JointInstance)network.getInstance();
 		Sentence sent  = di.getInput();
 		long parent = network.getNode(parent_k);
 		

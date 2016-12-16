@@ -1,4 +1,4 @@
-package com.statnlp.projects.dep.model.hyperedge;
+package com.statnlp.projects.dep.model.joint;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,14 +12,14 @@ import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
 import com.statnlp.projects.dep.utils.DataChecker;
 
-public class HPEReader {
+public class JointReader {
 
 	public static String ROOT_WORD = "ROOT";
 	public static String ROOT_TAG = "ROOT";
 
-	public static HPEInstance[] readCoNLLXData(String fileName, boolean isLabeled, int number, boolean checkProjective) throws IOException{
+	public static JointInstance[] readCoNLLXData(String fileName, boolean isLabeled, int number, boolean checkProjective) throws IOException{
 		BufferedReader br = RAWF.reader(fileName);
-		ArrayList<HPEInstance> result = new ArrayList<HPEInstance>();
+		ArrayList<JointInstance> result = new ArrayList<JointInstance>();
 		ArrayList<WordToken> words = new ArrayList<WordToken>();
 		List<Integer> originalHeads = new ArrayList<>();
 		List<String> originalHeadLabel = new ArrayList<>();
@@ -46,7 +46,7 @@ public class HPEReader {
 				}
 				start = -1;
 				WordToken[] wtArr = new WordToken[words.size()];
-				HPEInstance instance = new HPEInstance(instanceId, 1.0, new Sentence(words.toArray(wtArr)));
+				JointInstance instance = new JointInstance(instanceId, 1.0, new Sentence(words.toArray(wtArr)));
 				instance.input.setRecognized();
 				instance.output = output;
 				//assign span with head span
@@ -154,7 +154,7 @@ public class HPEReader {
 		System.err.println("[Info] number of "+type+" instances:"+result.size());
 		System.err.println("[Info] max sentence length: " + maxSentenceLength);
 		System.err.println("[Info] max entity length: " + maxEntityLength);
-		return result.toArray(new HPEInstance[result.size()]);
+		return result.toArray(new JointInstance[result.size()]);
 	}
 	
  	private static void createSpan(List<Span> output, int start, int end, Label label, Map<Integer, Integer> idx2SpanIdx){

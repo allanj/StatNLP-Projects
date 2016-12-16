@@ -1,4 +1,4 @@
-package com.statnlp.projects.dep.model.hyperedge;
+package com.statnlp.projects.dep.model.joint;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +19,7 @@ import com.statnlp.projects.dep.utils.DPConfig.COMP;
 import com.statnlp.projects.dep.utils.DPConfig.DIR;
 
 
-public class HPENetworkCompiler extends NetworkCompiler {
+public class JointNetworkCompiler extends NetworkCompiler {
 
 	private static final long serialVersionUID = -5080640847287255079L;
 
@@ -40,7 +40,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 	 * Compiler constructor
 	 * @param typeMap: typeMap from DPConfig
 	 */
-	public HPENetworkCompiler() {
+	public JointNetworkCompiler() {
 		// rightIndex, rightIndex-leftIndex, completeness, direction, entity type, node type
 		int[] capacity = new  int[]{145, 145, 2, 2, 9, Label.Labels.size(), 9, Label.Labels.size(), 1};
 		NetworkIDMapper.setCapacity(capacity);
@@ -69,7 +69,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 	
 	@Override
 	public Network compile(int networkId, Instance inst, LocalNetworkParam param) {
-		HPEInstance di = (HPEInstance)inst;
+		JointInstance di = (JointInstance)inst;
 		if(di.isLabeled()){
 			//System.err.println("[Info] Compiling Labeled Network...");
 			return this.compileLabledInstance(networkId, di, param);
@@ -79,13 +79,13 @@ public class HPENetworkCompiler extends NetworkCompiler {
 		}
 	}
 
-	public HPENetwork compileLabledInstance(int networkId, HPEInstance inst, LocalNetworkParam param){
-		HPENetwork network = new HPENetwork(networkId,inst,param);
+	public JointNetwork compileLabledInstance(int networkId, JointInstance inst, LocalNetworkParam param){
+		JointNetwork network = new JointNetwork(networkId,inst,param);
 		Sentence sent = inst.getInput();
 		List<Span> output = inst.getOutput();
 		this.compileLabeled(network, sent, output);
 		if(DEBUG){
-			HPENetwork unlabeled = compileUnLabledInstance(networkId, inst, param);
+			JointNetwork unlabeled = compileUnLabledInstance(networkId, inst, param);
 			if(!unlabeled.contains(network)){
 				System.err.println(sent.toString());
 				throw new NetworkException("Labeled network is not contained in the unlabeled version");
@@ -94,7 +94,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 		return network;
 	}
 	
-	private void compileLabeled(HPENetwork network, Sentence sent, List<Span> output){
+	private void compileLabeled(JointNetwork network, Sentence sent, List<Span> output){
 		long rootE = this.toNodeComp(0, 0, rightDir, OEntity, 1);
 		network.addNode(rootE);
 		Map<Span, Span> outputMap = new HashMap<>();
@@ -226,13 +226,13 @@ public class HPENetworkCompiler extends NetworkCompiler {
 		
 	}
 	
-	public HPENetwork compileUnLabledInstance(int networkId, HPEInstance inst, LocalNetworkParam param){
+	public JointNetwork compileUnLabledInstance(int networkId, JointInstance inst, LocalNetworkParam param){
 		if (this._nodes == null) {
 			this.compileUnlabeled();
 		}
 		long root = this.toNode_root(inst.getInput().length());
 		int rootIdx = Arrays.binarySearch(this._nodes, root);
-		HPENetwork network = new HPENetwork(networkId, inst, this._nodes, this._children, param, rootIdx + 1);
+		JointNetwork network = new JointNetwork(networkId, inst, this._nodes, this._children, param, rootIdx + 1);
 		return network;
 	}
 	
@@ -240,7 +240,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 		if(this._nodes!=null){
 			return;
 		}
-		HPENetwork network = new HPENetwork();
+		JointNetwork network = new JointNetwork();
 		//add the root word and other nodes
 		//all are complete nodes.
 		long rootE = this.toNodeComp(0, 0, rightDir, OEntity, 1);
@@ -371,8 +371,8 @@ public class HPENetworkCompiler extends NetworkCompiler {
 	
 	@Override
 	public Instance decompile(Network network) {
-		HPENetwork hpeNetwork = (HPENetwork)network;
-		HPEInstance inst = (HPEInstance)(hpeNetwork.getInstance());
+		JointNetwork hpeNetwork = (JointNetwork)network;
+		JointInstance inst = (JointInstance)(hpeNetwork.getInstance());
 		inst = inst.duplicate();
 		if(hpeNetwork.getMax()==Double.NEGATIVE_INFINITY) return inst;
 		List<Span> prediction = this.toOutput(hpeNetwork, inst);
@@ -381,7 +381,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 	}
 	
 	
-	private List<Span> toOutput(HPENetwork network, HPEInstance inst) {
+	private List<Span> toOutput(JointNetwork network, JointInstance inst) {
 		List<Span> prediction = new ArrayList<>();
 		long root = this.toNode_root(inst.size());
 		int rootIdx = Arrays.binarySearch(network.getAllNodes(), root);
@@ -390,7 +390,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 		return prediction;
 	}
 	
-	private void findBest(HPENetwork network, HPEInstance inst, int parent_k, List<Span> prediction) {
+	private void findBest(JointNetwork network, JointInstance inst, int parent_k, List<Span> prediction) {
 		int[] children_k = network.getMaxPath(parent_k);
 		for (int child_k: children_k) {
 			long node = network.getNode(child_k);
