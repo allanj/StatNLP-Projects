@@ -11,3 +11,4 @@ data/dat/*
 run.sh
 *.jar
 program/
+config/

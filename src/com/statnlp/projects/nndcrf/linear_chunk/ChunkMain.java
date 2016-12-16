@@ -47,11 +47,11 @@ public class ChunkMain {
 		
 		
 		/**Debug information**/
-		trainPath = "data/conll2000/train.txt";
-		trainNumber = 100;
-		testFile = "data/conll2000/test.txt";;
-		testNumber = 100;
-		numIteration = 1000;
+//		trainPath = "data/conll2000/train.txt";
+//		trainNumber = 1000;
+//		testFile = "data/conll2000/test.txt";;
+//		testNumber = 1000;
+//		numIteration = 4000;
 		/***/
 		
 		
@@ -124,7 +124,7 @@ public class ChunkMain {
 					case "-neural": 	if(args[i+1].equals("true")){ 
 											NetworkConfig.USE_NEURAL_FEATURES = true; 
 											NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
-											NetworkConfig.REGULARIZE_NEURAL_FEATURES = true; // Regularized the neural features in CRF or not
+											NetworkConfig.REGULARIZE_NEURAL_FEATURES = false; // Regularized the neural features in CRF or not
 										}
 										break;
 					case "-reg": 		l2 = Double.valueOf(args[i+1]);  break;

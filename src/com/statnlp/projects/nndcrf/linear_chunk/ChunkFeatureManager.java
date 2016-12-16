@@ -33,6 +33,7 @@ public class ChunkFeatureManager extends FeatureManager {
 		chunk, neural};
 	private String OUT_SEP = NeuralConfig.OUT_SEP; 
 	private String IN_SEP = NeuralConfig.IN_SEP;
+	private String UNK = "unk";
 	
 	private boolean cascade;
 	private int windowSize;
@@ -66,18 +67,18 @@ public class ChunkFeatureManager extends FeatureManager {
 		int[] child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[0]));
 		int childEId = child[1];
 		
-		String lw = pos>0? sent.get(pos-1).getName():"<PAD>";
+		String lw = pos>0? sent.get(pos-1).getName():UNK;
 		String lcaps = capsF(lw);
-		String llw = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getName();
+		String llw = pos==0? UNK: pos==1? UNK:sent.get(pos-2).getName();
 		String llcaps = capsF(llw);
-		String llt = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getTag();
-		String lt = pos>0? sent.get(pos-1).getTag():"<PAD>";
-		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"<PAD>";
+		String llt = pos==0? UNK: pos==1? UNK:sent.get(pos-2).getTag();
+		String lt = pos>0? sent.get(pos-1).getTag():UNK;
+		String rw = pos<sent.length()-1? sent.get(pos+1).getName():UNK;
 		String rcaps = capsF(rw);
-		String rt = pos<sent.length()-1? sent.get(pos+1).getTag():"<PAD>";
-		String rrw = pos==sent.length()-1? "<PAD>": pos==sent.length()-2? "<PAD>":sent.get(pos+2).getName();
+		String rt = pos<sent.length()-1? sent.get(pos+1).getTag():UNK;
+		String rrw = pos==sent.length()-1? UNK: pos==sent.length()-2? UNK:sent.get(pos+2).getName();
 		String rrcaps = capsF(rrw);
-		String rrt = pos==sent.length()-1? "<PAD>": pos==sent.length()-2? "<PAD>":sent.get(pos+2).getTag();
+		String rrt = pos==sent.length()-1? UNK: pos==sent.length()-2? UNK:sent.get(pos+2).getTag();
 		String currWord = inst.getInput().get(pos).getName();
 		String currCaps = capsF(currWord);
 		String currTag = inst.getInput().get(pos).getTag();
@@ -90,17 +91,17 @@ public class ChunkFeatureManager extends FeatureManager {
 		if(basicFeatures){
 			/**Simple word features**/
 			featureList.add(this._param_g.toFeature(network, FEATYPE.word.name(), 	currEn,  currWord));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.word_l.name(), currEn,  lw));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.word_ll.name(),currEn,  llw));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.word_r.name(), currEn,  rw));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.word_rr.name(),currEn,  rrw));
+//			featureList.add(this._param_g.toFeature(network, FEATYPE.word_l.name(), currEn,  lw));
+//			featureList.add(this._param_g.toFeature(network, FEATYPE.word_ll.name(),currEn,  llw));
+//			featureList.add(this._param_g.toFeature(network, FEATYPE.word_r.name(), currEn,  rw));
+//			featureList.add(this._param_g.toFeature(network, FEATYPE.word_rr.name(),currEn,  rrw));
 			
 			/**Simple caps features**/
 			featureList.add(this._param_g.toFeature(network, FEATYPE.cap.name(), 	currEn,  currCaps));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.cap_l.name(), 	currEn,  lcaps));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.cap_ll.name(), currEn,  llcaps));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.cap_r.name(), 	currEn,  rcaps));
-			featureList.add(this._param_g.toFeature(network, FEATYPE.cap_rr.name(),	currEn,  rrcaps));
+//			featureList.add(this._param_g.toFeature(network, FEATYPE.cap_l.name(), 	currEn,  lcaps));
+//			featureList.add(this._param_g.toFeature(network, FEATYPE.cap_ll.name(), currEn,  llcaps));
+//			featureList.add(this._param_g.toFeature(network, FEATYPE.cap_r.name(), 	currEn,  rcaps));
+//			featureList.add(this._param_g.toFeature(network, FEATYPE.cap_rr.name(),	currEn,  rrcaps));
 		}
 		
 		
@@ -126,8 +127,7 @@ public class ChunkFeatureManager extends FeatureManager {
 			else if(windowSize == 3)
 				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), currEn, lw.toLowerCase()+IN_SEP+
 						currWord.toLowerCase()+IN_SEP+
-						rw.toLowerCase()+OUT_SEP+
-						lcaps+IN_SEP+currCaps+IN_SEP+rcaps));
+						rw.toLowerCase()));
 			else if(windowSize == 1)
 				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), currEn, currWord.toLowerCase()+OUT_SEP+currCaps));
 			
@@ -156,7 +156,7 @@ public class ChunkFeatureManager extends FeatureManager {
 	
 	private String capsF(String word){
 		String cap = null;
-		if(word.equals("<PAD>")) return "others";
+		if(word.equals(UNK)) return "others";
 		if(word.equals(word.toLowerCase())) cap = "all_lowercases";
 		else if(word.equals(word.toUpperCase())) cap = "all_uppercases";
 		else if(word.matches("[A-Z][a-z0-9]*")) cap = "first_upper";
