@@ -23,6 +23,7 @@ import java.util.HashSet;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
+import com.statnlp.projects.entity.semi.SemiCRFNetwork;
 
 
 /**
@@ -107,6 +108,9 @@ public abstract class Network implements Serializable, HyperGraph{
 	
 	/** The current structure that the network is using*/
 	protected int currentStructure; 
+	
+	/**Specifically for the joint model, the span posterior (i, j, typeId), semiCRF is 0-indexed**/
+	protected double[][][] spanPosterior;
 	
 	/**
 	 * Default constructor. Note that the network constructed using this default constructor is lacking 
@@ -1134,6 +1138,50 @@ public abstract class Network implements Serializable, HyperGraph{
 			return true;
 		return false;
 	}
+	
+	/**
+	 * Calculate the posterior probability of each semiCRFs span
+	 */
+	public void calculateSemiCRFsPosterior() {
+		Instance inst = this.getInstance();
+		int instSize = inst.size();
+		int labelSize = com.statnlp.projects.entity.semi.Label.LABELS.size();
+		SemiCRFNetwork network = (SemiCRFNetwork)this;
+		this.spanPosterior = new double[instSize][instSize][labelSize];
+		for (int i = 0; i < instSize; i++) {
+			for (int j = i; j < instSize; j++) {
+				for (int eId = 0; eId < labelSize; eId++) {
+					spanPosterior[i][j][eId] = Double.NEGATIVE_INFINITY;
+					long currentNode = NetworkIDMapper.toHybridNodeID(new int[]{i+1, eId, 1});
+					int currentIdx = Arrays.binarySearch(network.getAllNodes(), currentNode);
+					int[][] childrenList_k = this.getChildren(currentIdx);
+
+					for(int children_k_index = 0; children_k_index < childrenList_k.length; children_k_index++){
+						int[] children_k = childrenList_k[children_k_index];
+						boolean ignoreflag = false;
+						for(int child_k : children_k){
+							if(this.isRemoved(child_k)){
+								ignoreflag = true;
+							}
+						}
+						if(ignoreflag) continue;
+						
+						long childNode = this.getNode(children_k[0]);
+						int[] childArr = NetworkIDMapper.toHybridNodeArray(childNode);
+						if (childArr[0] != i) continue; //restricted the span must be from [i, j]
+						
+						FeatureArray fa = this._param.extract(this, currentIdx, children_k, children_k_index);
+						int globalParamVersion = this._param._fm.getParam_G().getVersion();
+						double spanScore = this._inside[children_k[0]] + fa.getScore(this._param, globalParamVersion) + this._outside[currentIdx];
+						spanPosterior[i][j][eId] = sumLog(spanPosterior[i][j][eId], spanScore);
+					}
+					spanPosterior[i][j][eId] -= this.getInside();
+					spanPosterior[i][j][eId] = Math.exp(spanPosterior[i][j][eId]);
+				}
+			}
+		}
+	}
+	
 }
 
 

@@ -15,6 +15,7 @@ import com.statnlp.projects.entity.semi.SemiCRFMain;
 import com.statnlp.projects.entity.semi.SemiCRFNetworkCompiler;
 import com.statnlp.projects.entity.semi.SemiViewer;
 import com.statnlp.projects.entity.semi.Span;
+import com.statnlp.projects.entity.semi.Label;
 
 /**
  * A semi CRF for pruning the variables.
@@ -52,6 +53,7 @@ public class SemiPrune {
 	public void init() throws IOException, InterruptedException {
 		this.trainInsts = SemiCRFMain.readCoNLLData(trainFile, true, trainNum);
 		this.testInsts = SemiCRFMain.readCoNLLData(testFile, false,	testNum);
+		System.err.println("Labels from SemiCRFs: " + Label.LABELS.toString());
 		int maxSize = 0;
 		int maxSpan = 0;
 		for(SemiCRFInstance instance: trainInsts){
