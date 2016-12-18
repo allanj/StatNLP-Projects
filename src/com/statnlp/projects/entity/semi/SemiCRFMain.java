@@ -371,7 +371,7 @@ public class SemiCRFMain {
 	 * @throws IOException
 	 */
 	@SuppressWarnings("resource")
-	private static SemiCRFInstance[] readCoNLLData(String fileName, boolean isLabeled, int number) throws IOException{
+	public static SemiCRFInstance[] readCoNLLData(String fileName, boolean isLabeled, int number) throws IOException{
 		InputStreamReader isr = new InputStreamReader(new FileInputStream(fileName), "UTF-8");
 		BufferedReader br = new BufferedReader(isr);
 		ArrayList<SemiCRFInstance> result = new ArrayList<SemiCRFInstance>();

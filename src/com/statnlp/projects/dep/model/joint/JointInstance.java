@@ -16,9 +16,9 @@ public class JointInstance extends Instance {
 	/**
 	 * Output is span with head index and also the entity label.
 	 */
-	protected ArrayList<Span> output; 
+	protected ArrayList<JointSpan> output; 
 	
-	protected ArrayList<Span> prediction;
+	protected ArrayList<JointSpan> prediction;
 	
 	public JointInstance(int instanceId, double weight, Sentence input) {
 		super(instanceId, weight);
@@ -38,10 +38,10 @@ public class JointInstance extends Instance {
 		JointInstance inst = new JointInstance(this._instanceId, this._weight, this.input);
 		if (output==null)
 			inst.output = null;
-		else inst.output = (ArrayList<Span>)output.clone();
+		else inst.output = (ArrayList<JointSpan>)output.clone();
 		if(prediction==null)
 			inst.prediction = null;
-		else inst.prediction = (ArrayList<Span>)prediction.clone();
+		else inst.prediction = (ArrayList<JointSpan>)prediction.clone();
 		return inst;
 	}
 
@@ -61,12 +61,12 @@ public class JointInstance extends Instance {
 	}
 
 	@Override
-	public ArrayList<Span> getOutput() {
+	public ArrayList<JointSpan> getOutput() {
 		return this.output;
 	}
 
 	@Override
-	public ArrayList<Span> getPrediction() {
+	public ArrayList<JointSpan> getPrediction() {
 		return this.prediction;
 	}
 
@@ -83,7 +83,7 @@ public class JointInstance extends Instance {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void setPrediction(Object o) {
-		this.prediction = (ArrayList<Span>)o;
+		this.prediction = (ArrayList<JointSpan>)o;
 	}
 
 }

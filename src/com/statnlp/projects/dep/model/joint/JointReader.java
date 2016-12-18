@@ -29,8 +29,8 @@ public class JointReader {
 		words.add(new WordToken(ROOT_WORD, ROOT_TAG));
 		originalHeads.add(-1);
 		originalHeadLabel.add("UNK");
-		ArrayList<Span> output = new ArrayList<Span>();
-		output.add(new Span(0, 0, Label.get("O")));
+		ArrayList<JointSpan> output = new ArrayList<JointSpan>();
+		output.add(new JointSpan(0, 0, Label.get("O")));
 		idx2SpanIdx.put(0, output.size()-1);
 		int instanceId = 1;
 		int start = -1;
@@ -50,7 +50,7 @@ public class JointReader {
 				instance.input.setRecognized();
 				instance.output = output;
 				//assign span with head span
-				for (Span span: instance.output) {
+				for (JointSpan span: instance.output) {
 					if (span.length() == 1) {
 						if (originalHeads.get(span.start) != -1){
 							span.headSpan = output.get(idx2SpanIdx.get(originalHeads.get(span.start)));
@@ -82,8 +82,8 @@ public class JointReader {
 					originalHeadLabel = new ArrayList<>();
 					originalHeads.add(-1);
 					originalHeadLabel.add("UNK");
-					output = new ArrayList<Span>();
-					output.add(new Span(0, 0, Label.get("O")));
+					output = new ArrayList<JointSpan>();
+					output.add(new JointSpan(0, 0, Label.get("O")));
 					idx2SpanIdx = new HashMap<>();
 					idx2SpanIdx.put(0, output.size()-1);
 					continue;
@@ -98,8 +98,8 @@ public class JointReader {
 				maxSentenceLength = Math.max(maxSentenceLength, instance.size());
 				words = new ArrayList<WordToken>();
 				words.add(new WordToken(ROOT_WORD, ROOT_TAG));
-				output = new ArrayList<Span>();
-				output.add(new Span(0, 0, Label.get("O")));
+				output = new ArrayList<JointSpan>();
+				output.add(new JointSpan(0, 0, Label.get("O")));
 				originalHeads = new ArrayList<>();
 				originalHeadLabel = new ArrayList<>();
 				originalHeads.add(-1);
@@ -157,7 +157,7 @@ public class JointReader {
 		return result.toArray(new JointInstance[result.size()]);
 	}
 	
- 	private static void createSpan(List<Span> output, int start, int end, Label label, Map<Integer, Integer> idx2SpanIdx){
+ 	private static void createSpan(List<JointSpan> output, int start, int end, Label label, Map<Integer, Integer> idx2SpanIdx){
 		if (label == null) {
 			throw new RuntimeException("The label is null");
 		}
@@ -166,11 +166,11 @@ public class JointReader {
 		}
 		if (label.form.equals("O")) {
 			for (int i = start; i <= end; i++) {
-				output.add(new Span(i, i, label));
+				output.add(new JointSpan(i, i, label));
 				idx2SpanIdx.put(i, output.size()-1);
 			}
 		} else {
-			output.add(new Span(start, end, label));
+			output.add(new JointSpan(start, end, label));
 			for (int i = start; i <= end; i++) {
 				idx2SpanIdx.put(i, output.size()-1);
 			}

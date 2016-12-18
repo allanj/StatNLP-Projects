@@ -82,7 +82,7 @@ public class JointNetworkCompiler extends NetworkCompiler {
 	public JointNetwork compileLabledInstance(int networkId, JointInstance inst, LocalNetworkParam param){
 		JointNetwork network = new JointNetwork(networkId,inst,param);
 		Sentence sent = inst.getInput();
-		List<Span> output = inst.getOutput();
+		List<JointSpan> output = inst.getOutput();
 		this.compileLabeled(network, sent, output);
 		if(DEBUG){
 			JointNetwork unlabeled = compileUnLabledInstance(networkId, inst, param);
@@ -94,11 +94,11 @@ public class JointNetworkCompiler extends NetworkCompiler {
 		return network;
 	}
 	
-	private void compileLabeled(JointNetwork network, Sentence sent, List<Span> output){
+	private void compileLabeled(JointNetwork network, Sentence sent, List<JointSpan> output){
 		long rootE = this.toNodeComp(0, 0, rightDir, OEntity, 1);
 		network.addNode(rootE);
-		Map<Span, Span> outputMap = new HashMap<>();
-		for(Span span: output) 
+		Map<JointSpan, JointSpan> outputMap = new HashMap<>();
+		for(JointSpan span: output) 
 			outputMap.put(span, span);
 		for(int rightIndex = 1; rightIndex <= sent.length()-1; rightIndex++){
 			//eIndex: 1,2,3,4,5,..n
@@ -106,7 +106,7 @@ public class JointNetworkCompiler extends NetworkCompiler {
 				if(e.equals(EMPTY)) continue;
 				for (int spanLen = 1; spanLen <= maxEntityLen && (rightIndex - spanLen + 1) > 0; spanLen++) {
 					if (spanLen != 1 && e.equals(OEntity)) continue;
-					Span span = new Span(rightIndex - spanLen + 1, rightIndex, Label.get(e));
+					JointSpan span = new JointSpan(rightIndex - spanLen + 1, rightIndex, Label.get(e));
 					if (outputMap.containsKey(span)) {
 						long wordRightNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, rightDir, e, spanLen); 
 						long wordLeftNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, leftDir, e, spanLen);
@@ -136,8 +136,8 @@ public class JointNetworkCompiler extends NetworkCompiler {
 										for (int rt = 0; rt < Label.Labels.size(); rt++) {
 											if (rt == Label.get(EMPTY).id || (rightSpanLen != 1 && rt == Label.get(OEntity).id)) continue;
 											long parent = this.toNodeIncomp(leftIndex, rightIndex, direction, Label.get(lt).form, leftSpanLen, Label.get(rt).form, rightSpanLen);
-											Span leftSpan = new Span(leftIndex, lr, Label.get(lt));
-											Span rightSpan = new Span(rl, rightIndex, Label.get(rt));
+											JointSpan leftSpan = new JointSpan(leftIndex, lr, Label.get(lt));
+											JointSpan rightSpan = new JointSpan(rl, rightIndex, Label.get(rt));
 											boolean inOutput = false;
 											if (direction == leftDir) {
 												if (outputMap.containsKey(leftSpan) && outputMap.get(leftSpan).headSpan.equals(rightSpan)) {
@@ -375,14 +375,14 @@ public class JointNetworkCompiler extends NetworkCompiler {
 		JointInstance inst = (JointInstance)(hpeNetwork.getInstance());
 		inst = inst.duplicate();
 		if(hpeNetwork.getMax()==Double.NEGATIVE_INFINITY) return inst;
-		List<Span> prediction = this.toOutput(hpeNetwork, inst);
+		List<JointSpan> prediction = this.toOutput(hpeNetwork, inst);
 		inst.setPrediction(prediction);
 		return inst;
 	}
 	
 	
-	private List<Span> toOutput(JointNetwork network, JointInstance inst) {
-		List<Span> prediction = new ArrayList<>();
+	private List<JointSpan> toOutput(JointNetwork network, JointInstance inst) {
+		List<JointSpan> prediction = new ArrayList<>();
 		long root = this.toNode_root(inst.size());
 		int rootIdx = Arrays.binarySearch(network.getAllNodes(), root);
 		findBest(network, inst, rootIdx, prediction);
@@ -390,7 +390,7 @@ public class JointNetworkCompiler extends NetworkCompiler {
 		return prediction;
 	}
 	
-	private void findBest(JointNetwork network, JointInstance inst, int parent_k, List<Span> prediction) {
+	private void findBest(JointNetwork network, JointInstance inst, int parent_k, List<JointSpan> prediction) {
 		int[] children_k = network.getMaxPath(parent_k);
 		for (int child_k: children_k) {
 			long node = network.getNode(child_k);
@@ -404,11 +404,11 @@ public class JointNetworkCompiler extends NetworkCompiler {
 			int rightSpanLen = nodeArr[6];
 			int rtId = nodeArr[7];
 			if (comp == COMP.incomp.ordinal()) {
-				Span span;
+				JointSpan span;
 				if (direction == leftDir) {
-					span = new Span(leftIndex, leftIndex + leftSpanLen - 1, Label.get(ltId), new Span(rightIndex - rightSpanLen + 1, rightIndex, Label.get(rtId)));
+					span = new JointSpan(leftIndex, leftIndex + leftSpanLen - 1, Label.get(ltId), new JointSpan(rightIndex - rightSpanLen + 1, rightIndex, Label.get(rtId)));
 				} else {
-					span = new Span(rightIndex - rightSpanLen + 1, rightIndex, Label.get(rtId), new Span(leftIndex, leftIndex + leftSpanLen - 1, Label.get(ltId)));
+					span = new JointSpan(rightIndex - rightSpanLen + 1, rightIndex, Label.get(rtId), new JointSpan(leftIndex, leftIndex + leftSpanLen - 1, Label.get(ltId)));
 				}
 				prediction.add(span);
 			}

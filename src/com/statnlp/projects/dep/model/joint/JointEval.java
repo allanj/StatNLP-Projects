@@ -30,7 +30,7 @@ public class JointEval {
 		PrintWriter pw = RAWF.writer(dpOut);
 		for (int index = 0; index < testInsts.length; index++) {
 			JointInstance inst = (JointInstance)(testInsts[index]);
-			List<Span> prediction = inst.getPrediction();
+			List<JointSpan> prediction = inst.getPrediction();
 			for (int i = 0; i < prediction.size(); i++) {
 				//Span span = prediction.get(i);
 				//TODO complete the evaluation
@@ -59,13 +59,13 @@ public class JointEval {
 		PrintWriter pw = RAWF.writer(nerOut);
 		for(int index=0;index<testInsts.length;index++){
 			JointInstance inst = (JointInstance)testInsts[index];
-			List<Span> prediction = inst.getPrediction();
-			List<Span> output = inst.getOutput();
+			List<JointSpan> prediction = inst.getPrediction();
+			List<JointSpan> output = inst.getOutput();
 			Sentence sent = inst.getInput();
 			String[] outputE = new String[sent.length()];
 			String[] predictionE = new String[sent.length()];
 			for (int i = 0; i < output.size(); i++) {
-				Span span = output.get(i); 
+				JointSpan span = output.get(i); 
 				for (int p = span.start; p <= span.end; p++) {
 					if (!span.label.form.equals("O")) {
 						if (p == span.start) {
@@ -79,7 +79,7 @@ public class JointEval {
 				}
 			}
 			for (int i = 0; i < prediction.size(); i++) {
-				Span span = prediction.get(i); 
+				JointSpan span = prediction.get(i); 
 				for (int p = span.start; p <= span.end; p++) {
 					if (!span.label.form.equals("O")) {
 						if (p == span.start) {
