@@ -23,7 +23,6 @@ import java.util.HashSet;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
-import com.statnlp.projects.entity.semi.SemiCRFNetwork;
 
 
 /**
@@ -1146,40 +1145,41 @@ public abstract class Network implements Serializable, HyperGraph{
 		Instance inst = this.getInstance();
 		int instSize = inst.size();
 		int labelSize = com.statnlp.projects.entity.semi.Label.LABELS.size();
-		SemiCRFNetwork network = (SemiCRFNetwork)this;
 		this.spanPosterior = new double[instSize][instSize][labelSize];
-		for (int i = 0; i < instSize; i++) {
-			for (int j = i; j < instSize; j++) {
-				for (int eId = 0; eId < labelSize; eId++) {
-					spanPosterior[i][j][eId] = Double.NEGATIVE_INFINITY;
-					long currentNode = NetworkIDMapper.toHybridNodeID(new int[]{i+1, eId, 1});
-					int currentIdx = Arrays.binarySearch(network.getAllNodes(), currentNode);
-					int[][] childrenList_k = this.getChildren(currentIdx);
-
-					for(int children_k_index = 0; children_k_index < childrenList_k.length; children_k_index++){
-						int[] children_k = childrenList_k[children_k_index];
-						boolean ignoreflag = false;
-						for(int child_k : children_k){
-							if(this.isRemoved(child_k)){
-								ignoreflag = true;
-							}
-						}
-						if(ignoreflag) continue;
-						
-						long childNode = this.getNode(children_k[0]);
-						int[] childArr = NetworkIDMapper.toHybridNodeArray(childNode);
-						if (childArr[0] != i) continue; //restricted the span must be from [i, j]
-						
-						FeatureArray fa = this._param.extract(this, currentIdx, children_k, children_k_index);
-						int globalParamVersion = this._param._fm.getParam_G().getVersion();
-						double spanScore = this._inside[children_k[0]] + fa.getScore(this._param, globalParamVersion) + this._outside[currentIdx];
-						spanPosterior[i][j][eId] = sumLog(spanPosterior[i][j][eId], spanScore);
+		for(int i = 0; i < instSize; i++)
+			for (int j = 0; j < instSize; j++)
+				Arrays.fill(spanPosterior[i][j], Double.NEGATIVE_INFINITY);
+		for (int k = 1; k < this.countNodes(); k++) {
+			int[] nodeArr = this.getNodeArray(k);
+			if (nodeArr[2] == 2)  continue; //ignore the root nodes.
+			int currentPos = nodeArr[0] - 1;
+			int currentEId = nodeArr[1];
+			int[][] childrenList_k = this.getChildren(k);
+			for(int children_k_index = 0; children_k_index < childrenList_k.length; children_k_index++){
+				int[] children_k = childrenList_k[children_k_index];
+				boolean ignoreflag = false;
+				for(int child_k : children_k){
+					if(this.isRemoved(child_k)){
+						ignoreflag = true;
 					}
+				}
+				if(ignoreflag) continue;
+				
+				int[] childArr = this.getNodeArray(children_k[0]);
+				int prevPos = childArr[0] - 1;
+				
+				FeatureArray fa = this._param.extract(this, k, children_k, children_k_index);
+				int globalParamVersion = this._param._fm.getParam_G().getVersion();
+				double spanScore = this._inside[children_k[0]] + fa.getScore(this._param, globalParamVersion) + this._outside[k];
+				spanPosterior[prevPos+1][currentPos][currentEId] = sumLog(spanPosterior[prevPos+1][currentPos][currentEId], spanScore);
+			}
+		}
+		for (int i = 0; i < instSize; i++)
+			for (int j = 0; j < instSize; j++)
+				for (int eId = 0; eId < labelSize; eId++) {
 					spanPosterior[i][j][eId] -= this.getInside();
 					spanPosterior[i][j][eId] = Math.exp(spanPosterior[i][j][eId]);
 				}
-			}
-		}
 	}
 	
 }
