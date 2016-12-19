@@ -16,6 +16,9 @@
  */
 package com.statnlp.hybridnetworks;
 
+import java.util.Map;
+import java.util.Set;
+
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
 
@@ -33,17 +36,21 @@ public class LocalNetworkDecoderThread extends Thread{
 	private NetworkCompiler _compiler;
 	private boolean _cacheParam = true;
 	
-	//please make sure the threadId is 0-indexed.
-	public LocalNetworkDecoderThread(int threadId, FeatureManager fm, Instance[] instances, NetworkCompiler compiler){
-		this(threadId, fm, instances, compiler, false);
-	}
-	
-	public LocalNetworkDecoderThread(int threadId, FeatureManager fm, Instance[] instances, NetworkCompiler compiler, boolean cacheParam){
-		this(threadId, fm, instances, compiler, new LocalNetworkParam(threadId, fm, instances.length), cacheParam);
-	}
+	/**calculate posterior, for semiCRFs only**/
+	private boolean _posterior = false;
+	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalPruneMap;
 	
 	//please make sure the threadId is 0-indexed.
-	public LocalNetworkDecoderThread(int threadId, FeatureManager fm, Instance[] instances, NetworkCompiler compiler, LocalNetworkParam param, boolean cacheParam){
+	public LocalNetworkDecoderThread(int threadId, FeatureManager fm, Instance[] instances, NetworkCompiler compiler, boolean posterior){
+		this(threadId, fm, instances, compiler, false, posterior);
+	}
+	
+	public LocalNetworkDecoderThread(int threadId, FeatureManager fm, Instance[] instances, NetworkCompiler compiler, boolean cacheParam, boolean posterior){
+		this(threadId, fm, instances, compiler, new LocalNetworkParam(threadId, fm, instances.length), cacheParam, posterior);
+	}
+	
+	//please make sure the threadId is 0-indexed.
+	public LocalNetworkDecoderThread(int threadId, FeatureManager fm, Instance[] instances, NetworkCompiler compiler, LocalNetworkParam param, boolean cacheParam, boolean posterior){
 		this._threadId = threadId;
 		this._param = param;
 		fm.setLocalNetworkParams(this._threadId, this._param);
@@ -56,6 +63,7 @@ public class LocalNetworkDecoderThread extends Thread{
 		this._instances_input = instances;
 		this._compiler = compiler;
 		this._cacheParam = cacheParam;
+		this._posterior = posterior;
 	}
 	
 	public LocalNetworkParam getParam(){
@@ -78,46 +86,56 @@ public class LocalNetworkDecoderThread extends Thread{
 		System.err.println("Decoding time for thread "+this._threadId+" = "+ time/1000.0 +" secs.");
 	}
 	
+	public void setGlobalPruneMap(Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalPruneMap) {
+		this.globalPruneMap = globalPruneMap;
+	}
+	
 	public Instance max(Instance instance, int networkId){
 		Network network = this._compiler.compileAndStore(networkId, instance, this._param);
 		if(!_cacheParam){
 			this._param.disableCache();
 		}
-		if(NetworkConfig.INFERENCE == InferenceType.MEAN_FIELD){
-			//initialize the joint feature map and also the marginal score map.
-			network.initJointFeatureMap();
-			network.clearMarginalMap();
-			boolean prevDone = false;
-			for (int it = 0; it < NetworkConfig.MAX_MF_UPDATES; it++) {
+		if(_posterior) {
+			globalPruneMap.put(instance.getInstanceId(), network.calculateSemiCRFsPosterior());
+			return null;
+		} else {
+			if(NetworkConfig.INFERENCE == InferenceType.MEAN_FIELD){
+				//initialize the joint feature map and also the marginal score map.
+				network.initJointFeatureMap();
+				network.clearMarginalMap();
+				boolean prevDone = false;
+				for (int it = 0; it < NetworkConfig.MAX_MF_UPDATES; it++) {
+					for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
+						network.enableKthStructure(curr);
+						network.inference(true);
+					}
+					boolean done = network.compareMarginalMap();
+					if (prevDone && done){
+						network.renewCurrentMarginalMap();
+						break;
+					}
+					prevDone = done;
+					network.renewCurrentMarginalMap();
+				}
+				Instance inst = null;
 				for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
 					network.enableKthStructure(curr);
-					network.inference(true);
+					network.max();
+					network.setStructure(curr);
+					inst = this._compiler.decompile(network);
 				}
-				boolean done = network.compareMarginalMap();
-				if (prevDone && done){
-					network.renewCurrentMarginalMap();
-					break;
-				}
-				prevDone = done;
-				network.renewCurrentMarginalMap();
-			}
-			Instance inst = null;
-			for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
-				network.enableKthStructure(curr);
+				return inst;
+			}else if(NetworkConfig.MAX_MARGINAL_DECODING){
+				network.marginal();
+			}else{
 				network.max();
-				network.setStructure(curr);
-				inst = this._compiler.decompile(network);
+				return this._compiler.decompile(network);
 			}
-			return inst;
-		}else if(NetworkConfig.MAX_MARGINAL_DECODING){
-			network.marginal();
-		}else{
-			network.max();
+			
+//			System.err.println("max="+network.getMax());
 			return this._compiler.decompile(network);
 		}
 		
-//		System.err.println("max="+network.getMax());
-		return this._compiler.decompile(network);
 	}
 	
 	public Instance[] getOutputs(){

@@ -45,7 +45,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		maxSegmentLength = Math.max(maxSegLength, maxSegmentLength);
 //		this.maxSegmentLength = 2;
 		System.out.println(String.format("Max size: %s, Max segment length: %s", maxSize, maxSegLength));
-		System.out.println(Label.LABELS.toString());
+		System.out.println(SemiLabel.LABELS.toString());
 		this.sViewer = sViewer;
 		this.sViewer.nothing();
 		this.useDepNet = useDepNet;
@@ -88,7 +88,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 	}
 	
 	private boolean checkIncomSpan(Sentence sent, Span span){
-		if(span.label.equals(Label.get("O")) || span.start==span.end) return true;
+		if(span.label.equals(SemiLabel.get("O")) || span.start==span.end) return true;
 		if(!(sent.get(span.start).getHeadIndex()==span.end || sent.get(span.end).getHeadIndex()==span.start)) return false;
 		return true;
 	}
@@ -98,8 +98,8 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		int number = 0;
 		int start = span.start;
 		int end = span.end;
-		Label label = span.label;
-		if(label.equals(Label.get("O")) || start==end) return 0;
+		SemiLabel label = span.label;
+		if(label.equals(SemiLabel.get("O")) || start==end) return 0;
 		HashSet<Integer> set = new HashSet<Integer>();
 		int times = 0;
 		while(times<(end-start+1)){
@@ -183,11 +183,11 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		network.addNode(leaf);
 		List<Long> currNodes = new ArrayList<Long>();
 		for(int pos=0; pos<maxSize; pos++){
-			for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
+			for(int labelId=0; labelId<SemiLabel.LABELS.size(); labelId++){
 				long node = toNode(pos, labelId);
-				if(labelId!=Label.LABELS.get("O").id){
+				if(labelId!=SemiLabel.LABELS.get("O").id){
 					for(int prevPos=pos-1; prevPos >= pos-maxSegmentLength && prevPos >= 0; prevPos--){
-						for(int prevLabelId=0; prevLabelId<Label.LABELS.size(); prevLabelId++){
+						for(int prevLabelId=0; prevLabelId<SemiLabel.LABELS.size(); prevLabelId++){
 							long prevBeginNode = toNode(prevPos, prevLabelId);
 							if(network.contains(prevBeginNode)){
 								network.addNode(node);
@@ -203,7 +203,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 					//O label should be with only length 1. actually does not really affect.
 					int prevPos = pos - 1;
 					if(prevPos>=0){
-						for(int prevLabelId=0; prevLabelId<Label.LABELS.size(); prevLabelId++){
+						for(int prevLabelId=0; prevLabelId<SemiLabel.LABELS.size(); prevLabelId++){
 							long prevBeginNode = toNode(prevPos, prevLabelId);
 							if(network.contains(prevBeginNode)){
 								network.addNode(node);
@@ -250,7 +250,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		int[][] leftDepRel = Utils.sent2LeftDepRel(sent);
 		for(int pos=0; pos<sent.length(); pos++){
 			if(pos==0){ //means that from the start up to here, so connect to leaf. And of course no leftDepRel
-				for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
+				for(int labelId=0; labelId<SemiLabel.LABELS.size(); labelId++){
 					long node = toNode(pos, labelId);
 					network.addNode(node);
 					network.addEdge(node, new long[]{leaf});
@@ -258,10 +258,10 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 				}
 			}else{
 				
-				for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
+				for(int labelId=0; labelId<SemiLabel.LABELS.size(); labelId++){
 					//add the prevsPosition
 					long node = toNode(pos, labelId);
-					for(int prevLabelId=0; prevLabelId<Label.LABELS.size(); prevLabelId++){
+					for(int prevLabelId=0; prevLabelId<SemiLabel.LABELS.size(); prevLabelId++){
 						long child = toNode(pos-1, prevLabelId);
 						//if(labelId==prevLabelId && labelId!=Label.get("O").id) continue;
 						if(network.contains(child)){
@@ -279,10 +279,10 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 					if(leftDepIdxs[l]<0) continue;
 					int len = pos-leftDepIdxs[l] + 1;
 					if(len>maxSegmentLength) continue;
-					for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
-						if(labelId==Label.get("O").id) continue;
+					for(int labelId=0; labelId<SemiLabel.LABELS.size(); labelId++){
+						if(labelId==SemiLabel.get("O").id) continue;
 						long node = toNode(pos, labelId);
-						boolean[][] added = new boolean[sent.length()][Label.LABELS.size()]; //1-index. so 0 in this array is leaf. edges in network.
+						boolean[][] added = new boolean[sent.length()][SemiLabel.LABELS.size()]; //1-index. so 0 in this array is leaf. edges in network.
 						int leftDepId = leftDepIdxs[l];
 						long leftDepNode = toNode(leftDepId, labelId);
 						if(network.getChildren_tmp(leftDepNode)==null){
@@ -330,18 +330,18 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 				continue;
 			}
 			if(smallOne==0){ //means that from the start up to here
-				for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
-					if(labelId==Label.LABELS.get("O").id) continue;
+				for(int labelId=0; labelId<SemiLabel.LABELS.size(); labelId++){
+					if(labelId==SemiLabel.LABELS.get("O").id) continue;
 					long node = toNode(largeOne, labelId);
 					network.addNode(node);
 					network.addEdge(node, new long[]{leaf});
 				}
 			}else{
 				int prevEnd = smallOne - 1;
-				for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
-					if(labelId==Label.LABELS.get("O").id) continue;
+				for(int labelId=0; labelId<SemiLabel.LABELS.size(); labelId++){
+					if(labelId==SemiLabel.LABELS.get("O").id) continue;
 					long node = toNode(largeOne, labelId);
-					for(int prevLabelId=0; prevLabelId<Label.LABELS.size(); prevLabelId++){
+					for(int prevLabelId=0; prevLabelId<SemiLabel.LABELS.size(); prevLabelId++){
 						long prevEndNode = toNode(prevEnd, prevLabelId);
 						network.addNode(node);
 						network.addNode(prevEndNode);
@@ -353,11 +353,11 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		
 		//sepecifically for O
 		for(int pos=0; pos<instance.size(); pos++){
-			for(int labelId=0; labelId<Label.LABELS.size(); labelId++){
+			for(int labelId=0; labelId<SemiLabel.LABELS.size(); labelId++){
 				long node = toNode(pos, labelId);
 				int prevPos = pos - 1;
 				if(prevPos>=0){
-					for(int prevLabelId=0; prevLabelId<Label.LABELS.size(); prevLabelId++){
+					for(int prevLabelId=0; prevLabelId<SemiLabel.LABELS.size(); prevLabelId++){
 						long prevEndNode = toNode(prevPos, prevLabelId);
 						network.addNode(node);
 						network.addNode(prevEndNode);
@@ -379,7 +379,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 	}
 	
 	private long toNode_leaf(){
-		return toNode(0, Label.get("O").id, NodeType.LEAF);
+		return toNode(0, SemiLabel.get("O").id, NodeType.LEAF);
 	}
 	
 	private long toNode(int pos, int labelId){
@@ -387,7 +387,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 	}
 	
 	private long toNode_root(int size){
-		return toNode(size, Label.LABELS.size(), NodeType.ROOT);
+		return toNode(size, SemiLabel.LABELS.size(), NodeType.ROOT);
 	}
 	
 	private long toNode(int pos, int labelId, NodeType type){
@@ -418,9 +418,9 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 				int start = child_arr1[0] + 1 - 1;
 				if(child_arr1[2]==NodeType.LEAF.ordinal())
 					start = child_arr1[0];
-				prediction.add(new Span(start, end, Label.LABELS_INDEX.get(labelId)));
+				prediction.add(new Span(start, end, SemiLabel.LABELS_INDEX.get(labelId)));
 			}else{
-				prediction.add(new Span(end, end, Label.LABELS_INDEX.get(labelId)));
+				prediction.add(new Span(end, end, SemiLabel.LABELS_INDEX.get(labelId)));
 			}
 			node_k = children_k[0];
 			

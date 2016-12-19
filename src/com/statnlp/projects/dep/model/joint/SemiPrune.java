@@ -1,7 +1,8 @@
 package com.statnlp.projects.dep.model.joint;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
+import java.io.ObjectOutputStream;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,9 +14,9 @@ import com.statnlp.projects.entity.semi.SemiCRFFeatureManager;
 import com.statnlp.projects.entity.semi.SemiCRFInstance;
 import com.statnlp.projects.entity.semi.SemiCRFMain;
 import com.statnlp.projects.entity.semi.SemiCRFNetworkCompiler;
+import com.statnlp.projects.entity.semi.SemiLabel;
 import com.statnlp.projects.entity.semi.SemiViewer;
 import com.statnlp.projects.entity.semi.Span;
-import com.statnlp.projects.entity.semi.Label;
 
 /**
  * A semi CRF for pruning the variables.
@@ -29,31 +30,27 @@ public class SemiPrune {
 	private String testFile;
 	private int trainNum;
 	private int testNum;
-	private int numThread;
+	private int numThreads;
 	/**Run the semi until converge. **/
 	private final int ITER = 10000;
 	/**TODO: do we still need this L2 regularization for training?**/
 	private double l2 = 0.01; 
 	/**Now assume we dun have the depFeatures. But for training we have.**/
 	private boolean depFeature = false;
-	private SemiCRFInstance[] trainInsts;
-	private SemiCRFInstance[] testInsts;
-	private SemiCRFNetworkCompiler compiler; 
-	private SemiCRFFeatureManager fm;
-	private NetworkModel model;
-	private GlobalNetworkParam globalParam;
-
-	public SemiPrune(String trainFile, String testFile, int trainNum, int testNum) {
+	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> prunedMap;
+	
+	public SemiPrune(String trainFile, String testFile, int trainNum, int testNum, int numThreads) {
 		this.trainFile = trainFile;
 		this.testFile = testFile;
 		this.trainNum = trainNum;
 		this.testNum = testNum;
+		this.numThreads = numThreads;
 	}
 	
-	public void init() throws IOException, InterruptedException {
-		this.trainInsts = SemiCRFMain.readCoNLLData(trainFile, true, trainNum);
-		this.testInsts = SemiCRFMain.readCoNLLData(testFile, false,	testNum);
-		System.err.println("Labels from SemiCRFs: " + Label.LABELS.toString());
+	public Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> prune(double prunedProb) throws IOException, InterruptedException {
+		SemiCRFInstance[] trainInsts = SemiCRFMain.readCoNLLData(trainFile, true, trainNum);
+		SemiCRFInstance[] testInsts = SemiCRFMain.readCoNLLData(testFile, false,	testNum);
+		System.err.println("Labels from SemiCRFs: " + SemiLabel.LABELS.toString());
 		int maxSize = 0;
 		int maxSpan = 0;
 		for(SemiCRFInstance instance: trainInsts){
@@ -66,26 +63,50 @@ public class SemiPrune {
 			maxSize = Math.max(maxSize, instance.size());
 		}
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = l2;
-		NetworkConfig.NUM_THREADS = numThread;
+		NetworkConfig.NUM_THREADS = numThreads;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
-		this.compiler = new SemiCRFNetworkCompiler(maxSize, maxSpan, new SemiViewer(), false, false, false, false);
-		globalParam = new GlobalNetworkParam();	
-		this.fm = new SemiCRFFeatureManager(globalParam, false, depFeature);
-		this.model = DiscriminativeNetworkModel.create(fm, compiler);
+		NetworkConfig.prunedProb = prunedProb;
+		SemiCRFNetworkCompiler compiler = new SemiCRFNetworkCompiler(maxSize, maxSpan, new SemiViewer(), false, false, false, false);
+		GlobalNetworkParam globalParam = new GlobalNetworkParam();	
+		SemiCRFFeatureManager fm = new SemiCRFFeatureManager(globalParam, false, depFeature);
+		NetworkModel model = DiscriminativeNetworkModel.create(fm, compiler, true);
 		model.train(trainInsts, ITER);
-		
+		model.decode(testInsts);
+		prunedMap = model.getGlobalPrunedMap();
+		model = null;
+		compiler = null;
+		globalParam = null;
+		fm = null;
+		System.err.println("[Info] Global Map size: " + prunedMap.size());
+		/**Counting number of spans**/
+		int numSpans = 0;
+		for (int instId: prunedMap.keySet()) {
+			Map<Integer, Map<Integer, Set<Integer>>> instPrunedMap = prunedMap.get(instId);
+			for (int leftIdx: instPrunedMap.keySet()) {
+				Map<Integer, Set<Integer>> leftPrunedMap = instPrunedMap.get(leftIdx);
+				for (int rightIdx: leftPrunedMap.keySet()) {
+					numSpans += leftPrunedMap.get(rightIdx).size();
+				}
+			}
+		}
+		System.err.println("[Info] total number of spans: " + numSpans);
+		return prunedMap;
 	}
 	
+	private static void writeObject(ObjectOutputStream out, Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> prunedMap) throws IOException {
+        out.writeObject(prunedMap);
+        out.close();
+    }
 	
-	/**
-	 * Return a map containing the (semi-CRFs) span information.
-	 * Map<InstanceId, Map<LeftIndex, Set<SemiSpan>>>
-	 * Note that the span in CRF is 0-indexed.
-	 * @return
-	 */
-	private Map<Integer, Map<Integer, Set<Span>>> prune() {
-		Map<Integer, Map<Integer, Set<Span>>> spanMap = new HashMap<>();
-		return spanMap;
+	public static void main(String... args) throws IOException, InterruptedException {
+		String subsection = "abc";
+		String trainFile = "data/allanprocess/"+subsection+"/train.conllx";
+		String testFile = "data/allanprocess/"+subsection+"/test.conllx";
+		int trainNum = -1;
+		int testNum = -1;
+		SemiPrune pruner = new SemiPrune(trainFile, testFile, trainNum, testNum, 8);
+		writeObject(new ObjectOutputStream(new FileOutputStream("data/allanprocess/"+subsection+"/pruned")), pruner.prune(0.001));
+		
 	}
 	
 }

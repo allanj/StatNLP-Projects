@@ -47,6 +47,7 @@ public class JointReader {
 				start = -1;
 				WordToken[] wtArr = new WordToken[words.size()];
 				JointInstance instance = new JointInstance(instanceId, 1.0, new Sentence(words.toArray(wtArr)));
+				instanceId++;
 				instance.input.setRecognized();
 				instance.output = output;
 				//assign span with head span
@@ -93,7 +94,6 @@ public class JointReader {
 				} else {
 					instance.setUnlabeled();
 				}
-				instanceId++;
 				result.add(instance);
 				maxSentenceLength = Math.max(maxSentenceLength, instance.size());
 				words = new ArrayList<WordToken>();

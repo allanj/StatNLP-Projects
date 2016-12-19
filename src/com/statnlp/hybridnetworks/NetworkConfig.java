@@ -228,4 +228,7 @@ public class NetworkConfig {
 	 * Enable to saving the memory or not
 	 */
 	public static boolean AVOID_DUPLICATE_FEATURES = false;
+	
+	
+	public static double prunedProb = 0.001;
 }

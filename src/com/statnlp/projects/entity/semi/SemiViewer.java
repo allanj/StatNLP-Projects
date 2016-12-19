@@ -33,8 +33,8 @@ public class SemiViewer extends VisualizationViewerEngine {
 		int pos = ids[0];
 		int labelid = ids[2];
 		String type = "Root";
-		if(labelid<Label.LABELS.size())
-			type = Label.get(labelid).getForm();
+		if(labelid<SemiLabel.LABELS.size())
+			type = SemiLabel.get(labelid).getForm();
 		String label = pos+","+type;
 		return label;
 	}

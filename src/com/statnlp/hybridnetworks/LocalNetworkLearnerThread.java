@@ -17,6 +17,8 @@
 package com.statnlp.hybridnetworks;
 
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import com.statnlp.commons.types.Instance;
@@ -52,6 +54,10 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 	
 	/**default: false. Depend on whether network config precompile or not.**/
 	private boolean precompile = false;
+	
+	/**Used for the semiCRFs to calculate the posterior**/
+	private boolean posterior = false;
+	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalPruneMap;
 	
 	/**
 	 * Construct a new learner thread using current networks (if cached) or builder (if not cached),
@@ -116,7 +122,10 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
     		return;
     	}
     	if(!isTouching){
-    		this.train(this._it);
+    		if (!posterior)
+    			this.train(this._it);
+    		else 
+    			this.calculatePosterior();
     	} else {
     		this.touch();
     	}
@@ -166,6 +175,23 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 				network.clearMarginalMap(); //initialize the marginal map for the unlabeled network
 			network.initJointFeatureMap();
 		}
+	}
+	
+	/**
+	 * This one is used only in the joint model.
+	 */
+	public void calculatePosterior() {
+		for(int networkId = 0; networkId< this._instances.length; networkId++){
+			Network network = this.getNetwork(networkId);
+			if(!network.getInstance().isLabeled()) {
+				globalPruneMap.put(network.getInstance().getInstanceId(), network.calculateSemiCRFsPosterior());
+			}
+		}
+	}
+	
+	public void setPosteriorCalculation(Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalPruneMap) {
+		this.globalPruneMap = globalPruneMap;
+		this.posterior = true;
 	}
 	
 	/**

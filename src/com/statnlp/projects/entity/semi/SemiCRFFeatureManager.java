@@ -105,7 +105,7 @@ public class SemiCRFFeatureManager extends FeatureManager {
 		int start = childPos;
 		int end = parentPos;
 		if(parentPos==0 || childType==NodeType.LEAF ) start = childPos;
-		String currEn = Label.get(parentLabelId).getForm();
+		String currEn = SemiLabel.get(parentLabelId).getForm();
 		
 		String lw = start>0? sent.get(start-1).getName():"STR";
 //		String llw = start == 0 ? "STR1" : start == 1 ? "STR" : sent.get(start-2).getName();
@@ -166,7 +166,7 @@ public class SemiCRFFeatureManager extends FeatureManager {
 			featureList.add(this._param_g.toFeature(network, FeaType.seg_pref.name()+"-"+i,	currEn,	prefix));
 			featureList.add(this._param_g.toFeature(network, FeaType.seg_suff.name()+"-"+i,	currEn,	suffix));
 		}
-		String prevEntity = Label.get(childLabelId).getForm();
+		String prevEntity = SemiLabel.get(childLabelId).getForm();
 		featureList.add(this._param_g.toFeature(network,FeaType.transition.name(), prevEntity+"-"+currEn,	""));
 		
 //		featureList.add(this._param_g.toFeature(network, FeaType.left_3.name(),  currEn,	lllw + " & " + llw + " & " + lw));

@@ -20,6 +20,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
@@ -1140,11 +1142,14 @@ public abstract class Network implements Serializable, HyperGraph{
 	
 	/**
 	 * Calculate the posterior probability of each semiCRFs span
+	 * Map<leftIndex, Map<rightIndex, label_Id>>
 	 */
-	public void calculateSemiCRFsPosterior() {
+	public Map<Integer, Map<Integer, Set<Integer>>> calculateSemiCRFsPosterior() {
+		Map<Integer, Map<Integer, Set<Integer>>> networkMap = new HashMap<>();
 		Instance inst = this.getInstance();
+		this.inference(false);
 		int instSize = inst.size();
-		int labelSize = com.statnlp.projects.entity.semi.Label.LABELS.size();
+		int labelSize = com.statnlp.projects.entity.semi.SemiLabel.LABELS.size();
 		this.spanPosterior = new double[instSize][instSize][labelSize];
 		for(int i = 0; i < instSize; i++)
 			for (int j = 0; j < instSize; j++)
@@ -1174,12 +1179,41 @@ public abstract class Network implements Serializable, HyperGraph{
 				spanPosterior[prevPos+1][currentPos][currentEId] = sumLog(spanPosterior[prevPos+1][currentPos][currentEId], spanScore);
 			}
 		}
+		double[] maxLeft = new double[instSize];
+		Arrays.fill(maxLeft, Double.NEGATIVE_INFINITY);
+		//calculate the max over j, and eId.
 		for (int i = 0; i < instSize; i++)
 			for (int j = 0; j < instSize; j++)
 				for (int eId = 0; eId < labelSize; eId++) {
 					spanPosterior[i][j][eId] -= this.getInside();
 					spanPosterior[i][j][eId] = Math.exp(spanPosterior[i][j][eId]);
+					maxLeft[i] = Math.max(maxLeft[i], spanPosterior[i][j][eId]);
 				}
+		for (int i = 0; i < instSize; i++) {
+			for (int j = 0; j < instSize; j++) {
+				for (int eId = 0; eId < labelSize; eId++) {
+					if (spanPosterior[i][j][eId] < (NetworkConfig.prunedProb * maxLeft[i])) continue;
+					if (networkMap.containsKey(i)) {
+						Map<Integer, Set<Integer>> map = networkMap.get(i);
+						if (map.containsKey(j)) {
+							Set<Integer> set = map.get(j);
+							set.add(eId);
+						} else {
+							Set<Integer> set = new HashSet<Integer>();
+							set.add(eId);
+							map.put(j, set);
+						}
+					} else{
+						Map<Integer, Set<Integer>> map = new HashMap<>();
+						Set<Integer> set = new HashSet<Integer>();
+						set.add(eId);
+						map.put(j, set);
+						networkMap.put(i, map);
+					}
+				}
+			}
+		}
+		return networkMap;
 	}
 	
 }

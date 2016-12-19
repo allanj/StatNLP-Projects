@@ -1,7 +1,11 @@
 package com.statnlp.projects.dep.model.joint;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
@@ -28,7 +32,7 @@ public class JointMain {
 	public static boolean isDev = false;
 	public static HashSet<String> dataTypeSet;
 	
-	public static void main(String[] args) throws InterruptedException, IOException {
+	public static void main(String[] args) throws InterruptedException, IOException, ClassNotFoundException {
 		
 		
 		processArgs(args);
@@ -44,17 +48,24 @@ public class JointMain {
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
-		trainingPath = "data/allanprocess/voa/train.conllx";
-		testingPath = "data/allanprocess/voa/test.conllx";
-		trainNumber = 10;
-		testNumber = 10;
+		trainingPath = "data/allanprocess/abc/train.conllx";
+		testingPath = "data/allanprocess/abc/test.conllx";
+//		trainNumber = 100;
+//		testNumber = 100;
 //		numIteration = 20;
 //		numThreads = 8;
-		testingPath = trainingPath;
+//		testingPath = trainingPath;
 //		DPConfig.readWeight = true;
 //		DPConfig.writeWeight = false;
 		/************/
-		
+		//initialize the pruned map.
+//		SemiPrune pruner = new SemiPrune(trainingPath, testingPath, -1, -1, numThreads);
+//		Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> prunedMap = pruner.prune(0.1);
+		ObjectInputStream in = new ObjectInputStream(new FileInputStream("data/allanprocess/abc/pruned"));
+		@SuppressWarnings("unchecked")
+		Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> prunedMap = (Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>>)in.readObject();
+		in.close();
+		System.err.println("[Info] Pruned Map size: " + prunedMap.size());
 		
 		String decodePath = isDev?devPath:testingPath;
 		System.err.println("[Info] train path: "+trainingPath);
@@ -86,7 +97,7 @@ public class JointMain {
 		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
 		
 		JointFeatureManager hpfm = new JointFeatureManager(new GlobalNetworkParam());
-		JointNetworkCompiler dnc = new JointNetworkCompiler();
+		JointNetworkCompiler dnc = new JointNetworkCompiler(prunedMap);
 		NetworkModel model = DiscriminativeNetworkModel.create(hpfm, dnc);
 		model.train(trainingInsts, numIteration); 
 		

@@ -380,7 +380,7 @@ public class SemiCRFMain {
 		int instanceId = 1;
 		int start = -1;
 		int end = 0;
-		Label prevLabel = null;
+		SemiLabel prevLabel = null;
 		int sentIndex = 0;
 		while(br.ready()){
 			String line = br.readLine().trim();
@@ -442,25 +442,25 @@ public class SemiCRFMain {
 				headIdx = Integer.valueOf(values[6])-1;
 				if(depLabel.contains("|")) throw new RuntimeException("Mutiple label?");
 				wts.add(new WordToken(word, pos, headIdx, form, depLabel));
-				Label label = null;
+				SemiLabel label = null;
 				if(form.startsWith("B")){
 					if(start != -1){
 						end = index - 1;
 						createSpan(output, start, end, prevLabel);
 					}
 					start = index;
-					label = Label.get(form.substring(2));
+					label = SemiLabel.get(form.substring(2));
 					
 				} else if(form.startsWith("I")){
-					label = Label.get(form.substring(2));
+					label = SemiLabel.get(form.substring(2));
 				} else if(form.startsWith("O")){
 					if(start != -1){
 						end = index - 1;
 						createSpan(output, start, end, prevLabel);
 					}
 					start = -1;
-					createSpan(output, index, index, Label.get("O"));
-					label = Label.get("O");
+					createSpan(output, index, index, SemiLabel.get("O"));
+					label = SemiLabel.get("O");
 				}
 				prevLabel = label;
 			}
@@ -471,7 +471,7 @@ public class SemiCRFMain {
 		return result.toArray(new SemiCRFInstance[result.size()]);
 	}
 	
- 	private static void createSpan(List<Span> output, int start, int end, Label label){
+ 	private static void createSpan(List<Span> output, int start, int end, SemiLabel label){
 		if(label==null){
 			throw new RuntimeException("The label is null");
 		}
@@ -496,8 +496,8 @@ public class SemiCRFMain {
 		for(Span span: output){
 			int start = span.start;
 			int end = span.end;
-			Label label = span.label;
-			if(label.equals(Label.get("O")) || start==end) continue;
+			SemiLabel label = span.label;
+			if(label.equals(SemiLabel.get("O")) || start==end) continue;
 			boolean connected = traverseLeft(start, end, leftNodes);
 			if(!connected) number++;
 		}
@@ -526,8 +526,8 @@ public class SemiCRFMain {
 //			if(sent.get(i).getEntity().startsWith("B")) total++;
 //		}
 		for(Span span: output){
-			Label label = span.label;
-			if(label.equals(Label.get("O"))) continue;
+			SemiLabel label = span.label;
+			if(label.equals(SemiLabel.get("O"))) continue;
 			total++;
 		}
 		return total;

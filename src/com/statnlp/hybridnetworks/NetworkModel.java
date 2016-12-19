@@ -24,9 +24,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -61,7 +64,16 @@ public abstract class NetworkModel implements Serializable{
 	private NNCRFGlobalNetworkParam nnController;
 	private transient PrintStream[] outstreams = new PrintStream[]{System.out};
 	
+	/**calcualte semiCRF posterior or not**/
+	private boolean posterior = false; 
+	/**Global map:<instance Id, <leftIndex, <rightIndex, <labelId>>>>**/
+	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalPruneMap;
+	
 	public NetworkModel(FeatureManager fm, NetworkCompiler compiler, PrintStream... outstreams){
+		this(fm, compiler, false, outstreams);
+	}
+	
+	public NetworkModel(FeatureManager fm, NetworkCompiler compiler, boolean posterior, PrintStream... outstreams){
 		this._fm = fm;
 		this._numThreads = NetworkConfig.NUM_THREADS;
 		this._compiler = compiler;
@@ -70,6 +82,7 @@ public abstract class NetworkModel implements Serializable{
 		}
 		this.outstreams = new PrintStream[outstreams.length+1];
 		this.outstreams[0] = System.out;
+		this.posterior = posterior;
 		for(int i=0; i<outstreams.length; i++){
 			this.outstreams[i+1] = outstreams[i];
 		}
@@ -125,15 +138,15 @@ public abstract class NetworkModel implements Serializable{
 		train(allInstances, allInstances.length, maxNumIterations);
 	}
 	
+	
 	public void train(Instance[] allInstances, int trainLength, int maxNumIterations) throws InterruptedException{
 		
 		this._numThreads = NetworkConfig.NUM_THREADS;
 		
 		this._allInstances = allInstances;
-		for(int k = 0; k<this._allInstances.length; k++){
-//			System.err.println(k);
-			this._allInstances[k].setInstanceId(k+1);
-		}
+//		for(int k = 0; k<this._allInstances.length; k++){
+//			this._allInstances[k].setInstanceId(k+1);
+//		}
 		this._fm.getParam_G().setInstsNum(this._allInstances.length);
 		HashSet<Integer> batchInstIds = new HashSet<Integer>();
 		ArrayList<Integer> instIds = new ArrayList<Integer>();
@@ -277,9 +290,36 @@ public abstract class NetworkModel implements Serializable{
 					break;
 				}
 			}
+			//Then we calculate the posterior span
+			if(posterior) {
+				globalPruneMap = new HashMap<>();
+				calculatePosterior();
+			}
 		} finally {
 			pool.shutdown();
 		}
+	}
+	
+	/**
+	 * Calculation of the posterior for the semiCRFs
+	 * @throws InterruptedException
+	 */
+	private void calculatePosterior() throws InterruptedException{
+		System.err.println("[Info] Starting calculation of the posterior for training set...");
+		for(int threadId = 0; threadId < this._numThreads; threadId++){
+			this._learners[threadId] = this._learners[threadId].copyThread();
+			this._learners[threadId].setPosteriorCalculation(globalPruneMap);
+			this._learners[threadId].start();
+		}
+		for(int threadId = 0; threadId < this._numThreads; threadId++){
+			this._learners[threadId].join();
+			//no set back the posterior boolean value
+		}
+		System.err.println("Finish calculation of the posterior for semiCRFs");
+	}
+	
+	public Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> getGlobalPrunedMap() {
+		 return this.globalPruneMap;
 	}
 
 	private void preCompileNetworks(Instance[][] insts) throws InterruptedException{
@@ -329,31 +369,31 @@ public abstract class NetworkModel implements Serializable{
 				this._fm.mergeSubFeaturesToGlobalFeatures();
 			}
 		}
-		if(labeledNetworkByInstanceId == null || unlabeledNetworkByInstanceId == null){
-			labeledNetworkByInstanceId = new Network[this._allInstances.length];
-			unlabeledNetworkByInstanceId = new Network[this._allInstances.length];
-			Network[] arr;
-			for(int threadId=0; threadId < insts.length; threadId++){
-				LocalNetworkLearnerThread learner = this._learners[threadId];
-				for(int networkId=0; networkId < insts[threadId].length; networkId++){
-					Instance instance = insts[threadId][networkId];
-					int instanceId = instance.getInstanceId();
-					if(instanceId < 0){
-						arr = unlabeledNetworkByInstanceId;
-						instanceId = -instanceId;
-					} else {
-						arr = labeledNetworkByInstanceId;
-					}
-					instanceId -= 1;
-					arr[instanceId] = learner.getNetwork(networkId);
-				}
-			}
-			if(unlabeledNetworkByInstanceId[0] == null){
-				arr = labeledNetworkByInstanceId;
-				labeledNetworkByInstanceId = unlabeledNetworkByInstanceId;
-				unlabeledNetworkByInstanceId = arr;
-			}
-		}
+//		if(labeledNetworkByInstanceId == null || unlabeledNetworkByInstanceId == null){
+//			labeledNetworkByInstanceId = new Network[this._allInstances.length];
+//			unlabeledNetworkByInstanceId = new Network[this._allInstances.length];
+//			Network[] arr;
+//			for(int threadId=0; threadId < insts.length; threadId++){
+//				LocalNetworkLearnerThread learner = this._learners[threadId];
+//				for(int networkId=0; networkId < insts[threadId].length; networkId++){
+//					Instance instance = insts[threadId][networkId];
+//					int instanceId = instance.getInstanceId();
+//					if(instanceId < 0){
+//						arr = unlabeledNetworkByInstanceId;
+//						instanceId = -instanceId;
+//					} else {
+//						arr = labeledNetworkByInstanceId;
+//					}
+//					instanceId -= 1;
+//					arr[instanceId] = learner.getNetwork(networkId);
+//				} 
+//			}
+//			if(unlabeledNetworkByInstanceId[0] == null){
+//				arr = labeledNetworkByInstanceId;
+//				labeledNetworkByInstanceId = unlabeledNetworkByInstanceId;
+//				unlabeledNetworkByInstanceId = arr;
+//			}
+//		}
 	}
 	
 	public Instance[] decode(Instance[] allInstances) throws InterruptedException {
@@ -384,9 +424,9 @@ public abstract class NetworkModel implements Serializable{
 		//distribute the works into different threads.
 		for(int threadId = 0; threadId<this._numThreads; threadId++){
 			if(cacheFeatures && this._decoders[threadId] != null){
-				this._decoders[threadId] = new LocalNetworkDecoderThread(threadId, this._fm, insts[threadId], this._compiler, this._decoders[threadId].getParam(), true);
+				this._decoders[threadId] = new LocalNetworkDecoderThread(threadId, this._fm, insts[threadId], this._compiler, this._decoders[threadId].getParam(), true, posterior);
 			} else {
-				this._decoders[threadId] = new LocalNetworkDecoderThread(threadId, this._fm, insts[threadId], this._compiler, false);
+				this._decoders[threadId] = new LocalNetworkDecoderThread(threadId, this._fm, insts[threadId], this._compiler, false, posterior);
 			}
 		}
 		
@@ -394,6 +434,9 @@ public abstract class NetworkModel implements Serializable{
 		
 		long time = System.currentTimeMillis();
 		for(int threadId = 0; threadId<this._numThreads; threadId++){
+			if(posterior){
+				this._decoders[threadId].setGlobalPruneMap(globalPruneMap);
+			}
 			this._decoders[threadId].start();
 		}
 		for(int threadId = 0; threadId<this._numThreads; threadId++){
@@ -403,6 +446,8 @@ public abstract class NetworkModel implements Serializable{
 		System.err.println("Okay. Decoding done.");
 		time = System.currentTimeMillis() - time;
 		System.err.println("Overall decoding time = "+ time/1000.0 +" secs.");
+		
+		if(posterior) return null;
 		
 		int k = 0;
 		for(int threadId = 0; threadId<this._numThreads; threadId++){

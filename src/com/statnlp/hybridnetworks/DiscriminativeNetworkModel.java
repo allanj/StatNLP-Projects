@@ -26,11 +26,15 @@ public class DiscriminativeNetworkModel extends NetworkModel {
 	private static final long serialVersionUID = -9073908907104721192L;
 	
 	public static DiscriminativeNetworkModel create(FeatureManager fm, NetworkCompiler builder, PrintStream... outstreams){
-		return new DiscriminativeNetworkModel(fm, builder, outstreams);
+		return new DiscriminativeNetworkModel(fm, builder, false, outstreams);
 	}
 	
-	public DiscriminativeNetworkModel(FeatureManager fm, NetworkCompiler builder, PrintStream... outstreams){
-		super(fm, builder, outstreams);
+	public static DiscriminativeNetworkModel create(FeatureManager fm, NetworkCompiler builder, boolean posterior, PrintStream... outstreams){
+		return new DiscriminativeNetworkModel(fm, builder, posterior, outstreams);
+	}
+	
+	public DiscriminativeNetworkModel(FeatureManager fm, NetworkCompiler builder, boolean posterior, PrintStream... outstreams){
+		super(fm, builder,  posterior, outstreams);
 	}
 	
 	@Override

@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class Span implements Comparable<Span>, Serializable{
 	
 	private static final long serialVersionUID = 1849557517361796614L;
-	public Label label;
+	public SemiLabel label;
 	public int start;
 	public int end;
 
@@ -15,7 +15,7 @@ public class Span implements Comparable<Span>, Serializable{
 	 * @param end: inclusive
 	 * @param label
 	 */
-	public Span(int start, int end, Label label) {
+	public Span(int start, int end, SemiLabel label) {
 		if(start>end)
 			throw new RuntimeException("Start cannot be larger than end");
 		this.start = start;
