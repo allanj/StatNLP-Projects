@@ -50,10 +50,10 @@ public class JointMain {
 		/******Debug********/
 		trainingPath = "data/allanprocess/abc/train.conllx";
 		testingPath = "data/allanprocess/abc/test.conllx";
-//		trainNumber = 100;
-//		testNumber = 100;
+//		trainNumber = 10;
+//		testNumber = 10;
 //		numIteration = 20;
-//		numThreads = 8;
+//		numThreads = 5;
 //		testingPath = trainingPath;
 //		DPConfig.readWeight = true;
 //		DPConfig.writeWeight = false;

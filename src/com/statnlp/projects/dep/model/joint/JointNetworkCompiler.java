@@ -24,7 +24,7 @@ public class JointNetworkCompiler extends NetworkCompiler {
 
 	private static final long serialVersionUID = -5080640847287255079L;
 
-	private final int maxEntityLen = 7;
+	private final int maxEntityLen = 8;
 	private enum NodeType {normal};
 	public static String EMPTY = DPConfig.EMPTY;
 	
@@ -277,20 +277,12 @@ public class JointNetworkCompiler extends NetworkCompiler {
 									Set<Integer> rightLabelSet = rhsLeftMap.get(rightIndex-1);
 									int rightSpanLen = rightIndex - rl + 1;
 									if (leftSpanLen > 4 && rightSpanLen > 4) continue;
-									if (direction == DIR.right.ordinal() && rightSpanLen > 2 && leftSpanLen > 4) continue;
-									if (direction == DIR.right.ordinal() && rightSpanLen > 1 && leftSpanLen > 6) continue;
-									if (direction == DIR.right.ordinal() && rightSpanLen > 0 && leftSpanLen > 8) continue;
-									if (direction == DIR.left.ordinal() && leftSpanLen > 2 && rightSpanLen > 4) continue;
-									if (direction == DIR.left.ordinal() && leftSpanLen > 1 && rightSpanLen > 6) continue;
-									if (direction == DIR.left.ordinal() && leftSpanLen > 0 && rightSpanLen > 8) continue;
 									for (int lt = 0; lt < Label.Labels.size(); lt++) {
 										if(leftIndex == 0 && lt != Label.get(OEntity).id) continue;
 										if(leftIndex != 0 && !leftLabelSet.contains(lt)) continue;
-										if (leftSpanLen > 2 && rightSpanLen > 2 && (lt != Label.get("person").id && lt != Label.get("organization").id)  ) continue; 
 										if (lt == Label.get(EMPTY).id || (leftSpanLen != 1 && lt == Label.get(OEntity).id)) continue;
 										for (int rt = 0; rt < Label.Labels.size(); rt++) {
 											if(!rightLabelSet.contains(rt)) continue;
-											if (leftSpanLen > 2 && rightSpanLen > 2 && (rt != Label.get("person").id && rt != Label.get("organization").id)  ) continue;
 											if (rt == Label.get(EMPTY).id || (rightSpanLen != 1 && rt == Label.get(OEntity).id)) continue;
 											long parent = this.toNodeIncomp(leftIndex, rightIndex, direction, Label.get(lt).form, leftSpanLen, Label.get(rt).form, rightSpanLen);
 											for (int m = lr; m < rl; m++) {
