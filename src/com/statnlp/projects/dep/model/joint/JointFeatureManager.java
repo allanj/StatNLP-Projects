@@ -44,7 +44,8 @@ public class JointFeatureManager extends FeatureManager {
 		dep_tag_label,
 		modifier_word,
 		modifier_tag,
-		head_entity};
+		head_entity,
+		head_entity_word};
 	
 	
 	public static String O_TYPE = DPConfig.O_TYPE;
@@ -191,6 +192,7 @@ public class JointFeatureManager extends FeatureManager {
 			String currHeadTag = currHeadIndex>=0? sent.get(currHeadIndex).getTag():"STR";
 			featureList.add(this._param_g.toFeature(network, FeaType.head_word.name(),	currEn, currWord+"& head:"+currHead));
 			featureList.add(this._param_g.toFeature(network, FeaType.head_tag.name(),	currEn,	currTag+"& head:"+currHeadTag));
+			featureList.add(this._param_g.toFeature(network, FeaType.head_entity_word.name(),	currEn, headEn + "&" + currWord));
 		}
 		featureList.add(this._param_g.toFeature(network, FeaType.head_entity.name(),	currEn, headEn));
 		/**(END) add dependency features**/
