@@ -248,6 +248,8 @@ public class JointNetworkCompiler extends NetworkCompiler {
 				if(e.equals(EMPTY)) continue;
 				for (int spanLen = 1; spanLen <= maxEntityLen && (rightIndex - spanLen + 1) > 0; spanLen++) {
 					if (spanLen != 1 && e.equals(OEntity)) continue;
+					Map<Integer, Set<Integer>> leftMap = instMap.get(rightIndex - spanLen);
+					if (!leftMap.containsKey(rightIndex-1) || !leftMap.get(rightIndex-1).contains(Label.get(e).id)) continue;
 					long wordRightNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, rightDir, e, spanLen); 
 					long wordLeftNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, leftDir, e, spanLen);
 					network.addNode(wordRightNodeE);
@@ -261,28 +263,20 @@ public class JointNetworkCompiler extends NetworkCompiler {
 				//span: {(0,1)},{(1,2),(0,2)}
 				int leftIndex = rightIndex - L;
 				//span:[bIndex, rightIndex]
-				Map<Integer, Set<Integer>> leftMap = instMap.get(leftIndex - 1);
 				for(int complete = 0; complete <= 1; complete++){
 					for(int direction=0;direction<=1;direction++){
 						if (leftIndex == 0 && direction == 0) continue;
 						if (complete == COMP.incomp.ordinal()) {
 							for (int lr = leftIndex; lr < rightIndex && (lr - leftIndex + 1) <= maxEntityLen; lr++) {
 								if(leftIndex == 0 && lr != leftIndex) continue;
-								if (leftIndex != 0 && !leftMap.containsKey(lr-1)) continue;
-								Set<Integer> leftLabelSet = leftIndex != 0 ? leftMap.get(lr-1):null;
 								int leftSpanLen = lr - leftIndex + 1;
 								for (int rl = rightIndex; rl > lr && (rightIndex - rl + 1) <= maxEntityLen; rl--) {
-									Map<Integer, Set<Integer>> rhsLeftMap = instMap.get(rl - 1);
-									if (!rhsLeftMap.containsKey(rightIndex-1)) continue;
-									Set<Integer> rightLabelSet = rhsLeftMap.get(rightIndex-1);
 									int rightSpanLen = rightIndex - rl + 1;
 									if (leftSpanLen > 4 && rightSpanLen > 4) continue;
 									for (int lt = 0; lt < Label.Labels.size(); lt++) {
 										if(leftIndex == 0 && lt != Label.get(OEntity).id) continue;
-										if(leftIndex != 0 && !leftLabelSet.contains(lt)) continue;
 										if (lt == Label.get(EMPTY).id || (leftSpanLen != 1 && lt == Label.get(OEntity).id)) continue;
 										for (int rt = 0; rt < Label.Labels.size(); rt++) {
-											if(!rightLabelSet.contains(rt)) continue;
 											if (rt == Label.get(EMPTY).id || (rightSpanLen != 1 && rt == Label.get(OEntity).id)) continue;
 											long parent = this.toNodeIncomp(leftIndex, rightIndex, direction, Label.get(lt).form, leftSpanLen, Label.get(rt).form, rightSpanLen);
 											for (int m = lr; m < rl; m++) {
@@ -301,22 +295,14 @@ public class JointNetworkCompiler extends NetworkCompiler {
 						
 						if(complete == COMP.comp.ordinal() && direction == leftDir){
 							for (int rl = rightIndex; rl > leftIndex && (rightIndex - rl + 1) <= maxEntityLen; rl--) {
-								Map<Integer, Set<Integer>> rhsLeftMap = instMap.get(rl - 1);
-								if (!rhsLeftMap.containsKey(rightIndex-1)) continue;
 								int rightSpanLen = rightIndex - rl + 1;
-								Set<Integer> rightLabelSet = rhsLeftMap.get(rightIndex-1);
 								for (int rt = 0; rt < Label.Labels.size(); rt++) {
-									if(!rightLabelSet.contains(rt)) continue;
 									if (rt == Label.get(EMPTY).id || (rightSpanLen != 1 && rt == Label.get(OEntity).id)) continue;
 									long parent = this.toNodeComp(leftIndex, rightIndex, leftDir, Label.get(rt).form, rightSpanLen);
 									for (int ml = leftIndex; ml < rl; ml++) {
-										Map<Integer, Set<Integer>> middleLeftMap = instMap.get(ml - 1);
 										for (int mr = ml; mr < rl && (mr - ml + 1) <= maxEntityLen; mr++) {
-											if (!middleLeftMap.containsKey(mr-1)) continue;
-											Set<Integer> middleLabelSet = middleLeftMap.get(mr-1);
 											int middleSpanLen = mr - ml + 1;
 											for (int mt = 0; mt < Label.Labels.size(); mt++) {
-												if(!middleLabelSet.contains(mt)) continue;
 												if (mt == Label.get(EMPTY).id || (middleSpanLen != 1 && mt == Label.get(OEntity).id)) continue;
 												long leftChild = this.toNodeComp(leftIndex, mr, leftDir, Label.get(mt).form, middleSpanLen);
 												long rightChild = this.toNodeIncomp(ml, rightIndex, leftDir, Label.get(mt).form, middleSpanLen, Label.get(rt).form, rightSpanLen);
@@ -335,23 +321,16 @@ public class JointNetworkCompiler extends NetworkCompiler {
 							
 							for (int lr = leftIndex; lr < rightIndex && (lr - leftIndex + 1) <= maxEntityLen; lr++) {
 								if(leftIndex == 0 && lr != leftIndex) continue;
-								if (leftIndex != 0 && !leftMap.containsKey(lr-1)) continue;
-								Set<Integer> leftLabelSet = leftIndex != 0? leftMap.get(lr-1): null;
 								int leftSpanLen = lr - leftIndex + 1;
 								if (leftIndex == 0 && leftSpanLen != 1) continue;
 								for (int lt = 0; lt < Label.Labels.size(); lt++) {
-									if(leftIndex != 0 && !leftLabelSet.contains(lt)) continue;
 									if (leftIndex == 0 && lt != Label.get(OEntity).id) continue;
 									if (lt == Label.get(EMPTY).id || (leftSpanLen != 1 && lt == Label.get(OEntity).id)) continue;
 									long parent = this.toNodeComp(leftIndex, rightIndex, rightDir, Label.get(lt).form, leftSpanLen);
 									for (int ml = lr + 1; ml <= rightIndex; ml++) {
-										Map<Integer, Set<Integer>> middleLeftMap = instMap.get(ml - 1);
 										for (int mr = ml; mr <= rightIndex && (mr - ml + 1) <= maxEntityLen; mr++) {
-											if (!middleLeftMap.containsKey(mr-1)) continue;
-											Set<Integer> middleLabelSet = middleLeftMap.get(mr-1);
 											int middleSpanLen = mr - ml + 1;
 											for (int mt = 0; mt < Label.Labels.size(); mt++) {
-												if(!middleLabelSet.contains(mt)) continue;
 												long leftChild = this.toNodeIncomp(leftIndex, mr, rightDir, Label.get(lt).form, leftSpanLen, Label.get(mt).form, middleSpanLen);
 												long rightChild = this.toNodeComp(ml, rightIndex, rightDir, Label.get(mt).form, middleSpanLen);
 												if(network.contains(leftChild) && network.contains(rightChild)){
