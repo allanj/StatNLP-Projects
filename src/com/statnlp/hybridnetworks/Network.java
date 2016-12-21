@@ -1216,6 +1216,10 @@ public abstract class Network implements Serializable, HyperGraph{
 		return networkMap;
 	}
 	
+//	public Map<Integer, Map<Integer, Set<Integer>>> calculateSemiCRFsPosterior() {
+//		
+//	}
+	
 }
 
 

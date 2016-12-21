@@ -34,17 +34,18 @@ public class SemiPrune {
 	/**Run the semi until converge. **/
 	private final int ITER = 10000;
 	/**TODO: do we still need this L2 regularization for training?**/
-	private double l2 = 0.01; 
+	private double l2 = 0.1; 
 	/**Now assume we dun have the depFeatures. But for training we have.**/
 	private boolean depFeature = false;
 	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> prunedMap;
 	
-	public SemiPrune(String trainFile, String testFile, int trainNum, int testNum, int numThreads) {
+	public SemiPrune(String trainFile, String testFile, int trainNum, int testNum, int numThreads, double L2) {
 		this.trainFile = trainFile;
 		this.testFile = testFile;
 		this.trainNum = trainNum;
 		this.testNum = testNum;
 		this.numThreads = numThreads;
+		this.l2 = L2;
 	}
 	
 	public Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> prune(double prunedProb) throws IOException, InterruptedException {
@@ -71,6 +72,7 @@ public class SemiPrune {
 		SemiCRFFeatureManager fm = new SemiCRFFeatureManager(globalParam, false, depFeature);
 		NetworkModel model = DiscriminativeNetworkModel.create(fm, compiler, true);
 		model.train(trainInsts, ITER);
+		System.err.println("[Info] Train Map size: " + model.getGlobalPrunedMap().size());
 		model.decode(testInsts);
 		prunedMap = model.getGlobalPrunedMap();
 		model = null;
@@ -104,8 +106,11 @@ public class SemiPrune {
 		String testFile = "data/allanprocess/"+subsection+"/test.conllx";
 		int trainNum = -1;
 		int testNum = -1;
-		SemiPrune pruner = new SemiPrune(trainFile, testFile, trainNum, testNum, 8);
-		writeObject(new ObjectOutputStream(new FileOutputStream("data/allanprocess/"+subsection+"/pruned")), pruner.prune(0.001));
+		double L2 = 0.1;
+		int numThreads = 35;
+		double prunedProb = 0.001;
+		SemiPrune pruner = new SemiPrune(trainFile, testFile, trainNum, testNum, numThreads, L2);
+		writeObject(new ObjectOutputStream(new FileOutputStream("data/allanprocess/"+subsection+"/pruned")), pruner.prune(prunedProb));
 		
 	}
 	
