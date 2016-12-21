@@ -3,14 +3,18 @@ package com.statnlp.projects.entity.semi;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
+import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkException;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
 
@@ -174,6 +178,76 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		int root_k = Arrays.binarySearch(allNodes, root);
 		int numNodes = root_k + 1;
 		return new SemiCRFNetwork(networkId, instance, allNodes, allChildren, param, numNodes, this);
+//		return buildTmpUnlabeld(networkId, instance, param, SemiCRFMain.prunedMap.get(instance.getInstanceId()));
+	}
+	
+	@SuppressWarnings("unused")
+	private SemiCRFNetwork buildTmpUnlabeld(int networkId, SemiCRFInstance inst, LocalNetworkParam param, Map<Integer, Map<Integer, Set<Integer>>> instMap) {
+		SemiCRFNetwork network = new SemiCRFNetwork(networkId, inst, param,this);
+		long leaf = toNode_leaf();
+		network.addNode(leaf);
+		List<Long> currNodes = new ArrayList<Long>();
+		for(int pos=0; pos<inst.size(); pos++){
+			for(int labelId=0; labelId<SemiLabel.LABELS.size(); labelId++){
+				long node = toNode(pos, labelId);
+				if(labelId!=SemiLabel.LABELS.get("O").id){
+					for(int prevPos=pos-1; prevPos >= pos-maxSegmentLength && prevPos >= 0; prevPos--){
+						int left = prevPos + 1; 
+						Map<Integer, Set<Integer>> leftMap = instMap.get(left);
+						if (!leftMap.containsKey(pos) || !leftMap.get(pos).contains(labelId)) continue;
+						for(int prevLabelId=0; prevLabelId<SemiLabel.LABELS.size(); prevLabelId++){
+							long prevBeginNode = toNode(prevPos, prevLabelId);
+							if(network.contains(prevBeginNode)){
+								if (inst.getInstanceId()==-3 && left==4 && pos==4)
+									System.err.println(leftMap);
+								network.addNode(node);
+								network.addEdge(node, new long[]{prevBeginNode});
+							}
+						}
+					}
+					if(pos>=0){
+						int left = 0; 
+						Map<Integer, Set<Integer>> leftMap = instMap.get(left);
+						if (!leftMap.containsKey(pos) || !leftMap.get(pos).contains(labelId)) continue;
+						network.addNode(node);
+						network.addEdge(node, new long[]{toNode_leaf()});
+					}
+				}else{
+					//O label should be with only length 1. actually does not really affect.
+					int prevPos = pos - 1;
+					if(prevPos>=0){
+						int left = prevPos + 1; 
+						Map<Integer, Set<Integer>> leftMap = instMap.get(left);
+						if (!leftMap.containsKey(pos) || !leftMap.get(pos).contains(labelId)) continue;
+						for(int prevLabelId=0; prevLabelId<SemiLabel.LABELS.size(); prevLabelId++){
+							long prevBeginNode = toNode(prevPos, prevLabelId);
+							if(network.contains(prevBeginNode)){
+								network.addNode(node);
+								network.addEdge(node, new long[]{prevBeginNode});
+							}
+						}
+					}
+					if(pos==0){
+						int left = 0; 
+						Map<Integer, Set<Integer>> leftMap = instMap.get(left);
+						if (!leftMap.containsKey(pos) || !leftMap.get(pos).contains(labelId)) continue;
+						network.addNode(node);
+						network.addEdge(node, new long[]{toNode_leaf()});
+					}
+				}
+				currNodes.add(node);
+			}
+			long root = toNode_root(pos+1);
+			network.addNode(root);
+			for(long currNode: currNodes){
+				if(network.contains(currNode)){
+					network.addEdge(root, new long[]{currNode});
+				}	
+			}
+			currNodes = new ArrayList<Long>();
+		}
+		network.finalizeNetwork();
+		return network;
 	}
 	
 	//for O label, should only with span length 1.
@@ -427,6 +501,53 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		}
 		Collections.sort(prediction);
 		result.setPrediction(prediction);
+//		if (result.getInstanceId()==-8) {
+//			System.err.println(result.getInput().toString());
+//			System.err.println("top 1: " + prediction.toString());
+//		}
+		if (NetworkConfig._topKValue >= 1) {
+			List<List<Span>> topKPredictions = new ArrayList<List<Span>>(NetworkConfig._topKValue);
+			boolean stop = false;
+			for (int kth = 0; kth < NetworkConfig._topKValue; kth++) {
+				node_k = network.countNodes()-1;
+				int currentKth = kth;
+				prediction = new ArrayList<Span>();
+				while(node_k > 0) {
+					int[] children_k = network.getMaxTopKPath(node_k, currentKth);
+					if (children_k == null) {
+						stop = true;
+						break;
+					}
+					int[] children_k_bestlist = network.getMaxTopKBestListPath(node_k, currentKth);
+					int[] child_arr = network.getNodeArray(children_k[0]);
+					int pos = child_arr[0] - 1;;
+					int nodeType = child_arr[2];
+					if(nodeType == NodeType.LEAF.ordinal()){
+						break;
+					} 
+					int labelId = child_arr[1];
+					//System.err.println(pos+","+Label.LABELS_INDEX.get(labelId).getForm()+" ," + nodeType.toString());
+					int end = pos;
+					if(end!=0){
+						int[] children_k1 = network.getMaxPath(children_k[0]);
+						int[] child_arr1 = network.getNodeArray(children_k1[0]);
+						int start = child_arr1[0] + 1 - 1;
+						if(child_arr1[2]==NodeType.LEAF.ordinal())
+							start = child_arr1[0];
+						prediction.add(new Span(start, end, SemiLabel.LABELS_INDEX.get(labelId)));
+					}else{
+						prediction.add(new Span(end, end, SemiLabel.LABELS_INDEX.get(labelId)));
+					}
+					node_k = children_k[0];
+					currentKth = children_k_bestlist[0];
+				}
+				if (stop) {
+					break;
+				}
+				topKPredictions.add(prediction);
+			}
+			result.setTopKPrediction(topKPredictions);
+		}
 		return result;
 	}
 
@@ -434,5 +555,41 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		return 0.0;
 	}
 	
+	
+	public Map<Integer, Map<Integer, Set<Integer>>> getTopKPrunedMap(Network network) {
+		SemiCRFInstance inst = this.decompile(network);
+		Map<Integer, Map<Integer, Set<Integer>>> topKPrunedMap = new HashMap<Integer, Map<Integer, Set<Integer>>>(inst.size());
+		List<List<Span>> topKPredictions = inst.getTopKPrediction();
+		for (List<Span> prediction: topKPredictions) {
+//			if (inst.getInstanceId()==-8) {
+//				System.err.println(network.getInstance().getInput().toString());
+//				System.err.println(prediction.toString());
+//			}
+			for (Span span: prediction) {
+				int left = span.start;
+				int right = span.end;
+				int labelId = span.label.id;
+				if (topKPrunedMap.containsKey(left)) {
+					Map<Integer, Set<Integer>> map = topKPrunedMap.get(left);
+					if (map.containsKey(right)) {
+						map.get(right).add(labelId);
+					} else {
+						Set<Integer> set = new HashSet<Integer>();
+						set.add(labelId);
+						map.put(right, set);
+					}
+				} else {
+					Set<Integer> set = new HashSet<Integer>();
+					set.add(labelId);
+					Map<Integer, Set<Integer>> map = new HashMap<Integer, Set<Integer>>();
+					map.put(right, set);
+					topKPrunedMap.put(left, map);
+				}
+			}
+//			if (inst.getInstanceId()==-8)
+//				System.err.println(topKPrunedMap.toString());
+		}
+		return topKPrunedMap;
+	}
 	
 }

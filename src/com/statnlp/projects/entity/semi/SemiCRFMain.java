@@ -12,6 +12,8 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.ml.opt.OptimizerFactory;
@@ -54,7 +56,7 @@ public class SemiCRFMain {
 	public static boolean ignore = false;
 	public static String dataset = "allanprocess"; //default
 	public static boolean cross_validation = false; //
-	
+	public static Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> prunedMap;
 //	public static int[] debug = new int[150];
 //	public static int[] debugNum = new int[150];
 	
@@ -97,6 +99,7 @@ public class SemiCRFMain {
 							break;//cross validation
 				case "-trainFile": train_filename = args[i+1]; break;
 				case "-testFile": test_filename = args[i+1]; break;
+				case "-topk": NetworkConfig._topKValue = Integer.parseInt(args[i+1]); break;
 				default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 			}
 		}
@@ -135,7 +138,9 @@ public class SemiCRFMain {
 		System.out.println("[Info] Reading data:"+test_filename);
 		SemiCRFInstance[] trainInstances = readCoNLLData(train_filename, true,	trainNum);
 		SemiCRFInstance[] testInstances	 = readCoNLLData(test_filename, false,	testNumber);
-		
+//		ObjectInputStream prunedIn = new ObjectInputStream(new FileInputStream("data/allanprocess/abc/pruned"));
+//		prunedMap = (Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>>)prunedIn.readObject();
+//		prunedIn.close();
 		/****Printing the total Number of entities***/
 		int totalNumber = 0;
 		int tokenNum = 0;
@@ -342,8 +347,9 @@ public class SemiCRFMain {
 					Instance[] predictions = model.decode(cvTestList.toArray(new SemiCRFInstance[cvTestList.size()]));
 					SemiEval.evalNER(predictions, resEval);
 				}
-			}else
+			}else {
 				model.train(trainInstances, numIterations);
+			}
 			if(!cross_validation && modelFile!=null && !modelFile.equals("")){
 				ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
 				out.writeObject(fm.getParam_G());

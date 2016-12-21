@@ -68,6 +68,8 @@ public abstract class NetworkModel implements Serializable{
 	private boolean posterior = false; 
 	/**Global map:<instance Id, <leftIndex, <rightIndex, <labelId>>>>**/
 	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalPruneMap;
+	/**Global map:<instance Id, <leftIndex, <rightIndex, <labelId>>>>**/
+	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalTopKPruneMap;
 	
 	public NetworkModel(FeatureManager fm, NetworkCompiler compiler, PrintStream... outstreams){
 		this(fm, compiler, false, outstreams);
@@ -293,6 +295,7 @@ public abstract class NetworkModel implements Serializable{
 			//Then we calculate the posterior span
 			if(posterior) {
 				globalPruneMap = new HashMap<>();
+				globalTopKPruneMap = new HashMap<>();
 				calculatePosterior();
 			}
 		} finally {
@@ -308,7 +311,8 @@ public abstract class NetworkModel implements Serializable{
 		System.err.println("[Info] Starting calculation of the posterior for training set...");
 		for(int threadId = 0; threadId < this._numThreads; threadId++){
 			this._learners[threadId] = this._learners[threadId].copyThread();
-			this._learners[threadId].setPosteriorCalculation(globalPruneMap);
+			this._learners[threadId].setNetworkCompiler(this._compiler);
+			this._learners[threadId].setPosteriorCalculation(globalPruneMap, globalTopKPruneMap);
 			this._learners[threadId].start();
 		}
 		for(int threadId = 0; threadId < this._numThreads; threadId++){
@@ -321,6 +325,11 @@ public abstract class NetworkModel implements Serializable{
 	public Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> getGlobalPrunedMap() {
 		 return this.globalPruneMap;
 	}
+	
+	public Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> getGlobalTopKPrunedMap() {
+		 return this.globalTopKPruneMap;
+	}
+	
 
 	private void preCompileNetworks(Instance[][] insts) throws InterruptedException{
 		for(int threadId = 0; threadId < this._numThreads; threadId++){
@@ -436,6 +445,7 @@ public abstract class NetworkModel implements Serializable{
 		for(int threadId = 0; threadId<this._numThreads; threadId++){
 			if(posterior){
 				this._decoders[threadId].setGlobalPruneMap(globalPruneMap);
+				this._decoders[threadId].setGlobalopKPruneMap(globalTopKPruneMap);
 			}
 			this._decoders[threadId].start();
 		}

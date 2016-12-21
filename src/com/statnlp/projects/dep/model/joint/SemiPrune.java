@@ -38,6 +38,7 @@ public class SemiPrune {
 	/**Now assume we dun have the depFeatures. But for training we have.**/
 	private boolean depFeature = false;
 	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> prunedMap;
+	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> topKprunedMap;
 	
 	public SemiPrune(String trainFile, String testFile, int trainNum, int testNum, int numThreads, double L2) {
 		this.trainFile = trainFile;
@@ -75,11 +76,13 @@ public class SemiPrune {
 		System.err.println("[Info] Train Map size: " + model.getGlobalPrunedMap().size());
 		model.decode(testInsts);
 		prunedMap = model.getGlobalPrunedMap();
+		topKprunedMap = model.getGlobalTopKPrunedMap();
 		model = null;
 		compiler = null;
 		globalParam = null;
 		fm = null;
 		System.err.println("[Info] Global Map size: " + prunedMap.size());
+		System.err.println("[Info] Global Map size: " + topKprunedMap.size());
 		/**Counting number of spans**/
 		int numSpans = 0;
 		for (int instId: prunedMap.keySet()) {
@@ -92,6 +95,17 @@ public class SemiPrune {
 			}
 		}
 		System.err.println("[Info] total number of spans: " + numSpans);
+		numSpans = 0;
+		for (int instId: topKprunedMap.keySet()) {
+			Map<Integer, Map<Integer, Set<Integer>>> instPrunedMap = topKprunedMap.get(instId);
+			for (int leftIdx: instPrunedMap.keySet()) {
+				Map<Integer, Set<Integer>> leftPrunedMap = instPrunedMap.get(leftIdx);
+				for (int rightIdx: leftPrunedMap.keySet()) {
+					numSpans += leftPrunedMap.get(rightIdx).size();
+				}
+			}
+		}
+		System.err.println("[Info] total number of topk spans: " + numSpans);
 		return prunedMap;
 	}
 	
@@ -109,8 +123,11 @@ public class SemiPrune {
 		double L2 = 0.1;
 		int numThreads = 35;
 		double prunedProb = 0.001;
+		NetworkConfig._topKValue = 5;
 		SemiPrune pruner = new SemiPrune(trainFile, testFile, trainNum, testNum, numThreads, L2);
-		writeObject(new ObjectOutputStream(new FileOutputStream("data/allanprocess/"+subsection+"/pruned")), pruner.prune(prunedProb));
+		pruner.prune(prunedProb);
+//		writeObject(new ObjectOutputStream(new FileOutputStream("data/allanprocess/"+subsection+"/pruned")), pruner.prune(prunedProb));
+		writeObject(new ObjectOutputStream(new FileOutputStream("data/allanprocess/"+subsection+"/topKpruned")), pruner.topKprunedMap);
 		
 	}
 	

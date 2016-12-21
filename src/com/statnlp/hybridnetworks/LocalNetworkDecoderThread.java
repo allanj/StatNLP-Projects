@@ -21,6 +21,7 @@ import java.util.Set;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
+import com.statnlp.projects.entity.semi.SemiCRFNetworkCompiler;
 
 public class LocalNetworkDecoderThread extends Thread{
 	
@@ -39,6 +40,7 @@ public class LocalNetworkDecoderThread extends Thread{
 	/**calculate posterior, for semiCRFs only**/
 	private boolean _posterior = false;
 	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalPruneMap;
+	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalTopKPruneMap;
 	
 	//please make sure the threadId is 0-indexed.
 	public LocalNetworkDecoderThread(int threadId, FeatureManager fm, Instance[] instances, NetworkCompiler compiler, boolean posterior){
@@ -90,6 +92,10 @@ public class LocalNetworkDecoderThread extends Thread{
 		this.globalPruneMap = globalPruneMap;
 	}
 	
+	public void setGlobalopKPruneMap(Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalTopKPruneMap) {
+		this.globalTopKPruneMap = globalTopKPruneMap;
+	}
+	
 	public Instance max(Instance instance, int networkId){
 		Network network = this._compiler.compileAndStore(networkId, instance, this._param);
 		if(!_cacheParam){
@@ -97,6 +103,10 @@ public class LocalNetworkDecoderThread extends Thread{
 		}
 		if(_posterior) {
 			globalPruneMap.put(instance.getInstanceId(), network.calculateSemiCRFsPosterior());
+			network.max();
+			network.topK();
+			SemiCRFNetworkCompiler nc = (SemiCRFNetworkCompiler)this._compiler;
+			globalTopKPruneMap.put(network.getInstance().getInstanceId(), nc.getTopKPrunedMap(network));
 			return null;
 		} else {
 			if(NetworkConfig.INFERENCE == InferenceType.MEAN_FIELD){
@@ -129,6 +139,8 @@ public class LocalNetworkDecoderThread extends Thread{
 				network.marginal();
 			}else{
 				network.max();
+				if (NetworkConfig._topKValue > 1)
+					network.topK();
 				return this._compiler.decompile(network);
 			}
 			

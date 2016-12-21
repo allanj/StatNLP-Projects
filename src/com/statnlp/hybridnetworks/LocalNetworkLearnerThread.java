@@ -23,6 +23,7 @@ import java.util.concurrent.Callable;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
+import com.statnlp.projects.entity.semi.SemiCRFNetworkCompiler;
 
 public class LocalNetworkLearnerThread extends Thread implements Callable<Void> {
 	
@@ -57,7 +58,9 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 	
 	/**Used for the semiCRFs to calculate the posterior**/
 	private boolean posterior = false;
+	private boolean topkPruned = false;
 	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalPruneMap;
+	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalTopKPruneMap;
 	
 	/**
 	 * Construct a new learner thread using current networks (if cached) or builder (if not cached),
@@ -185,13 +188,21 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 			Network network = this.getNetwork(networkId);
 			if(!network.getInstance().isLabeled()) {
 				globalPruneMap.put(network.getInstance().getInstanceId(), network.calculateSemiCRFsPosterior());
+				if(this.topkPruned) {
+					network.max();
+					network.topK();
+					SemiCRFNetworkCompiler nc = (SemiCRFNetworkCompiler)this._builder;
+					globalTopKPruneMap.put(network.getInstance().getInstanceId(), nc.getTopKPrunedMap(network));
+				}
 			}
 		}
 	}
 	
-	public void setPosteriorCalculation(Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalPruneMap) {
+	public void setPosteriorCalculation(Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalPruneMap, Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalTopKPruneMap) {
 		this.globalPruneMap = globalPruneMap;
+		this.globalTopKPruneMap = globalTopKPruneMap;
 		this.posterior = true;
+		this.topkPruned = true;
 	}
 	
 	/**
@@ -264,6 +275,10 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 
 	public void setIterationNumber(int it) {
 		this._it = it;
+	}
+	
+	public void setNetworkCompiler(NetworkCompiler nc) {
+		this._builder = nc;
 	}
 	
 	public void setInstanceIdSet(HashSet<Integer> set){

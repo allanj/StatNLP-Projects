@@ -3,6 +3,7 @@ package com.statnlp.projects.dep.model.joint;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -61,10 +62,21 @@ public class JointMain {
 		//initialize the pruned map.
 //		SemiPrune pruner = new SemiPrune(trainingPath, testingPath, -1, -1, numThreads);
 //		Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> prunedMap = pruner.prune(0.1);
-		ObjectInputStream in = new ObjectInputStream(new FileInputStream("data/allanprocess/abc/pruned"));
+		ObjectInputStream in = new ObjectInputStream(new FileInputStream("data/allanprocess/abc/topKpruned"));
 		@SuppressWarnings("unchecked")
 		Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> prunedMap = (Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>>)in.readObject();
 		in.close();
+		int numSpans = 0;
+		for (int instId: prunedMap.keySet()) {
+			Map<Integer, Map<Integer, Set<Integer>>> instPrunedMap = prunedMap.get(instId);
+			for (int leftIdx: instPrunedMap.keySet()) {
+				Map<Integer, Set<Integer>> leftPrunedMap = instPrunedMap.get(leftIdx);
+				for (int rightIdx: leftPrunedMap.keySet()) {
+					numSpans += leftPrunedMap.get(rightIdx).size();
+				}
+			}
+		}
+		System.err.println("[Info] total number of spans: " + numSpans);
 		System.err.println("[Info] Pruned Map size: " + prunedMap.size());
 		
 		String decodePath = isDev?devPath:testingPath;
@@ -100,7 +112,6 @@ public class JointMain {
 		JointNetworkCompiler dnc = new JointNetworkCompiler(prunedMap);
 		NetworkModel model = DiscriminativeNetworkModel.create(hpfm, dnc);
 		model.train(trainingInsts, numIteration); 
-		
 		/****************Evaluation Part**************/
 		System.err.println("*****Evaluation*****");
 		Instance[] predInsts = model.decode(testingInsts);

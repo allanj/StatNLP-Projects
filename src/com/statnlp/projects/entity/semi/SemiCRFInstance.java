@@ -9,6 +9,8 @@ public class SemiCRFInstance extends BaseInstance<SemiCRFInstance, Sentence, Lis
 	
 	private static final long serialVersionUID = -5338701879189642344L;
 	
+	private List<List<Span>> topKOutput;
+	
 	public SemiCRFInstance(int instanceId, Sentence input, List<Span> output){
 		this(instanceId, 1.0, input, output);
 	}
@@ -86,6 +88,14 @@ public class SemiCRFInstance extends BaseInstance<SemiCRFInstance, Sentence, Lis
 		//System.err.println(ss.toString());
 		
 		return finalRes;
+	}
+	
+	public void setTopKPrediction(List<List<Span>> topKOutput) {
+		this.topKOutput = topKOutput;
+	}
+	
+	public List<List<Span>> getTopKPrediction() {
+		return this.topKOutput;
 	}
 
 }

@@ -88,6 +88,7 @@ public class JointNetworkCompiler extends NetworkCompiler {
 			JointInstance dupInst = inst.duplicate();
 			dupInst.setInstanceId(inst.getInstanceId()*-1);
 			JointNetwork unlabeled = compileUnLabledInstance(networkId, dupInst, param);
+			System.err.println("inst Id: " +dupInst.getInstanceId() + ": "+ prunedMap.get(dupInst.getInstanceId()).toString());
 			if(!unlabeled.contains(network)){
 				System.err.println(sent.toString());
 				throw new NetworkException("Labeled network is not contained in the unlabeled version");
@@ -241,13 +242,13 @@ public class JointNetworkCompiler extends NetworkCompiler {
 		//all are complete nodes.
 		long rootE = this.toNodeComp(0, 0, rightDir, OEntity, 1);
 		network.addNode(rootE);
-		
 		for(int rightIndex = 1; rightIndex < inst.size(); rightIndex++){
 			//eIndex: 1,2,3,4,5,..n
 			for(String e: Label.Labels.keySet()){
 				if(e.equals(EMPTY)) continue;
 				for (int spanLen = 1; spanLen <= maxEntityLen && (rightIndex - spanLen + 1) > 0; spanLen++) {
 					if (spanLen != 1 && e.equals(OEntity)) continue;
+					if (!instMap.containsKey(rightIndex - spanLen)) continue;
 					Map<Integer, Set<Integer>> leftMap = instMap.get(rightIndex - spanLen);
 					if (!leftMap.containsKey(rightIndex-1) || !leftMap.get(rightIndex-1).contains(Label.get(e).id)) continue;
 					long wordRightNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, rightDir, e, spanLen); 
