@@ -10,7 +10,7 @@ public class BinaryHeap {
 	theArray = new ValueIndexPair[DEFAULT_CAPACITY+1]; 
 	// theArray[0] serves as dummy parent for root (who is at 1) 
 	// "largest" is guaranteed to be larger than all keys in heap
-	theArray[0] = new ValueIndexPair(Double.POSITIVE_INFINITY,new int[]{-1,-1});          
+	theArray[0] = new ValueIndexPair(Double.POSITIVE_INFINITY, null);          
 	currentSize = 0; 
     } 
   
