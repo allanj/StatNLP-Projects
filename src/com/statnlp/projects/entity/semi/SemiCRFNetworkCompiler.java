@@ -193,6 +193,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 				if(labelId!=SemiLabel.LABELS.get("O").id){
 					for(int prevPos=pos-1; prevPos >= pos-maxSegmentLength && prevPos >= 0; prevPos--){
 						int left = prevPos + 1; 
+						if (!instMap.containsKey(left)) continue;
 						Map<Integer, Set<Integer>> leftMap = instMap.get(left);
 						if (!leftMap.containsKey(pos) || !leftMap.get(pos).contains(labelId)) continue;
 						for(int prevLabelId=0; prevLabelId<SemiLabel.LABELS.size(); prevLabelId++){
@@ -207,6 +208,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 					}
 					if(pos>=0){
 						int left = 0; 
+						if (!instMap.containsKey(left)) continue;
 						Map<Integer, Set<Integer>> leftMap = instMap.get(left);
 						if (!leftMap.containsKey(pos) || !leftMap.get(pos).contains(labelId)) continue;
 						network.addNode(node);
@@ -217,6 +219,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 					int prevPos = pos - 1;
 					if(prevPos>=0){
 						int left = prevPos + 1; 
+						if (!instMap.containsKey(left)) continue;
 						Map<Integer, Set<Integer>> leftMap = instMap.get(left);
 						if (!leftMap.containsKey(pos) || !leftMap.get(pos).contains(labelId)) continue;
 						for(int prevLabelId=0; prevLabelId<SemiLabel.LABELS.size(); prevLabelId++){
@@ -229,6 +232,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 					}
 					if(pos==0){
 						int left = 0; 
+						if (!instMap.containsKey(left)) continue;
 						Map<Integer, Set<Integer>> leftMap = instMap.get(left);
 						if (!leftMap.containsKey(pos) || !leftMap.get(pos).contains(labelId)) continue;
 						network.addNode(node);
@@ -506,7 +510,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 //			System.err.println(result.getInput().toString());
 //			System.err.println("top 1: " + prediction.toString());
 //		}
-		if (NetworkConfig._topKValue >= 1) {
+		if (NetworkConfig._topKValue > 1) {
 			List<List<Span>> topKPredictions = new ArrayList<List<Span>>(NetworkConfig._topKValue);
 			boolean stop = false;
 			for (int kth = 0; kth < NetworkConfig._topKValue; kth++) {
@@ -548,6 +552,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 				topKPredictions.add(prediction);
 //				if (result.getInstanceId()==-1) {
 //					System.err.println("K: top " + kth + " score: " + network.getMaxTopK(network.countNodes()-1, kth));
+//					System.err.println("K: top " + kth + " :" + prediction.toString());
 //				}
 			}
 			result.setTopKPrediction(topKPredictions);
@@ -564,6 +569,11 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		SemiCRFInstance inst = this.decompile(network);
 		Map<Integer, Map<Integer, Set<Integer>>> topKPrunedMap = new HashMap<Integer, Map<Integer, Set<Integer>>>(inst.size());
 		List<List<Span>> topKPredictions = inst.getTopKPrediction();
+		if (network.getInstance().getInstanceId() < 0) {
+			Network  labeledNetwork = network.getLabeledNetwork();
+			SemiCRFInstance labeledInst = (SemiCRFInstance)labeledNetwork.getInstance();
+			topKPredictions.add(labeledInst.getOutput());
+		}
 		for (List<Span> prediction: topKPredictions) {
 //			if (inst.getInstanceId()==-8) {
 //				System.err.println(network.getInstance().getInput().toString());

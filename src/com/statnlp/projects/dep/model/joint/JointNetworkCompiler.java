@@ -88,7 +88,6 @@ public class JointNetworkCompiler extends NetworkCompiler {
 			JointInstance dupInst = inst.duplicate();
 			dupInst.setInstanceId(inst.getInstanceId()*-1);
 			JointNetwork unlabeled = compileUnLabledInstance(networkId, dupInst, param);
-			System.err.println("inst Id: " +dupInst.getInstanceId() + ": "+ prunedMap.get(dupInst.getInstanceId()).toString());
 			if(!unlabeled.contains(network)){
 				System.err.println(sent.toString());
 				throw new NetworkException("Labeled network is not contained in the unlabeled version");

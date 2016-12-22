@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -37,8 +38,8 @@ public class SemiPrune {
 	private double l2 = 0.1; 
 	/**Now assume we dun have the depFeatures. But for training we have.**/
 	private boolean depFeature = false;
-	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> prunedMap;
-	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> topKprunedMap;
+	private ConcurrentHashMap<Integer, Map<Integer, Map<Integer, Set<Integer>>>> prunedMap;
+	private ConcurrentHashMap<Integer, Map<Integer, Map<Integer, Set<Integer>>>> topKprunedMap;
 	
 	public SemiPrune(String trainFile, String testFile, int trainNum, int testNum, int numThreads, double L2) {
 		this.trainFile = trainFile;
@@ -74,7 +75,7 @@ public class SemiPrune {
 		NetworkModel model = DiscriminativeNetworkModel.create(fm, compiler, true);
 		model.train(trainInsts, ITER);
 		System.err.println("[Info] Train Map size: " + model.getGlobalPrunedMap().size());
-		//model.decode(testInsts);
+		model.decode(testInsts);
 		prunedMap = model.getGlobalPrunedMap();
 		topKprunedMap = model.getGlobalTopKPrunedMap();
 		model = null;
@@ -115,11 +116,11 @@ public class SemiPrune {
     }
 	
 	public static void main(String... args) throws IOException, InterruptedException {
-		String subsection = "abc";
+		String subsection = args[0];
 		String trainFile = "data/allanprocess/"+subsection+"/train.conllx";
 		String testFile = "data/allanprocess/"+subsection+"/test.conllx";
-		int trainNum = 1;
-		int testNum = 1;
+		int trainNum = -1;
+		int testNum = -1;
 		double L2 = 0.1;
 		int numThreads = 35;
 		double prunedProb = 0.001;

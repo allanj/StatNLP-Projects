@@ -49,10 +49,10 @@ public class JointMain {
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
-		trainingPath = "data/allanprocess/abc/train.conllx";
-		testingPath = "data/allanprocess/abc/test.conllx";
-//		trainNumber = 10;
-//		testNumber = 10;
+//		trainingPath = "data/allanprocess/abc/train.conllx";
+//		testingPath = "data/allanprocess/abc/test.conllx";
+//		trainNumber = 100;
+//		testNumber = 100;
 //		numIteration = 20;
 //		numThreads = 5;
 //		testingPath = trainingPath;
@@ -62,7 +62,7 @@ public class JointMain {
 		//initialize the pruned map.
 //		SemiPrune pruner = new SemiPrune(trainingPath, testingPath, -1, -1, numThreads);
 //		Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> prunedMap = pruner.prune(0.1);
-		ObjectInputStream in = new ObjectInputStream(new FileInputStream("data/allanprocess/abc/topKpruned"));
+		ObjectInputStream in = new ObjectInputStream(new FileInputStream("data/allanprocess/"+DPConfig.dataType+"/topKpruned"));
 		@SuppressWarnings("unchecked")
 		Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> prunedMap = (Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>>)in.readObject();
 		in.close();

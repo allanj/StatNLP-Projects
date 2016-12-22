@@ -26,6 +26,7 @@ public class JointFeatureManager extends FeatureManager {
 		seg_next_word_shape,
 		seg_next_tag,
 		segment,
+		segment_shape,
 		seg_len,
 		start_word,
 		start_tag,
@@ -80,11 +81,11 @@ public class JointFeatureManager extends FeatureManager {
 		/**Add the entity features still only at the incomplete span as well.**/
 		if (completeness == COMP.incomp.ordinal()) {
 			addEntityFeatures(featureList, network, leftIndex, rightIndex, leftSpanLen, rightSpanLen, ltId, rtId, direction,sent);
-//			for (int l = leftIndex; l <= leftIndex + leftSpanLen - 1; l++) {
-//				for (int r = rightIndex - rightSpanLen + 1; r <= rightIndex; r++) {
-//					addDepFeatures(featureList, network, l, r, completeness, direction, sent);
-//				}
-//			}
+			for (int l = leftIndex; l <= leftIndex + leftSpanLen - 1; l++) {
+				for (int r = rightIndex - rightSpanLen + 1; r <= rightIndex; r++) {
+					addDepFeatures(featureList, network, l, r, completeness, direction, sent);
+				}
+			}
 		}
 		
 		
@@ -150,7 +151,7 @@ public class JointFeatureManager extends FeatureManager {
 			segPhraseShape.append(" " + shape(w));
 		}
 		featureList.add(this._param_g.toFeature(network, FeaType.segment.name(), currEn,	segPhrase.toString()));
-//		featureList.add(this._param_g.toFeature(network, FeaType.segment_shape.name(), currEn,	segPhraseShape.toString()));
+		featureList.add(this._param_g.toFeature(network, FeaType.segment_shape.name(), currEn,	segPhraseShape.toString()));
 		
 		int lenOfSeg = end-start+1;
 		featureList.add(this._param_g.toFeature(network, FeaType.seg_len.name(), currEn, lenOfSeg+""));
@@ -184,17 +185,17 @@ public class JointFeatureManager extends FeatureManager {
 		}
 		
 		/**Add dependency features**/
-//		for (int pos = start; pos <= end; pos++) {
-//			String currWord = sent.get(pos).getName();
-//			String currTag = sent.get(pos).getTag();
-//			int currHeadIndex = sent.get(pos).getHeadIndex();
-//			String currHead = currHeadIndex>=0? sent.get(currHeadIndex).getName():"STR";
-//			String currHeadTag = currHeadIndex>=0? sent.get(currHeadIndex).getTag():"STR";
-//			featureList.add(this._param_g.toFeature(network, FeaType.head_word.name(),	currEn, currWord+"& head:"+currHead));
-//			featureList.add(this._param_g.toFeature(network, FeaType.head_tag.name(),	currEn,	currTag+"& head:"+currHeadTag));
-//			featureList.add(this._param_g.toFeature(network, FeaType.head_entity_word.name(),	currEn, headEn + "&" + currWord));
-//		}
-//		featureList.add(this._param_g.toFeature(network, FeaType.head_entity.name(),	currEn, headEn));
+		for (int pos = start; pos <= end; pos++) {
+			String currWord = sent.get(pos).getName();
+			String currTag = sent.get(pos).getTag();
+			int currHeadIndex = sent.get(pos).getHeadIndex();
+			String currHead = currHeadIndex>=0? sent.get(currHeadIndex).getName():"STR";
+			String currHeadTag = currHeadIndex>=0? sent.get(currHeadIndex).getTag():"STR";
+			featureList.add(this._param_g.toFeature(network, FeaType.head_word.name(),	currEn, currWord+"& head:"+currHead));
+			featureList.add(this._param_g.toFeature(network, FeaType.head_tag.name(),	currEn,	currTag+"& head:"+currHeadTag));
+			featureList.add(this._param_g.toFeature(network, FeaType.head_entity_word.name(),	currEn, headEn + "&" + currWord));
+		}
+		featureList.add(this._param_g.toFeature(network, FeaType.head_entity.name(), currEn, headEn));
 		/**(END) add dependency features**/
 	}
 

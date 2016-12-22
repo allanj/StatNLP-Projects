@@ -24,13 +24,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -67,9 +67,9 @@ public abstract class NetworkModel implements Serializable{
 	/**calcualte semiCRF posterior or not**/
 	private boolean posterior = false; 
 	/**Global map:<instance Id, <leftIndex, <rightIndex, <labelId>>>>**/
-	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalPruneMap;
+	private ConcurrentHashMap<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalPruneMap;
 	/**Global map:<instance Id, <leftIndex, <rightIndex, <labelId>>>>**/
-	private Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalTopKPruneMap;
+	private ConcurrentHashMap<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalTopKPruneMap;
 	
 	public NetworkModel(FeatureManager fm, NetworkCompiler compiler, PrintStream... outstreams){
 		this(fm, compiler, false, outstreams);
@@ -294,8 +294,8 @@ public abstract class NetworkModel implements Serializable{
 			}
 			//Then we calculate the posterior span
 			if(posterior) {
-				globalPruneMap = new HashMap<>();
-				globalTopKPruneMap = new HashMap<>();
+				globalPruneMap = new ConcurrentHashMap<>();
+				globalTopKPruneMap = new ConcurrentHashMap<>();
 				calculatePosterior();
 			}
 		} finally {
@@ -322,11 +322,15 @@ public abstract class NetworkModel implements Serializable{
 		System.err.println("Finish calculation of the posterior for semiCRFs");
 	}
 	
-	public Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> getGlobalPrunedMap() {
+	public void setPosterior(boolean posterior) {
+		this.posterior = posterior;
+	}
+	
+	public ConcurrentHashMap<Integer, Map<Integer, Map<Integer, Set<Integer>>>> getGlobalPrunedMap() {
 		 return this.globalPruneMap;
 	}
 	
-	public Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> getGlobalTopKPrunedMap() {
+	public ConcurrentHashMap<Integer, Map<Integer, Map<Integer, Set<Integer>>>> getGlobalTopKPrunedMap() {
 		 return this.globalTopKPruneMap;
 	}
 	
