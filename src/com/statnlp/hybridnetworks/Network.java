@@ -983,7 +983,7 @@ public abstract class Network implements Serializable, HyperGraph{
 			
 		}
 		this._max_k[nodeIdx] = answerScore;
-		for(int x=k;x<answer.length;x++) {answer[x] = null; answerPath[x]= null;}
+		for(int x=k;x<answer.length;x++) {answer[x] = null; answerPath[x]= null;this._max_k[nodeIdx][x]= Double.NEGATIVE_INFINITY;}
 		this._max_k_paths[nodeIdx] = answerPath;
 		return answer;
 	}
