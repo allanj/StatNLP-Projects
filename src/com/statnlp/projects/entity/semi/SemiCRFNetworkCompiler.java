@@ -501,7 +501,8 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		}
 		Collections.sort(prediction);
 		result.setPrediction(prediction);
-//		if (result.getInstanceId()==-8) {
+//		if (result.getInstanceId()==-1) {
+//			System.err.println("top 1 score: " + network.getMax());
 //			System.err.println(result.getInput().toString());
 //			System.err.println("top 1: " + prediction.toString());
 //		}
@@ -545,6 +546,9 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 					break;
 				}
 				topKPredictions.add(prediction);
+//				if (result.getInstanceId()==-1) {
+//					System.err.println("K: top " + kth + " score: " + network.getMaxTopK(network.countNodes()-1, kth));
+//				}
 			}
 			result.setTopKPrediction(topKPredictions);
 		}

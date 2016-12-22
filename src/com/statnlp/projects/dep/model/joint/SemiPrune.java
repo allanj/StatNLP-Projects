@@ -74,7 +74,7 @@ public class SemiPrune {
 		NetworkModel model = DiscriminativeNetworkModel.create(fm, compiler, true);
 		model.train(trainInsts, ITER);
 		System.err.println("[Info] Train Map size: " + model.getGlobalPrunedMap().size());
-		model.decode(testInsts);
+		//model.decode(testInsts);
 		prunedMap = model.getGlobalPrunedMap();
 		topKprunedMap = model.getGlobalTopKPrunedMap();
 		model = null;
@@ -118,12 +118,12 @@ public class SemiPrune {
 		String subsection = "abc";
 		String trainFile = "data/allanprocess/"+subsection+"/train.conllx";
 		String testFile = "data/allanprocess/"+subsection+"/test.conllx";
-		int trainNum = -1;
-		int testNum = -1;
+		int trainNum = 1;
+		int testNum = 1;
 		double L2 = 0.1;
 		int numThreads = 35;
 		double prunedProb = 0.001;
-		NetworkConfig._topKValue = 5;
+		NetworkConfig._topKValue = 10;
 		SemiPrune pruner = new SemiPrune(trainFile, testFile, trainNum, testNum, numThreads, L2);
 		pruner.prune(prunedProb);
 //		writeObject(new ObjectOutputStream(new FileOutputStream("data/allanprocess/"+subsection+"/pruned")), pruner.prune(prunedProb));
