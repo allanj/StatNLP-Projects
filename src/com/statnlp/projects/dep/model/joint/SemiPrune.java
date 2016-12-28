@@ -40,6 +40,7 @@ public class SemiPrune {
 	private boolean depFeature = false;
 	private ConcurrentHashMap<Integer, Map<Integer, Map<Integer, Set<Integer>>>> prunedMap;
 	private ConcurrentHashMap<Integer, Map<Integer, Map<Integer, Set<Integer>>>> topKprunedMap;
+	public GlobalNetworkParam globalParam;
 	
 	public SemiPrune(String trainFile, String testFile, int trainNum, int testNum, int numThreads, double L2) {
 		this.trainFile = trainFile;
@@ -70,7 +71,7 @@ public class SemiPrune {
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		NetworkConfig.prunedProb = prunedProb;
 		SemiCRFNetworkCompiler compiler = new SemiCRFNetworkCompiler(maxSize, maxSpan, new SemiViewer(), false, false, false, false);
-		GlobalNetworkParam globalParam = new GlobalNetworkParam();	
+		globalParam = new GlobalNetworkParam();	
 		SemiCRFFeatureManager fm = new SemiCRFFeatureManager(globalParam, false, depFeature);
 		NetworkModel model = DiscriminativeNetworkModel.create(fm, compiler, true);
 		model.train(trainInsts, ITER);
@@ -80,7 +81,7 @@ public class SemiPrune {
 		topKprunedMap = model.getGlobalTopKPrunedMap();
 		model = null;
 		compiler = null;
-		globalParam = null;
+		//globalParam = null;
 		fm = null;
 		System.err.println("[Info] Global Map size: " + prunedMap.size());
 		System.err.println("[Info] Global Map size: " + topKprunedMap.size());
@@ -115,6 +116,11 @@ public class SemiPrune {
         out.close();
     }
 	
+	private static void writeParameter(ObjectOutputStream out, GlobalNetworkParam param) throws IOException {
+        out.writeObject(param);
+        out.close();
+    }
+	
 	public static void main(String... args) throws IOException, InterruptedException {
 		String subsection = args[0];
 		String trainFile = "data/allanprocess/"+subsection+"/train.conllx";
@@ -129,7 +135,7 @@ public class SemiPrune {
 		pruner.prune(prunedProb);
 //		writeObject(new ObjectOutputStream(new FileOutputStream("data/allanprocess/"+subsection+"/pruned")), pruner.prune(prunedProb));
 		writeObject(new ObjectOutputStream(new FileOutputStream("data/allanprocess/"+subsection+"/topKpruned")), pruner.topKprunedMap);
-		
+		writeParameter(new ObjectOutputStream(new FileOutputStream("data/allanprocess/"+subsection+"/global.param")), pruner.globalParam);
 	}
 	
 }

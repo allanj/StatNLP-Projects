@@ -79,6 +79,12 @@ public class JointMain {
 		System.err.println("[Info] total number of spans: " + numSpans);
 		System.err.println("[Info] Pruned Map size: " + prunedMap.size());
 		
+		//soft pruning by features.
+		prunedMap = null;
+		in = new ObjectInputStream(new FileInputStream("data/allanprocess/"+DPConfig.dataType+"/global.param"));
+		GlobalNetworkParam semiParam = (GlobalNetworkParam)in.readObject();
+		System.err.println("Semi feature number: " + semiParam.getWeights().length);
+		
 		String decodePath = isDev?devPath:testingPath;
 		System.err.println("[Info] train path: "+trainingPath);
 		System.err.println("[Info] testFile: "+decodePath);

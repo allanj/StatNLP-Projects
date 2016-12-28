@@ -230,7 +230,11 @@ public class JointNetworkCompiler extends NetworkCompiler {
 	
 	public JointNetwork compileUnLabledInstance(int networkId, JointInstance inst, LocalNetworkParam param){
 		
-		JointNetwork network = this.compileUnlabeled(networkId, inst, param, prunedMap.get(inst.getInstanceId()));//new JointNetwork(, inst, this._nodes, this._children, rootIdx + 1);
+		Map<Integer, Map<Integer, Set<Integer>>> instMap = null;;
+		if (prunedMap != null) {
+			instMap = prunedMap.get(inst.getInstanceId());
+		}
+		JointNetwork network = this.compileUnlabeled(networkId, inst, param, instMap);//new JointNetwork(, inst, this._nodes, this._children, rootIdx + 1);
 		return network;
 	}
 	
@@ -247,9 +251,11 @@ public class JointNetworkCompiler extends NetworkCompiler {
 				if(e.equals(EMPTY)) continue;
 				for (int spanLen = 1; spanLen <= maxEntityLen && (rightIndex - spanLen + 1) > 0; spanLen++) {
 					if (spanLen != 1 && e.equals(OEntity)) continue;
-					if (!instMap.containsKey(rightIndex - spanLen)) continue;
-					Map<Integer, Set<Integer>> leftMap = instMap.get(rightIndex - spanLen);
-					if (!leftMap.containsKey(rightIndex-1) || !leftMap.get(rightIndex-1).contains(Label.get(e).id)) continue;
+					if (instMap != null) {
+						if (!instMap.containsKey(rightIndex - spanLen)) continue;
+						Map<Integer, Set<Integer>> leftMap = instMap.get(rightIndex - spanLen);
+						if (!leftMap.containsKey(rightIndex-1) || !leftMap.get(rightIndex-1).contains(Label.get(e).id)) continue;
+					}
 					long wordRightNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, rightDir, e, spanLen); 
 					long wordLeftNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, leftDir, e, spanLen);
 					network.addNode(wordRightNodeE);
