@@ -109,6 +109,12 @@ public class DependencyMain {
 								DependencyReader.readCoNLLX(testFile, false,testNumber,trans, checkTestProjective);   //false: not check the projective in testing
 		System.err.println("[Info] Total number of dependency label:"+DepLabel.LABELS.size());
 		
+		/**Chech the head word + word pair frequency**/
+//		System.err.println("training inst size: " + trainingInsts.length);
+//		DataChecker.checkDepPairFeq(trainingInsts);
+//		System.exit(0);
+		/***/
+		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
 		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig.NUM_THREADS = numThreads;

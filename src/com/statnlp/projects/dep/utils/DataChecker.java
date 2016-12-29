@@ -2,6 +2,7 @@ package com.statnlp.projects.dep.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -384,5 +385,50 @@ public class DataChecker {
 		System.err.println(numIsE +",total:"+total);
 	}
 
-
+	/**
+	 * Print out the pair frequency of the dependency pair.
+	 * @param insts
+	 */
+	public static void checkDepPairFeq(DependInstance[] insts) {
+		HashMap<String, Integer> wordPair = new HashMap<>();
+		HashMap<String, Integer> wordTagPair = new HashMap<>();
+		for (DependInstance inst: insts) {
+			Sentence sent = inst.getInput();
+			for (int idx = 1; idx < sent.length(); idx++) {
+				String w = sent.get(idx).getName();
+				String t = sent.get(idx).getTag();
+				String hw = sent.get(sent.get(idx).getHeadIndex()).getName();
+				String ht = sent.get(sent.get(idx).getHeadIndex()).getTag();
+				String wp = hw + " " + w;
+				String wtp = hw + " " + ht + " " + w + " " + t;
+				if (wordPair.containsKey(wp)) {
+					int num = wordPair.get(wp);
+					wordPair.put(wp, num + 1);
+				} else {
+					wordPair.put(wp, 1);
+				}
+				if (wordTagPair.containsKey(wtp)) {
+					int num = wordTagPair.get(wtp);
+					wordTagPair.put(wtp, num + 1);
+				} else {
+					wordTagPair.put(wtp, 1);
+				}
+			}
+		}
+		List<StrFreq> wpList = new ArrayList<>();
+		List<StrFreq> wtpList = new ArrayList<>();
+		for (String wp : wordPair.keySet()) {
+			wpList.add(new StrFreq(wp, wordPair.get(wp)));
+		}
+		for (String wtp : wordTagPair.keySet()) {
+			wtpList.add(new StrFreq(wtp, wordTagPair.get(wtp)));
+		}
+		Collections.sort(wpList);
+		Collections.sort(wtpList);
+		System.err.println("[Info] Word Pair: ");
+		System.err.println(wpList.toString());
+		System.err.println("[Info] Word Tag Pair: ");
+		System.err.println(wtpList.toString());
+	}
+	
 }
