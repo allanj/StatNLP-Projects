@@ -259,7 +259,7 @@ public class JointNetworkCompiler extends NetworkCompiler {
 					long wordRightNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, rightDir, e, spanLen); 
 					long wordLeftNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, leftDir, e, spanLen);
 					network.addNode(wordRightNodeE);
-					network.addNode(wordLeftNodeE);
+					network.addNode(wordLeftNodeE); 
 				}
 			}
 			

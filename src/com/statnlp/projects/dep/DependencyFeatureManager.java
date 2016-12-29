@@ -48,6 +48,10 @@ public class DependencyFeatureManager extends FeatureManager {
 		
 		
 		ArrayList<Integer> featureList = new ArrayList<Integer>();
+//		ArrayList<Integer> headList = new ArrayList<Integer>();
+//		ArrayList<Integer> modifierList = new ArrayList<Integer>();
+//		ArrayList<Integer> pairList = new ArrayList<Integer>();
+//		ArrayList<Integer> hybridList = new ArrayList<Integer>();
 		
 		DependInstance di = (DependInstance)network.getInstance();
 		//int instanceId = di.getInstanceId();
@@ -70,7 +74,7 @@ public class DependencyFeatureManager extends FeatureManager {
 		String headTag = null;
 		String modifierWord = null;
 		String modifierTag = null;
-		
+		int threadId = network.getThreadId();
 		
 		
 		
@@ -306,7 +310,7 @@ public class DependencyFeatureManager extends FeatureManager {
 		}
 		if(finalList.size()==0) return FeatureArray.EMPTY;
 		//specifically each feature index is a feature.
-		int threadId = network.getThreadId();
+		
 		FeatureArray fa = new FeatureArray(FeatureBox.getFeatureBox(new int[]{finalList.get(0)}, this.getParams_L()[threadId]));
 		FeatureArray prevFa = fa;
 		for (int i = 1; i < finalList.size(); i++) {
