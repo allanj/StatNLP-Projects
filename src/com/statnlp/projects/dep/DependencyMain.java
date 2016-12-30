@@ -1,6 +1,10 @@
 package com.statnlp.projects.dep;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -10,6 +14,7 @@ import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
+import com.statnlp.hybridnetworks.NetworkIDMapper;
 import com.statnlp.hybridnetworks.NetworkModel;
 import com.statnlp.neural.NeuralConfigReader;
 import com.statnlp.projects.dep.commons.DepLabel;
@@ -41,6 +46,9 @@ public class DependencyMain {
 	protected static boolean basicFeatures = true;
 	protected static OptimizerFactory optimizer = OptimizerFactory.getLBFGSFactory();
 	protected static boolean entityFeature = false;
+	protected static boolean saveModel = false;
+	protected static boolean readModel = false;
+	protected static String modelFile = "";
 	
 	public static String[] initializeTypeMap(){
 		HashMap<String, Integer> typeMap = new HashMap<String, Integer>();
@@ -58,7 +66,7 @@ public class DependencyMain {
 		return entities;
 	}
 	
-	public static void main(String[] args) throws InterruptedException, IOException {
+	public static void main(String[] args) throws InterruptedException, IOException, ClassNotFoundException {
 	
 		entities = initializeTypeMap();
 		dataTypeSet = Init.iniOntoNotesData();
@@ -74,6 +82,8 @@ public class DependencyMain {
 		String modelType = "dep";
 		String dpOut = DPConfig.data_prefix+modelType+middle+DPConfig.dp_res_suffix;
 		String topKDepOut = DPConfig.data_prefix+modelType+middle+DPConfig.dp_topk_res_suffix;
+		String ef = entityFeature ? "ef":"noef";
+		modelFile = DPConfig.data_prefix+modelType+middle+"."+ef+".dep.model";
 		testFile = isDev? DPConfig.devPath:DPConfig.testingPath;
 		
 		if(isPipe) {
@@ -92,6 +102,7 @@ public class DependencyMain {
 		System.err.println("[Info] testFile: "+testFile);
 		System.err.println("[Info] depOut: "+dpOut);
 		System.err.println("[Info] topKDepOut: "+topKDepOut);
+		System.err.println("[Info] model file: "+modelFile);
 		System.err.println("[Info] Regularization: "+DPConfig.L2);
 		
 		if(NetworkConfig.USE_NEURAL_FEATURES){
@@ -123,28 +134,41 @@ public class DependencyMain {
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		System.err.println("[Info] Regularization Parameter: "+NetworkConfig.L2_REGULARIZATION_CONSTANT);
 		
-		
-		DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(optimizer), isPipe, labeledDep, windowSize, basicFeatures, entityFeature);
-		DependencyNetworkCompiler dnc = new DependencyNetworkCompiler(labeledDep);
-		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);
-		
-		DependInstance all_instances[] = new DependInstance[trainingInsts.length+testingInsts.length];
-        int i = 0;
-        for(; i<trainingInsts.length; i++) {
-            all_instances[i] = trainingInsts[i];
-        }
-        int lastId = all_instances[i-1].getInstanceId();
-        for(int j = 0; j<testingInsts.length; j++, i++) {
-            all_instances[i] = testingInsts[j];
-            all_instances[i].setInstanceId(lastId+j+1);
-            all_instances[i].setUnlabeled();
-        }
-        if(NetworkConfig.USE_NEURAL_FEATURES){
-			model.train(all_instances, trainingInsts.length, numIteration);
-		}else{
-			model.train(trainingInsts, numIteration);
+		NetworkModel model = null;
+		if (readModel) {
+			System.err.println("[Info] Reading the network model.");
+			ObjectInputStream in = new ObjectInputStream(new FileInputStream(modelFile));
+			NetworkIDMapper.setCapacity(new int[]{500, 500, 5, 5, 100, 10});
+			model =(NetworkModel)in.readObject();
+			in.close();
+			System.err.println("[Info] Model is read.");
+		} else {
+			DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(optimizer), isPipe, labeledDep, windowSize, basicFeatures, entityFeature);
+			DependencyNetworkCompiler dnc = new DependencyNetworkCompiler(labeledDep);
+			model = DiscriminativeNetworkModel.create(dfm, dnc);
+			DependInstance all_instances[] = new DependInstance[trainingInsts.length+testingInsts.length];
+	        int i = 0;
+	        for(; i<trainingInsts.length; i++) {
+	            all_instances[i] = trainingInsts[i];
+	        }
+	        int lastId = all_instances[i-1].getInstanceId();
+	        for(int j = 0; j<testingInsts.length; j++, i++) {
+	            all_instances[i] = testingInsts[j];
+	            all_instances[i].setInstanceId(lastId+j+1);
+	            all_instances[i].setUnlabeled();
+	        }
+	        if(NetworkConfig.USE_NEURAL_FEATURES){
+				model.train(all_instances, trainingInsts.length, numIteration);
+			}else{
+				model.train(trainingInsts, numIteration);
+			}
 		}
-		
+		if (saveModel) {
+			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
+			out.writeObject(model);
+			out.close();
+		}
+        
 		/****************Evaluation Part**************/
 		Instance[] predInsts = model.decode(testingInsts);
 		Evaluator.evalDP(predInsts, dpOut, labeledDep);
@@ -185,6 +209,8 @@ public class DependencyMain {
 					case "-topk":NetworkConfig._topKValue = Integer.valueOf(args[i+1]); break;
 					case "-topkinput": topKinput = true; break;
 					case "-las": labeledDep= args[i+1].equals("true")?true:false; break;
+					case "-saveModel": saveModel = args[i+1].equals("true")?true:false; break;
+					case "-readModel": readModel = args[i+1].equals("true")?true:false; break;
 					case "-windowSize": windowSize = Integer.valueOf(args[i+1]); break;
 					case "-neural": if(args[i+1].equals("true")){ 
 										NetworkConfig.USE_NEURAL_FEATURES = true; 

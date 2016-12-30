@@ -238,4 +238,5 @@ public class SemiCRFFeatureManager extends FeatureManager {
 	private String shape(String word){
 		return Extractor.wordShapeOf(word);
 	}
+	
 }

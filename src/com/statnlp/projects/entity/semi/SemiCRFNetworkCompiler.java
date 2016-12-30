@@ -27,7 +27,6 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 	public int maxSegmentLength = 8;
 	public long[] allNodes;
 	public int[][][] allChildren;
-	private SemiViewer sViewer;
 	private boolean useDepNet = false; 
 	private boolean incom2Linear = false; //means if not incomplete then change to linear. //model 1
 	private boolean notConnect2Linear = false; //model 2
@@ -50,8 +49,6 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 //		this.maxSegmentLength = 2;
 		System.out.println(String.format("Max size: %s, Max segment length: %s", maxSize, maxSegLength));
 		System.out.println(SemiLabel.LABELS.toString());
-		this.sViewer = sViewer;
-		this.sViewer.nothing();
 		this.useDepNet = useDepNet;
 		this.incom2Linear = incom2Linear;
 		this.notConnect2Linear = notConnect2Linear;

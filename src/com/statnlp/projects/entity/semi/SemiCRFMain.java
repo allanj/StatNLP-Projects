@@ -1,7 +1,6 @@
 package com.statnlp.projects.entity.semi;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -45,7 +44,8 @@ public class SemiCRFMain {
 	public static boolean useIncompleteSpan = false;
 	public static boolean useDepNet = false;
 	public static String modelFile = null;
-	public static boolean isTrain = true;
+	public static boolean saveModel = false;
+	public static boolean readModel = false;
 	public static String dataType = "semeval10t1";
 	public static String testSuff = "test";
 	public static String train_filename = "data/alldata/nbc/ecrf.train.MISC.txt";
@@ -91,7 +91,8 @@ public class SemiCRFMain {
 						break; //this option currently deprecated, since we are using cross_validation. no dev.conllx file 
 				case "-data": dataType = args[i+1]; break;
 				case "-ext": extention = args[i+1]; break;
-				case "-mode": isTrain = args[i+1].equals("train")?true:false; break;
+				case "-saveModel": saveModel = args[i+1].equals("true")?true:false; break;
+				case "-readModel": readModel = args[i+1].equals("true")?true:false; break;
 				case "-pipe": isPipe = args[i+1].equals("true")?true:false;break;
 				case "-ignore": ignore = args[i+1].equals("true")?true:false;break;
 				case "-dataset": dataset = args[i+1]; break;
@@ -133,6 +134,7 @@ public class SemiCRFMain {
 		String ign = ignore? "ignore":"noignore";
 		String resEval = "data/"+dataset+"/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".eval.txt";
 		String resRes  = "data/"+dataset+"/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".res.txt";
+		modelFile = "data/"+dataset+"/"+dataType+"/output/semi."+extention+"."+depStruct+".depf-"+depFeature+"."+ign+".model";
 		
 		System.out.println("[Info] Reading data:"+train_filename);
 		System.out.println("[Info] Reading data:"+test_filename);
@@ -279,42 +281,12 @@ public class SemiCRFMain {
 		
 		SemiViewer sViewer = new SemiViewer();
 		
-		GlobalNetworkParam gnp = null;
-		if(isTrain || modelFile==null || modelFile.equals("") || !new File(modelFile).exists()){
-			gnp = new GlobalNetworkParam(of);
-		}else{
-			ObjectInputStream in = new ObjectInputStream(new FileInputStream(modelFile));
-			gnp=(GlobalNetworkParam)in.readObject();
-			in.close();
-		}
+		NetworkModel model = null;
 		
-		SemiCRFNetworkCompiler compiler = new SemiCRFNetworkCompiler(maxSize, maxSpan,sViewer, useDepNet, model1, model2, ignore);
-		SemiCRFFeatureManager fm = new SemiCRFFeatureManager(gnp, nonMarkov, depFeature);
-		NetworkModel model = NetworkConfig.TRAIN_MODE_IS_GENERATIVE ? GenerativeNetworkModel.create(fm, compiler) : DiscriminativeNetworkModel.create(fm, compiler);
-		
-//		/***Debug information**/
-//		for(int n=1; n<=100; n++){
-//			System.out.println("[Info] Now n is:"+n);
-//			ArrayList<SemiCRFInstance> trains = new ArrayList<SemiCRFInstance>();
-//			int idxId = 1;
-//			for(SemiCRFInstance inst: trainInstances){
-//				if(inst.size()==n) { inst.setLabeled();inst.setInstanceId(idxId++); trains.add(inst); }
-//			}
-//			for(SemiCRFInstance inst: testInstances){
-//				if(inst.size()==n) { inst.setLabeled(); inst.setInstanceId(idxId++);trains.add(inst); }
-//			}
-//			if(trains.size()==0) continue;
-//			gnp = new GlobalNetworkParam(of);
-//			fm = new SemiCRFFeatureManager(gnp, nonMarkov, depFeature);
-//			model = NetworkConfig.TRAIN_MODE_IS_GENERATIVE ? GenerativeNetworkModel.create(fm, compiler) : DiscriminativeNetworkModel.create(fm, compiler);
-//			model.train(trains.toArray(new SemiCRFInstance[trains.size()]), numIterations);
-//		}
-//		System.exit(0);
-//		/**debug***/
-		
-		
-		if(isTrain){
-			
+		if(!readModel){
+			SemiCRFNetworkCompiler compiler = new SemiCRFNetworkCompiler(maxSize, maxSpan,sViewer, useDepNet, model1, model2, ignore);
+			SemiCRFFeatureManager fm = new SemiCRFFeatureManager(new GlobalNetworkParam(of), nonMarkov, depFeature);
+			model = NetworkConfig.TRAIN_MODE_IS_GENERATIVE ? GenerativeNetworkModel.create(fm, compiler) : DiscriminativeNetworkModel.create(fm, compiler);
 			if(cross_validation){
 				int foldNum = 10;
 				//by default do 10-fold cross-validation
@@ -340,9 +312,6 @@ public class SemiCRFMain {
 							cvTrainList.add(trainInstances[idx]);
 						}
 					}
-					gnp = new GlobalNetworkParam(of);
-					fm = new SemiCRFFeatureManager(gnp, nonMarkov, depFeature);
-					model = NetworkConfig.TRAIN_MODE_IS_GENERATIVE ? GenerativeNetworkModel.create(fm, compiler) : DiscriminativeNetworkModel.create(fm, compiler);
 					model.train(cvTrainList.toArray(new SemiCRFInstance[cvTrainList.size()]), numIterations);
 					Instance[] predictions = model.decode(cvTestList.toArray(new SemiCRFInstance[cvTestList.size()]));
 					SemiEval.evalNER(predictions, resEval);
@@ -350,22 +319,26 @@ public class SemiCRFMain {
 			}else {
 				model.train(trainInstances, numIterations);
 			}
-			if(!cross_validation && modelFile!=null && !modelFile.equals("")){
-				ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
-				out.writeObject(fm.getParam_G());
-				out.close();
-			}
+			
+		} else {
+			//read model.
+			ObjectInputStream in = new ObjectInputStream(new FileInputStream(modelFile));
+			model = (NetworkModel)in.readObject();
+			in.close();
 		}
+		
+		if(!cross_validation && saveModel){
+			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
+			out.writeObject(model);
+			out.close();
+		}
+		
+		//decoding
 		if(!cross_validation){
 			Instance[] predictions = model.decode(testInstances);
 			SemiEval.evalNER(predictions, resEval);
 			SemiEval.writeNERResult(predictions, resRes);
 		}
-		
-//		for(int i=1; i<150; i++){
-//			System.out.println(debug[i]+"\t"+debugNum[i]);
-//		}
-		
 	}
 	
 	/**

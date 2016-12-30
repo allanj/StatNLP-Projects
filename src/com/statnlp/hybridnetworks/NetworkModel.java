@@ -18,6 +18,9 @@ package com.statnlp.hybridnetworks;
 
 import static com.statnlp.commons.Utils.print;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -483,5 +486,17 @@ public abstract class NetworkModel implements Serializable{
 		return results;
 	}
 	
+	private void writeObject(ObjectOutputStream oos) throws IOException{
+		oos.writeObject(this._fm);
+		oos.writeObject(this._compiler);
+		if (NetworkConfig.USE_NEURAL_FEATURES)
+			oos.writeObject(this.nnController);
+	}
 	
+	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
+		this._fm = (FeatureManager)ois.readObject();
+		this._compiler = (NetworkCompiler)ois.readObject();
+		if (NetworkConfig.USE_NEURAL_FEATURES)
+			this.nnController = (NNCRFGlobalNetworkParam)ois.readObject();
+	}
 }
