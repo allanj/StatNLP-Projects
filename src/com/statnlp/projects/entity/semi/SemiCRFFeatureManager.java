@@ -197,12 +197,12 @@ public class SemiCRFFeatureManager extends FeatureManager {
 				int currHeadIndex = sent.get(pos).getHeadIndex();
 				String currHead = currHeadIndex>=0? sent.get(currHeadIndex).getName():"STR";
 				String currHeadTag = currHeadIndex>=0? sent.get(currHeadIndex).getTag():"STR";
-				String currDepLabel = currHeadIndex>=0? sent.get(currHeadIndex).getDepLabel():"NOLABEL";
-				if(currDepLabel==null || currDepLabel.equals("null")) throw new RuntimeException("The depenency label is null?");
+//				String currDepLabel = currHeadIndex>=0? sent.get(currHeadIndex).getDepLabel():"NOLABEL";
+//				if(currDepLabel==null || currDepLabel.equals("null")) throw new RuntimeException("The depenency label is null?");
 				featureList.add(this._param_g.toFeature(network, FeaType.head_word.name(),	currEn, currWord+"& head:"+currHead));
 				featureList.add(this._param_g.toFeature(network, FeaType.head_tag.name(),	currEn,	currTag+"& head:"+currHeadTag));
-				featureList.add(this._param_g.toFeature(network, FeaType.dep_word_label.name(), 	currEn, currWord+"& head:"+currHead+"& label:"+currDepLabel));
-				featureList.add(this._param_g.toFeature(network, FeaType.dep_tag_label.name(), 	currEn, currTag+"& head:"+currHeadTag+"& label:"+currDepLabel));
+//				featureList.add(this._param_g.toFeature(network, FeaType.dep_word_label.name(), 	currEn, currWord+"& head:"+currHead+"& label:"+currDepLabel));
+//				featureList.add(this._param_g.toFeature(network, FeaType.dep_tag_label.name(), 	currEn, currTag+"& head:"+currHeadTag+"& label:"+currDepLabel));
 				
 				/**The following set of dependency features are better***/
 //				featureList.add(this._param_g.toFeature(network, FeaType.head_word.name(), 		currEn, currHead));

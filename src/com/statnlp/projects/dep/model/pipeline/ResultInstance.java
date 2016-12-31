@@ -1,4 +1,4 @@
-package com.statnlp.projects.dep.model.joint.stat;
+package com.statnlp.projects.dep.model.pipeline;
 
 public class ResultInstance {
 
