@@ -24,13 +24,14 @@ public class IterativeModel {
 
 	protected NetworkModel depModel;
 	protected NetworkModel semiModel; 
-	protected NetworkModel semiOnlyModel; 
+	protected NetworkModel semiOnlyModel;
+	protected String trainFile;
 	protected String testFile;
 	protected String nerOut;
 	protected int testNumber = -1;
 	protected ResultInstance[] results;
 	
-	public IterativeModel(String depModelFile, String semiModelFile, String semiNodepf, String testFile) {
+	public IterativeModel(String depModelFile, String semiModelFile, String semiNodepf, String testFile, int testNumber) {
 		ObjectInputStream in;
 		try {
 			System.err.println("[Info] Reading dependency model...");
@@ -65,9 +66,11 @@ public class IterativeModel {
 		System.err.println("[Info] All models read..");
 		results = Reader.readResults(testFile, testNumber);
 		this.testFile = testFile;
+		this.testNumber = testNumber;
 	}
 	
-	public void setFiles(String nerOut) {
+	public void setFiles(String trainFile, String nerOut) {
+		this.trainFile = trainFile;
 		this.nerOut = nerOut;
 	}
 	
@@ -78,8 +81,11 @@ public class IterativeModel {
 	 * @throws IOException 
 	 */
 	private DependInstance[] init() throws InterruptedException, IOException {
+		SemiCRFMain.readCoNLLData(trainFile, false,	-1);
+		DependencyReader.readCoNLLX(trainFile, false, -1, new DependencyTransformer(), false);
+		SemiCRFMain.readCoNLLData(testFile, false,	-1);
+		DependencyReader.readCoNLLX(testFile, false, -1, new DependencyTransformer(), false);
 		SemiCRFInstance[] testInstances	 = SemiCRFMain.readCoNLLData(testFile, false,	testNumber);
-		DependencyReader.readCoNLLX(testFile, false,testNumber, new DependencyTransformer(), false);
 		NetworkIDMapper.setCapacity(new int[]{10000, 20, 100});
 		Instance[] results = semiOnlyModel.decode(testInstances);
 		return Converter.semiInst2DepInst(results);
@@ -115,13 +121,15 @@ public class IterativeModel {
 	public static void main(String[] args) throws InterruptedException, IOException {
 		String data = args[0];
 		NetworkConfig.NUM_THREADS = Integer.parseInt(args[1]);
-		String depModelFile = "data/allanprocess/"+data+"/output/dep.test.noef.dep.model";
+		int testNumber = Integer.parseInt(args[2]);
+		String depModelFile = "data/allanprocess/"+data+"/output/dep.test.ef.dep.model";
 		String semiModelFile = "data/allanprocess/"+data+"/output/semi.semi.gold.depf-true.noignore.model";
 		String semiOnlyModelFile = "data/allanprocess/"+data+"/output/semi.semi.gold.depf-false.noignore.model";
 		String testFile = "data/allanprocess/"+data+"/test.conllx";
+		String trainFile = "data/allanprocess/"+data+"/train.conllx";
 		String nerOut = "data/allanprocess/"+data+"/output/semi.pipe.eval.txt";
-		IterativeModel model = new IterativeModel(depModelFile, semiModelFile, semiOnlyModelFile, testFile);
-		model.setFiles(nerOut);
+		IterativeModel model = new IterativeModel(depModelFile, semiModelFile, semiOnlyModelFile, testFile, testNumber);
+		model.setFiles(trainFile, nerOut);
 		int maxIter = 10;
 		model.iterate(maxIter);
 	}

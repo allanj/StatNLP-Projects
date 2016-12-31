@@ -26,8 +26,8 @@ public class Eval {
 			String[] predEntities = eInst.toEntities(eInst.getPrediction());
 			String[] trueEntities = res[index].entities;
 			Sentence sent = eInst.getInput();
-			for(int i = 1; i < sent.length(); i++){
-				pw.write(sent.get(i).getName()+" "+sent.get(i).getTag()+" "+trueEntities[i]+" "+predEntities[i]+"\n");
+			for(int i = 0; i < sent.length(); i++){
+				pw.write(sent.get(i).getName()+" "+sent.get(i).getTag()+" "+trueEntities[i+1]+" "+predEntities[i]+"\n");
 			}
 			pw.write("\n");
 		}
