@@ -27,6 +27,7 @@ public class BFInstance extends Instance {
 		return this.sentence.length();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public BFInstance duplicate() {
 		BFInstance inst = new BFInstance(this._instanceId, this._weight,this.sentence);
@@ -81,6 +82,7 @@ public class BFInstance extends Instance {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void setPredEntities(Object o) {
 		this.predEntities = (ArrayList<String>)o;
 	}

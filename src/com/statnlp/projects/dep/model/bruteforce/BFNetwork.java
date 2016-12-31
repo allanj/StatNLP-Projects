@@ -1,7 +1,5 @@
 package com.statnlp.projects.dep.model.bruteforce;
 
-import java.util.Arrays;
-
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.TableLookupNetwork;
 import com.statnlp.projects.dep.model.bruteforce.BFNetworkCompiler.NODE_TYPES;

@@ -2,7 +2,6 @@ package com.statnlp.projects.dep.model;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
-import java.util.Arrays;
 
 import com.statnlp.ui.visualize.VisualizationViewerEngine;
 import com.statnlp.ui.visualize.type.VNode;

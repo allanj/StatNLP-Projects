@@ -16,10 +16,8 @@ import com.statnlp.projects.dep.Evaluator;
 import com.statnlp.projects.dep.Transformer;
 import com.statnlp.projects.dep.model.ModelViewer;
 import com.statnlp.projects.dep.utils.DPConfig;
-import com.statnlp.projects.dep.utils.DataChecker;
-import com.statnlp.projects.dep.utils.Formatter;
-import com.statnlp.projects.dep.utils.Init;
 import com.statnlp.projects.dep.utils.DPConfig.MODEL;
+import com.statnlp.projects.dep.utils.Init;
 
 /**
  * Additional Dependency parsing

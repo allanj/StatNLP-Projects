@@ -3,6 +3,7 @@ package com.statnlp.projects.dep.model.bruteforce;
 import java.io.IOException;
 import java.util.List;
 
+import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
@@ -71,8 +72,8 @@ public class BFMain {
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 		BFInstance[] ecrfs = trainInstances.toArray(new BFInstance[trainInstances.size()]);
 		model.train(ecrfs, numIteration);
-//		Instance[] predictions = model.decode(testInstances.toArray(new BFInstance[testInstances.size()]));
-//		BFEval.evalDP(predictions, dpOut);
+		Instance[] predictions = model.decode(testInstances.toArray(new BFInstance[testInstances.size()]));
+		BFEval.evalDP(predictions, dpOut);
 	}
 
 	

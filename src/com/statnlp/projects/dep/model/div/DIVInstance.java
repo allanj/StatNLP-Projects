@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.projects.dep.DependInstance;
-import com.statnlp.projects.dep.Transformer;
 import com.statnlp.projects.dep.commons.PositionType;
 
 import edu.stanford.nlp.ling.CoreLabel;
@@ -13,7 +12,6 @@ import edu.stanford.nlp.trees.UnnamedDependency;
 
 public class DIVInstance extends DependInstance {
 
-	private boolean invalid;
 	
 	
 	public DIVInstance(int instanceId, double weight) {
@@ -31,6 +29,7 @@ public class DIVInstance extends DependInstance {
 	
 	private static final long serialVersionUID = 2175742491946682505L;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public DIVInstance duplicate() {
 		DIVInstance di = new DIVInstance(this._instanceId, this._weight,this.sentence);

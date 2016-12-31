@@ -73,7 +73,6 @@ public class BFNetworkCompiler extends NetworkCompiler{
 	
 	public void findAllNetworks(Network network){
 		BFNetwork lcrfNetwork = (BFNetwork)network;
-		BFInstance lcrfInstance = (BFInstance)lcrfNetwork.getInstance();
 		
 		int[] heads = new int[_size];
 		long root = toNode_root(_size);

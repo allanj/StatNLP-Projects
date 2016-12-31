@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Random;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
@@ -55,6 +54,7 @@ public class DIVNetworkCompiler extends NetworkCompiler {
 				types[typeMap.get(entity)] = entity;
 		}
 		this.viewer = viewer;
+		this.viewer.nothing();
 	}
 
 	@Override

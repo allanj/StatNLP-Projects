@@ -2,7 +2,6 @@ package com.statnlp.projects.dep.model.labelleddp;
 
 import java.util.Arrays;
 
-
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
@@ -10,7 +9,6 @@ import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
 import com.statnlp.projects.dep.commons.DepLabel;
-import com.statnlp.ui.visualize.VisualizationViewerEngine;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.LabeledScoredTreeNode;

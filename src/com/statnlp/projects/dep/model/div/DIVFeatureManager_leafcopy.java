@@ -10,7 +10,6 @@ import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
 import com.statnlp.projects.dep.DependInstance;
 import com.statnlp.projects.dep.utils.DPConfig;
-import com.statnlp.projects.dep.utils.Extractor;
 
 public class DIVFeatureManager_leafcopy extends FeatureManager {
 
@@ -335,10 +334,6 @@ public class DIVFeatureManager_leafcopy extends FeatureManager {
 	}
 	
 	
-	private String wordShape(String word){
-		return Extractor.wordShapeOf(word);
-	}
-
 	private void addDepFeatures(ArrayList<Integer> featureList, Network network, int[] parentArr, int[] children_k, Sentence sent){
 		
 		
