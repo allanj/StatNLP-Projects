@@ -27,7 +27,7 @@ public class SDEval {
 					dp_corr++;
 				}
 				dp_total++;
-				if (inst.segments.get(i).length() == 1 && inst.segments.get(i).label.equals(Label.get("O"))) {
+				if (inst.segments.get(i).length() == 1 && inst.segments.get(i).label.equals(SpanLabel.get("O"))) {
 					if (output[i] == prediction[i]) {
 						nonSeg_corr++;
 					}

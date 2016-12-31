@@ -11,11 +11,11 @@ import java.io.Serializable;
 public class Span implements Comparable<Span>, Serializable{
 	
 	private static final long serialVersionUID = 1849557517361796614L;
-	public Label label;
+	public SpanLabel label;
 	public int start;
 	public int end;
 
-	public Span(int start, int end, Label label) {
+	public Span(int start, int end, SpanLabel label) {
 		if(start>end)
 			throw new RuntimeException("Start cannot be larger than end");
 		this.start = start;

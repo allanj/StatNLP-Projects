@@ -64,11 +64,11 @@ public class SDMain {
 		System.err.println("[Info] joint Res: "+jointRes);
 		SDInstance[] trainingInsts = SDReader.readCoNLLXData(trainingPath, true, trainNumber, true, lenOne);
 		SDInstance[] testingInsts = SDReader.readCoNLLXData(decodePath, false, testNumber, false, lenOne);
-		Label.get(DPConfig.EMPTY);
-		System.err.println("The label set: " + Label.Label_Index.toString());
+		SpanLabel.get(DPConfig.EMPTY);
+		System.err.println("The label set: " + SpanLabel.Label_Index.toString());
 		
 		//debug
-		Label.lock();
+		SpanLabel.lock();
 		
 		//debug:
 //		System.err.println("checking training");
