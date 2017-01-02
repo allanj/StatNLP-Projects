@@ -48,7 +48,7 @@ public class Converter {
 			int[] predHeads = Transformer.getHeads(predDependencies, depSent);
 			WordToken[] wts = new WordToken[depSent.length()-1];
 			for (int w = 0; w < wts.length; w++) {
-				wts[w] = new WordToken(depSent.get(w+1).getName(), depSent.get(w+1).getTag(), predHeads[w+1]-1, depSent.get(w+1).getEntity());
+				wts[w] = new WordToken(depSent.get(w+1).getName(), depSent.get(w+1).getTag(), predHeads[w+1]-1);
 			}
 			Sentence semiSent = new Sentence(wts);
 			SemiCRFInstance semiInst = new SemiCRFInstance(depInst.getInstanceId(), semiSent, null);
