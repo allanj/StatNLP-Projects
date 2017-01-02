@@ -284,8 +284,9 @@ public class DependencyFeatureManager extends FeatureManager {
 				
 				if(isPipe || entityFeature){
 					String me = sent.get(modifierIndex).getEntity();
-					enList.add(this._param_g.toFeature(network, FeaType.pipe.name(), "entity-memt",  me + " & " + modifierTag));
-					enList.add(this._param_g.toFeature(network, FeaType.pipe.name(), "entity-memw",  me + " & " + modifierWord));
+					String he = sent.get(headIndex).getEntity();
+					enList.add(this._param_g.toFeature(network, FeaType.pipe.name(), "entity-hwmw-heme",  headWord + " & " + modifierWord + " & " + he + " & " + me));
+					enList.add(this._param_g.toFeature(network, FeaType.pipe.name(), "entity-htmt-heme",  headTag + " & " + modifierTag + " & " + he + " & " + me));
 				}
 			}
 			
