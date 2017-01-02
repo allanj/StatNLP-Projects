@@ -60,32 +60,14 @@ public class SemiCRFInstance extends BaseInstance<SemiCRFInstance, Sentence, Lis
 		String[] res = new String[this.input.length()];
 		for(Span s: ss){
 			for(int i= s.start; i<= s.end; i++){
-				res[i] = s.label.form;
-			}
-		}
-		String[] finalRes = new String[this.input.length()];
-		String prev = "O";
-		for(int i=0;i<finalRes.length;i++){
-			if(prev.equals(res[i])){
-				if(prev.equals("O")){
-					finalRes[i] = "O";
-				}else{
-					finalRes[i] = "I-"+res[i];
-				}
-			}else{
-				if(prev.equals("O"))
-					finalRes[i] = "B-"+res[i];
-				else if(res[i].equals("O")){
-					finalRes[i] = "O";
-				}else{
-					finalRes[i] = "B-"+res[i];
+				if (s.label.form.equals("O")) {
+					res[i] = s.label.form;
+				} else {
+					res[i] = i == s.start? "B-"+s.label.form : "I-"+s.label.form;
 				}
 			}
-			prev = res[i];
 		}
-		//System.err.println(ss.toString());
-		
-		return finalRes;
+		return res;
 	}
 
 }
