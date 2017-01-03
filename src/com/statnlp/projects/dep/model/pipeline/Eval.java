@@ -11,6 +11,7 @@ import com.statnlp.commons.types.Sentence;
 import com.statnlp.projects.dep.DependInstance;
 import com.statnlp.projects.dep.Transformer;
 import com.statnlp.projects.entity.semi.SemiCRFInstance;
+import com.statnlp.projects.entity.semi.SemiCRFMain;
 
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.UnnamedDependency;
@@ -18,6 +19,23 @@ import edu.stanford.nlp.trees.UnnamedDependency;
 public class Eval {
 
 	public static boolean windows = false;
+	
+	public static void evalNERFile(Instance[] testInsts, String testFile, String nerOut) throws IOException, InterruptedException {
+		PrintWriter pw = RAWF.writer(nerOut);
+		SemiCRFInstance[] testNERInsts = SemiCRFMain.readCoNLLData(testFile, false,	-1);
+		for(int index=0;index<testInsts.length;index++){
+			SemiCRFInstance eInst = (SemiCRFInstance)testInsts[index];
+			String[] predEntities = eInst.toEntities(eInst.getPrediction());
+			String[] trueEntities = testNERInsts[index].toEntities(testNERInsts[index].getOutput());
+			Sentence sent = eInst.getInput();
+			for(int i = 0; i < sent.length(); i++){
+				pw.write(sent.get(i).getName()+" "+sent.get(i).getTag()+" "+trueEntities[i+1]+" "+predEntities[i]+"\n");
+			}
+			pw.write("\n");
+		}
+		pw.close();
+		evalNER(nerOut);
+	}
 	
 	public static void evalNER(Instance[] testInsts, ResultInstance[] res, String nerOut) throws IOException, InterruptedException {
 		PrintWriter pw = RAWF.writer(nerOut);

@@ -60,14 +60,14 @@ public class IterativeModel {
 				e.printStackTrace();
 			}
 			in.close();
-			System.err.println("[Info] Reading depOnly model...");
-			in = new ObjectInputStream(new FileInputStream(depOnlyModelFile));
-			try {
-				depOnlyModel = (NetworkModel)in.readObject();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-			in.close();
+//			System.err.println("[Info] Reading depOnly model...");
+//			in = new ObjectInputStream(new FileInputStream(depOnlyModelFile));
+//			try {
+//				depOnlyModel = (NetworkModel)in.readObject();
+//			} catch (ClassNotFoundException e) {
+//				e.printStackTrace();
+//			}
+//			in.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -99,12 +99,15 @@ public class IterativeModel {
 		SemiCRFInstance[] testInstances	 = SemiCRFMain.readCoNLLData(testFile, false,	testNumber);
 		NetworkIDMapper.setCapacity(new int[]{10000, 20, 100});
 		Instance[] results = semiOnlyModel.decode(testInstances);
+//		Eval.evalNERFile(results, testFile, nerOut);
 		Eval.evalNER(results, this.results, nerOut);
 		return Converter.semiInst2DepInst(results);
 	}
 	
+	@SuppressWarnings("unused")
 	private void debug() throws InterruptedException, IOException {
 		System.err.println("[Info] Debugging with dep model with entity features...");
+		DependencyReader.readCoNLLX(trainFile, false, -1, new DependencyTransformer(), false);
 		DependInstance[] testInstances = DependencyReader.readCoNLLX(testFile, false,testNumber, new DependencyTransformer(), false);
 		NetworkIDMapper.setCapacity(new int[]{500, 500, 5, 5, 100, 10});
 		Instance[] results = depModel.decode(testInstances);
@@ -117,18 +120,19 @@ public class IterativeModel {
 	 * @throws InterruptedException 
 	 */
 	public void iterate(int maxIter) throws InterruptedException, IOException {
-		debug();
-		DependInstance[] testInsts = init();
+		DependInstance[] testDepInsts = init();
 		Instance[] semiRes = null;
 		for (int it = 0; it < maxIter; it++) {
 			NetworkIDMapper.setCapacity(new int[]{500, 500, 5, 5, 100, 10});
 			System.err.println("[Info] Iteration " + (it + 1) + ":");
-			Instance[] depRes = depModel.decode(testInsts);
+			Instance[] depRes = depModel.decode(testDepInsts);
 			Eval.evalDP(depRes, this.results);
 			SemiCRFInstance[] testSemiInsts =  Converter.depInst2SemiInst(depRes);
 			NetworkIDMapper.setCapacity(new int[]{10000, 20, 100});
 			semiRes = semiModel.decode(testSemiInsts);
+//			Eval.evalNERFile(semiRes, testFile, nerOut);
 			Eval.evalNER(semiRes, this.results, nerOut);
+			testDepInsts = Converter.semiInst2DepInst(semiRes);
 			System.err.println();
 		}
 	}
@@ -137,6 +141,7 @@ public class IterativeModel {
 		String data = args[0];
 		NetworkConfig.NUM_THREADS = Integer.parseInt(args[1]);
 		int testNumber = Integer.parseInt(args[2]);
+		int maxIter = Integer.parseInt(args[3]);
 		String depOnlyModelFile = "data/allanprocess/"+data+"/output/dep.test.noef.dep.model";
 		String depModelFile = "data/allanprocess/"+data+"/output/dep.test.ef.dep.model";
 		String semiModelFile = "data/allanprocess/"+data+"/output/semi.semi.gold.depf-true.noignore.model";
@@ -146,7 +151,6 @@ public class IterativeModel {
 		String nerOut = "data/allanprocess/"+data+"/output/semi.pipe.eval.txt";
 		IterativeModel model = new IterativeModel(depOnlyModelFile, depModelFile, semiModelFile, semiOnlyModelFile, testFile, testNumber);
 		model.setFiles(trainFile, nerOut);
-		int maxIter = 10;
 		model.iterate(maxIter);
 	}
 

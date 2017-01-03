@@ -133,7 +133,7 @@ public abstract class NetworkModel implements Serializable{
 				Instance inst = insts_list.get(threadId).get(i);
 				insts[threadId][i] = inst;
 			}
-			print("Thread "+threadId+" has "+insts[threadId].length+" instances.", outstreams);
+			//print("Thread "+threadId+" has "+insts[threadId].length+" instances.", outstreams);
 		}
 		
 		return insts;

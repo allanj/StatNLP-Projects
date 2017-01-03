@@ -85,7 +85,7 @@ public class LocalNetworkDecoderThread extends Thread{
 			this._instances_output[k] = this.max(this._instances_input[k], k);
 		}
 		time = System.currentTimeMillis() - time;
-		System.err.println("Decoding time for thread "+this._threadId+" = "+ time/1000.0 +" secs.");
+		//System.err.println("Decoding time for thread "+this._threadId+" = "+ time/1000.0 +" secs.");
 	}
 	
 	public void setGlobalPruneMap(Map<Integer, Map<Integer, Map<Integer, Set<Integer>>>> globalPruneMap) {
