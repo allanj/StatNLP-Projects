@@ -253,7 +253,7 @@ public class SemiCRFMain {
 		int maxSpan = 0;
 		for(SemiCRFInstance instance: trainInstances){
 			maxSize = Math.max(maxSize, instance.size());
-			for(Span span: instance.output){
+			for(SemiSpan span: instance.output){
 				maxSpan = Math.max(maxSpan, span.end-span.start+1);
 			}
 		}
@@ -355,7 +355,7 @@ public class SemiCRFMain {
 		BufferedReader br = new BufferedReader(isr);
 		ArrayList<SemiCRFInstance> result = new ArrayList<SemiCRFInstance>();
 		ArrayList<WordToken> wts = new ArrayList<WordToken>();
-		List<Span> output = new ArrayList<Span>();
+		List<SemiSpan> output = new ArrayList<SemiSpan>();
 		int instanceId = 1;
 		int start = -1;
 		int end = 0;
@@ -403,7 +403,7 @@ public class SemiCRFMain {
 					result.add(instance);
 				}
 				wts = new ArrayList<WordToken>();
-				output = new ArrayList<Span>();
+				output = new ArrayList<SemiSpan>();
 				prevLabel = null;
 				start = -1;
 				end = 0;
@@ -450,7 +450,7 @@ public class SemiCRFMain {
 		return result.toArray(new SemiCRFInstance[result.size()]);
 	}
 	
- 	private static void createSpan(List<Span> output, int start, int end, SemiLabel label){
+ 	private static void createSpan(List<SemiSpan> output, int start, int end, SemiLabel label){
 		if(label==null){
 			throw new RuntimeException("The label is null");
 		}
@@ -459,20 +459,20 @@ public class SemiCRFMain {
 		}
 		if(label.form.equals("O")){
 			for(int i=start; i<=end; i++){
-				output.add(new Span(i, i, label));
+				output.add(new SemiSpan(i, i, label));
 			}
 		} else {
-			output.add(new Span(start, end, label));
+			output.add(new SemiSpan(start, end, label));
 		}
 	}
 
 	
 	private static int checkConnected(SemiCRFInstance inst){
 		int number = 0;
-		List<Span> output = inst.getOutput();
+		List<SemiSpan> output = inst.getOutput();
 		Sentence sent = inst.getInput();
 		int[][] leftNodes = Utils.sent2LeftDepRel(sent);
-		for(Span span: output){
+		for(SemiSpan span: output){
 			int start = span.start;
 			int end = span.end;
 			SemiLabel label = span.label;
@@ -499,12 +499,12 @@ public class SemiCRFMain {
 	
 	private static int totalEntities(SemiCRFInstance inst){
 		int total = 0;
-		List<Span> output = inst.getOutput();
+		List<SemiSpan> output = inst.getOutput();
 //		Sentence sent = inst.getInput();
 //		for(int i=0;i<sent.length();i++){
 //			if(sent.get(i).getEntity().startsWith("B")) total++;
 //		}
-		for(Span span: output){
+		for(SemiSpan span: output){
 			SemiLabel label = span.label;
 			if(label.equals(SemiLabel.get("O"))) continue;
 			total++;

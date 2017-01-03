@@ -5,13 +5,13 @@ import java.util.List;
 
 import com.statnlp.commons.types.Sentence;
 
-public class SemiCRFInstance extends BaseInstance<SemiCRFInstance, Sentence, List<Span>> {
+public class SemiCRFInstance extends BaseInstance<SemiCRFInstance, Sentence, List<SemiSpan>> {
 	
 	private static final long serialVersionUID = -5338701879189642344L;
 	
-	private List<List<Span>> topKOutput;
+	private List<List<SemiSpan>> topKOutput;
 	
-	public SemiCRFInstance(int instanceId, Sentence input, List<Span> output){
+	public SemiCRFInstance(int instanceId, Sentence input, List<SemiSpan> output){
 		this(instanceId, 1.0, input, output);
 	}
 	
@@ -19,19 +19,19 @@ public class SemiCRFInstance extends BaseInstance<SemiCRFInstance, Sentence, Lis
 		this(instanceId, weight, null, null);
 	}
 	
-	public SemiCRFInstance(int instanceId, double weight, Sentence input, List<Span> output){
+	public SemiCRFInstance(int instanceId, double weight, Sentence input, List<SemiSpan> output){
 		super(instanceId, weight);
 		this.input = input;
 		this.output = output;
 	}
 	
 	
-	public List<Span> duplicateOutput(){
-		return output == null ? null : new ArrayList<Span>(output);
+	public List<SemiSpan> duplicateOutput(){
+		return output == null ? null : new ArrayList<SemiSpan>(output);
 	}
 
-	public List<Span> duplicatePrediction(){
-		return prediction == null ? null : new ArrayList<Span>(prediction);
+	public List<SemiSpan> duplicatePrediction(){
+		return prediction == null ? null : new ArrayList<SemiSpan>(prediction);
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class SemiCRFInstance extends BaseInstance<SemiCRFInstance, Sentence, Lis
 		builder.append(input);
 		if(hasOutput()){
 			builder.append("\n");
-			for(Span span: output){
+			for(SemiSpan span: output){
 				builder.append(span+"|");
 			}
 		}
@@ -58,9 +58,9 @@ public class SemiCRFInstance extends BaseInstance<SemiCRFInstance, Sentence, Lis
 	}
 	
 	
-	public String[] toEntities(List<Span> ss){
+	public String[] toEntities(List<SemiSpan> ss){
 		String[] res = new String[this.input.length()];
-		for(Span s: ss){
+		for(SemiSpan s: ss){
 			for(int i= s.start; i<= s.end; i++){
 				if (s.label.form.equals("O")) {
 					res[i] = s.label.form;
@@ -104,11 +104,11 @@ public class SemiCRFInstance extends BaseInstance<SemiCRFInstance, Sentence, Lis
 //		return finalRes;
 //	}
 	
-	public void setTopKPrediction(List<List<Span>> topKOutput) {
+	public void setTopKPrediction(List<List<SemiSpan>> topKOutput) {
 		this.topKOutput = topKOutput;
 	}
 	
-	public List<List<Span>> getTopKPrediction() {
+	public List<List<SemiSpan>> getTopKPrediction() {
 		return this.topKOutput;
 	}
 

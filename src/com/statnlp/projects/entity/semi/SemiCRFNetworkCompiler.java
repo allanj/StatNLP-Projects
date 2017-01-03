@@ -88,14 +88,14 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		}
 	}
 	
-	private boolean checkIncomSpan(Sentence sent, Span span){
+	private boolean checkIncomSpan(Sentence sent, SemiSpan span){
 		if(span.label.equals(SemiLabel.get("O")) || span.start==span.end) return true;
 		if(!(sent.get(span.start).getHeadIndex()==span.end || sent.get(span.end).getHeadIndex()==span.start)) return false;
 		return true;
 	}
 	
 
-	private int checkConnected(Sentence sent, Span span){
+	private int checkConnected(Sentence sent, SemiSpan span){
 		int number = 0;
 		int start = span.start;
 		int end = span.end;
@@ -124,14 +124,14 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 		SemiCRFNetwork network = new SemiCRFNetwork(networkId, instance, param,this);
 		
 		int size = instance.size();
-		List<Span> output = instance.getOutput();
+		List<SemiSpan> output = instance.getOutput();
 		Collections.sort(output);
 		Sentence sent = instance.getInput();
 		long leaf = toNode_leaf();
 		network.addNode(leaf);
 		long prevNode = leaf;
 		
-		for(Span span: output){
+		for(SemiSpan span: output){
 			int labelId = span.label.id;
 			long end = toNode(span.end, labelId);
 			network.addNode(end);
@@ -473,7 +473,7 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 	public SemiCRFInstance decompile(Network net) {
 		SemiCRFNetwork network = (SemiCRFNetwork)net;
 		SemiCRFInstance result = (SemiCRFInstance)network.getInstance().duplicate();
-		List<Span> prediction = new ArrayList<Span>();
+		List<SemiSpan> prediction = new ArrayList<SemiSpan>();
 		int node_k = network.countNodes()-1;
 		while(node_k > 0){
 			int[] children_k = network.getMaxPath(node_k);
@@ -493,9 +493,9 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 				int start = child_arr1[0] + 1 - 1;
 				if(child_arr1[2]==NodeType.LEAF.ordinal())
 					start = child_arr1[0];
-				prediction.add(new Span(start, end, SemiLabel.LABELS_INDEX.get(labelId)));
+				prediction.add(new SemiSpan(start, end, SemiLabel.LABELS_INDEX.get(labelId)));
 			}else{
-				prediction.add(new Span(end, end, SemiLabel.LABELS_INDEX.get(labelId)));
+				prediction.add(new SemiSpan(end, end, SemiLabel.LABELS_INDEX.get(labelId)));
 			}
 			node_k = children_k[0];
 			
@@ -508,12 +508,12 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 //			System.err.println("top 1: " + prediction.toString());
 //		}
 		if (NetworkConfig._topKValue > 1) {
-			List<List<Span>> topKPredictions = new ArrayList<List<Span>>(NetworkConfig._topKValue);
+			List<List<SemiSpan>> topKPredictions = new ArrayList<List<SemiSpan>>(NetworkConfig._topKValue);
 			boolean stop = false;
 			for (int kth = 0; kth < NetworkConfig._topKValue; kth++) {
 				node_k = network.countNodes()-1;
 				int currentKth = kth;
-				prediction = new ArrayList<Span>();
+				prediction = new ArrayList<SemiSpan>();
 				while(node_k > 0) {
 					int[] children_k = network.getMaxTopKPath(node_k, currentKth);
 					if (children_k == null) {
@@ -536,9 +536,9 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 						int start = child_arr1[0] + 1 - 1;
 						if(child_arr1[2]==NodeType.LEAF.ordinal())
 							start = child_arr1[0];
-						prediction.add(new Span(start, end, SemiLabel.LABELS_INDEX.get(labelId)));
+						prediction.add(new SemiSpan(start, end, SemiLabel.LABELS_INDEX.get(labelId)));
 					}else{
-						prediction.add(new Span(end, end, SemiLabel.LABELS_INDEX.get(labelId)));
+						prediction.add(new SemiSpan(end, end, SemiLabel.LABELS_INDEX.get(labelId)));
 					}
 					node_k = children_k[0];
 					currentKth = children_k_bestlist[0];
@@ -565,18 +565,18 @@ public class SemiCRFNetworkCompiler extends NetworkCompiler {
 	public Map<Integer, Map<Integer, Set<Integer>>> getTopKPrunedMap(Network network) {
 		SemiCRFInstance inst = this.decompile(network);
 		Map<Integer, Map<Integer, Set<Integer>>> topKPrunedMap = new HashMap<Integer, Map<Integer, Set<Integer>>>(inst.size());
-		List<List<Span>> topKPredictions = inst.getTopKPrediction();
+		List<List<SemiSpan>> topKPredictions = inst.getTopKPrediction();
 		if (network.getInstance().getInstanceId() < 0) {
 			Network  labeledNetwork = network.getLabeledNetwork();
 			SemiCRFInstance labeledInst = (SemiCRFInstance)labeledNetwork.getInstance();
 			topKPredictions.add(labeledInst.getOutput());
 		}
-		for (List<Span> prediction: topKPredictions) {
+		for (List<SemiSpan> prediction: topKPredictions) {
 //			if (inst.getInstanceId()==-8) {
 //				System.err.println(network.getInstance().getInput().toString());
 //				System.err.println(prediction.toString());
 //			}
-			for (Span span: prediction) {
+			for (SemiSpan span: prediction) {
 				int left = span.start;
 				int right = span.end;
 				int labelId = span.label.id;

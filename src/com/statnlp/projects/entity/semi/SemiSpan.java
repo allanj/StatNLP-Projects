@@ -2,7 +2,7 @@ package com.statnlp.projects.entity.semi;
 
 import java.io.Serializable;
 
-public class Span implements Comparable<Span>, Serializable{
+public class SemiSpan implements Comparable<SemiSpan>, Serializable{
 	
 	private static final long serialVersionUID = 1849557517361796614L;
 	public SemiLabel label;
@@ -15,7 +15,7 @@ public class Span implements Comparable<Span>, Serializable{
 	 * @param end: inclusive
 	 * @param label
 	 */
-	public Span(int start, int end, SemiLabel label) {
+	public SemiSpan(int start, int end, SemiLabel label) {
 		if(start>end)
 			throw new RuntimeException("Start cannot be larger than end");
 		this.start = start;
@@ -24,8 +24,8 @@ public class Span implements Comparable<Span>, Serializable{
 	}
 	
 	public boolean equals(Object o){
-		if(o instanceof Span){
-			Span s = (Span)o;
+		if(o instanceof SemiSpan){
+			SemiSpan s = (SemiSpan)o;
 			if(start != s.start) return false;
 			if(end != s.end) return false;
 			return label.equals(s.label);
@@ -34,7 +34,7 @@ public class Span implements Comparable<Span>, Serializable{
 	}
 
 	@Override
-	public int compareTo(Span o) {
+	public int compareTo(SemiSpan o) {
 		if(start < o.start) return -1;
 		if(start > o.start) return 1;
 		if(end < o.start) return -1;
