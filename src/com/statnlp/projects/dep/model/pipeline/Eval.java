@@ -29,7 +29,7 @@ public class Eval {
 			String[] trueEntities = testNERInsts[index].toEntities(testNERInsts[index].getOutput());
 			Sentence sent = eInst.getInput();
 			for(int i = 0; i < sent.length(); i++){
-				pw.write(sent.get(i).getName()+" "+sent.get(i).getTag()+" "+trueEntities[i+1]+" "+predEntities[i]+"\n");
+				pw.write(sent.get(i).getName()+" "+sent.get(i).getTag()+" "+trueEntities[i]+" "+predEntities[i]+"\n");
 			}
 			pw.write("\n");
 		}
