@@ -1,13 +1,19 @@
 package com.statnlp.projects.dep.model.pipeline;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
 import com.statnlp.projects.dep.DependInstance;
 import com.statnlp.projects.dep.Transformer;
+import com.statnlp.projects.dep.model.segdep.SDInstance;
+import com.statnlp.projects.dep.model.segdep.SegSpan;
+import com.statnlp.projects.dep.model.segdep.SpanLabel;
 import com.statnlp.projects.entity.semi.SemiCRFInstance;
+import com.statnlp.projects.entity.semi.SemiSpan;
 
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.UnnamedDependency;
@@ -55,6 +61,29 @@ public class Converter {
 			semiInsts[idx] = semiInst;
 		}
 		return semiInsts;
+	}
+	
+	public static SDInstance[] semiInst2SDInst(Instance[] insts) {
+		SDInstance[] sdInsts = new SDInstance[insts.length];
+		for (int idx = 0; idx < insts.length; idx++) {
+			SemiCRFInstance semiInst = (SemiCRFInstance)insts[idx];
+			Sentence sent = semiInst.getInput();
+			WordToken[] newWTs = new WordToken[sent.length() + 1]; //because semi-CRFs is 0-indexed.
+			newWTs[0] = new WordToken("ROOT", "ROOT");
+			ArrayList<SegSpan> segments = new ArrayList<SegSpan>();
+			segments.add(new SegSpan(0, 0, SpanLabel.get("O")));
+			for (int w = 0; w < sent.length(); w++) {
+				newWTs[w + 1] = new WordToken(sent.get(w).getName(), sent.get(w).getTag());
+			}
+			List<SemiSpan> spanList = semiInst.getPrediction();
+			for (SemiSpan ss : spanList) {
+				segments.add(new SegSpan(ss.start, ss.end, new SpanLabel(ss.label.form, ss.label.id)));
+			}
+			Collections.sort(spanList);
+			sdInsts[idx] = new SDInstance(semiInst.getInstanceId(), 1.0, sent);
+			sdInsts[idx].setSegments(segments);
+		}
+		return sdInsts;
 	}
 
 }

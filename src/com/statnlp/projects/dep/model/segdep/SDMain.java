@@ -1,12 +1,17 @@
 package com.statnlp.projects.dep.model.segdep;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashSet;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
+import com.statnlp.hybridnetworks.NetworkIDMapper;
 import com.statnlp.hybridnetworks.NetworkModel;
 import com.statnlp.projects.dep.utils.DPConfig;
 import com.statnlp.projects.dep.utils.DPConfig.MODEL;
@@ -28,8 +33,11 @@ public class SDMain {
 	public static boolean isDev = false;
 	public static boolean lenOne = false;
 	public static HashSet<String> dataTypeSet;
+	protected static boolean saveModel = false;
+	protected static boolean readModel = false;
+	protected static String modelFile;
 	
-	public static void main(String[] args) throws InterruptedException, IOException {
+	public static void main(String[] args) throws InterruptedException, IOException, ClassNotFoundException {
 		
 		
 		processArgs(args);
@@ -39,6 +47,7 @@ public class SDMain {
 		String dpRes = DPConfig.data_prefix + modelType+middle+DPConfig.dp_res_suffix; 
 		String nerEval = DPConfig.data_prefix + modelType+middle+DPConfig.ner_eval_suffix;
 		String jointRes = DPConfig.data_prefix + modelType+middle+DPConfig.joint_res_suffix;
+		modelFile = DPConfig.data_prefix + modelType + middle + ".model";
 		trainingPath = DPConfig.trainingPath;
 		testingPath = DPConfig.testingPath;
 		devPath = DPConfig.devPath;
@@ -61,6 +70,7 @@ public class SDMain {
 		System.err.println("[Info] testFile: "+decodePath);
 		System.err.println("[Info] dpRes: "+dpRes);
 		System.err.println("[Info] ner eval: "+nerEval);
+		System.err.println("[Info] modelFile: "+modelFile);
 		System.err.println("[Info] joint Res: "+jointRes);
 		SDInstance[] trainingInsts = SDReader.readCoNLLXData(trainingPath, true, trainNumber, true, lenOne);
 		SDInstance[] testingInsts = SDReader.readCoNLLXData(decodePath, false, testNumber, false, lenOne);
@@ -84,11 +94,27 @@ public class SDMain {
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //DPConfig.L2;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		
+		NetworkModel model = null;
+		if (readModel) {
+			System.err.println("[Info] Reading the network model.");
+			ObjectInputStream in = new ObjectInputStream(new FileInputStream(modelFile));
+			NetworkIDMapper.setCapacity(new int[]{500, 500, 5, 5, 10});
+			model =(NetworkModel)in.readObject();
+			in.close();
+			System.err.println("[Info] Model is read.");
+		} else {
+			SDFeatureManager hpfm = new SDFeatureManager(new GlobalNetworkParam());
+			SDNetworkCompiler dnc = new SDNetworkCompiler();
+			model = DiscriminativeNetworkModel.create(hpfm, dnc);
+			model.train(trainingInsts, numIteration); 
+		}
 		
-		SDFeatureManager hpfm = new SDFeatureManager(new GlobalNetworkParam());
-		SDNetworkCompiler dnc = new SDNetworkCompiler();
-		NetworkModel model = DiscriminativeNetworkModel.create(hpfm, dnc);
-		model.train(trainingInsts, numIteration); 
+		
+		if (saveModel) {
+			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
+			out.writeObject(model);
+			out.close();
+		}
 		
 		/****************Evaluation Part**************/
 		System.err.println("*****Evaluation*****");
@@ -122,6 +148,8 @@ public class SDMain {
 						case "-rw": DPConfig.weightPath=args[i+1]; DPConfig.readWeight = true;DPConfig.writeWeight = false; break;
 						case "-ww":DPConfig.weightPath=args[i+1]; DPConfig.readWeight = false; DPConfig.writeWeight = true; break;
 						case "-lenone": lenOne = args[i+1].equals("true")? true:false; break;
+						case "-saveModel": saveModel = args[i+1].equals("true")? true:false; break;
+						case "-readModel": readModel = args[i+1].equals("true")? true:false; break;
 						default: System.err.println("Invalid arguments: "+args[i]+", please check usage."); System.err.println(usage);System.exit(0);
 					}
 				}

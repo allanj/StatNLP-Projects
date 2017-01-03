@@ -4,12 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.projects.dep.DependInstance;
 import com.statnlp.projects.dep.Transformer;
+import com.statnlp.projects.dep.model.segdep.SDInstance;
+import com.statnlp.projects.dep.model.segdep.SegSpan;
+import com.statnlp.projects.dep.model.segdep.SpanLabel;
 import com.statnlp.projects.entity.semi.SemiCRFInstance;
 import com.statnlp.projects.entity.semi.SemiCRFMain;
 
@@ -94,6 +100,55 @@ public class Eval {
 		System.out.println("[Dependency] total: "+dp_total);
 		System.out.println("[Dependency] UAS: "+dp_corr*1.0/dp_total);
 		System.out.println("*************************");
+	}
+	
+	/**
+	 * For the segments are predicted as well.
+	 * @param testInsts
+	 */
+	public static void evalSpanDep(Instance[] goldTestInsts, Instance[] testInsts) {
+		int corr = 0;
+		int predTotal = 0;
+		int goldTotal = 0;
+		for (int index = 0; index < testInsts.length; index++) {
+			SDInstance inst = (SDInstance)(testInsts[index]);
+			SDInstance goldInst = (SDInstance)(goldTestInsts[index]);
+			List<SegSpan> goldSegs = goldInst.getSegments();
+			List<SegSpan> predSegs = inst.getSegments();
+			processSegment(predSegs);
+			processSegment(goldSegs);
+			int[] output = goldInst.getOutput();
+			Map<SegSpan, Integer> goldSegHeadmap = new HashMap<SegSpan, Integer>(predSegs.size());
+			for (int s = 1; s < goldSegs.size(); s++) {
+				goldSegHeadmap.put(goldSegs.get(s), output[s]);
+			}
+			int[] prediction = inst.getPrediction();
+			for (int i = 1; i < prediction.length; i++) {
+				SegSpan curr = predSegs.get(i);
+				if (goldSegHeadmap.containsKey(curr)) {
+					int headSpanIdx = prediction[i];
+					SegSpan predHeadSpan = predSegs.get(headSpanIdx);
+					SegSpan goldHeadSpan = goldSegs.get(goldSegHeadmap.get(curr));
+					if (predHeadSpan.equals(goldHeadSpan)) 
+						corr++;
+				}
+			}
+			predTotal += prediction.length - 1;
+			goldTotal += output.length - 1;
+		}
+		System.out.println("**Evaluation of Segmented Dependency Result**");
+		System.out.println("[Dependency] Correct: "+corr);
+		System.out.println("[Dependency] Prediction Total: "+predTotal);
+		System.out.println("[Dependency] Gold Total: "+goldTotal);
+		System.out.printf("[Dependency] Metric 1 (pred): %.2f\n", corr*1.0/predTotal*100);
+		System.out.printf("[Dependency] Metric 2 (gold): %.2f\n", corr*1.0/goldTotal*100);
+		System.out.println("*************************");
+	}
+	
+	private static void processSegment(List<SegSpan> segments) {
+		for (SegSpan span: segments) {
+			span.label = new SpanLabel("", -1);
+		}
 	}
 	
 }

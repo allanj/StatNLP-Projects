@@ -1,6 +1,7 @@
 package com.statnlp.projects.dep.model.segdep;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
@@ -23,7 +24,7 @@ public class SDInstance extends Instance {
 	/**
 	 * The segment list store the span
 	 */
-	protected ArrayList<Span> segments;
+	protected ArrayList<SegSpan> segments;
 	
 	public SDInstance(int instanceId, double weight, Sentence input) {
 		super(instanceId, weight);
@@ -52,7 +53,7 @@ public class SDInstance extends Instance {
 		if (segments == null)
 			inst.segments = null;
 		else
-			inst.segments = (ArrayList<Span>) segments.clone();
+			inst.segments = (ArrayList<SegSpan>) segments.clone();
 		return inst;
 	}
 
@@ -94,6 +95,14 @@ public class SDInstance extends Instance {
 	@Override
 	public void setPrediction(Object o) {
 		this.prediction = (int[])o;
+	}
+	
+	public List<SegSpan> getSegments() {
+		return this.segments;
+	}
+	
+	public void setSegments(ArrayList<SegSpan> segments) {
+		this.segments = segments;
 	}
 
 }

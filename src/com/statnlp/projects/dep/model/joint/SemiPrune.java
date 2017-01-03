@@ -17,7 +17,7 @@ import com.statnlp.projects.entity.semi.SemiCRFMain;
 import com.statnlp.projects.entity.semi.SemiCRFNetworkCompiler;
 import com.statnlp.projects.entity.semi.SemiLabel;
 import com.statnlp.projects.entity.semi.SemiViewer;
-import com.statnlp.projects.entity.semi.Span;
+import com.statnlp.projects.entity.semi.SemiSpan;
 
 /**
  * A semi CRF for pruning the variables.
@@ -59,7 +59,7 @@ public class SemiPrune {
 		int maxSpan = 0;
 		for(SemiCRFInstance instance: trainInsts){
 			maxSize = Math.max(maxSize, instance.size());
-			for(Span span: instance.output){
+			for(SemiSpan span: instance.output){
 				maxSpan = Math.max(maxSpan, span.end-span.start+1);
 			}
 		}

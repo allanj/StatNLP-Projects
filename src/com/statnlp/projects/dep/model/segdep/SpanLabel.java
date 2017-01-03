@@ -35,7 +35,7 @@ public class SpanLabel implements Comparable<SpanLabel>, Serializable{
 	public String form;
 	public int id;
 	
-	private SpanLabel(String form, int id) {
+	public SpanLabel(String form, int id) {
 		this.form = form;
 		this.id = id;
 	}

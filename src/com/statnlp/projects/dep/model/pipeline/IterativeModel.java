@@ -12,6 +12,8 @@ import com.statnlp.hybridnetworks.NetworkModel;
 import com.statnlp.projects.dep.DependInstance;
 import com.statnlp.projects.dep.DependencyReader;
 import com.statnlp.projects.dep.DependencyTransformer;
+import com.statnlp.projects.dep.model.segdep.SDInstance;
+import com.statnlp.projects.dep.model.segdep.SDReader;
 import com.statnlp.projects.entity.semi.SemiCRFInstance;
 import com.statnlp.projects.entity.semi.SemiCRFMain;
 
@@ -60,14 +62,14 @@ public class IterativeModel {
 				e.printStackTrace();
 			}
 			in.close();
-//			System.err.println("[Info] Reading depOnly model...");
-//			in = new ObjectInputStream(new FileInputStream(depOnlyModelFile));
-//			try {
-//				depOnlyModel = (NetworkModel)in.readObject();
-//			} catch (ClassNotFoundException e) {
-//				e.printStackTrace();
-//			}
-//			in.close();
+			System.err.println("[Info] Reading depOnly model...");
+			in = new ObjectInputStream(new FileInputStream(depOnlyModelFile));
+			try {
+				depOnlyModel = (NetworkModel)in.readObject();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			in.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -90,8 +92,8 @@ public class IterativeModel {
 	 * @throws InterruptedException 
 	 * @throws IOException 
 	 */
-	private DependInstance[] init() throws InterruptedException, IOException {
-		System.err.println("[Info] Initialization...");
+	private DependInstance[] initSemi() throws InterruptedException, IOException {
+		System.err.println("[Info] Initialization semiCRF result without dep...");
 		SemiCRFMain.readCoNLLData(trainFile, false,	-1);
 		DependencyReader.readCoNLLX(trainFile, false, -1, new DependencyTransformer(), false);
 		SemiCRFMain.readCoNLLData(testFile, false,	-1);
@@ -104,14 +106,14 @@ public class IterativeModel {
 		return Converter.semiInst2DepInst(results);
 	}
 	
-	@SuppressWarnings("unused")
-	private void debug() throws InterruptedException, IOException {
-		System.err.println("[Info] Debugging with dep model with entity features...");
+	private SemiCRFInstance[] initDep() throws InterruptedException, IOException {
+		System.err.println("[Info] Initialization Dependency result without semi...");
 		DependencyReader.readCoNLLX(trainFile, false, -1, new DependencyTransformer(), false);
 		DependInstance[] testInstances = DependencyReader.readCoNLLX(testFile, false,testNumber, new DependencyTransformer(), false);
 		NetworkIDMapper.setCapacity(new int[]{500, 500, 5, 5, 100, 10});
-		Instance[] results = depModel.decode(testInstances);
+		Instance[] results = depOnlyModel.decode(testInstances);
 		Eval.evalDP(results, this.results);
+		return Converter.depInst2SemiInst(results);
 	}
 	
 	/**
@@ -119,22 +121,44 @@ public class IterativeModel {
 	 * @throws IOException 
 	 * @throws InterruptedException 
 	 */
-	public void iterate(int maxIter) throws InterruptedException, IOException {
-		DependInstance[] testDepInsts = init();
+	public void iterate(int maxIter, String segmentedModel) throws InterruptedException, IOException {
+		DependInstance[] testDepInsts = initSemi();
+		SemiCRFInstance[] testSemiInsts = initDep();
+		Instance[] depRes;
 		Instance[] semiRes = null;
-		for (int it = 0; it < maxIter; it++) {
+		for (int it = 1; it <= maxIter; it++) {
 			NetworkIDMapper.setCapacity(new int[]{500, 500, 5, 5, 100, 10});
-			System.err.println("[Info] Iteration " + (it + 1) + ":");
-			Instance[] depRes = depModel.decode(testDepInsts);
+			System.err.println("[Info] Iteration " + it + ":");
+			depRes = depModel.decode(testDepInsts);
 			Eval.evalDP(depRes, this.results);
-			SemiCRFInstance[] testSemiInsts =  Converter.depInst2SemiInst(depRes);
 			NetworkIDMapper.setCapacity(new int[]{10000, 20, 100});
 			semiRes = semiModel.decode(testSemiInsts);
 //			Eval.evalNERFile(semiRes, testFile, nerOut);
 			Eval.evalNER(semiRes, this.results, nerOut);
 			testDepInsts = Converter.semiInst2DepInst(semiRes);
+			testSemiInsts =  Converter.depInst2SemiInst(depRes);
 			System.err.println();
 		}
+		//go through the segmented parsing model.
+		segmentedParsing(segmentedModel, semiRes);
+	}
+	
+	private void segmentedParsing(String segmentedModel, Instance[] semiInsts) throws FileNotFoundException, IOException, InterruptedException {
+		System.err.println("[Info] Reading Segmented Dependency Parsing Model...");
+		NetworkModel segmentedDepModel = null;
+		ObjectInputStream in = new ObjectInputStream(new FileInputStream(segmentedModel));
+		try {
+			segmentedDepModel = (NetworkModel)in.readObject();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		in.close();
+		SDReader.readCoNLLXData(trainFile, true, -1, true, false);
+		SDInstance[] resultInstances = SDReader.readCoNLLXData(testFile, false, testNumber, false, false);
+		SDInstance[] testInsts = Converter.semiInst2SDInst(semiInsts);
+		NetworkIDMapper.setCapacity(new int[]{500, 500, 5, 5, 10});
+		Instance[] results = segmentedDepModel.decode(testInsts);
+		Eval.evalSpanDep(resultInstances, results);
 	}
 	
 	public static void main(String[] args) throws InterruptedException, IOException {
@@ -149,9 +173,10 @@ public class IterativeModel {
 		String testFile = "data/allanprocess/"+data+"/test.conllx";
 		String trainFile = "data/allanprocess/"+data+"/train.conllx";
 		String nerOut = "data/allanprocess/"+data+"/output/semi.pipe.eval.txt";
+		String segmentedModel = "data/allanprocess/"+data+"/output/SegDep.test.model";
 		IterativeModel model = new IterativeModel(depOnlyModelFile, depModelFile, semiModelFile, semiOnlyModelFile, testFile, testNumber);
 		model.setFiles(trainFile, nerOut);
-		model.iterate(maxIter);
+		model.iterate(maxIter, segmentedModel);
 	}
 
 }

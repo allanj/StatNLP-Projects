@@ -8,14 +8,14 @@ import java.io.Serializable;
  * @author allanjie
  *
  */
-public class Span implements Comparable<Span>, Serializable{
+public class SegSpan implements Comparable<SegSpan>, Serializable{
 	
 	private static final long serialVersionUID = 1849557517361796614L;
 	public SpanLabel label;
 	public int start;
 	public int end;
 
-	public Span(int start, int end, SpanLabel label) {
+	public SegSpan(int start, int end, SpanLabel label) {
 		if(start>end)
 			throw new RuntimeException("Start cannot be larger than end");
 		this.start = start;
@@ -30,8 +30,8 @@ public class Span implements Comparable<Span>, Serializable{
 	
 	@Override
 	public boolean equals(Object o){
-		if(o instanceof Span){
-			Span s = (Span)o;
+		if(o instanceof SegSpan){
+			SegSpan s = (SegSpan)o;
 			if(start != s.start) return false;
 			if(end != s.end) return false;
 			return label.equals(s.label);
@@ -50,7 +50,7 @@ public class Span implements Comparable<Span>, Serializable{
 	}
 
 	@Override
-	public int compareTo(Span o) {
+	public int compareTo(SegSpan o) {
 		if(start < o.start) return -1;
 		if(start > o.start) return 1;
 		if(end < o.start) return -1;
