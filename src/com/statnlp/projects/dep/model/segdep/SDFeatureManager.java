@@ -58,12 +58,8 @@ public class SDFeatureManager extends FeatureManager {
 		ArrayList<Integer> enList = new ArrayList<Integer>();
 		
 		if (completeness == COMP.incomp.ordinal()) {
-			for (int l = segments.get(leftSpanIndex).start; l <= segments.get(leftSpanIndex).end; l++) {
-				for (int r = segments.get(rightSpanIndex).start; r <= segments.get(rightSpanIndex).end; r++) {
-					addDepFeatures(headList, headDistList, modifierList, modifierDistList, pairList, pairDistList, bound1, bound1Dist, bound2, bound2Dist, bound3, bound3Dist, bound4, bound4Dist, inDistList, inList, enList, 
-							network, l, r, completeness, direction, sent, segments, leftSpanIndex, rightSpanIndex);
-				}
-			}
+			addDepFeatures(headList, headDistList, modifierList, modifierDistList, pairList, pairDistList, bound1, bound1Dist, bound2, bound2Dist, bound3, bound3Dist, bound4, bound4Dist, inDistList, inList, enList, 
+					network, leftSpanIndex, rightSpanIndex, completeness, direction, sent, segments);
 		}
 	
 		ArrayList<Integer> finalList = new ArrayList<Integer>();
@@ -121,15 +117,41 @@ public class SDFeatureManager extends FeatureManager {
 	private void addDepFeatures(List<Integer> headList, List<Integer> headDistList, List<Integer> modifierList, List<Integer> modifierDistList,
 			List<Integer> pairList, List<Integer> pairDistList, List<Integer> bound1, List<Integer> bound1Dist, List<Integer> bound2, List<Integer> bound2Dist, 
 			List<Integer> bound3, List<Integer> bound3Dist, List<Integer> bound4, List<Integer> bound4Dist, List<Integer> inDistList, List<Integer> inList, List<Integer> enList,
-			 Network network, int leftIndex, int rightIndex, int completeness, int direction, Sentence sent, List<SegSpan> segments, int leftSpanIndex, int rightSpanIndex){
+			 Network network, int leftSpanIndex, int rightSpanIndex, int completeness, int direction, Sentence sent, List<SegSpan> segments){
 		
-		String leftTag = sent.get(leftIndex).getTag();
-		String rightTag = sent.get(rightIndex).getTag();
-		String leftA = leftTag.substring(0, 1);
-		String rightA = rightTag.substring(0, 1);
+//		String leftTag = sent.get(leftIndex).getTag();
+//		String rightTag = sent.get(rightIndex).getTag();
+//		String leftA = leftTag.substring(0, 1);
+//		String rightA = rightTag.substring(0, 1);
+		SegSpan leftSpan = segments.get(leftSpanIndex);
+		SegSpan rightSpan = segments.get(rightSpanIndex);
+		String leftTag = "";
+		String rightTag = "";
+		String leftA = "";
+		String rightA = "";
+		for (int idx = leftSpan.start; idx <= leftSpan.end; idx++) {
+			if (idx == leftSpan.end) {
+				leftTag += sent.get(idx).getTag();
+				leftA += sent.get(idx).getTag().substring(0, 1);
+			} else {
+				leftTag += sent.get(idx).getTag() + "_";
+				leftA += sent.get(idx).getTag().substring(0, 1) + "_";
+			}
+		}
 		
-		//dist in a token sense...
-		int dist = Math.abs(rightIndex - leftIndex);
+		for (int idx = rightSpan.start; idx <= rightSpan.end; idx++) {
+			if (idx == rightSpan.end) {
+				rightTag += sent.get(idx).getTag();
+				rightA += sent.get(idx).getTag().substring(0, 1);
+			} else {
+				rightTag += sent.get(idx).getTag() + "_";
+				rightA += sent.get(idx).getTag().substring(0, 1) + "_";
+			}
+		}
+		
+		//dist in a span sense sense...
+		/**Dist is over span now.**/
+		int dist = Math.abs(rightSpanIndex - leftSpanIndex);
 		String att = direction == 1 ? "RA" : "LA";
 		String distBool = "0";
 		if(dist > 1)  distBool = "1";
@@ -142,14 +164,39 @@ public class SDFeatureManager extends FeatureManager {
 		//maybe we can concatenate the whole span.
 		
 		if (completeness == 0) {
-			int headIndex = direction == DIR.right.ordinal()? leftIndex: rightIndex;
-			int modifierIndex = direction == DIR.right.ordinal()? rightIndex : leftIndex;
+//			int headIndex = direction == DIR.right.ordinal()? leftIndex: rightIndex;
+//			int modifierIndex = direction == DIR.right.ordinal()? rightIndex : leftIndex;
 			int headSpanIndex = direction == DIR.right.ordinal()? leftSpanIndex: rightSpanIndex;
 			int modifierSpanIndex = direction == DIR.right.ordinal()? rightSpanIndex : leftSpanIndex;
-			String headWord = sent.get(headIndex).getName();
-			String headTag = sent.get(headIndex).getTag();
-			String modifierWord = sent.get(modifierIndex).getName();
-			String modifierTag = sent.get(modifierIndex).getTag();
+			SegSpan headSpan = segments.get(headSpanIndex);
+			SegSpan modifierSpan = segments.get(modifierSpanIndex);
+//			String headWord = sent.get(headIndex).getName();
+//			String headTag = sent.get(headIndex).getTag();
+//			String modifierWord = sent.get(modifierIndex).getName();
+//			String modifierTag = sent.get(modifierIndex).getTag();
+			String headWord = "";
+			String headTag = "";
+			String modifierWord = "";
+			String modifierTag = "";
+			for (int idx = headSpan.start; idx <= headSpan.end; idx++) {
+				if (idx == headSpan.end) {
+					headWord += sent.get(idx).getName();
+					headTag += sent.get(idx).getTag();
+				} else {
+					headWord += sent.get(idx).getName() + "_";
+					headTag += sent.get(idx).getTag() + "_";
+				}
+			}
+			for (int idx = modifierSpan.start; idx <= modifierSpan.end; idx++) {
+				if (idx == modifierSpan.end) {
+					modifierWord += sent.get(idx).getName();
+					modifierTag += sent.get(idx).getTag();
+				} else {
+					modifierWord += sent.get(idx).getName() + "_";
+					modifierTag += sent.get(idx).getTag() + "_";
+				}
+			}
+			
 			
 			if(headWord.length()>5 || modifierWord.length()>5){
 				int hL = headWord.length();
@@ -218,15 +265,88 @@ public class SDFeatureManager extends FeatureManager {
 		
 			
 			
-			String leftMinusTag = leftIndex>0? sent.get(leftIndex-1).getTag(): "STR";
-			String rightPlusTag = rightIndex<sent.length()-1? sent.get(rightIndex+1).getTag():"END";
-			String leftPlusTag = leftIndex<rightIndex-1? sent.get(leftIndex+1).getTag():"MID";
-			String rightMinusTag = rightIndex-1 > leftIndex? sent.get(rightIndex-1).getTag():"MID";
+//			String leftMinusTag = leftIndex>0? sent.get(leftIndex-1).getTag(): "STR";
+//			String rightPlusTag = rightIndex<sent.length()-1? sent.get(rightIndex+1).getTag():"END";
+//			String leftPlusTag = leftIndex<rightIndex-1? sent.get(leftIndex+1).getTag():"MID";
+//			String rightMinusTag = rightIndex-1 > leftIndex? sent.get(rightIndex-1).getTag():"MID";
+//			
+//			String leftMinusA = leftIndex>0? sent.get(leftIndex-1).getATag(): "STR";
+//			String rightPlusA = rightIndex<sent.length()-1? sent.get(rightIndex+1).getATag():"END";
+//			String leftPlusA = leftIndex<rightIndex-1? sent.get(leftIndex+1).getATag():"MID";
+//			String rightMinusA = rightIndex-1 > leftIndex?sent.get(rightIndex-1).getATag():"MID";
+			String leftMinusTag = "";
+			String rightPlusTag = "";
+			String leftPlusTag = "";
+			String rightMinusTag = "";
 			
-			String leftMinusA = leftIndex>0? sent.get(leftIndex-1).getATag(): "STR";
-			String rightPlusA = rightIndex<sent.length()-1? sent.get(rightIndex+1).getATag():"END";
-			String leftPlusA = leftIndex<rightIndex-1? sent.get(leftIndex+1).getATag():"MID";
-			String rightMinusA = rightIndex-1 > leftIndex?sent.get(rightIndex-1).getATag():"MID";
+			String leftMinusA = "";
+			String rightPlusA = "";
+			String leftPlusA = "";
+			String rightMinusA = "";
+			if (leftSpanIndex > 0) {
+				SegSpan leftMinusSpan = segments.get(leftSpanIndex - 1);
+				for (int idx = leftMinusSpan.start; idx <= leftMinusSpan.end; idx++) {
+					if (idx == leftMinusSpan.end) {
+						leftMinusTag += sent.get(idx).getTag();
+						leftMinusA += sent.get(idx).getATag();
+					} else {
+						leftMinusTag += sent.get(idx).getTag() + "_";
+						leftMinusA += sent.get(idx).getATag() + "_";
+					}
+				}
+			} else {
+				leftMinusTag = "STR";
+				leftMinusA = "STR";
+			}
+			
+			
+			if (rightSpanIndex < segments.size() - 1) {
+				SegSpan rightPlusSpan = segments.get(rightSpanIndex + 1);
+				for (int idx = rightPlusSpan.start; idx <= rightPlusSpan.end; idx++) {
+					if (idx == rightPlusSpan.end) {
+						rightPlusTag += sent.get(idx).getTag();
+						leftMinusA += sent.get(idx).getATag();
+					} else {
+						rightPlusTag += sent.get(idx).getTag() + "_";
+						leftMinusA += sent.get(idx).getATag() + "_";
+					}
+				}
+			} else {
+				rightPlusTag = "END";
+				rightPlusA = "END";
+			}
+			
+			if (leftSpanIndex < rightSpanIndex - 1) {
+				SegSpan leftPlusSpan = segments.get(leftSpanIndex + 1);
+				for (int idx = leftPlusSpan.start; idx <= leftPlusSpan.end; idx++) {
+					if (idx == leftPlusSpan.end) {
+						leftPlusTag += sent.get(idx).getTag();
+						leftPlusA += sent.get(idx).getATag();
+					} else {
+						leftPlusTag += sent.get(idx).getTag() + "_";
+						leftPlusA += sent.get(idx).getATag() + "_";
+					}
+				}
+			} else {
+				leftPlusTag = "END";
+				leftPlusA = "END";
+			}
+			
+			if (rightSpanIndex - 1 > leftSpanIndex) {
+				SegSpan rightMinusSpan = segments.get(rightSpanIndex - 1);
+				for (int idx = rightMinusSpan.start; idx <= rightMinusSpan.end; idx++) {
+					if (idx == rightMinusSpan.end) {
+						rightMinusTag += sent.get(idx).getTag();
+						rightMinusA += sent.get(idx).getATag();
+					} else {
+						rightMinusTag += sent.get(idx).getTag() + "_";
+						rightMinusA += sent.get(idx).getATag() + "_";
+					}
+				}
+			} else {
+				rightMinusTag = "END";
+				rightMinusA = "END";
+			}
 			
 			//l-1,l,r,r+1
 			bound1Dist.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-1-1-dist", leftMinusTag+","+leftTag+","+rightTag+","+rightPlusTag+attDist));
@@ -292,11 +412,30 @@ public class SDFeatureManager extends FeatureManager {
 			bound4.add(this._param_g.toFeature(network, FeaType.contextual.name(), "contextual-4-1a", leftA+","+leftPlusA+","+rightA+","+rightPlusA));
 			
 			
-			for(int i=leftIndex+1;i<rightIndex;i++){
-				inDistList.add(this._param_g.toFeature(network, FeaType.inbetween.name(), "inbetween-1", leftTag+","+sent.get(i).getTag()+","+rightTag+attDist));
-				inList.add(this._param_g.toFeature(network, FeaType.inbetween.name(), "inbetween-2", leftTag+","+sent.get(i).getTag()+","+rightTag));
-				inDistList.add(this._param_g.toFeature(network, FeaType.inbetween.name(), "inbetween-3", leftA+","+sent.get(i).getATag()+","+rightA+attDist));
-				inList.add(this._param_g.toFeature(network, FeaType.inbetween.name(), "inbetween-4", leftA+","+sent.get(i).getATag()+","+rightA));
+//			for(int i = leftIndex + 1; i < rightIndex; i++){
+//				inDistList.add(this._param_g.toFeature(network, FeaType.inbetween.name(), "inbetween-1", leftTag+","+sent.get(i).getTag()+","+rightTag+attDist));
+//				inList.add(this._param_g.toFeature(network, FeaType.inbetween.name(), "inbetween-2", leftTag+","+sent.get(i).getTag()+","+rightTag));
+//				inDistList.add(this._param_g.toFeature(network, FeaType.inbetween.name(), "inbetween-3", leftA+","+sent.get(i).getATag()+","+rightA+attDist));
+//				inList.add(this._param_g.toFeature(network, FeaType.inbetween.name(), "inbetween-4", leftA+","+sent.get(i).getATag()+","+rightA));
+//			}
+			
+			for(int i = leftSpanIndex + 1; i < rightSpanIndex; i++){
+				SegSpan middleSpan = segments.get(i);
+				String middleTag = "";
+				String middleATag = "";
+				for (int idx = middleSpan.start; idx <= middleSpan.end; idx++) {
+					if (idx == middleSpan.end) {
+						middleTag += sent.get(idx).getTag();
+						middleATag += sent.get(idx).getATag();
+					} else {
+						middleTag += sent.get(idx).getTag() + "_";
+						middleATag += sent.get(idx).getATag() + "_";
+					}
+				}
+				inDistList.add(this._param_g.toFeature(network, FeaType.inbetween.name(), "inbetween-1", leftTag+","+middleTag+","+rightTag+attDist));
+				inList.add(this._param_g.toFeature(network, FeaType.inbetween.name(), "inbetween-2", leftTag+","+middleTag+","+rightTag));
+				inDistList.add(this._param_g.toFeature(network, FeaType.inbetween.name(), "inbetween-3", leftA+","+middleATag+","+rightA+attDist));
+				inList.add(this._param_g.toFeature(network, FeaType.inbetween.name(), "inbetween-4", leftA+","+middleATag+","+rightA));
 			}
 			
 			//entity features

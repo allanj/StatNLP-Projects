@@ -108,7 +108,6 @@ public class Eval {
 	 */
 	public static void evalSpanDep(Instance[] goldTestInsts, Instance[] testInsts) {
 		int corr = 0;
-		int predTotal = 0;
 		int goldTotal = 0;
 		for (int index = 0; index < testInsts.length; index++) {
 			SDInstance inst = (SDInstance)(testInsts[index]);
@@ -118,30 +117,27 @@ public class Eval {
 			processSegment(predSegs);
 			processSegment(goldSegs);
 			int[] output = goldInst.getOutput();
-			Map<SegSpan, Integer> goldSegHeadmap = new HashMap<SegSpan, Integer>(predSegs.size());
-			for (int s = 1; s < goldSegs.size(); s++) {
-				goldSegHeadmap.put(goldSegs.get(s), output[s]);
-			}
 			int[] prediction = inst.getPrediction();
-			for (int i = 1; i < prediction.length; i++) {
-				SegSpan curr = predSegs.get(i);
-				if (goldSegHeadmap.containsKey(curr)) {
-					int headSpanIdx = prediction[i];
-					SegSpan predHeadSpan = predSegs.get(headSpanIdx);
-					SegSpan goldHeadSpan = goldSegs.get(goldSegHeadmap.get(curr));
-					if (predHeadSpan.equals(goldHeadSpan)) 
+			Map<SegSpan, Integer> predSegHeadmap = new HashMap<SegSpan, Integer>(predSegs.size());
+			for (int s = 1; s < predSegs.size(); s++) {
+				predSegHeadmap.put(predSegs.get(s), prediction[s]);
+			}
+			for (int i = 1; i < output.length; i++) {
+				SegSpan curr = goldSegs.get(i);
+				if (predSegHeadmap.containsKey(curr)) {
+					int predHeadSpanIdx = predSegHeadmap.get(curr);
+					SegSpan predHeadSpan = predSegs.get(predHeadSpanIdx);
+					SegSpan goldHeadSpan = goldSegs.get(output[i]);
+					if (predHeadSpan.equals(goldHeadSpan))
 						corr++;
 				}
 			}
-			predTotal += prediction.length - 1;
 			goldTotal += output.length - 1;
 		}
 		System.out.println("**Evaluation of Segmented Dependency Result**");
 		System.out.println("[Dependency] Correct: "+corr);
-		System.out.println("[Dependency] Prediction Total: "+predTotal);
 		System.out.println("[Dependency] Gold Total: "+goldTotal);
-		System.out.printf("[Dependency] Metric 1 (pred): %.2f\n", corr*1.0/predTotal*100);
-		System.out.printf("[Dependency] Metric 2 (gold): %.2f\n", corr*1.0/goldTotal*100);
+		System.out.printf("[Dependency] UAS: %.2f\n", corr*1.0/goldTotal*100);
 		System.out.println("*************************");
 	}
 	
