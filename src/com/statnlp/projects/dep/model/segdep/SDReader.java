@@ -39,13 +39,13 @@ public class SDReader {
 		int maxEntityLength = -1;
 		words.add(new WordToken(ROOT_WORD, ROOT_TAG));
 		originalHeads.add(-1);
-		ArrayList<Span> segments = new ArrayList<Span>();
-		segments.add(new Span(0, 0, Label.get("O")));
+		ArrayList<SegSpan> segments = new ArrayList<SegSpan>();
+		segments.add(new SegSpan(0, 0, SpanLabel.get("O")));
 		idx2SpanIdx.put(0, segments.size()-1);
 		int instanceId = 1;
 		int start = -1;
 		int end = 0;
-		Label prevLabel = null;
+		SpanLabel prevLabel = null;
 		while(br.ready()){
 			String line = br.readLine().trim();
 			if(line.length() == 0){
@@ -63,7 +63,7 @@ public class SDReader {
 				instance.output[0] = -1;
 				//assign span with head span
 				for (int s = 1; s < segments.size(); s++) {
-					Span span = segments.get(s);
+					SegSpan span = segments.get(s);
 					if (span.length() == 1) {
 						if (originalHeads.get(span.start) != -1){
 							instance.output[s] = idx2SpanIdx.get(originalHeads.get(span.start));
@@ -118,8 +118,8 @@ public class SDReader {
 					words.add(new WordToken(ROOT_WORD, ROOT_TAG));
 					originalHeads = new ArrayList<>();
 					originalHeads.add(-1);
-					segments = new ArrayList<Span>();
-					segments.add(new Span(0, 0, Label.get("O")));
+					segments = new ArrayList<SegSpan>();
+					segments.add(new SegSpan(0, 0, SpanLabel.get("O")));
 					idx2SpanIdx = new HashMap<>();
 					idx2SpanIdx.put(0, segments.size()-1);
 					continue;
@@ -134,8 +134,8 @@ public class SDReader {
 				maxSentenceLength = Math.max(maxSentenceLength, instance.size());
 				words = new ArrayList<WordToken>();
 				words.add(new WordToken(ROOT_WORD, ROOT_TAG));
-				segments = new ArrayList<Span>();
-				segments.add(new Span(0, 0, Label.get("O")));
+				segments = new ArrayList<SegSpan>();
+				segments.add(new SegSpan(0, 0, SpanLabel.get("O")));
 				originalHeads = new ArrayList<>();
 				originalHeads.add(-1);
 				idx2SpanIdx = new HashMap<>();
@@ -156,7 +156,7 @@ public class SDReader {
 				if(depLabel.contains("|")) throw new RuntimeException("Mutiple label?");
 				words.add(new WordToken(word, pos));
 				originalHeads.add(headIdx);
-				Label label = null;
+				SpanLabel label = null;
 				if(form.startsWith("B")){
 					if(start != -1){
 						end = index - 1;
@@ -164,10 +164,10 @@ public class SDReader {
 						maxEntityLength = Math.max(maxEntityLength, segments.get(segments.size()-1).length());
 					}
 					start = index;
-					label = Label.get(form.substring(2));
+					label = SpanLabel.get(form.substring(2));
 					
 				} else if(form.startsWith("I")){
-					label = Label.get(form.substring(2));
+					label = SpanLabel.get(form.substring(2));
 				} else if(form.startsWith("O")){
 					if(start != -1){
 						end = index - 1;
@@ -175,9 +175,9 @@ public class SDReader {
 						maxEntityLength = Math.max(maxEntityLength, segments.get(segments.size()-1).length());
 					}
 					start = -1;
-					createSpan(segments, index, index, Label.get("O"), idx2SpanIdx, lenOne);
+					createSpan(segments, index, index, SpanLabel.get("O"), idx2SpanIdx, lenOne);
 					maxEntityLength = Math.max(maxEntityLength, segments.get(segments.size()-1).length());
-					label = Label.get("O");
+					label = SpanLabel.get("O");
 				}
 				prevLabel = label;
 			}
@@ -191,7 +191,7 @@ public class SDReader {
 	}
 	
 	//return left most and right most elements. 
-	private static int[] createRanges(List<Integer> originalHeads, Span span) {
+	private static int[] createRanges(List<Integer> originalHeads, SegSpan span) {
 		int[] lrmost = new int[2];
 		Arrays.fill(lrmost, -1);
 		for (int i = 0; i < originalHeads.size(); i++) {
@@ -208,7 +208,7 @@ public class SDReader {
 		return lrmost;
 	}
 	
- 	private static void createSpan(List<Span> segments, int start, int end, Label label, Map<Integer, Integer> idx2SpanIdx, boolean lenOne){
+ 	private static void createSpan(List<SegSpan> segments, int start, int end, SpanLabel label, Map<Integer, Integer> idx2SpanIdx, boolean lenOne){
 		if (label == null) {
 			throw new RuntimeException("The label is null");
 		}
@@ -217,18 +217,18 @@ public class SDReader {
 		}
 		if (label.form.equals("O")) {
 			for (int i = start; i <= end; i++) {
-				segments.add(new Span(i, i, label));
+				segments.add(new SegSpan(i, i, label));
 				idx2SpanIdx.put(i, segments.size()-1);
 			}
 		} else {
 			if (!lenOne) {
-				segments.add(new Span(start, end, label));
+				segments.add(new SegSpan(start, end, label));
 				for (int i = start; i <= end; i++) {
 					idx2SpanIdx.put(i, segments.size()-1);
 				}
 			} else {
 				for (int i = start; i <= end; i++) {
-					segments.add(new Span(i, i, label));
+					segments.add(new SegSpan(i, i, label));
 					idx2SpanIdx.put(i, segments.size()-1);
 				}
 			}

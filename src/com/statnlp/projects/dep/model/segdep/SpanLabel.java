@@ -4,24 +4,24 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Label implements Comparable<Label>, Serializable{
+public class SpanLabel implements Comparable<SpanLabel>, Serializable{
 	
 	private static final long serialVersionUID = -3314363044582374266L;
-	public static final Map<String, Label> Labels = new HashMap<String, Label>();
-	public static final Map<Integer, Label> Label_Index = new HashMap<Integer, Label>();
+	public static final Map<String, SpanLabel> Labels = new HashMap<String, SpanLabel>();
+	public static final Map<Integer, SpanLabel> Label_Index = new HashMap<Integer, SpanLabel>();
 	public static boolean locked = false;
 	
-	public static Label get(String form){
+	public static SpanLabel get(String form){
 		if(!Labels.containsKey(form)){
 			if (locked) throw new RuntimeException("The label set is locked. cannot add more. ");
-			Label label = new Label(form, Labels.size());
+			SpanLabel label = new SpanLabel(form, Labels.size());
 			Labels.put(form, label);
 			Label_Index.put(label.id, label);
 		}
 		return Labels.get(form);
 	}
 	
-	public static Label get(int id){
+	public static SpanLabel get(int id){
 		return Label_Index.get(id);
 	}
 	
@@ -35,7 +35,7 @@ public class Label implements Comparable<Label>, Serializable{
 	public String form;
 	public int id;
 	
-	private Label(String form, int id) {
+	public SpanLabel(String form, int id) {
 		this.form = form;
 		this.id = id;
 	}
@@ -55,9 +55,9 @@ public class Label implements Comparable<Label>, Serializable{
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof Label))
+		if (!(obj instanceof SpanLabel))
 			return false;
-		Label other = (Label) obj;
+		SpanLabel other = (SpanLabel) obj;
 		if (form == null) {
 			if (other.form != null)
 				return false;
@@ -71,11 +71,11 @@ public class Label implements Comparable<Label>, Serializable{
 	}
 
 	@Override
-	public int compareTo(Label o) {
+	public int compareTo(SpanLabel o) {
 		return Integer.compare(id, o.id);
 	}
 	
-	public static int compare(Label o1, Label o2){
+	public static int compare(SpanLabel o1, SpanLabel o2){
 		if(o1 == null){
 			if(o2 == null) return 0;
 			else return -1;
