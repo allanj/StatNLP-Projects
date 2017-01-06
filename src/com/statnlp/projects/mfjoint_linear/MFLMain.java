@@ -1,4 +1,4 @@
-package com.statnlp.projects.mfjoint;
+package com.statnlp.projects.mfjoint_linear;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,7 +14,7 @@ import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
 import com.statnlp.hybridnetworks.NetworkModel;
 import com.statnlp.projects.mfjoint.MFJConfig.MFJTASK;
 
-public class MFJMain {
+public class MFLMain {
 
 	
 	public static String trainFile;
@@ -32,8 +32,8 @@ public class MFJMain {
 	public static MFJTASK task = MFJTASK.JOINT;
 	public static boolean useJointFeatures = false;
 	public static int maxSize = 150;
-	public static int maxSegmentLength = 8;
 	public static String nerOut;
+	public static boolean iobes = true;
 	
 	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
 		
@@ -53,8 +53,8 @@ public class MFJMain {
 		System.err.println("[Info] use joint features?: " + useJointFeatures);
 		
 		boolean checkProjective = task == MFJTASK.PARING || task == MFJTASK.JOINT ? true : false;
-		MFJInstance[] trainInsts = MFJReader.readCoNLLXData(trainFile, true, trainNum, checkProjective);
-		MFJInstance[] testInsts = MFJReader.readCoNLLXData(testFile, false, testNum, false);
+		MFLInstance[] trainInsts = MFLReader.readCoNLLXData(trainFile, true, trainNum, checkProjective, iobes);
+		MFLInstance[] testInsts = MFLReader.readCoNLLXData(testFile, false, testNum, false, false);
 		
 		NetworkConfig.NUM_THREADS = numThreads;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = l2;
@@ -65,12 +65,13 @@ public class MFJMain {
 		/***DEBUG configuration***/
 //		MFJConfig.windows = false;
 //		useJointFeatures = true;
+//		NetworkConfig.MAX_MF_UPDATES = 2;
 		/******/
 		
 		NetworkModel model = null;
 		if (!readModel) {
-			MFJNetworkCompiler compiler = new MFJNetworkCompiler(task, maxSize, maxSegmentLength);
-			MFJFeatureManager fm = new MFJFeatureManager(new GlobalNetworkParam(), useJointFeatures, maxSegmentLength);
+			MFLNetworkCompiler compiler = new MFLNetworkCompiler(task, maxSize, iobes);
+			MFLFeatureManager fm = new MFLFeatureManager(new GlobalNetworkParam(), useJointFeatures);
 			model = DiscriminativeNetworkModel.create(fm, compiler);
 			model.train(trainInsts, numIterations);
 		} else {
@@ -87,9 +88,9 @@ public class MFJMain {
 		
 		Instance[] predictions = model.decode(testInsts);
 		if (task == MFJTASK.PARING || task == MFJTASK.JOINT)
-			MFJEval.evalDep(predictions);
+			MFLEval.evalDep(predictions);
 		if ((task == MFJTASK.NER || task == MFJTASK.JOINT))
-			MFJEval.evalNER(predictions, nerOut);
+			MFLEval.evalNER(predictions, nerOut);
 	}
 
 	public static void processArgs(String[] args){
@@ -106,7 +107,7 @@ public class MFJMain {
 					case "-iter": numIterations = Integer.valueOf(args[i+1]); break;
 					case "-thread": numThreads = Integer.valueOf(args[i+1]); break;
 					case "-reg": l2 = Double.valueOf(args[i+1]); break;
-					case "-windows": MFJConfig.windows = args[i+1].equals("true")? true:false; break;
+					case "-windows": MFLConfig.windows = args[i+1].equals("true")? true:false; break;
 					case "-mfround": NetworkConfig.MAX_MF_UPDATES = Integer.valueOf(args[i+1]);
 									 useJointFeatures = true;
 									 if(NetworkConfig.MAX_MF_UPDATES == 0) useJointFeatures = false;
