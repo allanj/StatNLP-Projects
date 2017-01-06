@@ -385,31 +385,32 @@ public abstract class NetworkModel implements Serializable{
 				this._fm.mergeSubFeaturesToGlobalFeatures();
 			}
 		}
-//		if(labeledNetworkByInstanceId == null || unlabeledNetworkByInstanceId == null){
-//			labeledNetworkByInstanceId = new Network[this._allInstances.length];
-//			unlabeledNetworkByInstanceId = new Network[this._allInstances.length];
-//			Network[] arr;
-//			for(int threadId=0; threadId < insts.length; threadId++){
-//				LocalNetworkLearnerThread learner = this._learners[threadId];
-//				for(int networkId=0; networkId < insts[threadId].length; networkId++){
-//					Instance instance = insts[threadId][networkId];
-//					int instanceId = instance.getInstanceId();
-//					if(instanceId < 0){
-//						arr = unlabeledNetworkByInstanceId;
-//						instanceId = -instanceId;
-//					} else {
-//						arr = labeledNetworkByInstanceId;
-//					}
-//					instanceId -= 1;
-//					arr[instanceId] = learner.getNetwork(networkId);
-//				} 
-//			}
-//			if(unlabeledNetworkByInstanceId[0] == null){
-//				arr = labeledNetworkByInstanceId;
-//				labeledNetworkByInstanceId = unlabeledNetworkByInstanceId;
-//				unlabeledNetworkByInstanceId = arr;
-//			}
-//		}
+		//comment this "if" if using posterior because the instance id is resetting.
+		if(labeledNetworkByInstanceId == null || unlabeledNetworkByInstanceId == null){
+			labeledNetworkByInstanceId = new Network[this._allInstances.length];
+			unlabeledNetworkByInstanceId = new Network[this._allInstances.length];
+			Network[] arr;
+			for(int threadId=0; threadId < insts.length; threadId++){
+				LocalNetworkLearnerThread learner = this._learners[threadId];
+				for(int networkId=0; networkId < insts[threadId].length; networkId++){
+					Instance instance = insts[threadId][networkId];
+					int instanceId = instance.getInstanceId();
+					if(instanceId < 0){
+						arr = unlabeledNetworkByInstanceId;
+						instanceId = -instanceId;
+					} else {
+						arr = labeledNetworkByInstanceId;
+					}
+					instanceId -= 1;
+					arr[instanceId] = learner.getNetwork(networkId);
+				} 
+			}
+			if(unlabeledNetworkByInstanceId[0] == null){
+				arr = labeledNetworkByInstanceId;
+				labeledNetworkByInstanceId = unlabeledNetworkByInstanceId;
+				unlabeledNetworkByInstanceId = arr;
+			}
+		}
 	}
 	
 	public Instance[] decode(Instance[] allInstances) throws InterruptedException {
