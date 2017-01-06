@@ -93,6 +93,7 @@ public class SDMain {
 		NetworkConfig.NUM_THREADS = numThreads;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //DPConfig.L2;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
+		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
 		
 		NetworkModel model = null;
 		if (readModel) {

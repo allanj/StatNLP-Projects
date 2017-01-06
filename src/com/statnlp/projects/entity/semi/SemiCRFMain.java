@@ -266,6 +266,7 @@ public class SemiCRFMain {
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = l2;
 		NetworkConfig.NUM_THREADS = numThread;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
+		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
 
 		//modify this. and read neural config
 		OptimizerFactory of = NetworkConfig.USE_NEURAL_FEATURES || NetworkConfig.MODEL_TYPE==ModelType.SSVM? 

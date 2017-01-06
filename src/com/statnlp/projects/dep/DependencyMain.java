@@ -132,6 +132,7 @@ public class DependencyMain {
 		//0.1 is the best after tunning the parameters
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //default is 0.1
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
+		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
 		System.err.println("[Info] Regularization Parameter: "+NetworkConfig.L2_REGULARIZATION_CONSTANT);
 		
 		NetworkModel model = null;
