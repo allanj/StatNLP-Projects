@@ -102,7 +102,7 @@ public abstract class Network implements Serializable, HyperGraph{
 	/** The (srcNode, (featureIdx, destination node in unlabeled network)) map for mean-field inference. 
 	 * (local feature index in the sense of Parallel touching)
 	**/
-	protected transient HashMap<Integer, HashMap<Integer, Integer>> src2fIdx2Dst;
+	protected transient HashMap<Integer, HashMap<Integer, HashSet<Integer>>> src2fIdx2Dst;
 	/** The marginal map used in mean-field inference. To save the marginal score of the unlabeled network.**/
 	protected transient HashMap<Integer, Double> currentMarginalMap;
 	protected transient HashMap<Integer, Double> newMarginalMap;
@@ -1088,12 +1088,25 @@ public abstract class Network implements Serializable, HyperGraph{
 		if(fIdx==-1)
 			throw new RuntimeException("The feature idx is -1?");
 		if(src2fIdx2Dst.containsKey(srcNode)){
-			if(this.getInstance().isLabeled() && src2fIdx2Dst.get(srcNode).containsKey(fIdx))
-				throw new RuntimeException("repeated?");
-			src2fIdx2Dst.get(srcNode).put(fIdx, dstNode);
+			HashMap<Integer, HashSet<Integer>> fIdx2DstNode = src2fIdx2Dst.get(srcNode);
+			if (fIdx2DstNode.containsKey(fIdx)) {
+				HashSet<Integer> set = fIdx2DstNode.get(fIdx);
+				//if(this.getInstance().isLabeled() && src2fIdx2Dst.get(srcNode).containsKey(fIdx))
+				if(this.getInstance().isLabeled() && set.contains(dstNode)) {
+					System.err.println("src " + srcNode + " : " + Arrays.toString(this.getNodeArray(srcNode)));
+					System.err.println("tgt " + dstNode + " : " + Arrays.toString(this.getNodeArray(dstNode)));
+					throw new RuntimeException("repeated?");
+				}
+			} else {
+				HashSet<Integer> set = new HashSet<Integer>();
+				set.add(dstNode);
+				fIdx2DstNode.put(fIdx, set);
+			}
 		}else{
-			HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
-			map.put(fIdx, dstNode);
+			HashMap<Integer, HashSet<Integer>> map = new HashMap<Integer, HashSet<Integer>>();
+			HashSet<Integer> set = new HashSet<Integer>();
+			set.add(dstNode);
+			map.put(fIdx, set);
 			src2fIdx2Dst.put(srcNode, map);
 		}
 	}
@@ -1102,7 +1115,7 @@ public abstract class Network implements Serializable, HyperGraph{
 	 * Initialize the joint feature map for mean-field inference.
 	 */
 	public void initJointFeatureMap(){
-		src2fIdx2Dst = new HashMap<Integer, HashMap<Integer, Integer>>();
+		src2fIdx2Dst = new HashMap<Integer, HashMap<Integer, HashSet<Integer>>>();
 	}
 	
 	/**
