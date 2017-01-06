@@ -128,7 +128,7 @@ public class Eval {
 					int predHeadSpanIdx = predSegHeadmap.get(curr);
 					SegSpan predHeadSpan = predSegs.get(predHeadSpanIdx);
 					SegSpan goldHeadSpan = goldSegs.get(output[i]);
-					if (predHeadSpan.equals(goldHeadSpan))
+					if (predHeadSpan.start == goldHeadSpan.start && predHeadSpan.end == goldHeadSpan.end)
 						corr++;
 				}
 			}
