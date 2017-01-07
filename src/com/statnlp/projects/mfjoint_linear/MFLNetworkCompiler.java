@@ -7,10 +7,10 @@ import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
-import com.statnlp.projects.mfjoint.MFJConfig.COMP;
-import com.statnlp.projects.mfjoint.MFJConfig.DIR;
-import com.statnlp.projects.mfjoint.MFJConfig.MFJTASK;
-import com.statnlp.projects.mfjoint.MFJConfig.STRUCT;
+import com.statnlp.projects.mfjoint_linear.MFLConfig.COMP;
+import com.statnlp.projects.mfjoint_linear.MFLConfig.DIR;
+import com.statnlp.projects.mfjoint_linear.MFLConfig.MFLTASK;
+import com.statnlp.projects.mfjoint_linear.MFLConfig.STRUCT;
 
 public class MFLNetworkCompiler extends NetworkCompiler {
 
@@ -19,7 +19,7 @@ public class MFLNetworkCompiler extends NetworkCompiler {
 	private int maxSentLen = 150; //including the root node at 0 idx
 	private long[] _nodes;
 	private int[][][] _children;
-	private MFJTASK task;
+	private MFLTASK task;
 	private boolean DEBUG = false;
 	private boolean iobes = false;
 	
@@ -39,7 +39,7 @@ public class MFLNetworkCompiler extends NetworkCompiler {
 		NetworkIDMapper.setCapacity(new int[]{200, 200, 5, 5, 10});
 	}
 	
-	public MFLNetworkCompiler(MFJTASK task, int maxSize, boolean iobes){
+	public MFLNetworkCompiler(MFLTASK task, int maxSize, boolean iobes){
 		this.task = task;
 		this.maxSentLen = maxSize;
 		this.iobes = iobes;
@@ -92,7 +92,7 @@ public class MFLNetworkCompiler extends NetworkCompiler {
 		network.addNode(jointRoot);
 		int size = mfjInst.size();
 		
-		if (task == MFJTASK.NER || task == MFJTASK.JOINT) {
+		if (task == MFLTASK.NER || task == MFLTASK.JOINT) {
 			String[] outputEntities = mfjInst.getOutput().entities;
 			long entityLeaf = this.toNode_entityLeaf();
 			network.addNode(entityLeaf);
@@ -107,7 +107,7 @@ public class MFLNetworkCompiler extends NetworkCompiler {
 			network.addEdge(jointRoot, new long[]{prevNode});
 		}
 		
-		if (task == MFJTASK.PARING || task == MFJTASK.JOINT) {
+		if (task == MFLTASK.PARING || task == MFLTASK.JOINT) {
 			int[] heads = mfjInst.getOutput().heads;
 			this.buildDepNetwork(network, size, heads);
 		}
@@ -134,7 +134,7 @@ public class MFLNetworkCompiler extends NetworkCompiler {
 	private void compileUnlabeledInstancesGeneric() {
 		if (this._nodes != null) return;
 		MFLNetwork network = new MFLNetwork();
-		if (task == MFJTASK.NER || task == MFJTASK.JOINT) {
+		if (task == MFLTASK.NER || task == MFLTASK.JOINT) {
 			long entityLeaf = this.toNode_entityLeaf();
 			network.addNode(entityLeaf);
 			long[] children = new long[]{entityLeaf};
@@ -187,7 +187,7 @@ public class MFLNetworkCompiler extends NetworkCompiler {
 		}
 		
 		
-		if (task == MFJTASK.PARING || task == MFJTASK.JOINT) {
+		if (task == MFLTASK.PARING || task == MFLTASK.JOINT) {
 			this.buildDepNetwork(network, maxSentLen, null);
 		}
 		
@@ -275,11 +275,11 @@ public class MFLNetworkCompiler extends NetworkCompiler {
 	
 	@Override
 	public Instance decompile(Network network) {
-		if (task == MFJTASK.NER)
+		if (task == MFLTASK.NER)
 			return this.decompileNE(network);
-		else if (task == MFJTASK.PARING)
+		else if (task == MFLTASK.PARING)
 			return this.decompileDep(network);
-		else if (task == MFJTASK.JOINT) {
+		else if (task == MFLTASK.JOINT) {
 			int struct = network.getStructure();
 			if (struct == STRUCT.SEMI.ordinal()){
 				return this.decompileNE(network);

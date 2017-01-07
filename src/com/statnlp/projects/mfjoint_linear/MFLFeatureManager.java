@@ -11,9 +11,9 @@ import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
 import com.statnlp.projects.dep.utils.Extractor;
-import com.statnlp.projects.mfjoint.MFJConfig.COMP;
-import com.statnlp.projects.mfjoint.MFJConfig.DIR;
-import com.statnlp.projects.mfjoint.MFJNetworkCompiler.NodeType;
+import com.statnlp.projects.mfjoint_linear.MFLConfig.COMP;
+import com.statnlp.projects.mfjoint_linear.MFLConfig.DIR;
+import com.statnlp.projects.mfjoint_linear.MFLNetworkCompiler.NodeType;
 
 public class MFLFeatureManager extends FeatureManager {
 
@@ -433,6 +433,16 @@ public class MFLFeatureManager extends FeatureManager {
 				}
 			}
 		}
+		ArrayList<ArrayList<Integer>> bigList = new ArrayList<ArrayList<Integer>>();
+		bigList.add(joint1List);
+		bigList.add(joint2List);
+		bigList.add(joint3List);
+		bigList.add(joint4List);
+		FeatureArray last = curr;
+		for (int i = 0; i < bigList.size(); i++) {
+			FeatureArray now = addNext(last, bigList.get(i), threadId);
+			last = now;
+		}
 	}
 
 	private void addJointFeaturesForDep(FeatureArray curr, Network network, Sentence sent, int threadId, int node_k, int[] nodeArr, int leftIndex, int rightIndex, int direction) {
@@ -472,6 +482,16 @@ public class MFLFeatureManager extends FeatureManager {
 					joint4List.add(jf4); network.putJointFeature(node_k, jf4, unlabeledDstNodeIdx);
 				}
 			}
+		}
+		ArrayList<ArrayList<Integer>> bigList = new ArrayList<ArrayList<Integer>>();
+		bigList.add(joint1List);
+		bigList.add(joint2List);
+		bigList.add(joint3List);
+		bigList.add(joint4List);
+		FeatureArray last = curr;
+		for (int i = 0; i < bigList.size(); i++) {
+			FeatureArray now = addNext(last, bigList.get(i), threadId);
+			last = now;
 		}
 	}
 	

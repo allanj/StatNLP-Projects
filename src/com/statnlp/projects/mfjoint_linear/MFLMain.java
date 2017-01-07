@@ -12,7 +12,7 @@ import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
 import com.statnlp.hybridnetworks.NetworkModel;
-import com.statnlp.projects.mfjoint.MFJConfig.MFJTASK;
+import com.statnlp.projects.mfjoint_linear.MFLConfig.MFLTASK;
 
 public class MFLMain {
 
@@ -29,7 +29,7 @@ public class MFLMain {
 	public static boolean readModel = false;
 	public static String dataset = "allanprocess";
 	public static String dataSection = "abc";
-	public static MFJTASK task = MFJTASK.JOINT;
+	public static MFLTASK task = MFLTASK.JOINT;
 	public static boolean useJointFeatures = false;
 	public static int maxSize = 150;
 	public static String nerOut;
@@ -52,7 +52,7 @@ public class MFLMain {
 		System.err.println("[Info] inference type: " + NetworkConfig.INFERENCE.name());
 		System.err.println("[Info] use joint features?: " + useJointFeatures);
 		
-		boolean checkProjective = task == MFJTASK.PARING || task == MFJTASK.JOINT ? true : false;
+		boolean checkProjective = task == MFLTASK.PARING || task == MFLTASK.JOINT ? true : false;
 		MFLInstance[] trainInsts = MFLReader.readCoNLLXData(trainFile, true, trainNum, checkProjective, iobes);
 		MFLInstance[] testInsts = MFLReader.readCoNLLXData(testFile, false, testNum, false, false);
 		
@@ -60,12 +60,12 @@ public class MFLMain {
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = l2;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
-		NetworkConfig.INFERENCE = task == MFJTASK.JOINT ? InferenceType.MEAN_FIELD : InferenceType.FORWARD_BACKWARD;
+		NetworkConfig.INFERENCE = task == MFLTASK.JOINT ? InferenceType.MEAN_FIELD : InferenceType.FORWARD_BACKWARD;
 		
 		/***DEBUG configuration***/
-//		MFJConfig.windows = false;
-//		useJointFeatures = true;
-//		NetworkConfig.MAX_MF_UPDATES = 2;
+		MFLConfig.windows = true;
+		useJointFeatures = false;
+		NetworkConfig.MAX_MF_UPDATES = 0;
 		/******/
 		
 		NetworkModel model = null;
@@ -87,9 +87,9 @@ public class MFLMain {
 		}
 		
 		Instance[] predictions = model.decode(testInsts);
-		if (task == MFJTASK.PARING || task == MFJTASK.JOINT)
+		if (task == MFLTASK.PARING || task == MFLTASK.JOINT)
 			MFLEval.evalDep(predictions);
-		if ((task == MFJTASK.NER || task == MFJTASK.JOINT))
+		if ((task == MFLTASK.NER || task == MFLTASK.JOINT))
 			MFLEval.evalNER(predictions, nerOut);
 	}
 
@@ -113,9 +113,9 @@ public class MFLMain {
 									 if(NetworkConfig.MAX_MF_UPDATES == 0) useJointFeatures = false;
 									 break;
 					case "-task": 
-						if(args[i+1].equals("parsing"))  task = MFJTASK.PARING;
-						else if (args[i+1].equals("ner")) task  = MFJTASK.NER;
-						else if (args[i+1].equals("joint"))  task  = MFJTASK.JOINT;
+						if(args[i+1].equals("parsing"))  task = MFLTASK.PARING;
+						else if (args[i+1].equals("ner")) task  = MFLTASK.NER;
+						else if (args[i+1].equals("joint"))  task  = MFLTASK.JOINT;
 						else throw new RuntimeException("Unknown task:"+args[i+1]+"?"); break;
 					case "-saveModel": saveModel = args[i+1].equals("true")?true:false; break;
 					case "-readModel": readModel = args[i+1].equals("true")?true:false; break;

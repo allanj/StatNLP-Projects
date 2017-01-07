@@ -6,8 +6,8 @@ import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.LocalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkCompiler;
 import com.statnlp.hybridnetworks.TableLookupNetwork;
-import com.statnlp.projects.mfjoint.MFJConfig.STRUCT;
-import com.statnlp.projects.mfjoint.MFJNetworkCompiler.NodeType;
+import com.statnlp.projects.mfjoint_linear.MFLConfig.STRUCT;
+import com.statnlp.projects.mfjoint_linear.MFLNetworkCompiler.NodeType;
 
 public class MFLNetwork extends TableLookupNetwork {
 

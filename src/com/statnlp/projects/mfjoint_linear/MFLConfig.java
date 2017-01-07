@@ -3,7 +3,7 @@ package com.statnlp.projects.mfjoint_linear;
 public class MFLConfig {
 
 	
-	public static enum MFJTASK{
+	public static enum MFLTASK{
 		NER,
 		PARING,
 		JOINT;
