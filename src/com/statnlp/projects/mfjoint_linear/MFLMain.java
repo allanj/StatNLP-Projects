@@ -63,9 +63,9 @@ public class MFLMain {
 		NetworkConfig.INFERENCE = task == MFLTASK.JOINT ? InferenceType.MEAN_FIELD : InferenceType.FORWARD_BACKWARD;
 		
 		/***DEBUG configuration***/
-		MFLConfig.windows = true;
-		useJointFeatures = false;
-		NetworkConfig.MAX_MF_UPDATES = 0;
+//		MFLConfig.windows = true;
+//		useJointFeatures = false;
+//		NetworkConfig.MAX_MF_UPDATES = 0;
 		/******/
 		
 		NetworkModel model = null;
