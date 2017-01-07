@@ -49,6 +49,7 @@ public class MFLMain {
 		System.err.println("[Info] nerOut: "+nerOut);
 		System.err.println("[Info] task: "+task.toString());
 		System.err.println("[Info] #max-mf: " + NetworkConfig.MAX_MF_UPDATES);
+		NetworkConfig.INFERENCE = task == MFLTASK.JOINT ? InferenceType.MEAN_FIELD : InferenceType.FORWARD_BACKWARD;
 		System.err.println("[Info] inference type: " + NetworkConfig.INFERENCE.name());
 		System.err.println("[Info] use joint features?: " + useJointFeatures);
 		
@@ -60,7 +61,7 @@ public class MFLMain {
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = l2;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
-		NetworkConfig.INFERENCE = task == MFLTASK.JOINT ? InferenceType.MEAN_FIELD : InferenceType.FORWARD_BACKWARD;
+		
 		
 		/***DEBUG configuration***/
 //		MFLConfig.windows = true;
