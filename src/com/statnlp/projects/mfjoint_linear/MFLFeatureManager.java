@@ -24,8 +24,8 @@ public class MFLFeatureManager extends FeatureManager {
 	private int prefixSuffixLen = 3;
 	
 	public enum FeaType {
-		seg_prev_word, seg_prev_word_shape, seg_prev_tag, seg_next_word, seg_next_word_shape, seg_next_tag, segment, segment_shape, seg_len,
-		start_word, start_tag, end_word, end_tag, word, tag, shape, seg_pref, seg_suff, transition,
+		word, tag, shape, prev_word, prev_tag, prev_shape, next_word, next_tag, next_shape,
+		 surround_tags, surround_shapes, word_n_gram, left_4, right_4, entity_prefix, entity_suffix,transition,
 		unigram, bigram, contextual, inbetween, prefix, joint1, joint2, joint3, joint4
 	}
 	
@@ -85,84 +85,77 @@ public class MFLFeatureManager extends FeatureManager {
 	 */
 	private FeatureArray addSemiCRFFeatures(FeatureArray orgFa, Network network, Sentence sent, int parentPos, int childPos, int labelId, int childLabelId, int threadId) {
 		
-		int start = childPos;
-		int end = parentPos;
+		int idx = parentPos;
 		String currEn = MFLLabel.get(labelId).getForm();
-		
+
+		ArrayList<Integer> currList = new ArrayList<Integer>();
 		ArrayList<Integer> prevList = new ArrayList<Integer>();
 		ArrayList<Integer> nextList = new ArrayList<Integer>();
-		ArrayList<Integer> segList = new ArrayList<Integer>();
-		ArrayList<Integer> lenList = new ArrayList<Integer>();
-		ArrayList<Integer> startList = new ArrayList<Integer>();
-		ArrayList<Integer> endList = new ArrayList<Integer>();
-		ArrayList<Integer> insideList = new ArrayList<Integer>();
+		ArrayList<Integer> surrList = new ArrayList<Integer>();
+		ArrayList<Integer> left4List = new ArrayList<Integer>();
+		ArrayList<Integer> right4List = new ArrayList<Integer>();
+		ArrayList<Integer> ngramList = new ArrayList<Integer>();
 		ArrayList<Integer> prefixList = new ArrayList<Integer>();
 		ArrayList<Integer> suffixList = new ArrayList<Integer>();
 		ArrayList<Integer> transList = new ArrayList<Integer>();
 		
 		
-		String lw = start>0? sent.get(start-1).getName():"STR";
-		String ls = start>0? shape(lw):"STR_SHAPE";
-		String lt = start>0? sent.get(start-1).getTag():"STR";
-		String rw = end<sent.length()-1? sent.get(end+1).getName():"END";
-		String rt = end<sent.length()-1? sent.get(end+1).getTag():"END";
-		String rs = end<sent.length()-1? shape(rw):"END_SHAPE";
-		prevList.add(this._param_g.toFeature(network, FeaType.seg_prev_word.name(), 		currEn,	lw));
-		prevList.add(this._param_g.toFeature(network, FeaType.seg_prev_word_shape.name(), currEn, ls));
-		prevList.add(this._param_g.toFeature(network, FeaType.seg_prev_tag.name(), 		currEn, lt));
-		nextList.add(this._param_g.toFeature(network, FeaType.seg_next_word.name(), 		currEn, rw));
-		nextList.add(this._param_g.toFeature(network, FeaType.seg_next_word_shape.name(), currEn, rs));
-		nextList.add(this._param_g.toFeature(network, FeaType.seg_next_tag.name(), 	currEn, rt));
+		String w = sent.get(idx).getName();
+		String t = sent.get(idx).getTag();
+		String s = shape(w);
+		String lw = idx > 1? sent.get(idx - 1).getName() : "STR";
+		String ls = idx > 1? shape(lw):"STR_SHAPE";
+		String lt = idx > 1? sent.get(idx - 1).getTag():"STR";
+		String llw = idx - 2 > 0 ? sent.get(idx - 2).getName() : idx == 2 ? "STR" : "STR1";
+		String lllw = idx - 3 > 0 ? sent.get(idx - 3).getName() : idx == 3 ? "STR" : idx == 2 ? "STR1" : "STR2";
+		String llllw = idx - 4 > 0 ? sent.get(idx - 4).getName() : idx == 4 ? "STR" : idx == 3 ? "STR1" : idx == 2? "STR2" : "STR3";
+		String rw = idx < sent.length()-1? sent.get(idx + 1).getName():"END";
+		String rt = idx < sent.length()-1? sent.get(idx + 1).getTag():"END";
+		String rs = idx < sent.length()-1? shape(rw):"END_SHAPE";
+		String rrw = idx + 2 < sent.length() ? sent.get(idx + 2).getName() : idx + 2 == sent.length() ? "END" : "END1";
+		String rrrw = idx + 3 < sent.length() ? sent.get(idx + 3).getName() : idx + 3 == sent.length() ? "END" : idx + 2 == sent.length() ? "END1" : "END2";
+		String rrrrw = idx + 4 < sent.length() ? sent.get(idx + 3).getName() : idx + 4 == sent.length() ? "END" : idx + 3 == sent.length() ? "END1" : idx + 2 == sent.length() ? "END2" : "END3"; 
 		
-		StringBuilder segPhrase = new StringBuilder(sent.get(start).getName());
-		StringBuilder segPhraseShape = new StringBuilder(shape(sent.get(start).getName()));
-		for(int pos=start+1;pos<=end; pos++){
-			String w = sent.get(pos).getName();
-			segPhrase.append(" "+w);
-			segPhraseShape.append(" " + shape(w));
+		currList.add(this._param_g.toFeature(network, FeaType.word.name(), 	currEn,	w));
+		currList.add(this._param_g.toFeature(network, FeaType.tag.name(),   currEn, t));
+		currList.add(this._param_g.toFeature(network, FeaType.shape.name(), currEn, s));
+		prevList.add(this._param_g.toFeature(network, FeaType.prev_word.name(), currEn, lw));
+		prevList.add(this._param_g.toFeature(network, FeaType.prev_tag.name(), currEn, lt));
+		prevList.add(this._param_g.toFeature(network, FeaType.prev_shape.name(), currEn, ls));
+		nextList.add(this._param_g.toFeature(network, FeaType.next_word.name(), currEn, rw));
+		nextList.add(this._param_g.toFeature(network, FeaType.next_tag.name(), currEn, rt));
+		nextList.add(this._param_g.toFeature(network, FeaType.next_shape.name(), currEn, rs));
+		
+		surrList.add(this._param_g.toFeature(network, FeaType.surround_tags.name(), 	currEn,	lt + "-" + rt));
+		surrList.add(this._param_g.toFeature(network, FeaType.surround_shapes.name(),	currEn,	shape(lw) + "-" + shape(rw)));
+		
+		
+		for (int l = 1; l <= w.length(); l++) {
+			for (int sp = 0; sp <= w.length() - l; sp++) {
+				ngramList.add(this._param_g.toFeature(network, FeaType.word_n_gram.name() + l, 	currEn,	w.substring(sp, sp + l)));
+			}
 		}
-		segList.add(this._param_g.toFeature(network, FeaType.segment.name(), currEn,	segPhrase.toString()));
-		segList.add(this._param_g.toFeature(network, FeaType.segment_shape.name(), currEn,	segPhraseShape.toString()));
+		left4List.add(this._param_g.toFeature(network, FeaType.left_4.name(), 	currEn,	llllw + " & " + lllw + " & " + llw + " & " + lw));
+		right4List.add(this._param_g.toFeature(network, FeaType.right_4.name(), currEn,	rw + " & " + rrw + " & " + rrrw + " & " + rrrrw));
 		
-		int lenOfSeg = end-start+1;
-		lenList.add(this._param_g.toFeature(network, FeaType.seg_len.name(), currEn, lenOfSeg+""));
-		
-		/** Start and end features. **/
-		String startWord = sent.get(start).getName();
-		String startTag = sent.get(start).getTag();
-		startList.add(this._param_g.toFeature(network, FeaType.start_word.name(),	currEn,	startWord));
-		startList.add(this._param_g.toFeature(network, FeaType.start_tag.name(),	currEn,	startTag));
-		String endW = sent.get(end).getName();
-		String endT = sent.get(end).getTag();
-		endList.add(this._param_g.toFeature(network, FeaType.end_word.name(),		currEn,	endW));
-		endList.add(this._param_g.toFeature(network, FeaType.end_tag.name(),		currEn,	endT));
-		
-		int insideSegLen = lenOfSeg; //Math.min(twoDirInsideLen, lenOfSeg);
-		for (int i = 0; i < insideSegLen; i++) {
-			insideList.add(this._param_g.toFeature(network, FeaType.word.name()+":"+i,		currEn, sent.get(start+i).getName()));
-			insideList.add(this._param_g.toFeature(network, FeaType.tag.name()+":"+i,		currEn, sent.get(start+i).getTag()));
-			insideList.add(this._param_g.toFeature(network, FeaType.shape.name()+":"+i,	currEn, shape(sent.get(start+i).getName())));
-
-			insideList.add(this._param_g.toFeature(network, FeaType.word.name()+":-"+i,	currEn,	sent.get(start+lenOfSeg-i-1).getName()));
-			insideList.add(this._param_g.toFeature(network, FeaType.tag.name()+":-"+i,		currEn,	sent.get(start+lenOfSeg-i-1).getTag()));
-			insideList.add(this._param_g.toFeature(network, FeaType.shape.name()+":-"+i,	currEn,	shape(sent.get(start+lenOfSeg-i-1).getName())));
+		for(int plen = 1;plen <= prefixSuffixLen;plen++){
+			if(w.length() >= plen){
+				String suff = w.substring(w.length()-plen, w.length());
+				prefixList.add(this._param_g.toFeature(network, FeaType.entity_suffix.name()+"-"+plen, currEn, suff));
+				String pref = w.substring(0,plen);
+				prefixList.add(this._param_g.toFeature(network, FeaType.entity_prefix.name()+"-"+plen, currEn, pref));
+			}
 		}
-		/** needs to be modified maybe ***/
-		for(int i=0; i<prefixSuffixLen; i++){
-			String prefix = segPhrase.substring(0, Math.min(segPhrase.length(), i+1));
-			String suffix = segPhrase.substring(Math.max(segPhrase.length()-i-1, 0));
-			prefixList.add(this._param_g.toFeature(network, FeaType.seg_pref.name()+"-"+i,	currEn,	prefix));
-			suffixList.add(this._param_g.toFeature(network, FeaType.seg_suff.name()+"-"+i,	currEn,	suffix));
-		}
+		
 		String prevEntity = MFLLabel.get(childLabelId).getForm();
 		transList.add(this._param_g.toFeature(network,FeaType.transition.name(), prevEntity+"-"+currEn,	""));
 		
 		
 		ArrayList<ArrayList<Integer>> bigList = new ArrayList<ArrayList<Integer>>();
-		bigList.add(prevList); bigList.add(nextList);
-		bigList.add(segList); bigList.add(lenList);
-		bigList.add(startList); bigList.add(endList);
-		bigList.add(insideList); bigList.add(prefixList);
+		bigList.add(currList);bigList.add(prevList); 
+		bigList.add(nextList); bigList.add(surrList);
+		bigList.add(left4List); bigList.add(right4List); 
+		bigList.add(ngramList); bigList.add(prefixList); 
 		bigList.add(suffixList); bigList.add(transList); 
 		FeatureArray last = orgFa;
 		for (int i = 0; i < bigList.size(); i++) {

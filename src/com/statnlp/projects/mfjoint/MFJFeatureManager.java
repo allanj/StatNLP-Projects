@@ -103,12 +103,12 @@ public class MFJFeatureManager extends FeatureManager {
 		ArrayList<Integer> transList = new ArrayList<Integer>();
 		
 		
-		String lw = start>0? sent.get(start-1).getName():"STR";
-		String ls = start>0? shape(lw):"STR_SHAPE";
-		String lt = start>0? sent.get(start-1).getTag():"STR";
-		String rw = end<sent.length()-1? sent.get(end+1).getName():"END";
-		String rt = end<sent.length()-1? sent.get(end+1).getTag():"END";
-		String rs = end<sent.length()-1? shape(rw):"END_SHAPE";
+		String lw = start > 1? sent.get(start-1).getName():"STR";
+		String ls = start > 1? shape(lw):"STR_SHAPE";
+		String lt = start > 1? sent.get(start-1).getTag():"STR";
+		String rw = end < sent.length()-1? sent.get(end+1).getName():"END";
+		String rt = end < sent.length()-1? sent.get(end+1).getTag():"END";
+		String rs = end < sent.length()-1? shape(rw):"END_SHAPE";
 		prevList.add(this._param_g.toFeature(network, FeaType.seg_prev_word.name(), 		currEn,	lw));
 		prevList.add(this._param_g.toFeature(network, FeaType.seg_prev_word_shape.name(), currEn, ls));
 		prevList.add(this._param_g.toFeature(network, FeaType.seg_prev_tag.name(), 		currEn, lt));
