@@ -61,6 +61,7 @@ public class MFJNetwork extends TableLookupNetwork {
 	 */
 	public void enableKthStructure(int kthStructure){
 		if (kthStructure == STRUCT.SEMI.ordinal()) {
+			this.currentStructure = STRUCT.SEMI.ordinal();
 			// enable the semiCRF chain structure
 			for (int i = 0; i < this.countNodes(); i++) {
 				int[] node_k = this.getNodeArray(i);
@@ -70,6 +71,7 @@ public class MFJNetwork extends TableLookupNetwork {
 			}
 		} else if (kthStructure == STRUCT.TREE.ordinal()) {
 			// enable the dependency structure
+			this.currentStructure = STRUCT.TREE.ordinal();
 			for (int i = 0; i < this.countNodes(); i++) {
 				int[] node_k = this.getNodeArray(i);
 				if (node_k[4] == NodeType.DEP.ordinal() || node_k[4] == NodeType.ROOT.ordinal())

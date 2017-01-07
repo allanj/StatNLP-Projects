@@ -63,8 +63,9 @@ public class MFJMain {
 		NetworkConfig.INFERENCE = task == MFJTASK.JOINT ? InferenceType.MEAN_FIELD : InferenceType.FORWARD_BACKWARD;
 		
 		/***DEBUG configuration***/
-//		MFJConfig.windows = false;
+//		MFJConfig.windows = true;
 //		useJointFeatures = true;
+//		NetworkConfig.MAX_MF_UPDATES = 4;
 		/******/
 		
 		NetworkModel model = null;

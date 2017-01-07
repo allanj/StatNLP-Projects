@@ -116,6 +116,7 @@ public class LocalNetworkDecoderThread extends Thread{
 				boolean prevDone = false;
 				for (int it = 0; it < NetworkConfig.MAX_MF_UPDATES; it++) {
 					for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
+						network.setStructure(curr);
 						network.enableKthStructure(curr);
 						network.inference(true);
 					}
@@ -129,6 +130,7 @@ public class LocalNetworkDecoderThread extends Thread{
 				}
 				Instance inst = null;
 				for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
+					network.setStructure(curr);
 					network.enableKthStructure(curr);
 					network.max();
 					network.setStructure(curr);

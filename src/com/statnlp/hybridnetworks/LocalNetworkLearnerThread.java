@@ -227,6 +227,7 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 					boolean prevDone = false;
 					for (int mf = 0; mf < NetworkConfig.MAX_MF_UPDATES; mf++) {
 						for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
+							network.setStructure(curr);
 							network.enableKthStructure(curr);
 							network.inference(true);
 						}
@@ -241,6 +242,7 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 				}
 				//update the network
 				for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
+					network.setStructure(curr);
 					network.enableKthStructure(curr);
 					network.train();
 				}

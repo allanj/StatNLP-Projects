@@ -150,7 +150,7 @@ public class FeatureArray implements Serializable{
 	}
 	
 	
-	public void update_MF_Version(LocalNetworkParam param, double count, HashMap<Integer, HashSet<Integer>> fIdx2DstNode, HashMap<Integer, Double> marginalMap){
+	public void update_MF_Version(LocalNetworkParam param, double count, HashMap<Integer, HashSet<Component>> fIdx2DstNode, HashMap<Component, Double> marginalMap){
 		if(this == NEGATIVE_INFINITY){
 			return;
 		}
@@ -159,7 +159,7 @@ public class FeatureArray implements Serializable{
 		for (int f_local : fs_local) {
 			double featureValue = 1.0;
 			if (fIdx2DstNode.containsKey(f_local)) {
-				for (int dstNode : fIdx2DstNode.get(f_local)) {
+				for (Component dstNode : fIdx2DstNode.get(f_local)) {
 					if (marginalMap.containsKey(dstNode))
 						featureValue = Math.exp(marginalMap.get(dstNode));
 					else
@@ -232,7 +232,7 @@ public class FeatureArray implements Serializable{
 	 * @param marginals score array, serve as being the feature value. 
 	 * @return
 	 */
-	public double getScore_MF_Version(LocalNetworkParam param, HashMap<Integer, HashSet<Integer>> fIdx2DstNode, HashMap<Integer, Double> marginalMap, int version){
+	public double getScore_MF_Version(LocalNetworkParam param, HashMap<Integer, HashSet<Component>> fIdx2DstNode, HashMap<Component, Double> marginalMap, int version){
 		if(this == NEGATIVE_INFINITY){
 			return this._totalScore;
 		}
@@ -252,9 +252,10 @@ public class FeatureArray implements Serializable{
 					//in testing, f is the global feature index
 					double featureValue = 1.0;
 					if (fIdx2DstNode.containsKey(f)) {
-						for (int dstNode: fIdx2DstNode.get(f)) {
-							if (marginalMap.containsKey(dstNode))
+						for (Component dstNode: fIdx2DstNode.get(f)) {
+							if (marginalMap.containsKey(dstNode)) {
 								featureValue = Math.exp(marginalMap.get(dstNode));
+							}
 							else
 								featureValue = 0.0;
 						}

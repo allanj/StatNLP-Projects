@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.statnlp.commons.types.Sentence;
+import com.statnlp.hybridnetworks.Component;
+import com.statnlp.hybridnetworks.Edge;
 import com.statnlp.hybridnetworks.FeatureArray;
 import com.statnlp.hybridnetworks.FeatureBox;
 import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
+import com.statnlp.hybridnetworks.Node;
 import com.statnlp.projects.dep.utils.Extractor;
 import com.statnlp.projects.mfjoint.MFJConfig.COMP;
 import com.statnlp.projects.mfjoint.MFJConfig.DIR;
@@ -57,7 +60,7 @@ public class MFJFeatureManager extends FeatureManager {
 			int childLabelId = child_arr[1];
 			FeatureArray curr = addSemiCRFFeatures(fa, network, sent, pos, start, labelId, childLabelId, threadId);
 			if (useJointFeatures) {
-				addJointFeaturesForSemi(curr, network, sent, threadId, parent_k, nodeArr, child_arr);
+				addJointFeaturesForSemi(curr, network, sent, threadId, parent_k, nodeArr, children_k, child_arr);
 			}
 		} else if (nodeArr[4] == NodeType.DEP.ordinal()) {
 			int leftIndex = nodeArr[0] - nodeArr[1];
@@ -402,7 +405,7 @@ public class MFJFeatureManager extends FeatureManager {
 		}
 	}
 	
-	private void addJointFeaturesForSemi(FeatureArray curr, Network network, Sentence sent, int threadId, int node_k, int[] nodeArr, int[] childArr) {
+	private void addJointFeaturesForSemi(FeatureArray curr, Network network, Sentence sent, int threadId, int node_k, int[] nodeArr, int[] children_k, int[] childArr) {
 		String label = MFJLabel.get(nodeArr[1]).form;
 		int end = nodeArr[0];
 		int start = childArr[0] + 1;
@@ -412,6 +415,7 @@ public class MFJFeatureManager extends FeatureManager {
 		ArrayList<Integer> joint3List = new ArrayList<Integer>();
 		ArrayList<Integer> joint4List = new ArrayList<Integer>();
 		int jf1, jf2, jf3, jf4;
+		Component edge = new Edge(node_k, children_k);
 		for (int idx = start; idx <= end; idx++) {
 			String currWord = sent.get(idx).getName();
 			String currTag = sent.get(idx).getTag();
@@ -425,25 +429,36 @@ public class MFJFeatureManager extends FeatureManager {
 				int[] dstNodeArr = new int[]{right, right-left, COMP.incomp.ordinal(), direction, NodeType.DEP.ordinal()};
 				long unlabeledDstNode = NetworkIDMapper.toHybridNodeID(dstNodeArr);
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
+				Component dstNode = new Node(unlabeledDstNodeIdx);
 				if (unlabeledDstNodeIdx >= 0) {
 					jf1 = this._param_g.toFeature(network, FeaType.joint1.name(), label, headWord);
 					jf2 = this._param_g.toFeature(network, FeaType.joint2.name(), label, headWord + " & " + currWord);
 					jf3 = this._param_g.toFeature(network, FeaType.joint3.name(), label, headTag);
 					jf4 = this._param_g.toFeature(network, FeaType.joint4.name(), label, headTag + " & " + currTag);
 					if(jf1 != -1){
-						joint1List.add(jf1); network.putJointFeature(node_k, jf1, unlabeledDstNodeIdx);
+						joint1List.add(jf1); network.putJointFeature(edge, jf1, dstNode);
 					}
 					if(jf2 != -1){
-						joint2List.add(jf2); network.putJointFeature(node_k, jf2, unlabeledDstNodeIdx);
+						joint2List.add(jf2); network.putJointFeature(edge, jf2, dstNode);
 					}
 					if(jf3 != -1){
-						joint3List.add(jf3); network.putJointFeature(node_k, jf3, unlabeledDstNodeIdx);
+						joint3List.add(jf3); network.putJointFeature(edge, jf3, dstNode);
 					}
 					if(jf4 != -1){
-						joint4List.add(jf4); network.putJointFeature(node_k, jf4, unlabeledDstNodeIdx);
+						joint4List.add(jf4); network.putJointFeature(edge, jf4, dstNode);
 					}
 				}
 			}
+		}
+		ArrayList<ArrayList<Integer>> bigList = new ArrayList<ArrayList<Integer>>();
+		bigList.add(joint1List);
+		bigList.add(joint2List);
+		bigList.add(joint3List);
+		bigList.add(joint4List);
+		FeatureArray last = curr;
+		for (int i = 0; i < bigList.size(); i++) {
+			FeatureArray now = addNext(last, bigList.get(i), threadId);
+			last = now;
 		}
 	}
 
@@ -459,6 +474,7 @@ public class MFJFeatureManager extends FeatureManager {
 		ArrayList<Integer> joint3List = new ArrayList<Integer>();
 		ArrayList<Integer> joint4List = new ArrayList<Integer>();
 		int jf1, jf2, jf3, jf4;
+		Component srcComponent = new Node(node_k);
 		MFJNetwork unlabeledNetwork = (MFJNetwork) network.getUnlabeledNetwork();
 		for (int L = 1; L <= this.maxSegmentLength; L++) {
 			for (int startIdx = modifierIndex - L + 1; startIdx <= modifierIndex && (startIdx + L - 1) < sent.length(); startIdx++) {
@@ -470,26 +486,41 @@ public class MFJFeatureManager extends FeatureManager {
 					int[] dstNodeArr = new int[]{end, labelId, 0, 0, NodeType.ENTITY.ordinal()};
 					long unlabeledDstNode = NetworkIDMapper.toHybridNodeID(dstNodeArr);
 					int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
-					if (unlabeledDstNodeIdx >= 0) {
-						jf1 = this._param_g.toFeature(network, FeaType.joint1.name(), spanLabel, headWord);
-						jf2 = this._param_g.toFeature(network, FeaType.joint2.name(), spanLabel, headWord + " & " + modifierWord);
-						jf3 = this._param_g.toFeature(network, FeaType.joint3.name(), spanLabel, headTag);
-						jf4 = this._param_g.toFeature(network, FeaType.joint4.name(), spanLabel, headTag + " & " + modifierTag);
-						if(jf1 != -1){
-							joint1List.add(jf1); network.putJointFeature(node_k, jf1, unlabeledDstNodeIdx);
-						}
-						if(jf2 != -1){
-							joint2List.add(jf2); network.putJointFeature(node_k, jf2, unlabeledDstNodeIdx);
-						}
-						if(jf3 != -1){
-							joint3List.add(jf3); network.putJointFeature(node_k, jf3, unlabeledDstNodeIdx);
-						}
-						if(jf4 != -1){
-							joint4List.add(jf4); network.putJointFeature(node_k, jf4, unlabeledDstNodeIdx);
+					for (int prevLabelId = 0; prevLabelId < MFJLabel.Labels.size(); prevLabelId++) {
+						int[] dstPrevNodeArr = new int[]{startIdx - 1, prevLabelId, 0, 0, NodeType.ENTITY.ordinal()};
+						int unlabeledDstPrevNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), NetworkIDMapper.toHybridNodeID(dstPrevNodeArr));
+						if (unlabeledDstPrevNodeIdx >= 0 && unlabeledDstNodeIdx >= 0) {
+							Component dstComponent = new Edge(unlabeledDstNodeIdx, new int[]{unlabeledDstPrevNodeIdx});
+							jf1 = this._param_g.toFeature(network, FeaType.joint1.name(), spanLabel, headWord);
+							jf2 = this._param_g.toFeature(network, FeaType.joint2.name(), spanLabel, headWord + " & " + modifierWord);
+							jf3 = this._param_g.toFeature(network, FeaType.joint3.name(), spanLabel, headTag);
+							jf4 = this._param_g.toFeature(network, FeaType.joint4.name(), spanLabel, headTag + " & " + modifierTag);
+							if(jf1 != -1){
+								joint1List.add(jf1); network.putJointFeature(srcComponent, jf1, dstComponent);
+							}
+							if(jf2 != -1){
+								joint2List.add(jf2); network.putJointFeature(srcComponent, jf2, dstComponent);
+							}
+							if(jf3 != -1){
+								joint3List.add(jf3); network.putJointFeature(srcComponent, jf3, dstComponent);
+							}
+							if(jf4 != -1){
+								joint4List.add(jf4); network.putJointFeature(srcComponent, jf4, dstComponent);
+							}
 						}
 					}
 				}
 			}
+		}
+		ArrayList<ArrayList<Integer>> bigList = new ArrayList<ArrayList<Integer>>();
+		bigList.add(joint1List);
+		bigList.add(joint2List);
+		bigList.add(joint3List);
+		bigList.add(joint4List);
+		FeatureArray last = curr;
+		for (int i = 0; i < bigList.size(); i++) {
+			FeatureArray now = addNext(last, bigList.get(i), threadId);
+			last = now;
 		}
 	}
 	
