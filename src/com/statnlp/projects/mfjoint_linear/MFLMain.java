@@ -33,15 +33,15 @@ public class MFLMain {
 	public static boolean useJointFeatures = false;
 	public static int maxSize = 150;
 	public static String nerOut;
-	public static boolean iobes = true;
+	public static boolean iobes = false;
 	
 	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
 		
 		processArgs(args);
 		trainFile = "data/"+dataset+"/"+dataSection+"/train.conllx";
 		testFile = "data/"+dataset+"/"+dataSection+"/test.conllx";
-		modelFile = "data/"+dataset+"/"+dataSection+"/output/mfjoint.model";
-		nerOut = "data/"+dataset+"/"+dataSection+"/output/ner.eval";
+		modelFile = "data/"+dataset+"/"+dataSection+"/output/mfjoint_linear.model";
+		nerOut = "data/"+dataset+"/"+dataSection+"/output/mfjoint.linear.ner.eval";
 		
 		System.err.println("[Info] trainFile: " + trainFile);
 		System.err.println("[Info] testFile: " + testFile);
@@ -119,6 +119,7 @@ public class MFLMain {
 						else throw new RuntimeException("Unknown task:"+args[i+1]+"?"); break;
 					case "-saveModel": saveModel = args[i+1].equals("true")?true:false; break;
 					case "-readModel": readModel = args[i+1].equals("true")?true:false; break;
+					case "-iobes": iobes = args[i+1].equals("true")? true : false; break;
 					case "-dataset": dataset = args[i+1]; break;
 					case "-section": dataSection = args[i+1]; break;
 					case "-trainFile": trainFile = args[i+1]; break;
