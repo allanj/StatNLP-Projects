@@ -377,7 +377,11 @@ public class MFLFeatureManager extends FeatureManager {
 		return fa;
 	}
 	
-	private FeatureArray addNext(FeatureArray fa, ArrayList<Integer> featureList, int threadId)  {
+	private FeatureArray addNext(FeatureArray fa, ArrayList<Integer> featureList, int threadId) {
+		return addNext(fa, featureList, threadId, false);
+	}
+	
+	private FeatureArray addNext(FeatureArray fa, ArrayList<Integer> featureList, int threadId, boolean alwaysChanged)  {
 		ArrayList<Integer> finalList = new ArrayList<Integer>();
 		for(int i=0;i<featureList.size();i++){
 			if(featureList.get(i)!=-1)
@@ -388,6 +392,8 @@ public class MFLFeatureManager extends FeatureManager {
 			int[] fs = new int[finalList.size()];
 			for(int i = 0; i < fs.length; i++) fs[i] = finalList.get(i);
 			FeatureArray curr = new FeatureArray(FeatureBox.getFeatureBox(fs, this.getParams_L()[threadId]));
+			if (alwaysChanged)
+				curr.setAlwaysChange();
 			fa.next(curr);
 			return curr;
 		}
@@ -440,7 +446,8 @@ public class MFLFeatureManager extends FeatureManager {
 		bigList.add(joint4List);
 		FeatureArray last = curr;
 		for (int i = 0; i < bigList.size(); i++) {
-			FeatureArray now = addNext(last, bigList.get(i), threadId);
+			//setting always changed is very important
+			FeatureArray now = addNext(last, bigList.get(i), threadId, true);
 			last = now;
 		}
 	}
@@ -490,7 +497,8 @@ public class MFLFeatureManager extends FeatureManager {
 		bigList.add(joint4List);
 		FeatureArray last = curr;
 		for (int i = 0; i < bigList.size(); i++) {
-			FeatureArray now = addNext(last, bigList.get(i), threadId);
+			//setting always changed is very important
+			FeatureArray now = addNext(last, bigList.get(i), threadId, true);
 			last = now;
 		}
 	}

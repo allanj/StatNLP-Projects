@@ -19,7 +19,7 @@ public class MFLMain {
 	
 	public static String trainFile;
 	public static String testFile;
-	public static int trainNum = 20;
+	public static int trainNum = 2;
 	public static int testNum = 20;
 	public static int numThreads = 8;
 	public static int numIterations = 5000;
@@ -65,8 +65,8 @@ public class MFLMain {
 		
 		/***DEBUG configuration***/
 //		MFLConfig.windows = true;
-//		useJointFeatures = false;
-//		NetworkConfig.MAX_MF_UPDATES = 0;
+//		useJointFeatures = true;
+//		NetworkConfig.MAX_MF_UPDATES = 2;
 		/******/
 		
 		NetworkModel model = null;
