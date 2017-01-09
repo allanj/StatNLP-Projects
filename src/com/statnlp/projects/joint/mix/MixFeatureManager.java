@@ -1,7 +1,6 @@
-package com.statnlp.projects.mfjoint_linear;
+package com.statnlp.projects.joint.mix;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.hybridnetworks.FeatureArray;
@@ -10,34 +9,33 @@ import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
+import com.statnlp.projects.dep.DependencyFeatureManager.FeaType;
 import com.statnlp.projects.dep.utils.Extractor;
-import com.statnlp.projects.mfjoint_linear.MFLConfig.COMP;
-import com.statnlp.projects.mfjoint_linear.MFLConfig.DIR;
-import com.statnlp.projects.mfjoint_linear.MFLNetworkCompiler.NodeType;
+import com.statnlp.projects.joint.mix.MixConfig.DIR;
+import com.statnlp.projects.joint.mix.MixNetworkCompiler.NodeType;
 
-public class MFLFeatureManager extends FeatureManager {
+public class MixFeatureManager extends FeatureManager {
 
-
-	private static final long serialVersionUID = -8984938159601419422L;
 	
-	private boolean useJointFeatures;
+	private static final long serialVersionUID = 55903602509541919L;
 	private int prefixSuffixLen = 3;
+	private int maxSegmentLength = 8;
 	
 	public enum FeaType {
-		word, tag, shape, prev_word, prev_tag, prev_shape, next_word, next_tag, next_shape,
-		 surround_tags, surround_shapes, word_n_gram, left_4, right_4, entity_prefix, entity_suffix,transition,
-		unigram, bigram, contextual, inbetween, prefix, joint1, joint2, joint3, joint4
+		seg_prev_word, seg_prev_word_shape, seg_prev_tag, seg_next_word, seg_next_word_shape, seg_next_tag, segment, segment_shape, seg_len,
+		start_word, start_tag, end_word, end_tag, word, tag, shape, seg_pref, seg_suff, transition,
+		unigram, bigram, contextual, inbetween, prefix, label
 	}
 	
-	public MFLFeatureManager(GlobalNetworkParam param_g, boolean useJointFeature) {
+	public MixFeatureManager(GlobalNetworkParam param_g, boolean useJointFeature, int maxSegmentLength) {
 		super(param_g);
-		this.useJointFeatures = useJointFeature;
+		this.maxSegmentLength = maxSegmentLength;
 	}
 
 
 	@Override
 	protected FeatureArray extract_helper(Network network, int parent_k, int[] children_k) {
-		MFLInstance inst = (MFLInstance)network.getInstance();
+		MixInstance inst = (MixInstance)network.getInstance();
 		Sentence sent = inst.getInput();
 		long node = network.getNode(parent_k);
 		int[] nodeArr = NetworkIDMapper.toHybridNodeArray(node);
@@ -48,24 +46,21 @@ public class MFLFeatureManager extends FeatureManager {
 			return FeatureArray.EMPTY;
 		
 		FeatureArray fa = new FeatureArray(FeatureBox.getFeatureBox(new int[]{}, this.getParams_L()[threadId]));
-		if (nodeArr[4] == NodeType.ENTITY.ordinal()) {
+		if (nodeArr[1] == NodeType.ENTITY.ordinal()) {
 			int labelId = nodeArr[1];
 			int[] child_arr = network.getNodeArray(children_k[0]);
 			int start = child_arr[0] + 1;
 			int childLabelId = child_arr[1];
-			FeatureArray curr = addLinearCRFFeatures(fa, network, sent, pos, start, labelId, childLabelId, threadId);
-			if (useJointFeatures) {
-				addJointFeaturesForLinear(curr, network, sent, threadId, parent_k, nodeArr, child_arr);
-			}
-		} else if (nodeArr[4] == NodeType.DEP.ordinal()) {
-			int leftIndex = nodeArr[0] - nodeArr[1];
-			int rightIndex = nodeArr[0];
-			int direction = nodeArr[3];
-			int completeness = nodeArr[2];
-			FeatureArray curr = addDepFeatures(fa, network, sent, leftIndex, rightIndex, completeness, direction, threadId);
-			if (useJointFeatures) {
-				addJointFeaturesForDep(curr, network, sent, threadId, parent_k, nodeArr, leftIndex, rightIndex, direction);
-			}
+			FeatureArray curr = addSemiCRFFeatures(fa, network, sent, pos, start, labelId, childLabelId, threadId);
+			
+		} else if (nodeArr[1] == NodeType.DEP.ordinal()) {
+			int leftIndex = nodeArr[1] - nodeArr[2];
+			int rightIndex = nodeArr[1];
+			int direction = nodeArr[4];
+			int completeness = nodeArr[3];
+			int labelId = nodeArr[5];
+			FeatureArray curr = addDepFeatures(fa, network, sent, leftIndex, rightIndex, completeness, direction, threadId, labelId);
+			
 		}
 		
 		return fa;
@@ -83,79 +78,86 @@ public class MFLFeatureManager extends FeatureManager {
 	 * @param threadId
 	 * @return
 	 */
-	private FeatureArray addLinearCRFFeatures(FeatureArray orgFa, Network network, Sentence sent, int parentPos, int childPos, int labelId, int childLabelId, int threadId) {
+	private FeatureArray addSemiCRFFeatures(FeatureArray orgFa, Network network, Sentence sent, int parentPos, int childPos, int labelId, int childLabelId, int threadId) {
 		
-		int idx = parentPos;
-		String currEn = MFLLabel.get(labelId).getForm();
-
-		ArrayList<Integer> currList = new ArrayList<Integer>();
+		int start = childPos;
+		int end = parentPos;
+		String currEn = MixLabel.get(labelId).getForm();
+		
 		ArrayList<Integer> prevList = new ArrayList<Integer>();
 		ArrayList<Integer> nextList = new ArrayList<Integer>();
-		ArrayList<Integer> surrList = new ArrayList<Integer>();
-		ArrayList<Integer> left4List = new ArrayList<Integer>();
-		ArrayList<Integer> right4List = new ArrayList<Integer>();
-		ArrayList<Integer> ngramList = new ArrayList<Integer>();
+		ArrayList<Integer> segList = new ArrayList<Integer>();
+		ArrayList<Integer> lenList = new ArrayList<Integer>();
+		ArrayList<Integer> startList = new ArrayList<Integer>();
+		ArrayList<Integer> endList = new ArrayList<Integer>();
+		ArrayList<Integer> insideList = new ArrayList<Integer>();
 		ArrayList<Integer> prefixList = new ArrayList<Integer>();
 		ArrayList<Integer> suffixList = new ArrayList<Integer>();
 		ArrayList<Integer> transList = new ArrayList<Integer>();
 		
 		
-		String w = sent.get(idx).getName();
-		String t = sent.get(idx).getTag();
-		String s = shape(w);
-		String lw = idx > 1? sent.get(idx - 1).getName() : "STR";
-		String ls = idx > 1? shape(lw):"STR_SHAPE";
-		String lt = idx > 1? sent.get(idx - 1).getTag():"STR";
-		String llw = idx - 2 > 0 ? sent.get(idx - 2).getName() : idx == 2 ? "STR" : "STR1";
-		String lllw = idx - 3 > 0 ? sent.get(idx - 3).getName() : idx == 3 ? "STR" : idx == 2 ? "STR1" : "STR2";
-		String llllw = idx - 4 > 0 ? sent.get(idx - 4).getName() : idx == 4 ? "STR" : idx == 3 ? "STR1" : idx == 2? "STR2" : "STR3";
-		String rw = idx < sent.length()-1? sent.get(idx + 1).getName():"END";
-		String rt = idx < sent.length()-1? sent.get(idx + 1).getTag():"END";
-		String rs = idx < sent.length()-1? shape(rw):"END_SHAPE";
-		String rrw = idx + 2 < sent.length() ? sent.get(idx + 2).getName() : idx + 2 == sent.length() ? "END" : "END1";
-		String rrrw = idx + 3 < sent.length() ? sent.get(idx + 3).getName() : idx + 3 == sent.length() ? "END" : idx + 2 == sent.length() ? "END1" : "END2";
-		String rrrrw = idx + 4 < sent.length() ? sent.get(idx + 3).getName() : idx + 4 == sent.length() ? "END" : idx + 3 == sent.length() ? "END1" : idx + 2 == sent.length() ? "END2" : "END3"; 
+		String lw = start > 1? sent.get(start-1).getName():"STR";
+		String ls = start > 1? shape(lw):"STR_SHAPE";
+		String lt = start > 1? sent.get(start-1).getTag():"STR";
+		String rw = end < sent.length()-1? sent.get(end+1).getName():"END";
+		String rt = end < sent.length()-1? sent.get(end+1).getTag():"END";
+		String rs = end < sent.length()-1? shape(rw):"END_SHAPE";
+		prevList.add(this._param_g.toFeature(network, FeaType.seg_prev_word.name(), 		currEn,	lw));
+		prevList.add(this._param_g.toFeature(network, FeaType.seg_prev_word_shape.name(), currEn, ls));
+		prevList.add(this._param_g.toFeature(network, FeaType.seg_prev_tag.name(), 		currEn, lt));
+		nextList.add(this._param_g.toFeature(network, FeaType.seg_next_word.name(), 		currEn, rw));
+		nextList.add(this._param_g.toFeature(network, FeaType.seg_next_word_shape.name(), currEn, rs));
+		nextList.add(this._param_g.toFeature(network, FeaType.seg_next_tag.name(), 	currEn, rt));
 		
-		currList.add(this._param_g.toFeature(network, FeaType.word.name(), 	currEn,	w));
-		currList.add(this._param_g.toFeature(network, FeaType.tag.name(),   currEn, t));
-		currList.add(this._param_g.toFeature(network, FeaType.shape.name(), currEn, s));
-		prevList.add(this._param_g.toFeature(network, FeaType.prev_word.name(), currEn, lw));
-		prevList.add(this._param_g.toFeature(network, FeaType.prev_tag.name(), currEn, lt));
-		prevList.add(this._param_g.toFeature(network, FeaType.prev_shape.name(), currEn, ls));
-		nextList.add(this._param_g.toFeature(network, FeaType.next_word.name(), currEn, rw));
-		nextList.add(this._param_g.toFeature(network, FeaType.next_tag.name(), currEn, rt));
-		nextList.add(this._param_g.toFeature(network, FeaType.next_shape.name(), currEn, rs));
-		
-		surrList.add(this._param_g.toFeature(network, FeaType.surround_tags.name(), 	currEn,	lt + "-" + rt));
-		surrList.add(this._param_g.toFeature(network, FeaType.surround_shapes.name(),	currEn,	shape(lw) + "-" + shape(rw)));
-		
-		
-		for (int l = 1; l <= w.length(); l++) {
-			for (int sp = 0; sp <= w.length() - l; sp++) {
-				ngramList.add(this._param_g.toFeature(network, FeaType.word_n_gram.name() + l, 	currEn,	w.substring(sp, sp + l)));
-			}
+		StringBuilder segPhrase = new StringBuilder(sent.get(start).getName());
+		StringBuilder segPhraseShape = new StringBuilder(shape(sent.get(start).getName()));
+		for(int pos=start+1;pos<=end; pos++){
+			String w = sent.get(pos).getName();
+			segPhrase.append(" "+w);
+			segPhraseShape.append(" " + shape(w));
 		}
-		left4List.add(this._param_g.toFeature(network, FeaType.left_4.name(), 	currEn,	llllw + " & " + lllw + " & " + llw + " & " + lw));
-		right4List.add(this._param_g.toFeature(network, FeaType.right_4.name(), currEn,	rw + " & " + rrw + " & " + rrrw + " & " + rrrrw));
+		segList.add(this._param_g.toFeature(network, FeaType.segment.name(), currEn,	segPhrase.toString()));
+		segList.add(this._param_g.toFeature(network, FeaType.segment_shape.name(), currEn,	segPhraseShape.toString()));
 		
-		for(int plen = 1;plen <= prefixSuffixLen;plen++){
-			if(w.length() >= plen){
-				String suff = w.substring(w.length()-plen, w.length());
-				prefixList.add(this._param_g.toFeature(network, FeaType.entity_suffix.name()+"-"+plen, currEn, suff));
-				String pref = w.substring(0,plen);
-				prefixList.add(this._param_g.toFeature(network, FeaType.entity_prefix.name()+"-"+plen, currEn, pref));
-			}
+		int lenOfSeg = end-start+1;
+		lenList.add(this._param_g.toFeature(network, FeaType.seg_len.name(), currEn, lenOfSeg+""));
+		
+		/** Start and end features. **/
+		String startWord = sent.get(start).getName();
+		String startTag = sent.get(start).getTag();
+		startList.add(this._param_g.toFeature(network, FeaType.start_word.name(),	currEn,	startWord));
+		startList.add(this._param_g.toFeature(network, FeaType.start_tag.name(),	currEn,	startTag));
+		String endW = sent.get(end).getName();
+		String endT = sent.get(end).getTag();
+		endList.add(this._param_g.toFeature(network, FeaType.end_word.name(),		currEn,	endW));
+		endList.add(this._param_g.toFeature(network, FeaType.end_tag.name(),		currEn,	endT));
+		
+		int insideSegLen = lenOfSeg; //Math.min(twoDirInsideLen, lenOfSeg);
+		for (int i = 0; i < insideSegLen; i++) {
+			insideList.add(this._param_g.toFeature(network, FeaType.word.name()+":"+i,		currEn, sent.get(start+i).getName()));
+			insideList.add(this._param_g.toFeature(network, FeaType.tag.name()+":"+i,		currEn, sent.get(start+i).getTag()));
+			insideList.add(this._param_g.toFeature(network, FeaType.shape.name()+":"+i,	currEn, shape(sent.get(start+i).getName())));
+
+			insideList.add(this._param_g.toFeature(network, FeaType.word.name()+":-"+i,	currEn,	sent.get(start+lenOfSeg-i-1).getName()));
+			insideList.add(this._param_g.toFeature(network, FeaType.tag.name()+":-"+i,		currEn,	sent.get(start+lenOfSeg-i-1).getTag()));
+			insideList.add(this._param_g.toFeature(network, FeaType.shape.name()+":-"+i,	currEn,	shape(sent.get(start+lenOfSeg-i-1).getName())));
 		}
-		
-		String prevEntity = MFLLabel.get(childLabelId).getForm();
+		/** needs to be modified maybe ***/
+		for(int i=0; i<prefixSuffixLen; i++){
+			String prefix = segPhrase.substring(0, Math.min(segPhrase.length(), i+1));
+			String suffix = segPhrase.substring(Math.max(segPhrase.length()-i-1, 0));
+			prefixList.add(this._param_g.toFeature(network, FeaType.seg_pref.name()+"-"+i,	currEn,	prefix));
+			suffixList.add(this._param_g.toFeature(network, FeaType.seg_suff.name()+"-"+i,	currEn,	suffix));
+		}
+		String prevEntity = MixLabel.get(childLabelId).getForm();
 		transList.add(this._param_g.toFeature(network,FeaType.transition.name(), prevEntity+"-"+currEn,	""));
 		
 		
 		ArrayList<ArrayList<Integer>> bigList = new ArrayList<ArrayList<Integer>>();
-		bigList.add(currList);bigList.add(prevList); 
-		bigList.add(nextList); bigList.add(surrList);
-		bigList.add(left4List); bigList.add(right4List); 
-		bigList.add(ngramList); bigList.add(prefixList); 
+		bigList.add(prevList); bigList.add(nextList);
+		bigList.add(segList); bigList.add(lenList);
+		bigList.add(startList); bigList.add(endList);
+		bigList.add(insideList); bigList.add(prefixList);
 		bigList.add(suffixList); bigList.add(transList); 
 		FeatureArray last = orgFa;
 		for (int i = 0; i < bigList.size(); i++) {
@@ -165,7 +167,7 @@ public class MFLFeatureManager extends FeatureManager {
 		return last;
 	}
 
-	private FeatureArray addDepFeatures(FeatureArray orgFa, Network network, Sentence sent, int leftIndex, int rightIndex, int completeness, int direction, int threadId) {
+	private FeatureArray addDepFeatures(FeatureArray orgFa, Network network, Sentence sent, int leftIndex, int rightIndex, int completeness, int direction, int threadId, int labelId) {
 		
 		ArrayList<Integer> headList = new ArrayList<Integer>();
 		ArrayList<Integer> headDistList = new ArrayList<Integer>();
@@ -184,6 +186,7 @@ public class MFLFeatureManager extends FeatureManager {
 		ArrayList<Integer> bound4Dist = new ArrayList<Integer>();
 		ArrayList<Integer> inDistList = new ArrayList<Integer>();
 		ArrayList<Integer> inList = new ArrayList<Integer>();
+		ArrayList<Integer> labelList = new ArrayList<Integer>();
 		
 		String leftTag = sent.get(leftIndex).getTag();
 		String rightTag = sent.get(rightIndex).getTag();
@@ -359,6 +362,26 @@ public class MFLFeatureManager extends FeatureManager {
 				inDistList.add(this._param_g.toFeature(network, FeaType.inbetween.name(), "inbetween-3", leftA+","+sent.get(i).getATag()+","+rightA+attDist));
 				inList.add(this._param_g.toFeature(network, FeaType.inbetween.name(), "inbetween-4", leftA+","+sent.get(i).getATag()+","+rightA));
 			}
+			
+			String label = MixLabel.get(labelId).form;
+			labelList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-dir", label+"&"+att));
+			labelList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL", label));
+
+			String w = sent.get(pos).getName();
+			String wP = sent.get(pos).getTag();
+			String wPm1 = pos > 0 ? sent.get(pos-1).getTag() : "STR";
+			String wPp1 = pos < sent.length()-1 ? sent.get(pos+1).getTag() : "END";
+			for(int i = 0; i < 2; i++) {
+				String suff = i < 1 ? "&"+att : "";
+				suff = "&"+label+suff;
+				
+				featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-W-WP-suff", w + " " + wP + suff));
+				featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WP-suff", wP + suff));
+				featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WM-WP-suff", wPm1 + " " + wP + suff));
+				featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WP-WPT-suff", wP + " " + wPp1 + suff));
+				featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WM-WP-WPT-suff", wPm1 + " " + wP + " " + wPp1 + suff));
+				featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-W-suff", w + suff));
+			}
 		}
 		
 		ArrayList<ArrayList<Integer>> bigList = new ArrayList<ArrayList<Integer>>();
@@ -399,112 +422,32 @@ public class MFLFeatureManager extends FeatureManager {
 		}
 	}
 	
-	private void addJointFeaturesForLinear(FeatureArray curr, Network network, Sentence sent, int threadId, int node_k, int[] nodeArr, int[] childArr) {
-		String label = MFLLabel.get(nodeArr[1]).form;
-		int idx = nodeArr[0];
-		MFLNetwork unlabeledNetwork = (MFLNetwork) network.getUnlabeledNetwork();
-		ArrayList<Integer> joint1List = new ArrayList<Integer>();
-		ArrayList<Integer> joint2List = new ArrayList<Integer>();
-		ArrayList<Integer> joint3List = new ArrayList<Integer>();
-		ArrayList<Integer> joint4List = new ArrayList<Integer>();
-		int jf1, jf2, jf3, jf4;
-		String currWord = sent.get(idx).getName();
-		String currTag = sent.get(idx).getTag();
-		for (int headIdx = 0; headIdx <= sent.length() - 1; headIdx++) {
-			if (headIdx == idx) continue;
-			int direction = headIdx < idx ? DIR.right.ordinal() : DIR.left.ordinal();
-			int right = headIdx < idx ? idx : headIdx;
-			int left = headIdx < idx ? headIdx : idx;
-			String headWord = sent.get(headIdx).getName();
-			String headTag = sent.get(headIdx).getTag();
-			int[] dstNodeArr = new int[]{right, right-left, COMP.incomp.ordinal(), direction, NodeType.DEP.ordinal()};
-			long unlabeledDstNode = NetworkIDMapper.toHybridNodeID(dstNodeArr);
-			int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
-			if (unlabeledDstNodeIdx >= 0) {
-//				jf1 = this._param_g.toFeature(network, FeaType.joint1.name(), label, headWord);
-				jf2 = this._param_g.toFeature(network, FeaType.joint2.name(), label, headWord + " & " + currWord);
-//				jf3 = this._param_g.toFeature(network, FeaType.joint3.name(), label, headTag);
-				jf4 = this._param_g.toFeature(network, FeaType.joint4.name(), label, headTag + " & " + currTag);
-//				if(jf1 != -1){
-//					joint1List.add(jf1); network.putJointFeature(node_k, jf1, unlabeledDstNodeIdx);
-//				}
-				if(jf2 != -1){
-					joint2List.add(jf2); network.putJointFeature(node_k, jf2, unlabeledDstNodeIdx);
-				}
-//				if(jf3 != -1){
-//					joint3List.add(jf3); network.putJointFeature(node_k, jf3, unlabeledDstNodeIdx);
-//				}
-				if(jf4 != -1){
-					joint4List.add(jf4); network.putJointFeature(node_k, jf4, unlabeledDstNodeIdx);
-				}
-			}
-		}
-		ArrayList<ArrayList<Integer>> bigList = new ArrayList<ArrayList<Integer>>();
-		bigList.add(joint1List);
-		bigList.add(joint2List);
-		bigList.add(joint3List);
-		bigList.add(joint4List);
-		FeatureArray last = curr;
-		for (int i = 0; i < bigList.size(); i++) {
-			//setting always changed is very important
-			FeatureArray now = addNext(last, bigList.get(i), threadId, true);
-			last = now;
-		}
-	}
-
-	private void addJointFeaturesForDep(FeatureArray curr, Network network, Sentence sent, int threadId, int node_k, int[] nodeArr, int leftIndex, int rightIndex, int direction) {
-		int headIndex = direction == DIR.right.ordinal()? leftIndex: rightIndex;
-		int modifierIndex = direction == DIR.right.ordinal()? rightIndex : leftIndex;
-		String headWord = sent.get(headIndex).getName();
-		String headTag = sent.get(headIndex).getTag();
-		String modifierWord = sent.get(modifierIndex).getName();
-		String modifierTag = sent.get(modifierIndex).getTag();
-		ArrayList<Integer> joint1List = new ArrayList<Integer>();
-		ArrayList<Integer> joint2List = new ArrayList<Integer>();
-		ArrayList<Integer> joint3List = new ArrayList<Integer>();
-		ArrayList<Integer> joint4List = new ArrayList<Integer>();
-		int jf1, jf2, jf3, jf4;
-		MFLNetwork unlabeledNetwork = (MFLNetwork) network.getUnlabeledNetwork();
-		int endIdx = modifierIndex;
-		for (int labelId = 0; labelId < MFLLabel.Labels.size(); labelId++) {
-			String spanLabel = MFLLabel.Label_Index.get(labelId).form;
-			int[] dstNodeArr = new int[]{endIdx, labelId, 0, 0, NodeType.ENTITY.ordinal()};
-			long unlabeledDstNode = NetworkIDMapper.toHybridNodeID(dstNodeArr);
-			int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
-			if (unlabeledDstNodeIdx >= 0) {
-//				jf1 = this._param_g.toFeature(network, FeaType.joint1.name(), spanLabel, headWord);
-				jf2 = this._param_g.toFeature(network, FeaType.joint2.name(), spanLabel, headWord + " & " + modifierWord);
-//				jf3 = this._param_g.toFeature(network, FeaType.joint3.name(), spanLabel, headTag);
-				jf4 = this._param_g.toFeature(network, FeaType.joint4.name(), spanLabel, headTag + " & " + modifierTag);
-//				if(jf1 != -1){
-//					joint1List.add(jf1); network.putJointFeature(node_k, jf1, unlabeledDstNodeIdx);
-//				}
-				if(jf2 != -1){
-					joint2List.add(jf2); network.putJointFeature(node_k, jf2, unlabeledDstNodeIdx);
-				}
-//				if(jf3 != -1){
-//					joint3List.add(jf3); network.putJointFeature(node_k, jf3, unlabeledDstNodeIdx);
-//				}
-				if(jf4 != -1){
-					joint4List.add(jf4); network.putJointFeature(node_k, jf4, unlabeledDstNodeIdx);
-				}
-			}
-		}
-		ArrayList<ArrayList<Integer>> bigList = new ArrayList<ArrayList<Integer>>();
-		bigList.add(joint1List);
-		bigList.add(joint2List);
-		bigList.add(joint3List);
-		bigList.add(joint4List);
-		FeatureArray last = curr;
-		for (int i = 0; i < bigList.size(); i++) {
-			//setting always changed is very important
-			FeatureArray now = addNext(last, bigList.get(i), threadId, true);
-			last = now;
+	private void addLabeledFeatures(Network network, String att, boolean childFeatures, Sentence sent,int pos, String label, ArrayList<Integer> featureList){
+		
+		String w = sent.get(pos).getName();
+		String wP = sent.get(pos).getTag();
+		String wPm1 = pos > 1 ? sent.get(pos - 1).getTag() : "STR";
+		String wPp1 = pos < sent.length() - 1 ? sent.get(pos + 1).getTag() : "END";
+		
+		featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-dir", label+"&"+att));
+		featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL", label));
+		for(int i = 0; i < 2; i++) {
+			String suff = i < 1 ? "&"+att : "";
+			suff = "&"+label+suff;
+		 
+			featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-W-WP-suff", w + " " + wP + suff));
+			featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WP-suff", wP + suff));
+			featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WM-WP-suff", wPm1 + " " + wP + suff));
+			featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WP-WPT-suff", wP + " " + wPp1 + suff));
+			featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WM-WP-WPT-suff", wPm1 + " " + wP + " " + wPp1 + suff));
+			featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-W-suff", w + suff));
 		}
 	}
 	
 	private String shape(String word){
 		return Extractor.wordShapeOf(word);
 	}
-	
+		
+
+
 }

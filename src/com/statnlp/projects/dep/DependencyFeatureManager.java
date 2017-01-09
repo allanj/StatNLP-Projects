@@ -366,19 +366,18 @@ public class DependencyFeatureManager extends FeatureManager {
 		}
 	}
 	
-	private void addLabeledFeatures(Network network, String att, boolean childFeatures, Sentence sent,int pos, String label, ArrayList<Integer> featureList){
+	private void addLabeledFeatures(Network network, String att_1, boolean childFeatures, Sentence sent,int pos, String label, ArrayList<Integer> featureList){
 		
 		String w = sent.get(pos).getName();
 		String wP = sent.get(pos).getTag();
 		String wPm1 = pos > 0 ? sent.get(pos-1).getTag() : "STR";
 		String wPp1 = pos < sent.length()-1 ? sent.get(pos+1).getTag() : "END";
-		
+		String att = att_1 + "&" + childFeatures;
 		featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-dir", label+"&"+att));
 		featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL", label));
 		for(int i = 0; i < 2; i++) {
 			String suff = i < 1 ? "&"+att : "";
 			suff = "&"+label+suff;
-		 
 			featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-W-WP-suff", w + " " + wP + suff));
 			featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WP-suff", wP + suff));
 			featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WM-WP-suff", wPm1 + " " + wP + suff));
