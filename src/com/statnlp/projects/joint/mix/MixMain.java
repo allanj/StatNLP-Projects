@@ -1,5 +1,15 @@
 package com.statnlp.projects.joint.mix;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import com.statnlp.commons.types.Instance;
+import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
+import com.statnlp.hybridnetworks.GlobalNetworkParam;
+import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkModel;
 
 public class MixMain {
@@ -33,20 +43,15 @@ public class MixMain {
 		System.err.println("[Info] testFile: " + testFile);
 		System.err.println("[Info] model file: " + modelFile);
 		System.err.println("[Info] nerOut: "+nerOut);
-		System.err.println("[Info] task: "+task.toString());
-		System.err.println("[Info] #max-mf: " + NetworkConfig.MAX_MF_UPDATES);
-		System.err.println("[Info] inference type: " + NetworkConfig.INFERENCE.name());
 		System.err.println("[Info] use joint features?: " + useJointFeatures);
 		
-		boolean checkProjective = task == MFJTASK.PARING || task == MFJTASK.JOINT ? true : false;
-		MFJInstance[] trainInsts = MFJReader.readCoNLLXData(trainFile, true, trainNum, checkProjective);
-		MFJInstance[] testInsts = MFJReader.readCoNLLXData(testFile, false, testNum, false);
+		MixInstance[] trainInsts = MixReader.readCoNLLXData(trainFile, true, trainNum, true);
+		MixInstance[] testInsts = MixReader.readCoNLLXData(testFile, false, testNum, false);
 		MixLabel.lock();
 		NetworkConfig.NUM_THREADS = numThreads;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = l2;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
-		NetworkConfig.INFERENCE = task == MFJTASK.JOINT ? InferenceType.MEAN_FIELD : InferenceType.FORWARD_BACKWARD;
 		
 		/***DEBUG configuration***/
 //		MFJConfig.windows = true;
@@ -56,8 +61,8 @@ public class MixMain {
 		
 		NetworkModel model = null;
 		if (!readModel) {
-			MixNetworkCompiler compiler = new MixNetworkCompiler(task, maxSize, maxSegmentLength);
-			MFJFeatureManager fm = new MFJFeatureManager(new GlobalNetworkParam(), useJointFeatures, maxSegmentLength);
+			MixNetworkCompiler compiler = new MixNetworkCompiler(maxSize, maxSegmentLength);
+			MixFeatureManager fm = new MixFeatureManager(new GlobalNetworkParam());
 			model = DiscriminativeNetworkModel.create(fm, compiler);
 			model.train(trainInsts, numIterations);
 		} else {
@@ -73,10 +78,8 @@ public class MixMain {
 		}
 		
 		Instance[] predictions = model.decode(testInsts);
-		if (task == MFJTASK.PARING || task == MFJTASK.JOINT)
-			MFJEval.evalDep(predictions);
-		if ((task == MFJTASK.NER || task == MFJTASK.JOINT))
-			MFJEval.evalNER(predictions, nerOut);
+		MixEval.evalDep(predictions);
+		MixEval.evalNER(predictions, nerOut);
 	}
 
 	public static void processArgs(String[] args){
@@ -93,16 +96,7 @@ public class MixMain {
 					case "-iter": numIterations = Integer.valueOf(args[i+1]); break;
 					case "-thread": numThreads = Integer.valueOf(args[i+1]); break;
 					case "-reg": l2 = Double.valueOf(args[i+1]); break;
-					case "-windows": MFJConfig.windows = args[i+1].equals("true")? true:false; break;
-					case "-mfround": NetworkConfig.MAX_MF_UPDATES = Integer.valueOf(args[i+1]);
-									 useJointFeatures = true;
-									 if(NetworkConfig.MAX_MF_UPDATES == 0) useJointFeatures = false;
-									 break;
-					case "-task": 
-						if(args[i+1].equals("parsing"))  task = MFJTASK.PARING;
-						else if (args[i+1].equals("ner")) task  = MFJTASK.NER;
-						else if (args[i+1].equals("joint"))  task  = MFJTASK.JOINT;
-						else throw new RuntimeException("Unknown task:"+args[i+1]+"?"); break;
+					case "-windows": MixConfig.windows = args[i+1].equals("true")? true:false; break;
 					case "-saveModel": saveModel = args[i+1].equals("true")?true:false; break;
 					case "-readModel": readModel = args[i+1].equals("true")?true:false; break;
 					case "-dataset": dataset = args[i+1]; break;

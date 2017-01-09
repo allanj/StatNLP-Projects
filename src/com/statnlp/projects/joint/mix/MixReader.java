@@ -16,7 +16,7 @@ public class MixReader {
 	public static String ROOT_TAG = "ROOT";
 
 	/**
-	 * Reading the CoNLL-X format data, need to modify a bit to make it corresponds to the index.
+	 * Reading the CoNLL-X format data, need to modify a bit to make it corresponds to the index. refer to segdep
 	 * @param fileName
 	 * @param isLabeled
 	 * @param number

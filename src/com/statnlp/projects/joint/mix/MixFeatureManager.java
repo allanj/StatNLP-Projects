@@ -9,7 +9,6 @@ import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
-import com.statnlp.projects.dep.DependencyFeatureManager.FeaType;
 import com.statnlp.projects.dep.utils.Extractor;
 import com.statnlp.projects.joint.mix.MixConfig.DIR;
 import com.statnlp.projects.joint.mix.MixNetworkCompiler.NodeType;
@@ -19,7 +18,6 @@ public class MixFeatureManager extends FeatureManager {
 	
 	private static final long serialVersionUID = 55903602509541919L;
 	private int prefixSuffixLen = 3;
-	private int maxSegmentLength = 8;
 	
 	public enum FeaType {
 		seg_prev_word, seg_prev_word_shape, seg_prev_tag, seg_next_word, seg_next_word_shape, seg_next_tag, segment, segment_shape, seg_len,
@@ -27,9 +25,8 @@ public class MixFeatureManager extends FeatureManager {
 		unigram, bigram, contextual, inbetween, prefix, label
 	}
 	
-	public MixFeatureManager(GlobalNetworkParam param_g, boolean useJointFeature, int maxSegmentLength) {
+	public MixFeatureManager(GlobalNetworkParam param_g) {
 		super(param_g);
-		this.maxSegmentLength = maxSegmentLength;
 	}
 
 
@@ -51,7 +48,8 @@ public class MixFeatureManager extends FeatureManager {
 			int[] child_arr = network.getNodeArray(children_k[0]);
 			int start = child_arr[0] + 1;
 			int childLabelId = child_arr[1];
-			FeatureArray curr = addSemiCRFFeatures(fa, network, sent, pos, start, labelId, childLabelId, threadId);
+			//FeatureArray curr = addSemiCRFFeatures(fa, network, sent, pos, start, labelId, childLabelId, threadId);
+			addSemiCRFFeatures(fa, network, sent, pos, start, labelId, childLabelId, threadId);
 			
 		} else if (nodeArr[1] == NodeType.DEP.ordinal()) {
 			int leftIndex = nodeArr[1] - nodeArr[2];
@@ -59,7 +57,8 @@ public class MixFeatureManager extends FeatureManager {
 			int direction = nodeArr[4];
 			int completeness = nodeArr[3];
 			int labelId = nodeArr[5];
-			FeatureArray curr = addDepFeatures(fa, network, sent, leftIndex, rightIndex, completeness, direction, threadId, labelId);
+			//FeatureArray curr = addDepFeatures(fa, network, sent, leftIndex, rightIndex, completeness, direction, threadId, labelId);
+			addDepFeatures(fa, network, sent, leftIndex, rightIndex, completeness, direction, threadId, labelId);
 			
 		}
 		
@@ -186,7 +185,8 @@ public class MixFeatureManager extends FeatureManager {
 		ArrayList<Integer> bound4Dist = new ArrayList<Integer>();
 		ArrayList<Integer> inDistList = new ArrayList<Integer>();
 		ArrayList<Integer> inList = new ArrayList<Integer>();
-		ArrayList<Integer> labelList = new ArrayList<Integer>();
+		ArrayList<Integer> label1List = new ArrayList<Integer>();
+		ArrayList<Integer> label2List = new ArrayList<Integer>();
 		
 		String leftTag = sent.get(leftIndex).getTag();
 		String rightTag = sent.get(rightIndex).getTag();
@@ -364,24 +364,9 @@ public class MixFeatureManager extends FeatureManager {
 			}
 			
 			String label = MixLabel.get(labelId).form;
-			labelList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-dir", label+"&"+att));
-			labelList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL", label));
-
-			String w = sent.get(pos).getName();
-			String wP = sent.get(pos).getTag();
-			String wPm1 = pos > 0 ? sent.get(pos-1).getTag() : "STR";
-			String wPp1 = pos < sent.length()-1 ? sent.get(pos+1).getTag() : "END";
-			for(int i = 0; i < 2; i++) {
-				String suff = i < 1 ? "&"+att : "";
-				suff = "&"+label+suff;
-				
-				featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-W-WP-suff", w + " " + wP + suff));
-				featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WP-suff", wP + suff));
-				featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WM-WP-suff", wPm1 + " " + wP + suff));
-				featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WP-WPT-suff", wP + " " + wPp1 + suff));
-				featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-WM-WP-WPT-suff", wPm1 + " " + wP + " " + wPp1 + suff));
-				featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-W-suff", w + suff));
-			}
+			//including the O label.
+			addLabeledFeatures(network, att, true, sent, modifierIndex, label, label1List);
+			addLabeledFeatures(network, att, false, sent, headIndex, label, label2List);
 		}
 		
 		ArrayList<ArrayList<Integer>> bigList = new ArrayList<ArrayList<Integer>>();
@@ -392,6 +377,7 @@ public class MixFeatureManager extends FeatureManager {
 		bigList.add(bound3); bigList.add(bound3Dist);
 		bigList.add(bound4); bigList.add(bound4Dist);
 		bigList.add(inList); bigList.add(inDistList);
+		bigList.add(label1List); bigList.add(label2List);
 		FeatureArray fa = orgFa;
 		for (int i = 0; i < bigList.size(); i++) {
 			FeatureArray curr = addNext(fa, bigList.get(i), threadId);
@@ -422,13 +408,13 @@ public class MixFeatureManager extends FeatureManager {
 		}
 	}
 	
-	private void addLabeledFeatures(Network network, String att, boolean childFeatures, Sentence sent,int pos, String label, ArrayList<Integer> featureList){
+	private void addLabeledFeatures(Network network, String att_1, boolean childFeatures, Sentence sent, int pos, String label, ArrayList<Integer> featureList){
 		
 		String w = sent.get(pos).getName();
 		String wP = sent.get(pos).getTag();
 		String wPm1 = pos > 1 ? sent.get(pos - 1).getTag() : "STR";
 		String wPp1 = pos < sent.length() - 1 ? sent.get(pos + 1).getTag() : "END";
-		
+		String att = att_1 + "&" + childFeatures;
 		featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL-dir", label+"&"+att));
 		featureList.add(this._param_g.toFeature(network, FeaType.label.name(), "LABEL", label));
 		for(int i = 0; i < 2; i++) {
