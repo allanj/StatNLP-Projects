@@ -42,6 +42,7 @@ public class MixReader {
 		int end = 0;
 		int numOfNotTree = 0;
 		int nonProjective = 0;
+		int numNotConnected = 0;
 		MixLabel prevLabel = null;
 		while(br.ready()){
 			String line = br.readLine().trim();
@@ -55,7 +56,8 @@ public class MixReader {
 				WordToken[] wtArr = new WordToken[words.size()];
 				int[] heads = new int[originalHeads.size()];
 				for (int i = 0; i < originalHeads.size(); i++) heads[i] = originalHeads.get(i);
-				MixInstance instance = new MixInstance(instanceId, 1.0, new Sentence(words.toArray(wtArr)));
+				Sentence sent = new Sentence(words.toArray(wtArr));
+				MixInstance instance = new MixInstance(instanceId, 1.0, sent);
 				instance.input.setRecognized();
 				instance.output = new MixPair(heads, segments);
 				
@@ -74,6 +76,10 @@ public class MixReader {
 						if (checkProjective && !projectiveness) nonProjective++;
 						continue;
 					}
+				}
+				if (checkConnected(instance) > 0) {
+					System.err.println(sent.toString());
+					numNotConnected++;
 				}
 				if(isLabeled){
 					instance.setLabeled(); // Important!
@@ -137,9 +143,10 @@ public class MixReader {
 		System.err.println("[Info] max sentence length: " + maxSentenceLength);
 		System.err.println("[Info] max entity length: " + maxEntityLength);
 		if (isLabeled) {
-			System.err.println("[Info] #not tree: " + numOfNotTree);
-			System.err.println("[Info] #non projective: " + nonProjective);
+			System.err.println("[Info] "+type+" #not tree: " + numOfNotTree);
+			System.err.println("[Info] "+type+" #non projective: " + nonProjective);
 		}
+		System.err.println("[Info] #not connected "+type+" instance (after proj filter): " + numNotConnected);
 		return result.toArray(new MixInstance[result.size()]);
 	}
 	
@@ -157,5 +164,54 @@ public class MixReader {
 		} else {
 			segments.add(new MixSpan(start, end, label));
 		}
+	}
+ 	
+ 	private static int checkConnected(MixInstance inst){
+		int number = 0;
+		List<MixSpan> output = inst.getOutput().entities;
+		Sentence sent = inst.getInput();
+		int[][] leftNodes = sent2LeftDepRel(sent, inst.getOutput().heads);
+		for(MixSpan span: output){
+			int start = span.start;
+			int end = span.end;
+			MixLabel label = span.label;
+			if(label.equals(MixLabel.get("O")) || start==end) continue;
+			boolean connected = traverseLeft(start, end, leftNodes);
+			if(!connected) number++;
+		}
+		return number;
+	}
+ 	
+ 	private static int[][] sent2LeftDepRel(Sentence sent, int[] heads){
+		int[][] leftDepRel = new int[sent.length()][];
+		ArrayList<ArrayList<Integer>> leftDepList = new ArrayList<ArrayList<Integer>>();
+		for(int i = 0; i < leftDepRel.length; i++) leftDepList.add(new ArrayList<Integer>());
+		for(int pos = 0; pos < sent.length(); pos++){
+			int headIdx = heads[pos];
+			if(headIdx < 0) continue;
+			int smallOne = Math.min(pos, headIdx);
+			int largeOne = Math.max(pos, headIdx);
+			ArrayList<Integer> curr = leftDepList.get(largeOne);
+			curr.add(smallOne);
+		}
+		for(int pos = 0; pos < sent.length(); pos++){
+			ArrayList<Integer> curr = leftDepList.get(pos);
+			leftDepRel[pos] = new int[curr.size()];
+			for(int j=0; j<curr.size();j++)
+				leftDepRel[pos][j] = curr.get(j);
+		}
+		return leftDepRel;
+	}
+	
+	private static boolean traverseLeft(int start, int end, int[][] leftNodes){
+		for(int l=0; l<leftNodes[end].length; l++){
+			if(leftNodes[end][l] < start) continue;
+			if(leftNodes[end][l] == start)
+				return true;
+			else if(traverseLeft(start, leftNodes[end][l], leftNodes))
+				return true;
+			else continue;
+		}
+		return false;
 	}
 }

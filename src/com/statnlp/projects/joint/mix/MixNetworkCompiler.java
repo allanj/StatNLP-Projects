@@ -17,11 +17,11 @@ public class MixNetworkCompiler extends NetworkCompiler {
 
 	private static final long serialVersionUID = 2601737587426539990L;
 
-	private int maxSentLen = 150; //including the root node at 0 idx
+	private int maxSentLen = 128; //including the root node at 0 idx
 	public int maxSegmentLength = 8;
 	private long[] _nodes;
 	private int[][][] _children;
-	private boolean DEBUG = false;
+	private boolean DEBUG = true;
 	
 	public enum NodeType {
 		ENTITY_DEP,
@@ -36,10 +36,16 @@ public class MixNetworkCompiler extends NetworkCompiler {
 	
 	
 	static {
+//		/***for dependency parsing: nodeType, rightIdx, rightIdx-leftIdx, complete, direction, entityType
+//		for semi model: nodeType, position, SemiLabelId, 0, 0, 0
+//		for entity_dep node: nodeType, rightIdx, rightIdx-leftIdx, complete, direction, entityType ****/
+//		NetworkIDMapper.setCapacity(new int[]{10, 200, 200, 5, 5, 5});
+		
 		/***for dependency parsing: nodeType, rightIdx, rightIdx-leftIdx, complete, direction, entityType
-		for semi model: nodeType, position, SemiLabelId, 0, 0, 0
-		for entity_dep node: nodeType, rightIdx, rightIdx-leftIdx, complete, direction, entityType ****/
-		NetworkIDMapper.setCapacity(new int[]{10, 200, 200, 5, 5, 5});
+		for semi model: position, max, max, max, SemiLabelId, nodeType
+		for entity_dep node: rightIdx, rightIdx-leftIdx, complete, direction, entityType, nodeType
+		for dep node: rightIndex, rightIdx-leftIdx, complete, direction, labelId, nodeType****/
+		NetworkIDMapper.setCapacity(new int[]{200, 200, 5, 5, 10, 5});
 	}
 	
 	public MixNetworkCompiler(int maxSize, int maxSegmentLength){
@@ -63,48 +69,48 @@ public class MixNetworkCompiler extends NetworkCompiler {
 	 * @return
 	 */
 	private long toNode_JointRoot(int len) {
-		return NetworkIDMapper.toHybridNodeID(new int[]{NodeType.ROOT.ordinal(), len, 0, 0, 0, 0});
+		return NetworkIDMapper.toHybridNodeID(new int[]{len, 0, 0, 0, MixLabel.Labels.size(), NodeType.ROOT.ordinal()});
 	}
 	
 	private long toNode_entityLeaf(){
-		return NetworkIDMapper.toHybridNodeID(new int[]{NodeType.ENTITY.ordinal(), 0, MixLabel.get("O").id, 0, 0, 0});
+		return NetworkIDMapper.toHybridNodeID(new int[]{0, 0, 0, 0, MixLabel.get("O").id, NodeType.ENTITY.ordinal()});
 	}
 	
 	private long toNode_entity(int pos, int labelId){
-		return NetworkIDMapper.toHybridNodeID(new int[]{NodeType.ENTITY.ordinal(), pos, labelId, 0, 0, 0});
+		return NetworkIDMapper.toHybridNodeID(new int[]{pos, 199, 4, 4, labelId, NodeType.ENTITY.ordinal()});
 	}
 	
 	private long toNode_entityRoot(int size){
-		return NetworkIDMapper.toHybridNodeID(new int[]{NodeType.ENTITY.ordinal(), size, 0, 0, 0, 0});
+		return NetworkIDMapper.toHybridNodeID(new int[]{size, 0, 0, 0, MixLabel.Labels.size(), NodeType.ENTITY.ordinal()});
 	}
 	
 	private long toNode_entity_non_dep_comp(int leftIndex, int rightIndex, int direction, int labelId) {
-		return NetworkIDMapper.toHybridNodeID(new int[]{NodeType.ENTITY_NONDEP.ordinal(), rightIndex, rightIndex-leftIndex, COMP.comp.ordinal(), direction, labelId});
+		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex, rightIndex-leftIndex, COMP.comp.ordinal(), direction, labelId, NodeType.ENTITY_NONDEP.ordinal()});
 	}
 	
 	private long toNode_entity_non_dep_incomp(int leftIndex, int rightIndex, int direction, int labelId) {
-		return NetworkIDMapper.toHybridNodeID(new int[]{NodeType.ENTITY_NONDEP.ordinal(), rightIndex, rightIndex-leftIndex, COMP.incomp.ordinal(), direction, labelId});
+		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex, rightIndex-leftIndex, COMP.incomp.ordinal(), direction, labelId, NodeType.ENTITY_NONDEP.ordinal()});
 	}
 	
 	private long toNode_entity_dep_comp(int leftIndex, int rightIndex, int direction, int labelId) {
-		return NetworkIDMapper.toHybridNodeID(new int[]{NodeType.ENTITY_DEP.ordinal(), rightIndex, rightIndex-leftIndex, COMP.comp.ordinal(), direction, labelId});
+		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex, rightIndex-leftIndex, COMP.comp.ordinal(), direction, labelId, NodeType.ENTITY_DEP.ordinal()});
 	}
 	
 	private long toNode_entity_dep_incomp(int leftIndex, int rightIndex, int direction, int labelId) {
-		return NetworkIDMapper.toHybridNodeID(new int[]{NodeType.ENTITY_DEP.ordinal(), rightIndex, rightIndex-leftIndex, COMP.incomp.ordinal(), direction, labelId});
+		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex, rightIndex-leftIndex, COMP.incomp.ordinal(), direction, labelId, NodeType.ENTITY_DEP.ordinal()});
 	}
 	
 	private long toNode_DepRoot(int sentLen){
 		int endIndex = sentLen - 1;
-		return NetworkIDMapper.toHybridNodeID(new int[]{NodeType.DEP.ordinal(), endIndex, endIndex - 0, COMP.comp.ordinal(), DIR.right.ordinal(), 0});
+		return NetworkIDMapper.toHybridNodeID(new int[]{endIndex, endIndex - 0, COMP.comp.ordinal(), DIR.right.ordinal(), 0, NodeType.DEP.ordinal()});
 	}
 	
 	private long toNodeIncomp(int leftIndex, int rightIndex, int direction, int labelId){
-		return NetworkIDMapper.toHybridNodeID(new int[]{NodeType.DEP.ordinal(), rightIndex, rightIndex-leftIndex, COMP.incomp.ordinal(), direction, labelId});
+		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex, rightIndex-leftIndex, COMP.incomp.ordinal(), direction, labelId, NodeType.DEP.ordinal()});
 	}
 	
 	private long toNodeComp(int leftIndex, int rightIndex, int direction){
-		return NetworkIDMapper.toHybridNodeID(new int[]{NodeType.DEP.ordinal(), rightIndex, rightIndex-leftIndex, COMP.comp.ordinal(), direction, 0});
+		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex, rightIndex-leftIndex, COMP.comp.ordinal(), direction, 0, NodeType.DEP.ordinal()});
 	}
 	
 	private Network compileLabeledNetwork(int networkId, Instance inst, LocalNetworkParam param) {
@@ -135,13 +141,14 @@ public class MixNetworkCompiler extends NetworkCompiler {
 			prevNode = end;
 		}
 		long entityRoot = this.toNode_entityRoot(size);
-		
+		network.addNode(entityRoot);
+		network.addEdge(entityRoot, new long[]{prevNode});
 		this.buildDepNetwork(network, size, heads);
 		long depRoot = this.toNode_DepRoot(size);
 		network.addEdge(jointRoot, new long[]{entityRoot, depRoot});
-		
 		network.finalizeNetwork();
 		if (DEBUG) {
+//			System.err.println(inst.getInput().toString());
 			MixNetwork generic = (MixNetwork) compileUnlabeledNetwork(networkId, inst, param);
 			if (!generic.contains(network)) {
 				System.err.println("wrong");
@@ -203,6 +210,8 @@ public class MixNetworkCompiler extends NetworkCompiler {
 							long prevBeginNode = this.toNode_entity(prevPos, prevLabelId);
 							if(network.contains(prevBeginNode)){
 								network.addNode(node);
+//								System.err.println("parent: " + pos + ", " + "O; child: "+prevPos+","+MixLabel.get(prevLabelId));
+//								System.err.println("parent: " + Arrays.toString(NetworkIDMapper.toHybridNodeArray(node)) + ", " + " child: "+Arrays.toString(NetworkIDMapper.toHybridNodeArray(prevBeginNode)));
 								network.addEdge(node, new long[]{prevBeginNode});
 							}
 						}
@@ -216,6 +225,7 @@ public class MixNetworkCompiler extends NetworkCompiler {
 			}
 			
 			long entityRoot = this.toNode_entityRoot(pos + 1);
+			network.addNode(entityRoot);
 			for(long currNode: currNodes){
 				if(network.contains(currNode)){
 					network.addEdge(entityRoot, new long[]{currNode});
@@ -230,6 +240,7 @@ public class MixNetworkCompiler extends NetworkCompiler {
 		network.finalizeNetwork();
 		this._nodes = network.getAllNodes();
 		this._children = network.getAllChildren();
+		System.err.println(this._nodes.length + " nodes..");
 	}
 
 	/**
@@ -244,11 +255,6 @@ public class MixNetworkCompiler extends NetworkCompiler {
 		network.addNode(rootRight);
 		long depRoot = this.toNode_DepRoot(maxLength);
 		network.addNode(depRoot);
-		long jointRoot = this.toNode_JointRoot(maxLength);
-		if (heads != null) {
-			network.addNode(jointRoot);
-			network.addEdge(jointRoot, new long[]{depRoot});
-		}
 		for(int rightIndex = 1; rightIndex <= maxLength - 1; rightIndex++){
 			//eIndex: 1,2,3,4,5,..n
 			long wordLeftNode = this.toNodeComp(rightIndex, rightIndex, leftDir);
@@ -310,11 +316,6 @@ public class MixNetworkCompiler extends NetworkCompiler {
 								}
 								
 							}
-//							if (heads == null && leftIndex == 0 && network.contains(parent)) {
-//								jointRoot = this.toNode_JointRoot(rightIndex + 1);
-//								network.addNode(jointRoot);
-//								network.addEdge(jointRoot, new long[]{parent});
-//							}
 						}
 					}
 				}
@@ -327,21 +328,20 @@ public class MixNetworkCompiler extends NetworkCompiler {
 		for(int rightIndex = 1; rightIndex <= maxLength - 1; rightIndex++){
 			//eIndex: 1,2,3,4,5,..n
 			for (int lab = 0; lab < MixLabel.Labels.size(); lab++) {
-				if (lab == oLabelId) continue;
-				if (entities != null) {
-					if (entities[lab].equals("O")) continue;
-				}
+				
+				if (lab == oLabelId || (entities != null && entities[rightIndex].equals("O"))) continue;
+				
 				long wordLeftNode = this.toNode_entity_dep_comp(rightIndex, rightIndex, leftDir, lab);
 				long wordRightNode = this.toNode_entity_dep_comp(rightIndex, rightIndex, rightDir, lab);
 				network.addNode(wordLeftNode);
 				network.addNode(wordRightNode);
 				long dummyRootRight = this.toNode_entity_non_dep_comp(rightIndex - 1 , rightIndex - 1, rightDir, lab);
-				if (entities != null && entities[rightIndex].startsWith("B")) {
+				
+				if (entities != null && entities[rightIndex].startsWith("B") && entities[rightIndex].substring(2).equals(MixLabel.get(lab).form)) {
 					if (rightIndex == maxLength - 1) continue;
 					if (!entities[rightIndex + 1].startsWith("I")) continue;
 				}
 				network.addNode(dummyRootRight);
-				
 			}
 			
 			for(int L = 1;L <= rightIndex;L++){
@@ -445,12 +445,12 @@ public class MixNetworkCompiler extends NetworkCompiler {
 		while(node_k > 0){
 			int[] children_k = mixNetwork.getMaxPath(node_k);
 			int[] child_arr = mixNetwork.getNodeArray(children_k[0]);
-			int pos = child_arr[1];
-			int nodeType = child_arr[0];
+			int pos = child_arr[0];
+			int nodeType = child_arr[5];
 			if(pos == 0){
 				break;
 			}
-			int labelId = child_arr[2];
+			int labelId = child_arr[4];
 			int end = pos;
 			if (nodeType != NodeType.ROOT.ordinal()) {
 				if(end != 1){
@@ -477,13 +477,13 @@ public class MixNetworkCompiler extends NetworkCompiler {
 		String[] entityArr = result.toEntities(predSpans);
 		for (int k = 0; k < mixNetwork.countNodes(); k++) {
 			int[] arr = mixNetwork.getNodeArray(k);
-			int nodeType = arr[0];
-			int comp = arr[3];
-			int direction = arr[4];
-			int rightIndex = arr[1];
-			int leftIndex = arr[1] - arr[2];
-			int labelId = arr[5];
-			if (nodeType == NodeType.DEP.ordinal() && comp == COMP.incomp.ordinal()) {
+			int nodeType = arr[5];
+			int comp = arr[2];
+			int direction = arr[3];
+			int rightIndex = arr[0];
+			int leftIndex = arr[0] - arr[1];
+			int labelId = arr[4];
+			if (nodeType == NodeType.DEP.ordinal() && comp == COMP.incomp.ordinal() && rightIndex < result.size()) {
 				int modifierIndex = direction == leftDir ? leftIndex : rightIndex;
 				if (preHeadPrediction[modifierIndex] != -1) {
 					if (labelId != MixLabel.get(entityArr[modifierIndex].substring(2)).id) {
@@ -500,6 +500,7 @@ public class MixNetworkCompiler extends NetworkCompiler {
 		long depRoot = this.toNode_DepRoot(result.size());
 		int depRootIdx = Arrays.binarySearch(mixNetwork.getAllNodes(), depRoot);
 		findBest(mixNetwork, result, depRootIdx, preHeadPrediction);
+		result.setPrediction(new MixPair(preHeadPrediction, predSpans));
 		return result;
 	}
 	
@@ -513,11 +514,11 @@ public class MixNetworkCompiler extends NetworkCompiler {
 		for (int child_k: children_k) {
 			long node = network.getNode(child_k);
 			int[] nodeArr = NetworkIDMapper.toHybridNodeArray(node);
-			int rightIndex = nodeArr[1];
-			int leftIndex = nodeArr[1] - nodeArr[2];
-			int comp = nodeArr[3];
-			int direction = nodeArr[4];
-			int nodeType = nodeArr[0];
+			int rightIndex = nodeArr[0];
+			int leftIndex = nodeArr[0] - nodeArr[1];
+			int comp = nodeArr[2];
+			int direction = nodeArr[3];
+			int nodeType = nodeArr[5];
 			if (nodeType == NodeType.ENTITY_DEP.ordinal() && comp == COMP.incomp.ordinal()) {
 				if (direction == leftDir) {
 					prediction[leftIndex] = rightIndex;

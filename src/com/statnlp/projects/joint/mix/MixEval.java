@@ -12,7 +12,7 @@ import com.statnlp.commons.types.Sentence;
 
 public class MixEval {
 
-private static HashSet<String> punct = new HashSet<>(Arrays.asList("''", ",", ".", ":", "``", "-LRB-", "-RRB-"));
+	private static HashSet<String> punct = new HashSet<>(Arrays.asList("''", ",", ".", ":", "``", "-LRB-", "-RRB-"));
 	
 	public static void evalDep(Instance[] testInsts){
 		int dp_corr=0;

@@ -16,16 +16,16 @@ public class MixMain {
 
 	public static String trainFile;
 	public static String testFile;
-	public static int trainNum = 20;
-	public static int testNum = 20;
+	public static int trainNum = -1;
+	public static int testNum = -1;
 	public static int numThreads = 8;
 	public static int numIterations = 5000;
 	public static double l2 = 0.1;
 	public static String modelFile = null;
 	public static boolean saveModel = false;
 	public static boolean readModel = false;
-	public static String dataset = "allanprocess";
-	public static String dataSection = "abc";
+	public static String dataset = "ConnectedData";
+	public static String dataSection = "pri";
 	public static boolean useJointFeatures = false;
 	public static int maxSize = 150;
 	public static int maxSegmentLength = 8;
@@ -45,16 +45,23 @@ public class MixMain {
 		System.err.println("[Info] nerOut: "+nerOut);
 		System.err.println("[Info] use joint features?: " + useJointFeatures);
 		
+		/***DEBUG configuration***/
+//		trainFile = "data/"+dataset+"/"+dataSection+"/train.conllx";
+//		testFile = trainFile;
+		/****/
+		
 		MixInstance[] trainInsts = MixReader.readCoNLLXData(trainFile, true, trainNum, true);
 		MixInstance[] testInsts = MixReader.readCoNLLXData(testFile, false, testNum, false);
 		MixLabel.lock();
+		System.err.println(MixLabel.Label_Index.toString());
 		NetworkConfig.NUM_THREADS = numThreads;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = l2;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
 		
 		/***DEBUG configuration***/
-//		MFJConfig.windows = true;
+//		System.exit(0);
+//		MixConfig.windows = true;
 //		useJointFeatures = true;
 //		NetworkConfig.MAX_MF_UPDATES = 4;
 		/******/

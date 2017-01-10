@@ -408,7 +408,7 @@ public abstract class TableLookupNetwork extends Network{
 		for(long child : children){
 			if(child >= parent){
 				System.err.println(Arrays.toString(NetworkIDMapper.toHybridNodeArray(parent)));
-				System.err.println(Arrays.toString(NetworkIDMapper.toHybridNodeArray(children[0])));
+				System.err.println(Arrays.toString(NetworkIDMapper.toHybridNodeArray(child)));
 				System.err.println();
 				throw new NetworkException("This link seems to be invalid:"+parent+"\t"+Arrays.toString(children));
 			}

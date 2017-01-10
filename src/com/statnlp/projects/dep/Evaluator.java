@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 
 import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.types.Instance;
@@ -18,6 +20,7 @@ public class Evaluator {
 
 	public static boolean DEBUG = false;
 
+	private static HashSet<String> punct = new HashSet<>(Arrays.asList("''", ",", ".", ":", "``", "-LRB-", "-RRB-"));
 	
 	public static void evalDP(Instance[] testInsts, String dpOut) throws IOException{
 		evalDP(testInsts, dpOut, false);
@@ -32,6 +35,8 @@ public class Evaluator {
 	public static void evalDP(Instance[] testInsts, String dpOut, boolean labeledDep) throws IOException{
 		int dp_corr=0;
 		int dp_total=0;
+		int noPunc_corr = 0;
+		int noPunc_total = 0;
 		int las_corr = 0;
 		int lastGlobalId = Integer.MIN_VALUE;
 		double max = Double.NEGATIVE_INFINITY;
@@ -78,6 +83,12 @@ public class Evaluator {
 						if(predHeads[i]==trueHeads[i])
 							dp_corr++;
 						dp_total++;
+						if (!punct.contains(bestSent.get(i).getName())) {
+							if (trueHeads[i] == predHeads[i]) {
+								noPunc_corr++;
+							}
+							noPunc_total++;
+						}
 						pw.write(i+" "+bestSent.get(i).getName()+" "+bestSent.get(i).getTag()+" "+bestSent.get(i).getEntity()+" "+trueHeads[i]+" "+predHeads[i]+"\n");
 					}
 					pw.write("\n");
@@ -94,6 +105,12 @@ public class Evaluator {
 							las_corr++;
 					}
 					dp_total++;
+					if (!punct.contains(sent.get(i).getName())) {
+						if (sent.get(i).getHeadIndex() == predHeads[i]) {
+							noPunc_corr++;
+						}
+						noPunc_total++;
+					}
 					pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+sent.get(i).getHeadIndex()+" "+predHeads[i]+"\n");
 				}
 				pw.write("\n");
@@ -105,6 +122,9 @@ public class Evaluator {
 		System.out.println("[Dependency] Correct: "+dp_corr);
 		System.out.println("[Dependency] total: "+dp_total);
 		System.out.println("[Dependency] UAS: "+dp_corr*1.0/dp_total);
+		System.out.println("[Dependency] No punctuation Correct: "+noPunc_corr);
+		System.out.println("[Dependency] No punctuation total: "+noPunc_total);
+		System.out.println("[Dependency] UAS: "+noPunc_corr*1.0/noPunc_total);
 		if(labeledDep) System.out.println("[Dependency] LAS: "+las_corr*1.0/dp_total);
 		System.out.println("*************************");
 	}

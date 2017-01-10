@@ -26,6 +26,7 @@ import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkConfig.ModelType;
 import com.statnlp.hybridnetworks.NetworkModel;
 import com.statnlp.neural.NeuralConfigReader;
+import com.statnlp.projects.dep.utils.DataChecker;
 import com.statnlp.projects.entity.EntityChecker;
 
 public class SemiCRFMain {
@@ -376,6 +377,10 @@ public class SemiCRFMain {
 				instance.input.setRecognized();
 				instance.output = output;
 				/** debug information **/
+				List<Integer> headList = new ArrayList<Integer>(wts.size());
+				for (int h = 0; h < wts.size(); h++)
+					headList.add(instance.input.get(h).getHeadIndex());
+//				boolean projective = DataChecker.checkProjective(headList);
 				int realE = 0;
 				for(int i=0;i<instance.input.length(); i++){
 					if(instance.input.get(i).getEntity().startsWith("B-")) realE++;
@@ -400,8 +405,10 @@ public class SemiCRFMain {
 				}else if(isLabeled && ignore && extention.equals("dgm-s") && EntityChecker.checkAllIncomplete(instance.input).size()>0){
 					//do nothing
 				}else{
+					//if (projective) {
 					instanceId++;
 					result.add(instance);
+					//}
 				}
 				wts = new ArrayList<WordToken>();
 				output = new ArrayList<SemiSpan>();
