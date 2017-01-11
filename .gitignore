@@ -12,3 +12,4 @@ run.sh
 *.jar
 program/
 config/
+data/ConnectedData/*

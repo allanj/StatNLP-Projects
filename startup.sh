@@ -3,7 +3,7 @@
 ## This is a pre script that before you run our program
 
 ## Better set the memory to maximum to avoid memory issue
-sed -i '$ a export _JAVA_OPTIONS=-Xmx244000m' ~/.bashrc
+sed -i '$ a export _JAVA_OPTIONS=-Xmx256000m' ~/.bashrc
 
 ## Make the above configuration work
 source ~/.bashrc
