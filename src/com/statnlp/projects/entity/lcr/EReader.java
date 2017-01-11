@@ -8,6 +8,7 @@ import java.util.List;
 import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
+import com.statnlp.projects.dep.utils.DataChecker;
 import com.statnlp.projects.entity.Entity;
 
 public class EReader {
@@ -28,6 +29,13 @@ public class EReader {
 				ECRFInstance inst = new ECRFInstance(index++,1.0,sent);
 				inst.entities = es;
 				if(setLabel) inst.setLabeled(); else inst.setUnlabeled();
+				/***debug info*/
+//				List<Integer> headList = new ArrayList<Integer>(words.size());
+//				for (int h = 0; h < words.size(); h++)
+//					headList.add(inst.getInput().get(h).getHeadIndex());
+//				boolean projective = DataChecker.checkProjective(headList);
+//				if (projective)
+				/***/
 				insts.add(inst);
 				words = new ArrayList<WordToken>();
 				es = new ArrayList<String>();

@@ -95,6 +95,9 @@ public class EMain {
 //		System.out.println(com.statnlp.entity.Entity.Entities.toString());
 //		Formatter.ner2Text(trainInstances, "data/testRandom2.txt");
 //		System.exit(0);
+		/**Debug info**/
+		
+		/****/
 		
 		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2;

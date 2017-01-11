@@ -47,6 +47,8 @@ public class MixMain {
 		
 		/***DEBUG configuration***/
 //		trainFile = "data/"+dataset+"/"+dataSection+"/train.conllx";
+//		trainFile = "E:/Framework/data/ontonotes/nw/train.conllx";
+//		testFile = "E:/Framework/data/ontonotes/nw/test.conllx";
 //		testFile = trainFile;
 		/****/
 		
