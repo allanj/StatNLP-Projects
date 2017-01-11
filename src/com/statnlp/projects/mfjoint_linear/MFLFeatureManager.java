@@ -421,19 +421,19 @@ public class MFLFeatureManager extends FeatureManager {
 			long unlabeledDstNode = NetworkIDMapper.toHybridNodeID(dstNodeArr);
 			int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 			if (unlabeledDstNodeIdx >= 0) {
-//				jf1 = this._param_g.toFeature(network, FeaType.joint1.name(), label, headWord);
+				jf1 = this._param_g.toFeature(network, FeaType.joint1.name(), label, headWord);
 				jf2 = this._param_g.toFeature(network, FeaType.joint2.name(), label, headWord + " & " + currWord);
-//				jf3 = this._param_g.toFeature(network, FeaType.joint3.name(), label, headTag);
+				jf3 = this._param_g.toFeature(network, FeaType.joint3.name(), label, headTag);
 				jf4 = this._param_g.toFeature(network, FeaType.joint4.name(), label, headTag + " & " + currTag);
-//				if(jf1 != -1){
-//					joint1List.add(jf1); network.putJointFeature(node_k, jf1, unlabeledDstNodeIdx);
-//				}
+				if(jf1 != -1){
+					joint1List.add(jf1); network.putJointFeature(node_k, jf1, unlabeledDstNodeIdx);
+				}
 				if(jf2 != -1){
 					joint2List.add(jf2); network.putJointFeature(node_k, jf2, unlabeledDstNodeIdx);
 				}
-//				if(jf3 != -1){
-//					joint3List.add(jf3); network.putJointFeature(node_k, jf3, unlabeledDstNodeIdx);
-//				}
+				if(jf3 != -1){
+					joint3List.add(jf3); network.putJointFeature(node_k, jf3, unlabeledDstNodeIdx);
+				}
 				if(jf4 != -1){
 					joint4List.add(jf4); network.putJointFeature(node_k, jf4, unlabeledDstNodeIdx);
 				}
@@ -472,19 +472,19 @@ public class MFLFeatureManager extends FeatureManager {
 			long unlabeledDstNode = NetworkIDMapper.toHybridNodeID(dstNodeArr);
 			int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 			if (unlabeledDstNodeIdx >= 0) {
-//				jf1 = this._param_g.toFeature(network, FeaType.joint1.name(), spanLabel, headWord);
+				jf1 = this._param_g.toFeature(network, FeaType.joint1.name(), spanLabel, headWord);
 				jf2 = this._param_g.toFeature(network, FeaType.joint2.name(), spanLabel, headWord + " & " + modifierWord);
-//				jf3 = this._param_g.toFeature(network, FeaType.joint3.name(), spanLabel, headTag);
+				jf3 = this._param_g.toFeature(network, FeaType.joint3.name(), spanLabel, headTag);
 				jf4 = this._param_g.toFeature(network, FeaType.joint4.name(), spanLabel, headTag + " & " + modifierTag);
-//				if(jf1 != -1){
-//					joint1List.add(jf1); network.putJointFeature(node_k, jf1, unlabeledDstNodeIdx);
-//				}
+				if(jf1 != -1){
+					joint1List.add(jf1); network.putJointFeature(node_k, jf1, unlabeledDstNodeIdx);
+				}
 				if(jf2 != -1){
 					joint2List.add(jf2); network.putJointFeature(node_k, jf2, unlabeledDstNodeIdx);
 				}
-//				if(jf3 != -1){
-//					joint3List.add(jf3); network.putJointFeature(node_k, jf3, unlabeledDstNodeIdx);
-//				}
+				if(jf3 != -1){
+					joint3List.add(jf3); network.putJointFeature(node_k, jf3, unlabeledDstNodeIdx);
+				}
 				if(jf4 != -1){
 					joint4List.add(jf4); network.putJointFeature(node_k, jf4, unlabeledDstNodeIdx);
 				}
