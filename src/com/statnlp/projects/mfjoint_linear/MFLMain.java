@@ -33,6 +33,7 @@ public class MFLMain {
 	public static boolean useJointFeatures = false;
 	public static int maxSize = 150;
 	public static String nerOut;
+	public static String jointOutput;
 	public static boolean iobes = false;
 	
 	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
@@ -42,6 +43,7 @@ public class MFLMain {
 		testFile = "data/"+dataset+"/"+dataSection+"/test.conllx";
 		modelFile = "data/"+dataset+"/"+dataSection+"/output/mfjoint_linear.model";
 		nerOut = "data/"+dataset+"/"+dataSection+"/output/mfjoint.linear.ner.eval";
+		jointOutput = "data/"+dataset+"/"+dataSection+"/output/mfjoint.linear.res";
 		
 		System.err.println("[Info] trainFile: " + trainFile);
 		System.err.println("[Info] testFile: " + testFile);
@@ -92,6 +94,8 @@ public class MFLMain {
 			MFLEval.evalDep(predictions);
 		if ((task == MFLTASK.NER || task == MFLTASK.JOINT))
 			MFLEval.evalNER(predictions, nerOut);
+		if (task == MFLTASK.JOINT)
+			MFLEval.writeJointResult(predictions, jointOutput);
 	}
 
 	public static void processArgs(String[] args){

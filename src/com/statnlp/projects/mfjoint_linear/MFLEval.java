@@ -83,4 +83,20 @@ public class MFLEval {
 			ioe.printStackTrace();
 		}
 	}
+	
+	public static void writeJointResult(Instance[] testInsts, String resultFile) throws IOException {
+		PrintWriter pw = RAWF.writer(resultFile);
+		for(int index=0;index<testInsts.length;index++){
+			MFLInstance eInst = (MFLInstance)testInsts[index];
+			String[] predEntities = eInst.getPrediction().entities;
+			int[] headIdxs = eInst.getPrediction().heads;
+			Sentence sent = eInst.getInput();
+			for(int i = 1; i < sent.length(); i++){
+				pw.write(i + "\t" + sent.get(i).getName()+"\t"+sent.get(i).getTag()+"\t"+predEntities[i]+"\t"+headIdxs[i]+"\n");
+			}
+			pw.write("\n");
+		}
+		pw.close();
+	}
+	
 }
