@@ -41,9 +41,9 @@ public class MFLMain {
 		processArgs(args);
 		trainFile = "data/"+dataset+"/"+dataSection+"/train.conllx";
 		testFile = "data/"+dataset+"/"+dataSection+"/test.conllx";
-		modelFile = "data/"+dataset+"/"+dataSection+"/output/mfjoint_linear.model";
-		nerOut = "data/"+dataset+"/"+dataSection+"/output/mfjoint.linear.ner.eval";
-		jointOutput = "data/"+dataset+"/"+dataSection+"/output/mfjoint.linear.res";
+		modelFile = "data/"+dataset+"/"+dataSection+"/output/mfjoint_linear.mf"+NetworkConfig.MAX_MF_UPDATES+".model";
+		nerOut = "data/"+dataset+"/"+dataSection+"/output/mfjoint.linear.mf"+NetworkConfig.MAX_MF_UPDATES+".ner.eval";
+		jointOutput = "data/"+dataset+"/"+dataSection+"/output/mfjoint.linear.mf"+NetworkConfig.MAX_MF_UPDATES+".res";
 		
 		System.err.println("[Info] trainFile: " + trainFile);
 		System.err.println("[Info] testFile: " + testFile);
