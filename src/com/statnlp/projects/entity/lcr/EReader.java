@@ -8,7 +8,6 @@ import java.util.List;
 import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.commons.types.WordToken;
-import com.statnlp.projects.dep.utils.DataChecker;
 import com.statnlp.projects.entity.Entity;
 
 public class EReader {
@@ -34,7 +33,7 @@ public class EReader {
 //				for (int h = 0; h < words.size(); h++)
 //					headList.add(inst.getInput().get(h).getHeadIndex());
 //				boolean projective = DataChecker.checkProjective(headList);
-//				if (projective)
+//				if (setLabel && !projective) continue;
 				/***/
 				insts.add(inst);
 				words = new ArrayList<WordToken>();

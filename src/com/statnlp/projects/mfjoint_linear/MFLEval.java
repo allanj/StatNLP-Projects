@@ -4,7 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.types.Instance;
@@ -97,6 +101,39 @@ public class MFLEval {
 			pw.write("\n");
 		}
 		pw.close();
+	}
+	
+	public static void evalCombined(Instance[] testInsts) {
+		for(int index=0;index<testInsts.length;index++){
+			MFLInstance eInst = (MFLInstance)testInsts[index];
+			List<MFLSpan> outputSpans = Utils.toSpan(eInst.getOutput().entities, eInst.getOutput().heads);
+			List<MFLSpan> predSpans = Utils.toSpan(eInst.getPrediction().entities, eInst.getPrediction().heads);
+			int tp = 0;
+			int fp = 0;
+			int fn = 0;
+			Map<MFLSpan, MFLSpan> outputMap = new HashMap<MFLSpan, MFLSpan>(outputSpans.size());
+			for (MFLSpan outputSpan : outputSpans) outputMap.put(outputSpan, outputSpan);
+			Map<MFLSpan, MFLSpan> predMap = new HashMap<MFLSpan, MFLSpan>(outputSpans.size());
+			for (MFLSpan predSpan : predSpans) predMap.put(predSpan, predSpan);
+			for (MFLSpan predSpan: predSpans) {
+				if (outputMap.containsKey(predSpan)) {
+					MFLSpan outputSpan = outputMap.get(predSpan);
+					Set<Integer> intersection = new HashSet<Integer>(predSpan.heads);
+					intersection.retainAll(outputSpan.heads);
+					tp += intersection.size();
+				}
+				fp += predSpan.heads.size();
+			}
+			
+			for (MFLSpan outputSpan: outputSpans) {
+				fn += outputSpan.heads.size();
+			}
+			double precision = tp*1.0 / (tp + fp);
+			double recall = tp*1.0 / (tp + fn);
+			double fmeasure = 2.0*tp / (2*tp + fp + fn);
+			System.out.printf("[Entity Attachment Evaluation]\n");
+			System.out.printf("Precision: %.2f, Recall: %.2f, F-measure: %.2f\n",precision, recall, fmeasure);
+		}
 	}
 	
 }
