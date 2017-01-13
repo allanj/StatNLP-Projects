@@ -2,8 +2,8 @@ package com.statnlp.projects.mfjoint_linear;
 
 public class MFLPair {
 
-	protected int[] heads;
-	protected String[] entities;
+	public int[] heads;
+	public String[] entities;
 	
 	public MFLPair() {
 	}

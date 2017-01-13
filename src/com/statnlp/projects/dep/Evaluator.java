@@ -111,7 +111,7 @@ public class Evaluator {
 						}
 						noPunc_total++;
 					}
-					pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+sent.get(i).getHeadIndex()+" "+predHeads[i]+"\n");
+					pw.write(i+"\t"+sent.get(i).getName()+"\t"+sent.get(i).getTag()+"\t"+sent.get(i).getEntity()+"\t"+sent.get(i).getHeadIndex()+"\t"+predHeads[i]+"\n");
 				}
 				pw.write("\n");
 			}

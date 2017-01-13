@@ -116,15 +116,15 @@ public class MFLFeatureManager extends FeatureManager {
 		String rrrw = idx + 3 < sent.length() ? sent.get(idx + 3).getName() : idx + 3 == sent.length() ? "END" : idx + 2 == sent.length() ? "END1" : "END2";
 		String rrrrw = idx + 4 < sent.length() ? sent.get(idx + 3).getName() : idx + 4 == sent.length() ? "END" : idx + 3 == sent.length() ? "END1" : idx + 2 == sent.length() ? "END2" : "END3"; 
 		
-		currList.add(this._param_g.toFeature(network, FeaType.word.name(), 	currEn,	w));
-		currList.add(this._param_g.toFeature(network, FeaType.tag.name(),   currEn, t));
-		currList.add(this._param_g.toFeature(network, FeaType.shape.name(), currEn, s));
+		currList.add(this._param_g.toFeature(network, FeaType.word.name(), 		currEn,	w));
+		currList.add(this._param_g.toFeature(network, FeaType.tag.name(),   	currEn, t));
+		currList.add(this._param_g.toFeature(network, FeaType.shape.name(), 	currEn, s));
 		prevList.add(this._param_g.toFeature(network, FeaType.prev_word.name(), currEn, lw));
-		prevList.add(this._param_g.toFeature(network, FeaType.prev_tag.name(), currEn, lt));
-		prevList.add(this._param_g.toFeature(network, FeaType.prev_shape.name(), currEn, ls));
+		prevList.add(this._param_g.toFeature(network, FeaType.prev_tag.name(), 	currEn, lt));
+		prevList.add(this._param_g.toFeature(network, FeaType.prev_shape.name(),currEn, ls));
 		nextList.add(this._param_g.toFeature(network, FeaType.next_word.name(), currEn, rw));
-		nextList.add(this._param_g.toFeature(network, FeaType.next_tag.name(), currEn, rt));
-		nextList.add(this._param_g.toFeature(network, FeaType.next_shape.name(), currEn, rs));
+		nextList.add(this._param_g.toFeature(network, FeaType.next_tag.name(), 	currEn, rt));
+		nextList.add(this._param_g.toFeature(network, FeaType.next_shape.name(),currEn, rs));
 		
 		surrList.add(this._param_g.toFeature(network, FeaType.surround_tags.name(), 	currEn,	lt + "-" + rt));
 		surrList.add(this._param_g.toFeature(network, FeaType.surround_shapes.name(),	currEn,	shape(lw) + "-" + shape(rw)));
@@ -148,7 +148,7 @@ public class MFLFeatureManager extends FeatureManager {
 		}
 		
 		String prevEntity = MFLLabel.get(childLabelId).getForm();
-		transList.add(this._param_g.toFeature(network,FeaType.transition.name(), prevEntity+"-"+currEn,	""));
+		transList.add(this._param_g.toFeature(network,FeaType.transition.name(), currEn,	prevEntity));
 		
 		
 		ArrayList<ArrayList<Integer>> bigList = new ArrayList<ArrayList<Integer>>();

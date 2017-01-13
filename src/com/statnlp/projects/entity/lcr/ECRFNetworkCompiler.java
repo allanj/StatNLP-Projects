@@ -19,11 +19,13 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 	public int _size;
 	public ECRFNetwork genericUnlabeledNetwork;
 	private boolean useSSVMCost;
+	private boolean iobes;
 	private static boolean DEBUG = false;
 	
-	public ECRFNetworkCompiler(boolean useSSVMCost){
+	public ECRFNetworkCompiler(boolean useSSVMCost, boolean iobes){
 		this._size = 150;
 		this.useSSVMCost = useSSVMCost;
+		this.iobes = iobes;
 		this.compileUnlabeledInstancesGeneric();
 	}
 	
@@ -69,7 +71,10 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 				long child = lcrfNetwork.getNode(child_k);
 				rootIdx = child_k;
 				int tagID = NetworkIDMapper.toHybridNodeArray(child)[1];
-				prediction.add(0, Entity.get(tagID).getForm());
+				String entity = Entity.get(tagID).getForm();
+				if(entity.startsWith("S")) entity = "B"+ entity.substring(1);
+				if(entity.startsWith("E")) entity = "I"+ entity.substring(1);
+				prediction.add(0, entity);
 			}
 			
 			result.setPrediction(prediction);
@@ -95,7 +100,10 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 					rootIdx = child_k;
 					subk = child_k_best_order;
 					int tagID = NetworkIDMapper.toHybridNodeArray(child)[1];
-					tmpPrediction.add(0, Entity.get(tagID).getForm());
+					String entity = Entity.get(tagID).getForm();
+					if(entity.startsWith("S")) entity = "B"+ entity.substring(1);
+					if(entity.startsWith("E")) entity = "I"+ entity.substring(1);
+					tmpPrediction.add(0, entity);
 				}
 				String[] tmpArr = new String[lcrfInstance.size()];
 				tmpPrediction.toArray(tmpArr);
@@ -153,21 +161,41 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 		lcrfNetwork.addNode(leaf);
 		for(int i=0;i<_size;i++){
 			long[] currentNodes = new long[Entity.Entities.size()];
-			for(int l=0;l<Entity.Entities.size();l++){
+			for (int l = 0; l < Entity.Entities.size(); l++) {
 				if(i==0 && Entity.get(l).getForm().startsWith("I-")){ currentNodes[l]=-1; continue;}
 				long node = toNode(i,l);
-				currentNodes[l] = node;
-				lcrfNetwork.addNode(node);
 				for(long child: children){
 					if(child==-1) continue;
 					int[] childArr = NetworkIDMapper.toHybridNodeArray(child);
-					String currE = Entity.get(l).getForm();
-					String childE = Entity.get(childArr[1]).getForm();
-					if(childE.startsWith("B-") && currE.startsWith("I-") && !childE.substring(2).equals(currE.substring(2))) continue;
-					if(childE.startsWith("I-") && currE.startsWith("I-") && !childE.substring(2).equals(currE.substring(2))) continue;
-					//if(entities[childArr[1]].startsWith("I-") && entities[l].startsWith("B-") && entities[childArr[1]].substring(2).equals(entities[l].substring(2))) continue;
-					if(childE.equals("O") && currE.startsWith("I-")) continue;
+					String currEntity = Entity.get(l).getForm();
+					String childEntity = Entity.get(childArr[1]).getForm();
+					if(childEntity.startsWith("I")){
+						if(currEntity.startsWith("I") && !childEntity.substring(1).equals(currEntity.substring(1))) continue;
+						if(currEntity.startsWith("E") && !childEntity.substring(1).equals(currEntity.substring(1))) continue;
+						if(iobes && (currEntity.startsWith("O") || currEntity.startsWith("B") || currEntity.startsWith("S")  ) ) continue;
+					}else if(childEntity.equals("O")){
+						if(currEntity.startsWith("I") || currEntity.startsWith("E")) continue;
+						
+					}else if(childEntity.startsWith("B")){
+						if(currEntity.startsWith("I")  && !childEntity.substring(1).equals(currEntity.substring(1)) ) continue;
+						if(currEntity.startsWith("E")  && !childEntity.substring(1).equals(currEntity.substring(1)) ) continue;
+						if(iobes && ( currEntity.equals("O") || currEntity.equals("B") || currEntity.equals("S") )  ) continue;
+						
+					}else if(childEntity.startsWith("E")){
+						if(currEntity.startsWith("I") || currEntity.startsWith("E")) continue;
+						
+					}else if(childEntity.startsWith("S")){
+						if(currEntity.startsWith("I") || currEntity.startsWith("E")) continue;
+					}else{
+						throw new RuntimeException("Unknown type "+childEntity+" in network compilation");
+					}
+					lcrfNetwork.addNode(node);
 					lcrfNetwork.addEdge(node, new long[]{child});
+				}
+				if (lcrfNetwork.contains(node)) {
+					currentNodes[l] = node;
+				} else {
+					currentNodes[l] = -1;
 				}
 			}
 			long root = toNode_root(i+1);

@@ -9,9 +9,13 @@ public class Entity implements Comparable<Entity>, Serializable{
 	private static final long serialVersionUID = -3314363044582374266L;
 	public static final Map<String, Entity> Entities = new HashMap<String, Entity>();
 	public static final Map<Integer, Entity> Entities_INDEX = new HashMap<Integer, Entity>();
+	private static boolean lock = false;
 	
 	public static Entity get(String form){
 		if(!Entities.containsKey(form)){
+			if (lock) {
+				throw new RuntimeException("cannot add more entities type");
+			}
 			Entity label = new Entity(form, Entities.size());
 			Entities.put(form, label);
 			Entities_INDEX.put(label.id, label);
@@ -29,6 +33,10 @@ public class Entity implements Comparable<Entity>, Serializable{
 	private Entity(String form, int id) {
 		this.form = form;
 		this.id = id;
+	}
+	
+	public static void lock(){
+		lock = true;
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package com.statnlp.projects.entity.lcr;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.hybridnetworks.FeatureArray;
@@ -13,6 +14,7 @@ import com.statnlp.hybridnetworks.NetworkIDMapper;
 import com.statnlp.neural.NeuralConfig;
 import com.statnlp.projects.dep.utils.Extractor;
 import com.statnlp.projects.entity.Entity;
+import com.statnlp.projects.entity.lcr.ECRFNetworkCompiler.NODE_TYPES;
 
 public class ECRFFeatureManager extends FeatureManager {
 
@@ -70,13 +72,20 @@ public class ECRFFeatureManager extends FeatureManager {
 		ArrayList<Integer> featureList = new ArrayList<Integer>();
 		
 		int pos = nodeArr[0]-1;
-		if(pos<0 || pos >= inst.size())
+		if(pos < 0 || pos >= inst.size() || nodeArr[4] == NODE_TYPES.ROOT.ordinal())
 			return FeatureArray.EMPTY;
 			
 		int eId = nodeArr[1];
+		if (children_k.length == 0 )
+			System.err.println(Arrays.toString(nodeArr) + Entity.get(nodeArr[1]).form);
 		int[] child = NetworkIDMapper.toHybridNodeArray(network.getNode(children_k[0]));
 		int childEId = child[1];
 //		int childPos = child[0]-1;
+		
+		
+		String currWord = inst.getInput().get(pos).getName();
+		String currTag = inst.getInput().get(pos).getTag();
+		String currShape = shape(currWord);
 		
 		String lw = pos>0? sent.get(pos-1).getName():"STR";
 		String ls = pos>0? shape(lw):"STR_SHAPE";
@@ -94,11 +103,7 @@ public class ECRFFeatureManager extends FeatureManager {
 		String rrrrw = pos==sent.length()-1? "END3": pos==sent.length()-2? "END2":pos==sent.length()-3? "END1":pos==sent.length()-4? "END":sent.get(pos+4).getName();
 //		String rrt = pos==sent.length()-1? "END1": pos==sent.length()-2? "END":sent.get(pos+2).getTag();
 		
-		String currWord = inst.getInput().get(pos).getName();
-		String currTag = inst.getInput().get(pos).getTag();
-		String currShape = shape(currWord);
-//		String childWord = childPos>=0? inst.getInput().get(childPos).getName():"STR";
-//		String childTag = childPos>=0? inst.getInput().get(childPos).getTag():"STR";
+		
 		
 		
 		
@@ -121,8 +126,6 @@ public class ECRFFeatureManager extends FeatureManager {
 		featureList.add(this._param_g.toFeature(network, FeaType.next_word.name(), currEn, rw));
 		featureList.add(this._param_g.toFeature(network, FeaType.next_tag.name(), currEn, rt));
 		featureList.add(this._param_g.toFeature(network, FeaType.next_shape.name(), currEn, rs));
-//		featureList.add(this._param_g.toFeature(network, FeaType.next_word.name(), 		currEn,	rw));
-//		featureList.add(this._param_g.toFeature(network, FeaType.next_tag.name(), 		currEn,	rt));
 		featureList.add(this._param_g.toFeature(network, FeaType.surround_tags.name(), 	currEn,	lt + "-" + rt));
 		featureList.add(this._param_g.toFeature(network, FeaType.surround_shapes.name(),currEn,	shape(lw) + "-" + shape(rw)));
 		
@@ -134,8 +137,7 @@ public class ECRFFeatureManager extends FeatureManager {
 			}
 		}
 		featureList.add(this._param_g.toFeature(network, FeaType.left_4.name(), 	currEn,	llllw + " & " + lllw + " & " + llw + " & " + lw));
-		featureList.add(this._param_g.toFeature(network, FeaType.right_4.name(), currEn,	rw + " & " + rrw + " & " + rrrw + " & " + rrrrw));
-		/****/
+		featureList.add(this._param_g.toFeature(network, FeaType.right_4.name(), 	currEn,	rw + " & " + rrw + " & " + rrrw + " & " + rrrrw));
 		
 		
 		/****Add some prefix features******/
@@ -163,23 +165,8 @@ public class ECRFFeatureManager extends FeatureManager {
 			if(currDepLabel==null || currDepLabel.equals("null")) throw new RuntimeException("The depenency label is null?");
 			featureList.add(this._param_g.toFeature(network, FeaType.head_word.name(), 		currEn, currWord+"& head:"+currHead));
 			featureList.add(this._param_g.toFeature(network, FeaType.head_tag.name(), 		currEn, currTag+"& head:"+currHeadTag)); //the most powerful one
-			featureList.add(this._param_g.toFeature(network, FeaType.dep_word_label.name(), 	currEn, currWord+"& head:"+currHead+"& label:"+currDepLabel));
-			featureList.add(this._param_g.toFeature(network, FeaType.dep_tag_label.name(), 	currEn, currTag+"& head:"+currHeadTag+"& label:"+currDepLabel));
-			
-			/**The following set of dependency features are better***/
-			
-//			featureList.add(this._param_g.toFeature(network, FeaType.head_word.name(), 		currEn, currHead));
-//			featureList.add(this._param_g.toFeature(network, FeaType.head_tag.name(), 		currEn, currHeadTag)); //the most powerful one
-//			featureList.add(this._param_g.toFeature(network, FeaType.dep_word_label.name(), 	currEn, currDepLabel));
-//			for (int p = 0; p < sent.length(); p++){
-//				if (p == pos) continue;
-//				if (sent.get(p).getHeadIndex() == pos) {
-//					featureList.add(this._param_g.toFeature(network, FeaType.modifier_word.name(), 	currEn, sent.get(p).getName()));
-//					featureList.add(this._param_g.toFeature(network, FeaType.modifier_tag.name(), 	currEn, sent.get(p).getTag()));
-//				}
-//			}
-			
-			/*****/
+//			featureList.add(this._param_g.toFeature(network, FeaType.dep_word_label.name(), 	currEn, currWord+"& head:"+currHead+"& label:"+currDepLabel));
+//			featureList.add(this._param_g.toFeature(network, FeaType.dep_tag_label.name(), 	currEn, currTag+"& head:"+currHeadTag+"& label:"+currDepLabel));
 		}
 		
 		
@@ -191,7 +178,6 @@ public class ECRFFeatureManager extends FeatureManager {
 		int[] features = new int[finalList.size()];
 		for(int i=0;i<finalList.size();i++) features[i] = finalList.get(i);
 		if(features.length==0) return FeatureArray.EMPTY;
-//		fa = new FeatureArray(features);
 		fa = new FeatureArray(FeatureBox.getFeatureBox(features, this.getParams_L()[network.getThreadId()]));
 		
 		return fa;

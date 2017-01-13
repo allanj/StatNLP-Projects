@@ -35,7 +35,7 @@ public class MFLEval {
 					dp_corr++;
 				}
 				dp_total++;
-				if (!punct.contains(sent.get(i).getName())) {
+				if (!punct.contains(sent.get(i).getTag())) {
 					if (output[i] == prediction[i]) {
 						noPunc_corr++;
 					}
@@ -104,36 +104,50 @@ public class MFLEval {
 	}
 	
 	public static void evalCombined(Instance[] testInsts) {
+		int tp = 0;
+		int tp_fp = 0;
+		int tp_fn = 0;
 		for(int index=0;index<testInsts.length;index++){
 			MFLInstance eInst = (MFLInstance)testInsts[index];
+			Sentence sent = eInst.getInput();
 			List<MFLSpan> outputSpans = Utils.toSpan(eInst.getOutput().entities, eInst.getOutput().heads);
 			List<MFLSpan> predSpans = Utils.toSpan(eInst.getPrediction().entities, eInst.getPrediction().heads);
-			int tp = 0;
-			int fp = 0;
-			int fn = 0;
 			Map<MFLSpan, MFLSpan> outputMap = new HashMap<MFLSpan, MFLSpan>(outputSpans.size());
 			for (MFLSpan outputSpan : outputSpans) outputMap.put(outputSpan, outputSpan);
 			Map<MFLSpan, MFLSpan> predMap = new HashMap<MFLSpan, MFLSpan>(outputSpans.size());
 			for (MFLSpan predSpan : predSpans) predMap.put(predSpan, predSpan);
 			for (MFLSpan predSpan: predSpans) {
+				if (predSpan.start == predSpan.end && punct.contains(sent.get(predSpan.start).getTag())) {
+					continue;
+				}
+				if (predSpan.start == predSpan.end && predSpan.start == 0) {
+					continue;
+				}
 				if (outputMap.containsKey(predSpan)) {
 					MFLSpan outputSpan = outputMap.get(predSpan);
 					Set<Integer> intersection = new HashSet<Integer>(predSpan.heads);
 					intersection.retainAll(outputSpan.heads);
 					tp += intersection.size();
 				}
-				fp += predSpan.heads.size();
+				tp_fp += predSpan.heads.size();
 			}
 			
 			for (MFLSpan outputSpan: outputSpans) {
-				fn += outputSpan.heads.size();
+				if (outputSpan.start == outputSpan.end && punct.contains(sent.get(outputSpan.start).getTag())) {
+					continue;
+				}
+				if (outputSpan.start == outputSpan.end && outputSpan.start == 0) {
+					continue;
+				}
+				tp_fn += outputSpan.heads.size();
 			}
-			double precision = tp*1.0 / (tp + fp);
-			double recall = tp*1.0 / (tp + fn);
-			double fmeasure = 2.0*tp / (2*tp + fp + fn);
-			System.out.printf("[Entity Attachment Evaluation]\n");
-			System.out.printf("Precision: %.2f, Recall: %.2f, F-measure: %.2f\n",precision, recall, fmeasure);
 		}
+		double precision = tp*1.0 / tp_fp * 100;
+		double recall = tp*1.0 / tp_fn * 100;
+		double fmeasure = 2.0*tp / (tp_fp + tp_fn) * 100;
+		System.out.printf("[Unit Attachment Evaluation]\n");
+		System.out.printf("TP: %d, TP+FP: %d, TP+FN: %d\n", tp, tp_fp, tp_fn);
+		System.out.printf("Precision: %.2f%%, Recall: %.2f%%, F-measure: %.2f%%\n", precision, recall, fmeasure);
 	}
 	
 }

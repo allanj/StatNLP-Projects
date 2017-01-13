@@ -1,8 +1,11 @@
 package com.statnlp.projects.entity.lcr;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import com.statnlp.commons.ml.opt.OptimizerFactory;
@@ -14,7 +17,7 @@ import com.statnlp.hybridnetworks.NetworkConfig.ModelType;
 import com.statnlp.hybridnetworks.NetworkModel;
 import com.statnlp.neural.NeuralConfigReader;
 import com.statnlp.projects.dep.utils.DPConfig;
-import com.statnlp.projects.dep.utils.Init;
+import com.statnlp.projects.entity.Entity;
 
 
 public class EMain {
@@ -29,19 +32,21 @@ public class EMain {
 	public static String topKNEROut;
 	public static String nerRes;
 	public static boolean isDev = false;
-	public static HashSet<String> dataTypeSet;
 	public static boolean topkinput = false;
 	public static String MODEL = "crf";
 	public static double adagrad_learningRate = 0.1;
 	public static boolean useSSVMCost = false;
 	public static boolean useAdaGrad = false;
 	public static boolean useDepf = false;
-	private static boolean testOnTrain = false;
 	public static String dataset = "allanprocess";
 	public static boolean cross_validation = false;
+	public static boolean iobes = true;
+	protected static boolean saveModel = false;
+	protected static boolean readModel = false;
+	protected static String modelFile = "";
 	
 	
-	public static void main(String[] args) throws IOException, InterruptedException{
+	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException{
 		
 		trainNumber = 80;
 		testNumber = 2;
@@ -49,21 +54,21 @@ public class EMain {
 		numIteration = 200;
 		isPipe = false;
 		processArgs(args);
-		dataTypeSet = Init.iniOntoNotesData(dataset);
 		String modelType = DPConfig.MODEL.ecrf.name();
 
 		
 		String middle = isDev? ".dev":".test";
-		nerOut = DPConfig.data_prefix+modelType+middle+".depf-"+useDepf+DPConfig.ner_eval_suffix;
-		topKNEROut = DPConfig.data_prefix + modelType + middle +".depf-"+useDepf+ DPConfig.ner_topk_res_suffix;
-		nerRes = DPConfig.data_prefix+modelType+middle+".depf-"+useDepf+ DPConfig.ner_res_suffix;
+		nerOut = DPConfig.data_prefix+DPConfig.dataType+"."+modelType+middle+".depf-"+useDepf+DPConfig.ner_eval_suffix;
+		topKNEROut = DPConfig.data_prefix +DPConfig.dataType+"." + modelType + middle +".depf-"+useDepf+ DPConfig.ner_topk_res_suffix;
+		nerRes = DPConfig.data_prefix +DPConfig.dataType+"." + modelType+middle+".depf-"+useDepf+ DPConfig.ner_res_suffix;
+		modelFile = DPConfig.data_prefix+DPConfig.dataType+"."+modelType+".depf-"+useDepf+ ".model";
 		testFile = isDev? DPConfig.devPath:DPConfig.testingPath;
 		if(isPipe){
 			testFile = isDev?DPConfig.dp2ner_dp_dev_input:DPConfig.dp2ner_dp_test_input;
 			if(topkinput)
 				testFile = isDev?DPConfig.dp2ner_dp_dev_input:DPConfig.dp2ner_dp_topK_test_input;
-			nerOut = DPConfig.data_prefix+modelType+middle+".pred.depf-"+useDepf+DPConfig.ner_eval_suffix;
-			nerRes = DPConfig.data_prefix+modelType+middle+".pred.depf-"+useDepf+ DPConfig.ner_res_suffix;
+			nerOut = DPConfig.data_prefix+DPConfig.dataType+"."+modelType+middle+".pred.depf-"+useDepf+DPConfig.ner_eval_suffix;
+			nerRes = DPConfig.data_prefix+DPConfig.dataType+"."+modelType+middle+".pred.depf-"+useDepf+ DPConfig.ner_res_suffix;
 		}
 		System.err.println("[Info] trainingFile: "+DPConfig.trainingPath);
 		System.err.println("[Info] Cross_Validation: "+cross_validation);
@@ -73,25 +78,9 @@ public class EMain {
 		
 		List<ECRFInstance> trainInstances = null;
 		List<ECRFInstance> testInstances = null;
-		/***********DEBUG*****************/
-//		DPConfig.ecrftrain = "data/semeval10t1/output/ecrf.train.part.txt";
-//		testFile="data/semeval10t1/ecrf.smalltest.txt";
-//		DPConfig.writeWeight = true;
-//		DPConfig.weightPath = "data/semeval10t1/ecrfWeight.txt";
-//		DPConfig.readWeight = false;
-//		testFile = DPConfig.ecrftrain;
-//		testFile = "data/semeval10t1/ecrf.test.part.txt";
-		/***************************/
-		if(dataTypeSet.contains(DPConfig.dataType)){
-			System.out.println("Reading Ontonotes conllx format...");
-			trainInstances = EReader.readCoNLLX(DPConfig.trainingPath, true, trainNumber);
-			testInstances = EReader.readCoNLLX(testFile, false, testNumber);
-		}else{
-			trainInstances = EReader.readData(DPConfig.trainingPath,true,trainNumber);
-			testInstances = EReader.readData(testFile,false,testNumber);
-			
-//			testInstances = EReader.readData(testFile,false,testNumber,entityMap);
-		}
+		trainInstances = EReader.readCoNLLX(DPConfig.trainingPath, true, trainNumber, iobes);
+		testInstances = EReader.readCoNLLX(testFile, false, testNumber, false);
+		Entity.lock();
 //		System.out.println(com.statnlp.entity.Entity.Entities.toString());
 //		Formatter.ner2Text(trainInstances, "data/testRandom2.txt");
 //		System.exit(0);
@@ -103,6 +92,7 @@ public class EMain {
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2;
 		NetworkConfig.NUM_THREADS = numThreads;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
+		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
 		
 		OptimizerFactory of = OptimizerFactory.getLBFGSFactory();
 		NetworkConfig.MODEL_TYPE = MODEL.equals("crf")? ModelType.CRF:ModelType.SSVM;
@@ -117,37 +107,34 @@ public class EMain {
 			crossValidate(trainInstances.toArray(new ECRFInstance[trainInstances.size()]), of);
 			System.exit(0);
 		}
-		ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(of),useDepf);
-		ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(useSSVMCost);
-		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
-		ECRFInstance[] ecrfs = trainInstances.toArray(new ECRFInstance[trainInstances.size()]);
-		/***Debug information****/
-//		for(int n=1; n<=100; n++){
-//			System.out.println("[Info] Now n is:"+n);
-//			ArrayList<ECRFInstance> trains = new ArrayList<ECRFInstance>();
-//			int idxId = 1;
-//			for(ECRFInstance inst: trainInstances){
-//				if(inst.size()==n) { inst.setLabeled(); inst.setInstanceId(idxId++); trains.add(inst); }
-//			}
-//			for(ECRFInstance inst: testInstances){
-//				if(inst.size()==n) { inst.setLabeled(); inst.setInstanceId(idxId++); trains.add(inst); }
-//			}
-//			if(trains.size()==0) continue;
-//			fa = new ECRFFeatureManager(new GlobalNetworkParam(of),useDepf);
-//			compiler = new ECRFNetworkCompiler(useSSVMCost);
-//			model = DiscriminativeNetworkModel.create(fa, compiler);
-//			model.train(trains.toArray(new ECRFInstance[trains.size()]), numIteration);
-// 		}
-//		System.exit(0);
-		/*********************/
-		model.train(ecrfs, numIteration);
-		if(testOnTrain){
-			for(ECRFInstance inst:trainInstances) inst.setUnlabeled();
-			testInstances = trainInstances;
+		
+		NetworkModel model = null; 
+		if (readModel) {
+			System.err.println("[Info] Reading the network model.");
+			ObjectInputStream in = new ObjectInputStream(new FileInputStream(modelFile));
+			model =(NetworkModel)in.readObject();
+			in.close();
+			System.err.println("[Info] Model is read.");
+		} else {
+			ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(of),useDepf);
+			ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(useSSVMCost, iobes);
+			model = DiscriminativeNetworkModel.create(fa, compiler);
+			ECRFInstance[] ecrfs = trainInstances.toArray(new ECRFInstance[trainInstances.size()]);
+			model.train(ecrfs, numIteration);
 		}
+		
+		if (saveModel) {
+			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
+			out.writeObject(model);
+			out.close();
+		}
+		
 		Instance[] predictions = model.decode(testInstances.toArray(new ECRFInstance[testInstances.size()]));
 		ECRFEval.evalNER(predictions, nerOut);
 		ECRFEval.writeNERResult(predictions, nerRes, true);
+		if (isPipe) {
+			
+		}
 		if(NetworkConfig._topKValue>1)
 			ECRFEval.outputTopKNER(predictions, topKNEROut);
 	}
@@ -179,7 +166,7 @@ public class EMain {
 				}
 			}
 			ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(of),useDepf);
-			ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(useSSVMCost);
+			ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(useSSVMCost, iobes);
 			NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
 			model.train(cvTrainInsts.toArray(new ECRFInstance[cvTrainInsts.size()]), numIteration);
 			Instance[] predictions = model.decode(cvInsts.toArray(new ECRFInstance[cvInsts.size()]));
@@ -207,7 +194,7 @@ public class EMain {
 					case "-dev":isDev = args[i+1].equals("true")?true:false; break;
 					case "-windows":DPConfig.windows = true; break;
 					case "-comb": DPConfig.comb = true; break;
-					case "-data":DPConfig.dataType=args[i+1];DPConfig.changeDataType(dataset); break;
+					case "-data":DPConfig.dataType=args[i+1]; DPConfig.changeDataType(dataset); break;
 					case "-topkinput": topkinput = true; break;
 					case "-topk": NetworkConfig._topKValue = Integer.valueOf(args[i+1]); break;
 					case "-batch": NetworkConfig.USE_BATCH_TRAINING = true;
@@ -222,10 +209,12 @@ public class EMain {
 										else useSSVMCost = false; 
 										break;
 					case "-adagrad": useAdaGrad = args[i+1].equals("true")? true:false;break;
-					case "-testtrain": testOnTrain = args[i+1].equals("true")? true:false;break;
 					case "-depf": useDepf = args[i+1].equals("true")? true:false; break;
+					case "-iobes": iobes = args[i+1].equals("true")? true:false; break;
 					case "-dataset": dataset = args[i+1];DPConfig.changeDataType(dataset); break;
 					case "-cv": cross_validation = args[i+1].equals("true")? true:false; break;
+					case "-saveModel": saveModel = args[i+1].equals("true")?true:false; break;
+					case "-readModel": readModel = args[i+1].equals("true")?true:false; break;
 					default: System.err.println("Invalid arguments, please check usage."); System.exit(0);
 				}
 			}

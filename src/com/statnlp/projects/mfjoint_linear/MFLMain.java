@@ -19,7 +19,7 @@ public class MFLMain {
 	
 	public static String trainFile;
 	public static String testFile;
-	public static int trainNum = 10;
+	public static int trainNum = 50;
 	public static int testNum = 20;
 	public static int numThreads = 8;
 	public static int numIterations = 5000;
@@ -34,16 +34,18 @@ public class MFLMain {
 	public static int maxSize = 150;
 	public static String nerOut;
 	public static String jointOutput;
-	public static boolean iobes = false;
+	public static boolean iobes = true;
+	public static boolean evaluation = false;
+	public static boolean isPipe = false;
 	
 	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
 		
 		processArgs(args);
 		trainFile = "data/"+dataset+"/"+dataSection+"/train.conllx";
 		testFile = "data/"+dataset+"/"+dataSection+"/test.conllx";
-		modelFile = "data/"+dataset+"/"+dataSection+"/output/mfjoint_linear.mf"+NetworkConfig.MAX_MF_UPDATES+".model";
-		nerOut = "data/"+dataset+"/"+dataSection+"/output/mfjoint.linear.mf"+NetworkConfig.MAX_MF_UPDATES+".ner.eval";
-		jointOutput = "data/"+dataset+"/"+dataSection+"/output/mfjoint.linear.mf"+NetworkConfig.MAX_MF_UPDATES+".res";
+		modelFile = "data/"+dataset+"/"+dataSection+"/output/"+dataSection+".mfjoint.linear.mf"+NetworkConfig.MAX_MF_UPDATES+".reg"+l2+".model";
+		nerOut = "data/"+dataset+"/"+dataSection+"/output/"+dataSection+".mfjoint.linear.mf"+NetworkConfig.MAX_MF_UPDATES+".ner.eval";
+		jointOutput = "data/"+dataset+"/"+dataSection+"/output/"+dataSection+".mfjoint.linear.mf"+NetworkConfig.MAX_MF_UPDATES+".res";
 		
 		System.err.println("[Info] trainFile: " + trainFile);
 		System.err.println("[Info] testFile: " + testFile);
@@ -59,6 +61,7 @@ public class MFLMain {
 		MFLInstance[] trainInsts = MFLReader.readCoNLLXData(trainFile, true, trainNum, checkProjective, iobes);
 		MFLInstance[] testInsts = MFLReader.readCoNLLXData(testFile, false, testNum, false, false);
 		
+		
 		NetworkConfig.NUM_THREADS = numThreads;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = l2;
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
@@ -70,6 +73,15 @@ public class MFLMain {
 //		useJointFeatures = true;
 //		NetworkConfig.MAX_MF_UPDATES = 30;
 		/******/
+		
+
+		if (evaluation) {
+			MFLReader.readResultFile(jointOutput, testInsts);
+			MFLEval.evalDep(testInsts);
+			MFLEval.evalNER(testInsts, nerOut);
+			MFLEval.evalCombined(testInsts);
+			return;
+		}
 		
 		NetworkModel model = null;
 		if (!readModel) {
@@ -94,8 +106,10 @@ public class MFLMain {
 			MFLEval.evalDep(predictions);
 		if ((task == MFLTASK.NER || task == MFLTASK.JOINT))
 			MFLEval.evalNER(predictions, nerOut);
-		if (task == MFLTASK.JOINT)
+		if (task == MFLTASK.JOINT) {
+			MFLEval.evalCombined(testInsts);
 			MFLEval.writeJointResult(predictions, jointOutput);
+		}
 	}
 
 	public static void processArgs(String[] args){
@@ -121,10 +135,12 @@ public class MFLMain {
 						if(args[i+1].equals("parsing"))  task = MFLTASK.PARING;
 						else if (args[i+1].equals("ner")) task  = MFLTASK.NER;
 						else if (args[i+1].equals("joint"))  task  = MFLTASK.JOINT;
+						else if (args[i+1].equals("eval"))  evaluation = true;
 						else throw new RuntimeException("Unknown task:"+args[i+1]+"?"); break;
 					case "-saveModel": saveModel = args[i+1].equals("true")?true:false; break;
 					case "-readModel": readModel = args[i+1].equals("true")?true:false; break;
 					case "-iobes": iobes = args[i+1].equals("true")? true : false; break;
+					case "-pipe": isPipe = args[i+1].equals("true")? true : false; break;
 					case "-dataset": dataset = args[i+1]; break;
 					case "-section": dataSection = args[i+1]; break;
 					case "-trainFile": trainFile = args[i+1]; break;

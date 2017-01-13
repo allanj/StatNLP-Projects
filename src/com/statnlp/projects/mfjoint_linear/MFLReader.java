@@ -139,4 +139,35 @@ public class MFLReader {
 			}
 		}
 	}
+	
+	public static void readResultFile(String resultFile, MFLInstance[] testInsts) throws IOException{
+		BufferedReader br = RAWF.reader(resultFile);
+		List<Integer> originalHeads = new ArrayList<>();
+		ArrayList<String> enList = new ArrayList<>();
+		enList.add("O");
+		originalHeads.add(-1);
+		int index = 0;
+		while(br.ready()){
+			String line = br.readLine().trim();
+			if(line.length() == 0){
+				int[] heads = new int[originalHeads.size()];
+				String[] entities = new String[enList.size()];
+				enList.toArray(entities);
+				for (int i = 0; i < originalHeads.size(); i++) heads[i] = originalHeads.get(i);
+				testInsts[index].setPrediction(new MFLPair(heads, entities));
+				index++;
+				enList = new ArrayList<>();
+				enList.add("O");
+				originalHeads = new ArrayList<>();
+				originalHeads.add(-1);
+			} else {
+				String[] values = line.split("[\t ]");
+				int headIdx = Integer.parseInt(values[4]);
+				String form = values[3];
+				originalHeads.add(headIdx);
+				enList.add(form);
+			}
+		}
+		br.close();
+	}
 }

@@ -80,17 +80,17 @@ public class DependencyMain {
 		
 		String middle = isDev? ".dev":".test";
 		String modelType = "dep";
-		String dpOut = DPConfig.data_prefix+modelType+middle+DPConfig.dp_res_suffix;
-		String topKDepOut = DPConfig.data_prefix+modelType+middle+DPConfig.dp_topk_res_suffix;
 		String ef = entityFeature ? "ef":"noef";
-		modelFile = DPConfig.data_prefix+modelType+middle+"."+ef+".dep.model";
+		String dpOut = DPConfig.data_prefix+DPConfig.dataType+"."+modelType+middle+"."+ef+DPConfig.dp_res_suffix;
+		String topKDepOut = DPConfig.data_prefix+DPConfig.dataType+"."+modelType+middle+DPConfig.dp_topk_res_suffix;
+		modelFile = DPConfig.data_prefix+DPConfig.dataType+"."+modelType+"."+ef+".dep.model";
 		testFile = isDev? DPConfig.devPath:DPConfig.testingPath;
 		
 		if(isPipe) {
 			testFile = isDev?DPConfig.ner2dp_ner_dev_input: DPConfig.ner2dp_ner_test_input;
 			if(topKinput)
 				testFile = isDev?DPConfig.ner2dp_ner_dev_input:DPConfig.ner2dp_ner_topK_test_input;
-			dpOut = DPConfig.data_prefix+middle+".pp.ner2dp.dp.res.txt";
+			dpOut = DPConfig.data_prefix+DPConfig.dataType+"."+middle+".pp.ner2dp.dp.res.txt";
 		}
 		/****Debug info****/
 //		trainingPath = "data/semeval10t1/small.txt";
@@ -119,12 +119,6 @@ public class DependencyMain {
 		testingInsts =   isPipe? DependencyReader.readFromPipeline(testFile,testNumber,trans, topKinput): 
 								DependencyReader.readCoNLLX(testFile, false,testNumber,trans, checkTestProjective);   //false: not check the projective in testing
 		System.err.println("[Info] Total number of dependency label:"+DepLabel.LABELS.size());
-		
-		/**Chech the head word + word pair frequency**/
-//		System.err.println("training inst size: " + trainingInsts.length);
-//		DataChecker.checkDepPairFeq(trainingInsts);
-//		System.exit(0);
-		/***/
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
 		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
@@ -173,7 +167,7 @@ public class DependencyMain {
 		/****************Evaluation Part**************/
 		Instance[] predInsts = model.decode(testingInsts);
 		Evaluator.evalDP(predInsts, dpOut, labeledDep);
-		if(NetworkConfig._topKValue>1)
+		if(NetworkConfig._topKValue > 1)
 			Evaluator.outputTopKDep(predInsts, topKDepOut);
 		
 	}

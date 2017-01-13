@@ -4,11 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.projects.dep.utils.DPConfig;
+import com.statnlp.projects.mfjoint_linear.MFLInstance;
+import com.statnlp.projects.mfjoint_linear.MFLSpan;
+import com.statnlp.projects.mfjoint_linear.Utils;
 
 public class ECRFEval {
 
@@ -77,12 +81,12 @@ public class ECRFEval {
 	
 	private static void evalNER(String outputFile) throws IOException, InterruptedException{
 		try{
-			System.err.println("perl data/semeval10t1/conlleval.pl < "+outputFile);
+			System.err.println("perl eval/conlleval.pl < "+outputFile);
 			ProcessBuilder pb = null;
 			if(DPConfig.windows){
 				pb = new ProcessBuilder("D:/Perl64/bin/perl","E:/Framework/data/semeval10t1/conlleval.pl"); 
 			}else{
-				pb = new ProcessBuilder("data/semeval10t1/conlleval.pl"); 
+				pb = new ProcessBuilder("eval/conlleval.pl"); 
 			}
 			pb.redirectInput(new File(outputFile));
 			pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
@@ -131,5 +135,20 @@ public class ECRFEval {
 			}
 		}
 		pw.close();
+	}
+	
+	
+	public static void evalCombined(Instance[] testInsts, Instance[] predInsts) {
+		if (testInsts.length != predInsts.length) throw new RuntimeException("not equal size");
+		int tp = 0;
+		int tp_fp = 0;
+		int tp_fn = 0;
+		for(int index=0;index<testInsts.length;index++){
+			MFLInstance mlInst = (MFLInstance)testInsts[index];
+			ECRFInstance eInst = (ECRFInstance)predInsts[index];
+			Sentence sent = eInst.getInput();
+			List<MFLSpan> outputSpans = Utils.toSpan(mlInst.getOutput().entities, mlInst.getOutput().heads);
+			List<MFLSpan> outputSpans = Utils.toSpan(eInst.getPrediction()
+		}
 	}
 }
