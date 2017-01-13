@@ -4,15 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.List;
 
 import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.projects.dep.utils.DPConfig;
-import com.statnlp.projects.mfjoint_linear.MFLInstance;
-import com.statnlp.projects.mfjoint_linear.MFLSpan;
-import com.statnlp.projects.mfjoint_linear.Utils;
 
 public class ECRFEval {
 
@@ -104,11 +100,10 @@ public class ECRFEval {
 			Instance inst = predictions[index];
 			ECRFInstance eInst = (ECRFInstance)inst;
 			ArrayList<String> predEntities = eInst.getPrediction();
-			ArrayList<String> trueEntities = eInst.getOutput();
 			Sentence sent = eInst.getInput();
 			for(int i=0;i<sent.length();i++){
 				int headIndex = sent.get(i).getHeadIndex()+1;
-				pw.write((i+1)+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+trueEntities.get(i)+" "+predEntities.get(i)+" "+headIndex+"\n");
+				pw.write((i+1)+"\t"+sent.get(i).getName()+"\t"+sent.get(i).getTag()+"\t"+predEntities.get(i)+"\t"+headIndex+"\n");
 			}
 			pw.write("\n");
 		}
@@ -135,20 +130,5 @@ public class ECRFEval {
 			}
 		}
 		pw.close();
-	}
-	
-	
-	public static void evalCombined(Instance[] testInsts, Instance[] predInsts) {
-		if (testInsts.length != predInsts.length) throw new RuntimeException("not equal size");
-		int tp = 0;
-		int tp_fp = 0;
-		int tp_fn = 0;
-		for(int index=0;index<testInsts.length;index++){
-			MFLInstance mlInst = (MFLInstance)testInsts[index];
-			ECRFInstance eInst = (ECRFInstance)predInsts[index];
-			Sentence sent = eInst.getInput();
-			List<MFLSpan> outputSpans = Utils.toSpan(mlInst.getOutput().entities, mlInst.getOutput().heads);
-			List<MFLSpan> outputSpans = Utils.toSpan(eInst.getPrediction()
-		}
 	}
 }

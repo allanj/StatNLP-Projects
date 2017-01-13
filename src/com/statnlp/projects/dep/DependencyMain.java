@@ -20,6 +20,9 @@ import com.statnlp.neural.NeuralConfigReader;
 import com.statnlp.projects.dep.commons.DepLabel;
 import com.statnlp.projects.dep.utils.DPConfig;
 import com.statnlp.projects.dep.utils.Init;
+import com.statnlp.projects.mfjoint_linear.MFLEval;
+import com.statnlp.projects.mfjoint_linear.MFLInstance;
+import com.statnlp.projects.mfjoint_linear.MFLReader;
 
 /**
  * Dependency Parsing
@@ -90,7 +93,7 @@ public class DependencyMain {
 			testFile = isDev?DPConfig.ner2dp_ner_dev_input: DPConfig.ner2dp_ner_test_input;
 			if(topKinput)
 				testFile = isDev?DPConfig.ner2dp_ner_dev_input:DPConfig.ner2dp_ner_topK_test_input;
-			dpOut = DPConfig.data_prefix+DPConfig.dataType+"."+middle+".pp.ner2dp.dp.res.txt";
+			dpOut = DPConfig.data_prefix+DPConfig.dataType+middle+".pp.ner2dp.dp.res.txt";
 		}
 		/****Debug info****/
 //		trainingPath = "data/semeval10t1/small.txt";
@@ -116,7 +119,7 @@ public class DependencyMain {
 		DependInstance[] testingInsts = null;
 		trainingInsts = DependencyReader.readCoNLLX(trainingPath, true, trainNumber, trans, true); //true: check projective
 		boolean checkTestProjective = isDev? true:false;
-		testingInsts =   isPipe? DependencyReader.readFromPipeline(testFile,testNumber,trans, topKinput): 
+		testingInsts =   isPipe? DependencyReader.readFromPipeline(testFile,testNumber): 
 								DependencyReader.readCoNLLX(testFile, false,testNumber,trans, checkTestProjective);   //false: not check the projective in testing
 		System.err.println("[Info] Total number of dependency label:"+DepLabel.LABELS.size());
 		
@@ -167,6 +170,15 @@ public class DependencyMain {
 		/****************Evaluation Part**************/
 		Instance[] predInsts = model.decode(testingInsts);
 		Evaluator.evalDP(predInsts, dpOut, labeledDep);
+		if (isPipe) {
+			//for warm up the label
+			System.err.println("Gold test path: " + DPConfig.testingPath);
+			MFLReader.readCoNLLXData(trainingPath, true, trainNumber, true, true);
+			MFLInstance[] testInsts = MFLReader.readCoNLLXData(DPConfig.testingPath, false, testNumber, false, false);
+			MFLReader.readResultFile(dpOut, testInsts);
+			MFLEval.evalCombined(testInsts);
+		}
+		
 		if(NetworkConfig._topKValue > 1)
 			Evaluator.outputTopKDep(predInsts, topKDepOut);
 		

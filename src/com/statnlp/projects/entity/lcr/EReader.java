@@ -90,6 +90,36 @@ public class EReader {
 			}
 		}
 	}
+	
+	public static List<ECRFInstance> readPipe(String path, int number) throws IOException{
+		BufferedReader br = RAWF.reader(path);
+		String line = null;
+		List<ECRFInstance> insts = new ArrayList<ECRFInstance>();
+		int index =1;
+		ArrayList<WordToken> words = new ArrayList<WordToken>();
+		while((line = br.readLine())!=null){
+			if(line.startsWith("#")) continue;
+			if(line.equals("")){
+				WordToken[] wordsArr = new WordToken[words.size()];
+				words.toArray(wordsArr);
+				Sentence sent = new Sentence(wordsArr);
+				ECRFInstance inst = new ECRFInstance(index++,1.0,sent);
+				inst.setUnlabeled();
+				insts.add(inst);
+				words = new ArrayList<WordToken>();
+				if(number!=-1 && insts.size()==number) break;
+				continue;
+			}
+			String[] values = line.split("\\t");
+			int headIdx = Integer.valueOf(values[4])-1;
+			words.add(new WordToken(values[1], values[2], headIdx, null, null));
+		}
+		br.close();
+		List<ECRFInstance> myInsts = insts;
+		String type = "Pipeline from dep ";
+		System.err.println(type+" instance, total:"+ myInsts.size()+" Instance. ");
+		return myInsts;
+	}
 
 	
 }

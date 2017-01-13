@@ -61,7 +61,7 @@ public class DependInstance extends ModelInstance {
 		super(instanceId, weight);
 		this.sentence = sentence;
 		this.dependencies = dependencies;
-		this.dependencyRoot = dependencyRoot.deepCopy();
+		this.dependencyRoot = dependencyRoot!=null? dependencyRoot.deepCopy():null;
 		this.output = output;
 		this.globalId = globalId;
 	}

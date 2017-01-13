@@ -19,12 +19,12 @@ public class DPConfig {
 	
 	public static String data_prefix = "data/"+dataType+"/output/";
 	
-	public static String ner2dp_ner_dev_input = "data/"+dataType+"/pptest/ecrf.dev.ner.res.txt";
-	public static String ner2dp_ner_test_input = "data/"+dataType+"/pptest/ecrf.test.ner.res.txt";
-	public static String dp2ner_dp_dev_input = "data/"+dataType+"/pptest/only.dev.dp.res.txt";
-	public static String dp2ner_dp_test_input = "data/"+dataType+"/pptest/only.test.dp.res.txt";
-	public static String dp2ner_dp_topK_test_input = "data/"+dataType+"/pptest/only.test.dp.topk.res.txt";
-	public static String ner2dp_ner_topK_test_input = "data/"+dataType+"/pptest/ecrf.test.ner.topk.res.txt";
+	public static String ner2dp_ner_dev_input = "data/"+dataType+"/output/"+dataType+".ecrf.dev.depf-false.ner.res.txt";
+	public static String ner2dp_ner_test_input = "data/"+dataType+"/output/"+dataType+".ecrf.test.depf-false.ner.res.txt";
+	public static String dp2ner_dp_dev_input = "data/"+dataType+"/output/"+dataType+".dep.test.noef.dp.res.txt";
+	public static String dp2ner_dp_test_input = "data/"+dataType+"/output/"+dataType+".dep.test.noef.dp.res.txt";
+	public static String dp2ner_dp_topK_test_input = "data/"+dataType+"/output/"+dataType+".dep.test.noef.dp.topk.txt";
+	public static String ner2dp_ner_topK_test_input = "data/"+dataType+"/output/"+dataType+".ecrf.test.depf-false.ner.topk.txt";
 	
 	public static void changeDataType(String dataset){
 		if(dataset.equals("semeval10t1")) dataset = "";
@@ -33,11 +33,11 @@ public class DPConfig {
 		testingPath = "data/"+dataset+"/"+dataType+"/test.conllx";
 		data_prefix = "data/"+dataset+"/"+dataType+"/output/";
 		
-		ner2dp_ner_dev_input = "data/"+dataset+"/"+dataType+"/pptest/ecrf.dev.ner.res.txt";
-		ner2dp_ner_test_input = "data/"+dataset+"/"+dataType+"/pptest/ecrf.test.ner.res.txt";
-		dp2ner_dp_dev_input = "data/"+dataset+"/"+dataType+"/pred_dev.conllx";
-		dp2ner_dp_test_input = "data/"+dataset+"/"+dataType+"/pred_test.conllx";
-		dp2ner_dp_topK_test_input = "data/"+dataset+"/"+dataType+"/pptest/pred_test.topk.conllx";
+		ner2dp_ner_dev_input = "data/"+dataset+"/"+dataType+"/output/"+dataType+".ecrf.dev.depf-false.ner.res.txt";
+		ner2dp_ner_test_input = "data/"+dataset+"/"+dataType+"/output/"+dataType+".ecrf.test.depf-false.ner.res.txt";
+		dp2ner_dp_dev_input = "data/"+dataset+"/"+dataType+"/output/"+dataType+".dep.test.noef.dp.res.txt";
+		dp2ner_dp_test_input = "data/"+dataset+"/"+dataType+"/output/"+dataType+".dep.test.noef.dp.res.txt";
+		dp2ner_dp_topK_test_input = "data/"+dataset+"/"+dataType+"/output/"+dataType+".dep.test.noef.dp.topk.txt";
 	}
 	
 	public static void changeDataType(){

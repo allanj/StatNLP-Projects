@@ -18,6 +18,9 @@ import com.statnlp.hybridnetworks.NetworkModel;
 import com.statnlp.neural.NeuralConfigReader;
 import com.statnlp.projects.dep.utils.DPConfig;
 import com.statnlp.projects.entity.Entity;
+import com.statnlp.projects.mfjoint_linear.MFLEval;
+import com.statnlp.projects.mfjoint_linear.MFLInstance;
+import com.statnlp.projects.mfjoint_linear.MFLReader;
 
 
 public class EMain {
@@ -79,14 +82,9 @@ public class EMain {
 		List<ECRFInstance> trainInstances = null;
 		List<ECRFInstance> testInstances = null;
 		trainInstances = EReader.readCoNLLX(DPConfig.trainingPath, true, trainNumber, iobes);
-		testInstances = EReader.readCoNLLX(testFile, false, testNumber, false);
+		testInstances = isPipe ? EReader.readPipe(testFile, testNumber) : 
+			EReader.readCoNLLX(testFile, false, testNumber, false);
 		Entity.lock();
-//		System.out.println(com.statnlp.entity.Entity.Entities.toString());
-//		Formatter.ner2Text(trainInstances, "data/testRandom2.txt");
-//		System.exit(0);
-		/**Debug info**/
-		
-		/****/
 		
 		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2;
@@ -130,10 +128,17 @@ public class EMain {
 		}
 		
 		Instance[] predictions = model.decode(testInstances.toArray(new ECRFInstance[testInstances.size()]));
-		ECRFEval.evalNER(predictions, nerOut);
 		ECRFEval.writeNERResult(predictions, nerRes, true);
 		if (isPipe) {
-			
+			//for warm up the label
+			System.err.println("[Pipeline Model Evaluation]");
+			System.err.println("[Gold test path]: " + DPConfig.testingPath);
+			MFLReader.readCoNLLXData(DPConfig.trainingPath, true, trainNumber, true, iobes);
+			MFLInstance[] testInsts = MFLReader.readCoNLLXData(DPConfig.testingPath, false, testNumber, false, false);
+			MFLReader.readResultFile(nerRes, testInsts);
+			MFLEval.evalCombined(testInsts);
+		} else {
+			ECRFEval.evalNER(predictions, nerOut);
 		}
 		if(NetworkConfig._topKValue>1)
 			ECRFEval.outputTopKNER(predictions, topKNEROut);

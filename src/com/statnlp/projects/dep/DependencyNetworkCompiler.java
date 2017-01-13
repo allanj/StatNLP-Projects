@@ -152,51 +152,6 @@ public class DependencyNetworkCompiler extends NetworkCompiler {
 		return network;
 	}
 	
-	public DependencyNetwork debug(int networkId, DependInstance inst, LocalNetworkParam param){
-		DependencyNetwork network = new DependencyNetwork();
-		long rootNode = this.toNode(0, 3, 1, 1,1);
-		long rootchild1 = this.toNode(0, 2, 1, 0,1);
-		long rootchild2 = this.toNode(2, 3, 1, 1,1);
-		long leaf1 = this.toNode(0, 0, 1, 1,1);
-		long leaf2 = this.toNode(1, 2, 0, 1,1);
-		network.addNode(rootNode);
-		network.addNode(rootchild1);
-		network.addNode(rootchild2);
-		network.addEdge(rootNode, new long[]{rootchild1, rootchild2});
-		network.addNode(leaf1);
-		network.addNode(leaf2);
-		network.addEdge(rootchild1, new long[]{leaf1,leaf2});
-		long leaf11 = this.toNode(1, 1, 0, 1,1);
-		long leaf12 = this.toNode(1, 2, 0, 0,1);
-		network.addNode(leaf11);
-		network.addNode(leaf12);
-		network.addEdge(leaf2, new long[]{leaf11,leaf12});
-		long leaf11r = this.toNode(1, 1, 1, 1,1);
-		long leaf22l = this.toNode(2, 2, 0, 1,1);
-		network.addNode(leaf11r);
-		network.addNode(leaf22l);
-		network.addEdge(leaf12, new long[]{leaf11r,leaf22l});
-		
-		long node23 = this.toNode(2, 3, 1, 0,1);
-		long leaf33r = this.toNode(3, 3, 1, 1,1);
-		network.addNode(node23); network.addNode(leaf33r);
-		network.addEdge(rootchild2, new long[]{node23,leaf33r});
-		
-		long leaf22r = this.toNode(2, 2, 1, 1,1);
-		long leaf33l = this.toNode(3, 3, 0, 1,1);
-		network.addNode(leaf22r); network.addNode(leaf33l);
-		network.addEdge(node23, new long[]{leaf22r,leaf33l});
-		
-		network.finalizeNetwork();
-		this._nodes = network.getAllNodes();
-		this._children = network.getAllChildren();
-		System.err.println("Debug mode:"+network.countNodes()+" nodes..");
-		long root = this.toNode(0, 3, 1, 1,1);
-		int rootIdx = Arrays.binarySearch(this._nodes, root);
-		DependencyNetwork mynetwork = new DependencyNetwork(networkId, inst, this._nodes, this._children, param, rootIdx+1);
-		return mynetwork;
-	}
-	
 	public synchronized void compileUnlabeled(){
 		if(this._nodes!=null){
 			return;
