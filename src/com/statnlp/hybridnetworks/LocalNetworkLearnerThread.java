@@ -223,22 +223,7 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 			if (NetworkConfig.INFERENCE == InferenceType.MEAN_FIELD) {
 				// only the unlabeled network needs the marginal map.
 				if (!network.getInstance().isLabeled()){
-					network.clearMarginalMap();
-					boolean prevDone = false;
-					for (int mf = 0; mf < NetworkConfig.MAX_MF_UPDATES; mf++) {
-						for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
-							network.enableKthStructure(curr);
-							network.inference(true);
-						}
-						boolean done = network.compareMarginalMap();
-						if (prevDone && done){
-							network.renewCurrentMarginalMap();
-							break;
-						}
-						prevDone = done;
-						network.renewCurrentMarginalMap();
-						network.calculateExpForMarginalMap();
-					}
+					network.meanFieldInference();
 				}
 				//update the network
 				for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {

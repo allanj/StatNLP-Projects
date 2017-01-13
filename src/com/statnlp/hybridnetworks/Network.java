@@ -370,6 +370,28 @@ public abstract class Network implements Serializable, HyperGraph{
 	}
 	
 	/**
+	 * Code for mean field updats
+	 */
+	public void meanFieldInference() {
+		this.clearMarginalMap();
+		boolean prevDone = false;
+		for (int mf = 0; mf < NetworkConfig.MAX_MF_UPDATES; mf++) {
+			for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
+				this.enableKthStructure(curr);
+				this.inference(true);
+			}
+			boolean done = this.compareMarginalMap();
+			if (prevDone && done){
+				this.renewCurrentMarginalMap();
+				break;
+			}
+			prevDone = done;
+			this.renewCurrentMarginalMap();
+			this.calculateExpForMarginalMap();
+		}
+	}
+	
+	/**
 	 * Inference in the Network without updating the parameters
 	 */
 	public void inference(boolean marginalize){
