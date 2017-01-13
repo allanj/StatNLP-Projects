@@ -159,13 +159,12 @@ public class FeatureArray implements Serializable{
 		for (int f_local : fs_local) {
 			double featureValue = 1.0;
 			if (fIdx2DstNode.containsKey(f_local)) {
+				featureValue = 0.0;
 				for (int dstNode : fIdx2DstNode.get(f_local)) {
 					if (marginalMap.containsKey(dstNode))
-						featureValue = Math.exp(marginalMap.get(dstNode));
-					else
-						featureValue = 0.0;
+						featureValue += marginalMap.get(dstNode); //Math.exp(marginalMap.get(dstNode));
+						
 				}
-				
 			}
 			param.addCount(f_local, featureValue * count);
 		}
@@ -252,13 +251,11 @@ public class FeatureArray implements Serializable{
 					//in testing, f is the global feature index
 					double featureValue = 1.0;
 					if (fIdx2DstNode.containsKey(f)) {
+						featureValue = 0.0;
 						for (int dstNode: fIdx2DstNode.get(f)) {
 							if (marginalMap.containsKey(dstNode))
-								featureValue = Math.exp(marginalMap.get(dstNode));
-							else
-								featureValue = 0.0;
+								featureValue += marginalMap.get(dstNode); //Math.exp(marginalMap.get(dstNode));
 						}
-						
 					}
 					this._fb._currScore += param.getWeight(f) * featureValue;
 				}

@@ -1143,12 +1143,19 @@ public abstract class Network implements Serializable, HyperGraph{
 		for(Integer key: this.newMarginalMap.keySet()){
 			double curr = this.currentMarginalMap.get(key);
 			double newM = this.newMarginalMap.get(key);
-			diff += Math.abs(newM-curr);
+			diff += curr > newM ? newM - curr : curr - newM;
 		}
 		diff /= this.newMarginalMap.size();
 		if(diff < 0.0001)
 			return true;
 		return false;
+	}
+	
+	public void calculateExpForMarginalMap() {
+		for(Integer key: this.currentMarginalMap.keySet()){
+			double curr = this.currentMarginalMap.get(key);
+			this.currentMarginalMap.put(key, Math.exp(curr));
+		}
 	}
 	
 	/**

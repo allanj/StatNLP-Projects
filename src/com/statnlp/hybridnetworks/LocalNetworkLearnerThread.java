@@ -237,6 +237,7 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 						}
 						prevDone = done;
 						network.renewCurrentMarginalMap();
+						network.calculateExpForMarginalMap();
 					}
 				}
 				//update the network
@@ -247,7 +248,6 @@ public class LocalNetworkLearnerThread extends Thread implements Callable<Void> 
 			}else{
 				network.train();
 			}
-			
 		}
 	}
 	
