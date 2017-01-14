@@ -102,7 +102,7 @@ public class ECRFEval {
 			ArrayList<String> predEntities = eInst.getPrediction();
 			Sentence sent = eInst.getInput();
 			for(int i=0;i<sent.length();i++){
-				int headIndex = sent.get(i).getHeadIndex()+1;
+				int headIndex = sent.get(i).getHeadIndex() + 1;
 				pw.write((i+1)+"\t"+sent.get(i).getName()+"\t"+sent.get(i).getTag()+"\t"+predEntities.get(i)+"\t"+headIndex+"\n");
 			}
 			pw.write("\n");

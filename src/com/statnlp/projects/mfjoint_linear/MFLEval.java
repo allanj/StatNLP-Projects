@@ -150,4 +150,23 @@ public class MFLEval {
 		System.out.printf("Precision: %.2f%%, Recall: %.2f%%, F-measure: %.2f%%\n", precision, recall, fmeasure);
 	}
 	
+	
+	public static void evalCombinedSeparateModel(String goldTrainFile, String goldTestFile, String depResult, String neResult) throws IOException {
+		MFLReader.readCoNLLXData(goldTrainFile, true, -1, true, true);
+		MFLInstance[] testInsts = MFLReader.readCoNLLXData(goldTestFile, false, -1, false, false);
+		Utils.readSeparateResultFile(testInsts, depResult, neResult);
+		MFLEval.evalCombined(testInsts);
+	}
+	
+//	public static void main(String[] args) throws IOException{
+//		String[] sections = new String[] {"abc", "cnn", "mnb", "nbc", "p25", "pri", "voa", "all"};
+//		for (int s = 0; s < sections.length; s++) {
+//			String depFile = "F:/Dropbox/SUTD/Work (1)/ACL2017/Experiments/depresults/"+sections[s]+".dep.test.noef.dp.res.txt";
+//			String neResult = "F:/Dropbox/SUTD/Work (1)/ACL2017/Experiments/linearresult/"+sections[s]+".ecrf.test.depf-false.ner.res.txt";
+//			String goldTrainFile = "data/allanprocess/"+sections[s]+"/train.conllx";
+//			String goldTestFile = "data/allanprocess/"+sections[s]+"/test.conllx";
+//			evalCombinedSeparateModel(goldTrainFile, goldTestFile, depFile, neResult);
+//		}
+//	}
+	
 }

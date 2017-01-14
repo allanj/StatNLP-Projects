@@ -40,7 +40,7 @@ public class ECRFNetworkCompiler extends NetworkCompiler{
 	}
 	
 	public long toNode_leaf(){
-		int[] arr = new int[]{0,0,0,0,NODE_TYPES.LEAF.ordinal()};
+		int[] arr = new int[]{0,Entity.get("O").id,0,0,NODE_TYPES.LEAF.ordinal()};
 		return NetworkIDMapper.toHybridNodeID(arr);
 	}
 	

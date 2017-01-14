@@ -83,7 +83,7 @@ public class Evaluator {
 						if(predHeads[i]==trueHeads[i])
 							dp_corr++;
 						dp_total++;
-						if (!punct.contains(bestSent.get(i).getName())) {
+						if (!punct.contains(bestSent.get(i).getTag())) {
 							if (trueHeads[i] == predHeads[i]) {
 								noPunc_corr++;
 							}
@@ -105,7 +105,7 @@ public class Evaluator {
 							las_corr++;
 					}
 					dp_total++;
-					if (!punct.contains(sent.get(i).getName())) {
+					if (!punct.contains(sent.get(i).getTag())) {
 						if (sent.get(i).getHeadIndex() == predHeads[i]) {
 							noPunc_corr++;
 						}

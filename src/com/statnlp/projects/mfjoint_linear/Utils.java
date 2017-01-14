@@ -1,8 +1,12 @@
 package com.statnlp.projects.mfjoint_linear;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
+import com.statnlp.commons.io.RAWF;
 
 
 
@@ -66,6 +70,49 @@ public class Utils {
 			HashSet<Integer> set = new HashSet<Integer>(heads);
 			segments.add(new MFLSpan(start, end, label, set));
 		}
+	}
+	
+	/**
+	 * Read from the two separate result file obtain from two models.
+	 * @param testInsts
+	 * @param depResult
+	 * @param neResult
+	 * @throws IOException
+	 */
+	public static void readSeparateResultFile(MFLInstance[] testInsts, String depResult, String neResult) throws IOException{
+		BufferedReader brDep = RAWF.reader(depResult);
+		BufferedReader brNE = RAWF.reader(neResult);
+		List<Integer> originalHeads = new ArrayList<>();
+		ArrayList<String> enList = new ArrayList<>();
+		enList.add("O");
+		originalHeads.add(-1);
+		int index = 0;
+		String line = null;
+		while((line = brDep.readLine()) != null){
+			String depline = line.trim();
+			String neLine = brNE.readLine().trim();
+			if(line.length() == 0){
+				int[] heads = new int[originalHeads.size()];
+				String[] entities = new String[enList.size()];
+				enList.toArray(entities);
+				for (int i = 0; i < originalHeads.size(); i++) heads[i] = originalHeads.get(i);
+				testInsts[index].setPrediction(new MFLPair(heads, entities));
+				index++;
+				enList = new ArrayList<>();
+				enList.add("O");
+				originalHeads = new ArrayList<>();
+				originalHeads.add(-1);
+			} else {
+				String[] depValues = depline.split("[\t ]");
+				String[] neValues = neLine.split("[\t ]");
+				int headIdx = Integer.parseInt(depValues[4]);
+				String form = neValues[3];
+				originalHeads.add(headIdx);
+				enList.add(form);
+			}
+		}
+		brDep.close();
+		brNE.close();
 	}
 	
 }

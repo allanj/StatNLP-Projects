@@ -85,7 +85,7 @@ public class EMain {
 		testInstances = isPipe ? EReader.readPipe(testFile, testNumber) : 
 			EReader.readCoNLLX(testFile, false, testNumber, false);
 		Entity.lock();
-		
+		System.err.println(Entity.Entities_INDEX.toString());
 		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2;
 		NetworkConfig.NUM_THREADS = numThreads;
@@ -114,7 +114,7 @@ public class EMain {
 			in.close();
 			System.err.println("[Info] Model is read.");
 		} else {
-			ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(of),useDepf);
+			ECRFFeatureManager fa = new ECRFFeatureManager(new GlobalNetworkParam(of), useDepf);
 			ECRFNetworkCompiler compiler = new ECRFNetworkCompiler(useSSVMCost, iobes);
 			model = DiscriminativeNetworkModel.create(fa, compiler);
 			ECRFInstance[] ecrfs = trainInstances.toArray(new ECRFInstance[trainInstances.size()]);
@@ -129,6 +129,7 @@ public class EMain {
 		
 		Instance[] predictions = model.decode(testInstances.toArray(new ECRFInstance[testInstances.size()]));
 		ECRFEval.writeNERResult(predictions, nerRes, true);
+		ECRFEval.evalNER(predictions, nerOut);
 		if (isPipe) {
 			//for warm up the label
 			System.err.println("[Pipeline Model Evaluation]");
@@ -137,9 +138,7 @@ public class EMain {
 			MFLInstance[] testInsts = MFLReader.readCoNLLXData(DPConfig.testingPath, false, testNumber, false, false);
 			MFLReader.readResultFile(nerRes, testInsts);
 			MFLEval.evalCombined(testInsts);
-		} else {
-			ECRFEval.evalNER(predictions, nerOut);
-		}
+		} 
 		if(NetworkConfig._topKValue>1)
 			ECRFEval.outputTopKNER(predictions, topKNEROut);
 	}

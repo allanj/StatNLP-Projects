@@ -40,6 +40,7 @@ public class EReader {
 				if (setLabel && !projective) {
 					words = new ArrayList<WordToken>();
 					es = new ArrayList<String>();
+					index--;
 					continue;
 				}
 				/***/
@@ -47,15 +48,16 @@ public class EReader {
 				words = new ArrayList<WordToken>();
 				es = new ArrayList<String>();
 				if(number!=-1 && insts.size()==number) break;
-				continue;
+			} else {
+				String[] values = line.split("\\t");
+				String entity = values[10];
+				Entity.get(entity);
+				int headIdx = Integer.valueOf(values[6])-1;
+				String depLabel = values[7];
+				words.add(new WordToken(values[1], values[4], headIdx, entity, depLabel));
+				es.add(entity);
 			}
-			String[] values = line.split("\\t");
-			String entity = values[10];
-			Entity.get(entity);
-			int headIdx = Integer.valueOf(values[6])-1;
-			String depLabel = values[7];
-			words.add(new WordToken(values[1],values[4],headIdx,entity, depLabel));
-			es.add(entity);
+			
 		}
 		br.close();
 		List<ECRFInstance> myInsts = insts;
@@ -97,6 +99,7 @@ public class EReader {
 		List<ECRFInstance> insts = new ArrayList<ECRFInstance>();
 		int index =1;
 		ArrayList<WordToken> words = new ArrayList<WordToken>();
+		ArrayList<String> es = new ArrayList<String>();
 		while((line = br.readLine())!=null){
 			if(line.startsWith("#")) continue;
 			if(line.equals("")){
@@ -104,15 +107,19 @@ public class EReader {
 				words.toArray(wordsArr);
 				Sentence sent = new Sentence(wordsArr);
 				ECRFInstance inst = new ECRFInstance(index++,1.0,sent);
+				inst.entities = es;
 				inst.setUnlabeled();
 				insts.add(inst);
 				words = new ArrayList<WordToken>();
+				es = new ArrayList<String>();
 				if(number!=-1 && insts.size()==number) break;
 				continue;
 			}
 			String[] values = line.split("\\t");
 			int headIdx = Integer.valueOf(values[4])-1;
-			words.add(new WordToken(values[1], values[2], headIdx, null, null));
+			String entity = values[3];
+			words.add(new WordToken(values[1], values[2], headIdx, entity, null));
+			es.add(entity);
 		}
 		br.close();
 		List<ECRFInstance> myInsts = insts;

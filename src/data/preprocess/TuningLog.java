@@ -13,15 +13,15 @@ import com.statnlp.commons.io.RAWF;
 public class TuningLog {
 
 //	public static String[] newstypes = new String[]{"abc","cnn","mnb","nbc","p25","pri", "voa"};
-	public static String[] newstypes = new String[]{"cnn"};
+	public static String[] newstypes = new String[]{"all"};
 	public static String[] models = new String[]{"model1"};
 //	public static String[] models = new String[]{"semi"};
 	public static String[] l2vals = new String[]{"0.0001", "0.001", "0.01", "0.1", "1"};
-	public static String[] deps = new String[]{"nodep", "dep"};
+	public static String[] deps = new String[]{"nodep"};
 //	public static String linear_dataPrefix = "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/Tunning/LinearCRF-bn/";
 //	public static String semi_dataPrefix =  "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/Tunning/SemiCRF/";
 	
-	public static String linear_dataPrefix = "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/cvtuning/";
+	public static String linear_dataPrefix = "F:/Dropbox/SUTD/Work (1)/ACL2017/Experiments/linearTuningLogs/";
 	public static String semi_dataPrefix =  "F:/Dropbox/SUTD/Work (1)/AAAI17/exp/cvtuning/";
 	public static boolean cross_validation = true;
 //	public static 
@@ -45,7 +45,9 @@ public class TuningLog {
 		String devType = cross_validation? "cv":"dev";
 		String dataPrefix = model.equals("lcrf")?linear_dataPrefix:semi_dataPrefix;
 		for(int l=0; l<l2vals.length; l++){
-			String file = model.equals("lcrf")? dataPrefix+model+"-"+dep+"-reg"+l2vals[l]+"-"+devType+"-"+news+".log" :dataPrefix+model+"-"+dep+"-reg"+l2vals[l]+"-noignore-"+devType+"-"+news+".log";
+			System.out.println("regularziong: " + l2vals[l]);
+			String file = linear_dataPrefix + "log_linear_"+news+"_reg"+l2vals[l]+".log";
+			//String file = model.equals("lcrf")? dataPrefix+model+"-"+dep+"-reg"+l2vals[l]+"-"+devType+"-"+news+".log" :dataPrefix+model+"-"+dep+"-reg"+l2vals[l]+"-noignore-"+devType+"-"+news+".log";
 			double acc = cross_validation? getCVAcc(file):getAcc(file);
 			if(acc > bestAcc){
 				bestAcc = acc;
@@ -53,7 +55,7 @@ public class TuningLog {
 			}
 		}
 //		System.out.println("Best L2 for model:"+model+" dep:"+dep+" data:"+news+" is:"+bestL2);
-		System.out.print(bestL2+"\t");
+		System.out.print("best L2 for "+news+": " + bestL2+"\t");
 	}
 	
 	

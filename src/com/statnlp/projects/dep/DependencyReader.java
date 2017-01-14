@@ -144,7 +144,8 @@ public class DependencyReader {
 				}
 				String[] values = line.split("\t");
 				String predEntity = values[3];
-				words.add(new WordToken(values[1], values[2], -1, predEntity));
+				int headIndex = Integer.parseInt(values[4]);
+				words.add(new WordToken(values[1], values[2], headIndex, predEntity));
 				
 			}
 		} catch (IOException e) {
