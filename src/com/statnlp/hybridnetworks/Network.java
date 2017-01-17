@@ -940,26 +940,23 @@ public abstract class Network implements Serializable, HyperGraph{
 	private int[][] merge(int currMaxPath[][], int[] children, int nodeIdx, double score){
 		int[][] answer = new int[NetworkConfig._topKValue][children.length];//pair is two
 		int[][] answerPath = new int[NetworkConfig._topKValue][children.length];
+		double[] answerScore = new double[NetworkConfig._topKValue];
 		int i=0, j=0, k=0;
 		while(k<answer.length){
-//			System.err.println("node idx:"+nodeIdx+" i:"+i+" j:"+j);
 			double left = Double.NEGATIVE_INFINITY;
 			if(currMaxPath[i]!=null){
 				left = 0;
 				for(int ith=0;ith<children.length;ith++){
 					left += this._max_k[children[ith]][currMaxPath[i][ith]];
 				}
+				left += score;
 			}
-			
 			int[] pathChildren = this._max_k_paths[nodeIdx][j]==null? null:this._max_k_paths[nodeIdx][j];
 			
 			double right = Double.NEGATIVE_INFINITY;
 			if(!(pathChildren==null || this._max_k_path_listbest[nodeIdx][j]==null)){
-				right = 0;
-				for(int pth=0;pth<pathChildren.length;pth++)
-					right += this._max_k[pathChildren[pth]][this._max_k_path_listbest[nodeIdx][j][pth]];
+				right = this._max_k[nodeIdx][j];
 			}
-			
 			
 			if(left==Double.NEGATIVE_INFINITY && right==Double.NEGATIVE_INFINITY){
 				break;
@@ -967,20 +964,19 @@ public abstract class Network implements Serializable, HyperGraph{
 			
 			if(left > right){
 				answer[k] = currMaxPath[i];
-				this._max_k[nodeIdx][k] = left + score;
+				answerScore[k] = left;
 				answerPath[k] = children;
 				i++;
 			}else{
 				answer[k] = this._max_k_path_listbest[nodeIdx][j];
-				this._max_k[nodeIdx][k] = right + score;
+				answerScore[k] = right;
 				System.arraycopy(this._max_k_paths[nodeIdx][j], 0, answerPath[k], 0, this._max_k_paths[nodeIdx][j].length); //a faster way to copy array
-				//answerPath[k] = this._max_k_paths[nodeIdx][j].clone();
 				j++;
 			}
 			k++;
-			
 		}
-		for(int x=k;x<answer.length;x++) {answer[x] = null; answerPath[x]= null;}
+		this._max_k[nodeIdx] = answerScore;
+		for(int x=k;x<answer.length;x++) {answer[x] = null; answerPath[x]= null; this._max_k[nodeIdx][x]= Double.NEGATIVE_INFINITY;}
 		this._max_k_paths[nodeIdx] = answerPath;
 		return answer;
 	}

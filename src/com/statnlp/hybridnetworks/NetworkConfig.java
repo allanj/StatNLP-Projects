@@ -215,4 +215,8 @@ public class NetworkConfig {
 	 * Enable to saving the memory or not
 	 */
 	public static boolean AVOID_DUPLICATE_FEATURES = false;
+	
+	public static boolean READ_DEP_WEIGHTS = false;
+	public static boolean SAVE_DEP_WEIGHTS = false;
+	public static String WEIGHTS_FILE;
 }

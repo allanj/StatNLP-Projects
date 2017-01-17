@@ -104,7 +104,7 @@ public class GlobalNetworkParam implements Serializable{
 	/** The weights that some of them will be replaced by neural net if NNCRF is enabled. */
 	private transient double[] concatWeights, concatCounts;
 	
-	private final String DUMP_TYPE = "test";  
+	protected static final String DUMP_TYPE = "test";  
 	
 	public GlobalNetworkParam(){
 		this(OptimizerFactory.getLBFGSFactory());

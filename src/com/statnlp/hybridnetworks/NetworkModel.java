@@ -18,7 +18,13 @@ package com.statnlp.hybridnetworks;
 
 import static com.statnlp.commons.Utils.print;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +39,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
 import com.statnlp.neural.NNCRFGlobalNetworkParam;
@@ -60,6 +67,7 @@ public abstract class NetworkModel implements Serializable{
 	//neuralCRF/SSVM socket controller
 	private NNCRFGlobalNetworkParam nnController;
 	private transient PrintStream[] outstreams = new PrintStream[]{System.out};
+	private double[] savedWeights;
 	
 	public NetworkModel(FeatureManager fm, NetworkCompiler compiler, PrintStream... outstreams){
 		this._fm = fm;
@@ -177,6 +185,24 @@ public abstract class NetworkModel implements Serializable{
 		this._fm.getParam_G().lockIt();
 		nnController = this._fm.getParam_G()._nnController;
 		
+		if (NetworkConfig.READ_DEP_WEIGHTS) {
+			System.err.println("[Info] Reading the CRF weights.");
+			ObjectInputStream in;
+			try {
+				in = new ObjectInputStream(new FileInputStream(NetworkConfig.WEIGHTS_FILE));
+				savedWeights =(double[])in.readObject();
+				in.close();
+			} catch (IOException | ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			System.err.println("[Info] CRF weights is read.");
+			for (int w = 0; w < this._fm.getParam_G()._weights.length; w++) {
+				if (!this._fm.getParam_G().getFeatureRep(w)[0].startsWith("neural") && !this._fm.getParam_G().getFeatureRep(w)[0].equals(GlobalNetworkParam.DUMP_TYPE)) {
+					this._fm.getParam_G().overRideWeight(w, savedWeights[w]);
+				}
+			}
+		}
+		
 		if(NetworkConfig.BUILD_FEATURES_FROM_LABELED_ONLY && NetworkConfig.CACHE_FEATURES_DURING_TRAINING){
 			touch(insts, true); // Touch again to cache the features, both in labeled and unlabeled
 		}
@@ -226,6 +252,13 @@ public abstract class NetworkModel implements Serializable{
 							// this means one epoch
 							print(String.format("Epoch %d: Obj=%-18.12f", epochNum++, epochObj/instIds.size()), outstreams);
 							epochObj = 0.0;
+						}
+					}
+				}
+				if (NetworkConfig.READ_DEP_WEIGHTS) {
+					for (int w = 0; w < this._fm.getParam_G()._weights.length; w++) {
+						if (!this._fm.getParam_G().getFeatureRep(w)[0].startsWith("neural")) {
+							this._fm.getParam_G().overRideWeight(w, savedWeights[w]);
 						}
 					}
 				}
@@ -279,6 +312,16 @@ public abstract class NetworkModel implements Serializable{
 			}
 		} finally {
 			pool.shutdown();
+		}
+		if (NetworkConfig.SAVE_DEP_WEIGHTS) {
+			ObjectOutputStream out;
+			try {
+				out = new ObjectOutputStream(new FileOutputStream(NetworkConfig.WEIGHTS_FILE));
+				out.writeObject(this._fm.getParam_G()._weights);
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

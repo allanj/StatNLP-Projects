@@ -1,6 +1,10 @@
 package com.statnlp.projects.dep;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -10,6 +14,7 @@ import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
+import com.statnlp.hybridnetworks.NetworkIDMapper;
 import com.statnlp.hybridnetworks.NetworkModel;
 import com.statnlp.neural.NeuralConfigReader;
 import com.statnlp.projects.dep.commons.DepLabel;
@@ -41,6 +46,9 @@ public class DependencyMain {
 	protected static boolean basicFeatures = true;
 	protected static OptimizerFactory optimizer = OptimizerFactory.getLBFGSFactory();
 	protected static boolean entityFeature = false;
+	protected static boolean saveModel = false;
+	protected static boolean readModel = false;
+	protected static String modelFile = "";
 	
 	public static String[] initializeTypeMap(){
 		HashMap<String, Integer> typeMap = new HashMap<String, Integer>();
@@ -58,7 +66,7 @@ public class DependencyMain {
 		return entities;
 	}
 	
-	public static void main(String[] args) throws InterruptedException, IOException {
+	public static void main(String[] args) throws InterruptedException, IOException, ClassNotFoundException {
 	
 		entities = initializeTypeMap();
 		dataTypeSet = Init.iniOntoNotesData();
@@ -74,6 +82,8 @@ public class DependencyMain {
 		String modelType = "dep";
 		String dpOut = DPConfig.data_prefix+modelType+middle+DPConfig.dp_res_suffix;
 		String topKDepOut = DPConfig.data_prefix+modelType+middle+DPConfig.dp_topk_res_suffix;
+		String ef = entityFeature ? "ef":"noef";
+		modelFile = DPConfig.data_prefix+modelType+middle+"."+ef+".dep.model";
 		testFile = isDev? DPConfig.devPath:DPConfig.testingPath;
 		
 		if(isPipe) {
@@ -92,6 +102,7 @@ public class DependencyMain {
 		System.err.println("[Info] testFile: "+testFile);
 		System.err.println("[Info] depOut: "+dpOut);
 		System.err.println("[Info] topKDepOut: "+topKDepOut);
+		System.err.println("[Info] model file: "+modelFile);
 		System.err.println("[Info] Regularization: "+DPConfig.L2);
 		
 		if(NetworkConfig.USE_NEURAL_FEATURES){
@@ -109,37 +120,65 @@ public class DependencyMain {
 								DependencyReader.readCoNLLX(testFile, false,testNumber,trans, checkTestProjective);   //false: not check the projective in testing
 		System.err.println("[Info] Total number of dependency label:"+DepLabel.LABELS.size());
 		
+		/**Chech the head word + word pair frequency**/
+//		System.err.println("training inst size: " + trainingInsts.length);
+//		DataChecker.checkDepPairFeq(trainingInsts);
+//		System.exit(0);
+		/***/
+		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
 		NetworkConfig.CACHE_FEATURES_DURING_TRAINING = true;
 		NetworkConfig.NUM_THREADS = numThreads;
 		//0.1 is the best after tunning the parameters
 		NetworkConfig.L2_REGULARIZATION_CONSTANT = DPConfig.L2; //default is 0.1
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
+		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
+		NetworkConfig.SAVE_DEP_WEIGHTS = false;
+		NetworkConfig.READ_DEP_WEIGHTS = false;
+		NetworkConfig.WEIGHTS_FILE = "data/weights";
 		System.err.println("[Info] Regularization Parameter: "+NetworkConfig.L2_REGULARIZATION_CONSTANT);
 		
-		
-		DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(optimizer), isPipe, labeledDep, windowSize, basicFeatures, entityFeature);
-		DependencyNetworkCompiler dnc = new DependencyNetworkCompiler(labeledDep);
-		NetworkModel model = DiscriminativeNetworkModel.create(dfm, dnc);
-		
-		DependInstance all_instances[] = new DependInstance[trainingInsts.length+testingInsts.length];
-        int i = 0;
-        for(; i<trainingInsts.length; i++) {
-            all_instances[i] = trainingInsts[i];
-        }
-        int lastId = all_instances[i-1].getInstanceId();
-        for(int j = 0; j<testingInsts.length; j++, i++) {
-            all_instances[i] = testingInsts[j];
-            all_instances[i].setInstanceId(lastId+j+1);
-            all_instances[i].setUnlabeled();
-        }
-        if(NetworkConfig.USE_NEURAL_FEATURES){
-			model.train(all_instances, trainingInsts.length, numIteration);
-		}else{
-			model.train(trainingInsts, numIteration);
+		NetworkModel model = null;
+		if (readModel) {
+			System.err.println("[Info] Reading the network model.");
+			ObjectInputStream in = new ObjectInputStream(new FileInputStream(modelFile));
+			NetworkIDMapper.setCapacity(new int[]{500, 500, 5, 5, 100, 10});
+			model =(NetworkModel)in.readObject();
+			in.close();
+			System.err.println("[Info] Model is read.");
+		} else {
+			DependencyFeatureManager dfm = new DependencyFeatureManager(new GlobalNetworkParam(optimizer), isPipe, labeledDep, windowSize, basicFeatures, entityFeature);
+			DependencyNetworkCompiler dnc = new DependencyNetworkCompiler(labeledDep);
+			model = DiscriminativeNetworkModel.create(dfm, dnc);
+			DependInstance all_instances[] = new DependInstance[trainingInsts.length+testingInsts.length];
+	        int i = 0;
+	        for(; i<trainingInsts.length; i++) {
+	            all_instances[i] = trainingInsts[i];
+	        }
+	        int lastId = all_instances[i-1].getInstanceId();
+	        for(int j = 0; j<testingInsts.length; j++, i++) {
+	            all_instances[i] = testingInsts[j];
+	            all_instances[i].setInstanceId(lastId+j+1);
+	            all_instances[i].setUnlabeled();
+	        }
+	        if(NetworkConfig.USE_NEURAL_FEATURES){
+				model.train(all_instances, trainingInsts.length, numIteration);
+			}else{
+				model.train(trainingInsts, numIteration);
+			}
 		}
-		
+		if (saveModel) {
+			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
+			out.writeObject(model);
+			out.close();
+		}
+        
 		/****************Evaluation Part**************/
+//		testingInsts = new DependInstance[trainingInsts.length];
+//		for (int idx = 0; idx < trainingInsts.length; idx++) {
+//			testingInsts[idx] = trainingInsts[idx].duplicate();
+//			testingInsts[idx].setUnlabeled();
+//		}
 		Instance[] predInsts = model.decode(testingInsts);
 		Evaluator.evalDP(predInsts, dpOut, labeledDep);
 		if(NetworkConfig._topKValue>1)
@@ -179,12 +218,14 @@ public class DependencyMain {
 					case "-topk":NetworkConfig._topKValue = Integer.valueOf(args[i+1]); break;
 					case "-topkinput": topKinput = true; break;
 					case "-las": labeledDep= args[i+1].equals("true")?true:false; break;
+					case "-saveModel": saveModel = args[i+1].equals("true")?true:false; break;
+					case "-readModel": readModel = args[i+1].equals("true")?true:false; break;
 					case "-windowSize": windowSize = Integer.valueOf(args[i+1]); break;
 					case "-neural": if(args[i+1].equals("true")){ 
 										NetworkConfig.USE_NEURAL_FEATURES = true; 
-										NetworkConfig.OPTIMIZE_NEURAL = true;  //optimize in CRF..
+										NetworkConfig.OPTIMIZE_NEURAL = true; //optimize the neural features in CRF
 										NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
-										NetworkConfig.REGULARIZE_NEURAL_FEATURES = false; // Regularized the neural features in CRF or not
+										NetworkConfig.REGULARIZE_NEURAL_FEATURES = true; // Regularized the neural features in CRF or not
 									} break; 
 					case "-basicf": basicFeatures = args[i+1].equals("true") ? true : false; break;
 					case "-entityf": entityFeature = args[i+1].equals("true") ? true : false; break;
@@ -215,7 +256,7 @@ public class DependencyMain {
 			System.err.println("[Info] Using neural features: "+ NetworkConfig.USE_NEURAL_FEATURES);
 			System.err.println("[Info] Labeled Dependency Parsing?: " + labeledDep);
 			if (NetworkConfig.USE_NEURAL_FEATURES) {
-				System.err.println("[Neural Info] Opimizing Neural in CRF ?: "+ NetworkConfig.OPTIMIZE_NEURAL);
+				System.err.println("[Neural Info] Optimized the neural features in CRF ?: "+ NetworkConfig.OPTIMIZE_NEURAL);
 				System.err.println("[Neural Info] Indexed neural features ?: "+ NetworkConfig.IS_INDEXED_NEURAL_FEATURES);
 				System.err.println("[Neural Info] Regularize neural features in CRF ?: "+ NetworkConfig.REGULARIZE_NEURAL_FEATURES);
 			}
