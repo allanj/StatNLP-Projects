@@ -11,3 +11,5 @@ data/dat/*
 run.sh
 *.jar
 program/
+data/ConnectedData/*
+data/weights
