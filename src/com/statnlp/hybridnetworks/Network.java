@@ -374,18 +374,11 @@ public abstract class Network implements Serializable, HyperGraph{
 	 */
 	public void meanFieldInference() {
 		this.clearMarginalMap();
-		boolean prevDone = false;
 		for (int mf = 0; mf < NetworkConfig.MAX_MF_UPDATES; mf++) {
 			for (int curr = 0; curr < NetworkConfig.NUM_STRUCTS; curr++) {
 				this.enableKthStructure(curr);
 				this.inference(true);
 			}
-			boolean done = this.compareMarginalMap();
-			if (prevDone && done){
-				this.renewCurrentMarginalMap();
-				break;
-			}
-			prevDone = done;
 			this.renewCurrentMarginalMap();
 			this.calculateExpForMarginalMap();
 		}
@@ -1151,26 +1144,6 @@ public abstract class Network implements Serializable, HyperGraph{
 	public void renewCurrentMarginalMap(){
 		this.currentMarginalMap = this.newMarginalMap;
 		this.newMarginalMap = new HashMap<>();
-	}
-	
-	/**
-	 * Compare the new and old marginal map
-	 * decide to continue mean-field update or not 
-	 * @return almost equal OR not
-	 */
-	public boolean compareMarginalMap(){
-		if(this.currentMarginalMap == null || this.currentMarginalMap.size() == 0)
-			return false;
-		double diff = 0;
-		for(Integer key: this.newMarginalMap.keySet()){
-			double curr = this.currentMarginalMap.get(key);
-			double newM = this.newMarginalMap.get(key);
-			diff += curr > newM ? newM - curr : curr - newM;
-		}
-		diff /= this.newMarginalMap.size();
-		if(diff < 0.0001)
-			return true;
-		return false;
 	}
 	
 	public void calculateExpForMarginalMap() {
