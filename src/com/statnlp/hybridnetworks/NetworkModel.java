@@ -196,9 +196,15 @@ public abstract class NetworkModel implements Serializable{
 				e.printStackTrace();
 			}
 			System.err.println("[Info] CRF weights is read.");
-			for (int w = 0; w < this._fm.getParam_G()._weights.length; w++) {
-				if (!this._fm.getParam_G().getFeatureRep(w)[0].startsWith("neural") && !this._fm.getParam_G().getFeatureRep(w)[0].equals(GlobalNetworkParam.DUMP_TYPE)) {
+			if (NetworkConfig.CONTINUE_TRAINING) {
+				for (int w = 0; w < this._fm.getParam_G()._weights.length; w++) {
 					this._fm.getParam_G().overRideWeight(w, savedWeights[w]);
+				}
+			} else {
+				for (int w = 0; w < this._fm.getParam_G()._weights.length; w++) {
+					if (!this._fm.getParam_G().getFeatureRep(w)[0].startsWith("neural") && !this._fm.getParam_G().getFeatureRep(w)[0].equals(GlobalNetworkParam.DUMP_TYPE)) {
+						this._fm.getParam_G().overRideWeight(w, savedWeights[w]);
+					}
 				}
 			}
 		}
@@ -255,13 +261,6 @@ public abstract class NetworkModel implements Serializable{
 						}
 					}
 				}
-				if (NetworkConfig.READ_DEP_WEIGHTS) {
-					for (int w = 0; w < this._fm.getParam_G()._weights.length; w++) {
-						if (!this._fm.getParam_G().getFeatureRep(w)[0].startsWith("neural")) {
-							this._fm.getParam_G().overRideWeight(w, savedWeights[w]);
-						}
-					}
-				}
 				for(LocalNetworkLearnerThread learner: this._learners){
 					learner.setIterationNumber(it);
 					if(NetworkConfig.USE_BATCH_TRAINING) learner.setInstanceIdSet(batchInstIds);
@@ -279,8 +278,6 @@ public abstract class NetworkModel implements Serializable{
 						throw new RuntimeException(e);
 					}
 				}
-				
-				
 				boolean done = true;
 				boolean lastIter = (it == maxNumIterations);
 				if(lastIter){
@@ -301,6 +298,13 @@ public abstract class NetworkModel implements Serializable{
 						nnController.forwardNetwork(false);
 					}
 				}
+				if (NetworkConfig.READ_DEP_WEIGHTS) {
+					for (int w = 0; w < this._fm.getParam_G()._weights.length; w++) {
+						if (!this._fm.getParam_G().getFeatureRep(w)[0].startsWith("neural") && !this._fm.getParam_G().getFeatureRep(w)[0].equals(GlobalNetworkParam.DUMP_TYPE)) {
+							this._fm.getParam_G().overRideWeight(w, savedWeights[w]);
+						}
+					}
+				}
 				if(lastIter){
 					print("Training completes. The specified number of iterations ("+it+") has passed.", outstreams);
 					break;
@@ -316,6 +320,7 @@ public abstract class NetworkModel implements Serializable{
 		if (NetworkConfig.SAVE_DEP_WEIGHTS) {
 			ObjectOutputStream out;
 			try {
+				System.err.println("Saving the weights");
 				out = new ObjectOutputStream(new FileOutputStream(NetworkConfig.WEIGHTS_FILE));
 				out.writeObject(this._fm.getParam_G()._weights);
 				out.close();

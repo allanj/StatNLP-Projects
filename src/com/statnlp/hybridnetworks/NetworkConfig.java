@@ -218,5 +218,6 @@ public class NetworkConfig {
 	
 	public static boolean READ_DEP_WEIGHTS = false;
 	public static boolean SAVE_DEP_WEIGHTS = false;
+	public static boolean CONTINUE_TRAINING = false;
 	public static String WEIGHTS_FILE;
 }
