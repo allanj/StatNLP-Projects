@@ -182,7 +182,9 @@ public class DependencyFeatureManager extends FeatureManager {
 				modifierDistList.add(this._param_g.toFeature(network, FeaType.unigram.name(), "modifierwordtag-dist", modifierWord+","+modifierTag+attDist));
 				
 				/****Bigram features without dist info******/
-				pairList.add(this._param_g.toFeature(network, FeaType.bigram.name(), "bigramword", headWord+","+modifierWord));
+				if (!NetworkConfig.USE_NEURAL_FEATURES) {
+					pairList.add(this._param_g.toFeature(network, FeaType.bigram.name(), "bigramword", headWord+","+modifierWord));
+				}
 				pairList.add(this._param_g.toFeature(network, FeaType.bigram.name(),"bigramtag", headTag+","+modifierTag));
 				pairList.add(this._param_g.toFeature(network, FeaType.bigram.name(), "bigramnametag",  headWord+","+headTag+","+modifierWord+","+modifierTag));
 				pairList.add(this._param_g.toFeature(network, FeaType.bigram.name(), "headallmoditag", headWord+","+headTag+","+modifierTag));
@@ -191,7 +193,9 @@ public class DependencyFeatureManager extends FeatureManager {
 				pairList.add(this._param_g.toFeature(network, FeaType.bigram.name(), "headwordmodiall", headWord+","+modifierWord+","+modifierTag));
 				
 				/****Bigram features with dist info******/
-				pairDistList.add(this._param_g.toFeature(network, FeaType.bigram.name(), "bigramword-dist", headWord+","+modifierWord+attDist));
+				if (!NetworkConfig.USE_NEURAL_FEATURES) {
+					pairDistList.add(this._param_g.toFeature(network, FeaType.bigram.name(), "bigramword-dist", headWord+","+modifierWord+attDist));
+				}
 				pairDistList.add(this._param_g.toFeature(network, FeaType.bigram.name(),"bigramtag-dist", headTag+","+modifierTag+attDist));
 				pairDistList.add(this._param_g.toFeature(network, FeaType.bigram.name(), "bigramnametag-dist",  headWord+","+headTag+","+modifierWord+","+modifierTag+attDist));
 				pairDistList.add(this._param_g.toFeature(network, FeaType.bigram.name(), "headallmoditag-dist", headWord+","+headTag+","+modifierTag+attDist));
@@ -313,7 +317,8 @@ public class DependencyFeatureManager extends FeatureManager {
 				String rw = sent.get(rightIndex).getName().toLowerCase();
 				String rlw = rightIndex - 1 >= 1 ? sent.get(rightIndex - 1).getName().toLowerCase() : "unk";
 				String rrw = rightIndex + 1 < sent.length() ? sent.get(rightIndex + 1).getName().toLowerCase(): "unk";
-				neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, llw + insep + lw + insep + lrw + insep + rlw + insep + rw + insep + rrw));
+				neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, lw + insep + rw));
+				//neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, llw + insep + lw + insep + lrw + insep + rlw + insep + rw + insep + rrw));
 			}
 			
 //			
