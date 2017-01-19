@@ -22,8 +22,8 @@ public class Evaluator {
 
 	private static HashSet<String> punct = new HashSet<>(Arrays.asList("''", ",", ".", ":", "``", "-LRB-", "-RRB-"));
 	
-	public static void evalDP(Instance[] testInsts, String dpOut) throws IOException{
-		evalDP(testInsts, dpOut, false);
+	public static double evalDP(Instance[] testInsts, String dpOut) throws IOException{
+		return evalDP(testInsts, dpOut, false);
 	}
 	
 	/**
@@ -32,7 +32,7 @@ public class Evaluator {
 	 * @param dpOut, index \t word \t tag \t true entity \t trueHead \t predHead
 	 * @throws IOException
 	 */
-	public static void evalDP(Instance[] testInsts, String dpOut, boolean labeledDep) throws IOException{
+	public static double evalDP(Instance[] testInsts, String dpOut, boolean labeledDep) throws IOException{
 		int dp_corr=0;
 		int dp_total=0;
 		int noPunc_corr = 0;
@@ -41,7 +41,10 @@ public class Evaluator {
 		int lastGlobalId = Integer.MIN_VALUE;
 		double max = Double.NEGATIVE_INFINITY;
 		int bestId = -1;
-		PrintWriter pw = RAWF.writer(dpOut);
+		PrintWriter pw = null;
+		if (dpOut != null) {
+			pw = RAWF.writer(dpOut);
+		}
 		DependInstance bestInst = null;
 		for(int index=0; index<testInsts.length; index++){
 			DependInstance inst = (DependInstance)(testInsts[index]);
@@ -64,9 +67,11 @@ public class Evaluator {
 							if(predHeads[i]==trueHeads[i])
 								dp_corr++;
 							dp_total++;
-							pw.write(i+" "+bestSent.get(i).getName()+" "+bestSent.get(i).getTag()+" "+bestSent.get(i).getEntity()+" "+trueHeads[i]+" "+predHeads[i]+"\n");
+							if (pw != null)
+								pw.write(i+" "+bestSent.get(i).getName()+" "+bestSent.get(i).getTag()+" "+bestSent.get(i).getEntity()+" "+trueHeads[i]+" "+predHeads[i]+"\n");
 						}
-						pw.write("\n");
+						if (pw != null)
+							pw.write("\n");
 					}
 					bestId = inst.getInstanceId();
 					max = inst.getPrediction().score();
@@ -89,9 +94,11 @@ public class Evaluator {
 							}
 							noPunc_total++;
 						}
-						pw.write(i+" "+bestSent.get(i).getName()+" "+bestSent.get(i).getTag()+" "+bestSent.get(i).getEntity()+" "+trueHeads[i]+" "+predHeads[i]+"\n");
+						if (pw != null)
+							pw.write(i+" "+bestSent.get(i).getName()+" "+bestSent.get(i).getTag()+" "+bestSent.get(i).getEntity()+" "+trueHeads[i]+" "+predHeads[i]+"\n");
 					}
-					pw.write("\n");
+					if (pw != null)
+						pw.write("\n");
 				}
 				
 			}else{
@@ -111,13 +118,16 @@ public class Evaluator {
 						}
 						noPunc_total++;
 					}
-					pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+sent.get(i).getHeadIndex()+" "+predHeads[i]+"\n");
+					if (pw != null)
+						pw.write(i+" "+sent.get(i).getName()+" "+sent.get(i).getTag()+" "+sent.get(i).getEntity()+" "+sent.get(i).getHeadIndex()+" "+predHeads[i]+"\n");
 				}
-				pw.write("\n");
+				if (pw != null)
+					pw.write("\n");
 			}
 			
 		}
-		pw.close();
+		if (pw != null)
+			pw.close();
 		System.out.println("**Evaluating Dependency Result**");
 		System.out.println("[Dependency] Correct: "+dp_corr);
 		System.out.println("[Dependency] total: "+dp_total);
@@ -127,6 +137,7 @@ public class Evaluator {
 		System.out.printf("[Dependency] No Punctutation UAS: %.2f\n", noPunc_corr*1.0/noPunc_total*100);
 		if(labeledDep) System.out.println("[Dependency] LAS: "+las_corr*1.0/dp_total);
 		System.out.println("*************************");
+		return noPunc_corr*1.0/noPunc_total*100;
 	}
 	
 	/**

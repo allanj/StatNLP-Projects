@@ -220,4 +220,5 @@ public class NetworkConfig {
 	public static boolean SAVE_DEP_WEIGHTS = false;
 	public static boolean CONTINUE_TRAINING = false;
 	public static String WEIGHTS_FILE;
+	public static int EVAL_PER_ITERS = 0;
 }

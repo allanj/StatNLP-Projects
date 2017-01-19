@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,10 +38,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import com.statnlp.commons.io.RAWF;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.NetworkConfig.InferenceType;
 import com.statnlp.neural.NNCRFGlobalNetworkParam;
+import com.statnlp.projects.dep.Evaluator;
 
 public abstract class NetworkModel implements Serializable{
 	
@@ -68,6 +67,7 @@ public abstract class NetworkModel implements Serializable{
 	private NNCRFGlobalNetworkParam nnController;
 	private transient PrintStream[] outstreams = new PrintStream[]{System.out};
 	private double[] savedWeights;
+	private double[] savedInternalNeuralWeights;
 	
 	public NetworkModel(FeatureManager fm, NetworkCompiler compiler, PrintStream... outstreams){
 		this._fm = fm;
@@ -97,9 +97,9 @@ public abstract class NetworkModel implements Serializable{
 	
 	protected abstract Instance[][] splitInstancesForTrain();
 	
-	public Instance[][] splitInstancesForTest() {
+	public Instance[][] splitInstancesForTest(Instance[] testInsts) {
 		
-		System.err.println("#instances="+this._allInstances.length);
+		System.err.println("#instances="+testInsts.length);
 		
 		Instance[][] insts = new Instance[this._numThreads][];
 
@@ -110,8 +110,8 @@ public abstract class NetworkModel implements Serializable{
 		}
 		
 		threadId = 0;
-		for(int k = 0; k<this._allInstances.length; k++){
-			Instance inst = this._allInstances[k];
+		for(int k = 0; k< testInsts.length; k++){
+			Instance inst = testInsts[k];
 			insts_list.get(threadId).add(inst);
 			threadId = (threadId+1)%this._numThreads;
 		}
@@ -134,6 +134,10 @@ public abstract class NetworkModel implements Serializable{
 	}
 	
 	public void train(Instance[] allInstances, int trainLength, int maxNumIterations) throws InterruptedException{
+		train(allInstances, allInstances.length, maxNumIterations, null, null);
+	}
+	
+	public void train(Instance[] allInstances, int trainLength, int maxNumIterations, Instance[] testInsts, String modelFile) throws InterruptedException{
 		
 		this._numThreads = NetworkConfig.NUM_THREADS;
 		
@@ -191,15 +195,15 @@ public abstract class NetworkModel implements Serializable{
 			try {
 				in = new ObjectInputStream(new FileInputStream(NetworkConfig.WEIGHTS_FILE));
 				savedWeights =(double[])in.readObject();
+				savedInternalNeuralWeights = (double[])in.readObject();
 				in.close();
 			} catch (IOException | ClassNotFoundException e) {
 				e.printStackTrace();
 			}
 			System.err.println("[Info] CRF weights is read.");
 			if (NetworkConfig.CONTINUE_TRAINING) {
-				for (int w = 0; w < this._fm.getParam_G()._weights.length; w++) {
-					this._fm.getParam_G().overRideWeight(w, savedWeights[w]);
-				}
+				this._fm.getParam_G().setWeights(savedWeights.clone());
+				this.nnController.setInternalNeuralWeights(savedInternalNeuralWeights);
 			} else {
 				for (int w = 0; w < this._fm.getParam_G()._weights.length; w++) {
 					if (!this._fm.getParam_G().getFeatureRep(w)[0].startsWith("neural") && !this._fm.getParam_G().getFeatureRep(w)[0].equals(GlobalNetworkParam.DUMP_TYPE)) {
@@ -238,6 +242,7 @@ public abstract class NetworkModel implements Serializable{
 			int batchId = 0;
 			int epochNum = 0;
 			double epochObj = 0.0;
+			double bestScore = 0;
 			for(int it = 0; it<=maxNumIterations; it++){
 				//at each iteration, shuffle the inst ids. and reset the set, which is already in the learner thread
 				if(NetworkConfig.USE_BATCH_TRAINING){
@@ -298,11 +303,34 @@ public abstract class NetworkModel implements Serializable{
 						nnController.forwardNetwork(false);
 					}
 				}
-				if (NetworkConfig.READ_DEP_WEIGHTS) {
-					for (int w = 0; w < this._fm.getParam_G()._weights.length; w++) {
-						if (!this._fm.getParam_G().getFeatureRep(w)[0].startsWith("neural") && !this._fm.getParam_G().getFeatureRep(w)[0].equals(GlobalNetworkParam.DUMP_TYPE)) {
-							this._fm.getParam_G().overRideWeight(w, savedWeights[w]);
+//				if (NetworkConfig.READ_DEP_WEIGHTS) {
+//					for (int w = 0; w < this._fm.getParam_G()._weights.length; w++) {
+//						if (!this._fm.getParam_G().getFeatureRep(w)[0].startsWith("neural") && !this._fm.getParam_G().getFeatureRep(w)[0].equals(GlobalNetworkParam.DUMP_TYPE)) {
+//							this._fm.getParam_G().overRideWeight(w, savedWeights[w]);
+//						}
+//					}
+//				}
+				if (testInsts != null && NetworkConfig.EVAL_PER_ITERS > 0) {
+					if ( (it + 1) % NetworkConfig.EVAL_PER_ITERS == 0) {
+						Instance[] prediction = this.decode(testInsts);
+						try {
+							double score = Evaluator.evalDP(prediction, null);
+							if (score > bestScore) {
+								print("Better than previous best: " + bestScore+" Saving the model...", outstreams);
+								bestScore = score;
+								if (modelFile != null) {
+									ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
+									out.writeObject(this);
+									out.close();
+								}
+							}
+						} catch (IOException e) {
+							e.printStackTrace();
 						}
+						for(int threadId = 0; threadId<this._numThreads; threadId++){
+							this._fm.setLocalNetworkParams(threadId, this._learners[threadId].getLocalNetworkParam());
+						}
+						
 					}
 				}
 				if(lastIter){
@@ -313,6 +341,7 @@ public abstract class NetworkModel implements Serializable{
 					print("Training completes. No significant progress (<objtol) after "+it+" iterations.", outstreams);
 					break;
 				}
+				
 			}
 		} finally {
 			pool.shutdown();
@@ -323,6 +352,7 @@ public abstract class NetworkModel implements Serializable{
 				System.err.println("Saving the weights");
 				out = new ObjectOutputStream(new FileOutputStream(NetworkConfig.WEIGHTS_FILE));
 				out.writeObject(this._fm.getParam_G()._weights);
+				out.writeObject(this.nnController.getInternalNeuralWeights());
 				out.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -420,14 +450,14 @@ public abstract class NetworkModel implements Serializable{
 		Instance[] results = new Instance[allInstances.length];
 		
 		//all the instances.
-		this._allInstances = allInstances;
+		//this._allInstances = allInstances;
 		
 		//create the threads.
 		if(this._decoders == null || !cacheFeatures){
 			this._decoders = new LocalNetworkDecoderThread[this._numThreads];
 		}
 		
-		Instance[][] insts = this.splitInstancesForTest();
+		Instance[][] insts = this.splitInstancesForTest(allInstances);
 		
 		//distribute the works into different threads.
 		for(int threadId = 0; threadId<this._numThreads; threadId++){

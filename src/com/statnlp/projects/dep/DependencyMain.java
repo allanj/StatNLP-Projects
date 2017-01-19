@@ -83,7 +83,7 @@ public class DependencyMain {
 		String dpOut = DPConfig.data_prefix+modelType+middle+DPConfig.dp_res_suffix;
 		String topKDepOut = DPConfig.data_prefix+modelType+middle+DPConfig.dp_topk_res_suffix;
 		String ef = entityFeature ? "ef":"noef";
-		modelFile = DPConfig.data_prefix+modelType+middle+"."+ef+".dep.model";
+		modelFile = saveModel || readModel ? DPConfig.data_prefix+modelType+middle+"."+ef+".dep.model" : null;
 		testFile = isDev? DPConfig.devPath:DPConfig.testingPath;
 		
 		if(isPipe) {
@@ -135,7 +135,7 @@ public class DependencyMain {
 		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
 		//NetworkConfig.SAVE_DEP_WEIGHTS = false;
 		//NetworkConfig.READ_DEP_WEIGHTS = true;
-		NetworkConfig.WEIGHTS_FILE = "data/weights";
+		NetworkConfig.WEIGHTS_FILE = "data/allanprocess/"+DPConfig.dataType+"/weights";
 		System.err.println("[Info] Regularization Parameter: "+NetworkConfig.L2_REGULARIZATION_CONSTANT);
 		
 		DependInstance all_instances[] = new DependInstance[trainingInsts.length+testingInsts.length];
@@ -162,12 +162,13 @@ public class DependencyMain {
 			DependencyNetworkCompiler dnc = new DependencyNetworkCompiler(labeledDep);
 			model = DiscriminativeNetworkModel.create(dfm, dnc);
 	        if(NetworkConfig.USE_NEURAL_FEATURES){
-				model.train(all_instances, trainingInsts.length, numIteration);
+				model.train(all_instances, trainingInsts.length, numIteration, testingInsts, modelFile);
 			}else{
 				model.train(trainingInsts, numIteration);
 			}
 		}
-		if (saveModel) {
+		//if eval per iteration is larger than 1, then it alreadys saving model.
+		if (saveModel && NetworkConfig.EVAL_PER_ITERS == 0) {
 			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(modelFile));
 			out.writeObject(model);
 			out.close();
@@ -223,9 +224,9 @@ public class DependencyMain {
 					case "-windowSize": windowSize = Integer.valueOf(args[i+1]); break;
 					case "-neural": if(args[i+1].equals("true")){ 
 										NetworkConfig.USE_NEURAL_FEATURES = true; 
-										NetworkConfig.OPTIMIZE_NEURAL = true; //optimize the neural features in CRF
+										NetworkConfig.OPTIMIZE_NEURAL = false; //optimize the neural features in CRF
 										NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
-										NetworkConfig.REGULARIZE_NEURAL_FEATURES = false; // Regularized the neural features in CRF or not
+										NetworkConfig.REGULARIZE_NEURAL_FEATURES = false; // Regularized the neural features in /ad or not
 									} break; 
 					case "-basicf": basicFeatures = args[i+1].equals("true") ? true : false; break;
 					case "-entityf": entityFeature = args[i+1].equals("true") ? true : false; break;
@@ -236,6 +237,8 @@ public class DependencyMain {
 										i = i + 1;
 									} else if (args[i+1].equals("adam")) {
 										optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaM(0.001, 0.9, 0.95, 1.0e-7);
+									} else if (args[i+1].equals("adadelta")) {
+										optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaDelta();
 									} else {
 										throw new RuntimeException ("Unknown optimizer: " + args[i+1]);
 									}
@@ -243,6 +246,7 @@ public class DependencyMain {
 					case "-saveWeights": NetworkConfig.SAVE_DEP_WEIGHTS = args[i+1].equals("true") ? true : false; break;
 					case "-readWeights": NetworkConfig.READ_DEP_WEIGHTS = args[i+1].equals("true") ? true : false; break;
 					case "-continueTrain": NetworkConfig.CONTINUE_TRAINING = args[i+1].equals("true") ? true : false; break;
+					case "-evalIters": NetworkConfig.EVAL_PER_ITERS = Integer.valueOf(args[i+1]); break;
 					default: System.err.println("Invalid argument " + args[i] + ", please check usage."); System.err.println(usage);System.exit(0);
 				}
 			}
