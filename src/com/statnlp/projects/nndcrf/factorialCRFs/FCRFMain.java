@@ -64,19 +64,19 @@ public class FCRFMain {
 		List<FCRFInstance> testInstances = null;
 		/***********DEBUG*****************/
 		trainFile = "data/conll2000/train.txt";
-//		trainNumber = 1000;
+		trainNumber = 20;
 		testFile = "data/conll2000/test.txt";;
-//		testNumber = 1000;
+		testNumber = 20;
 //		numIteration = 1000;   
 //		testFile = trainFile;
-//		NetworkConfig.MAX_MF_UPDATES = 50;
-//		useJointFeatures = true;
-//		task = TASK.JOINT;
+		NetworkConfig.MAX_MF_UPDATES = 4;
+		useJointFeatures = true;
+		task = TASK.JOINT;
 		IOBESencoding = true;
 		saveModel = false;
-		modelFile = "data/conll2000/model";
-		useExistingModel = true;
-		npchunking = false;
+		//modelFile = "data/conll2000/model";
+		useExistingModel = false;
+		npchunking = true;
 		FCRFConfig.l2val = 0.01;
 		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
 		NetworkConfig.RANDOM_INIT_FEATURE_SEED = randomSeed;
