@@ -1108,9 +1108,9 @@ public abstract class Network implements Serializable, HyperGraph{
 				HashSet<Integer> set = fIdx2DstNode.get(fIdx);
 				//if(this.getInstance().isLabeled() && src2fIdx2Dst.get(srcNode).containsKey(fIdx))
 				if(this.getInstance().isLabeled() && set.contains(dstNode)) {
-					System.err.println("src " + srcNode + " : " + Arrays.toString(this.getNodeArray(srcNode)));
-					System.err.println("tgt " + dstNode + " : " + Arrays.toString(this.getNodeArray(dstNode)));
-					throw new RuntimeException("repeated?");
+//					System.err.println("src " + srcNode + " : " + Arrays.toString(this.getNodeArray(srcNode)));
+//					System.err.println("tgt " + dstNode + " : " + Arrays.toString(this.getNodeArray(dstNode)));
+					throw new RuntimeException("Instance " + this.getInstance().getInstanceId() + ":repeated?");
 				}
 			} else {
 				HashSet<Integer> set = new HashSet<Integer>();

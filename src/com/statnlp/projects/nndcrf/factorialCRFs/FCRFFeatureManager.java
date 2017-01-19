@@ -49,16 +49,9 @@ public class FCRFFeatureManager extends FeatureManager {
 		tag_cap_ll, 
 		tag_cap_r, 
 		tag_cap_rr, 
-		e_joint1,
-		t_joint1,
-		e_joint2,
-		t_joint2,
-		e_joint3,
-		t_joint3,
-		e_joint4,
-		t_joint4,
-		e_joint5,
-		t_joint5,
+		joint1,
+		joint2,
+		joint3,
 		neural
 		};
 	
@@ -286,11 +279,11 @@ public class FCRFFeatureManager extends FeatureManager {
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 				if (unlabeledDstNodeIdx >= 0) {
 //					jf0 = this._param_g.toFeature(network, FEATYPE.e_joint.name(), currLabel + "&" + tag, "");
-					jf1 = this._param_g.toFeature(network, FEATYPE.e_joint1.name(), currLabel + "&" + tag, w);
-					jf2 = this._param_g.toFeature(network, FEATYPE.e_joint2.name(), currLabel + "&" + tag, lw);
-					jf3 = this._param_g.toFeature(network, FEATYPE.e_joint3.name(), currLabel + "&" + tag, rw);
-					jf4 = this._param_g.toFeature(network, FEATYPE.e_joint4.name(), currLabel + "&" + tag, llw);
-					jf5 = this._param_g.toFeature(network, FEATYPE.e_joint5.name(), currLabel + "&" + tag, rrw);
+					jf1 = this._param_g.toFeature(network, FEATYPE.joint1.name(), currLabel + "&" + tag, w);
+					jf2 = this._param_g.toFeature(network, FEATYPE.joint2.name(), currLabel + "&" + tag, lw);
+					jf3 = this._param_g.toFeature(network, FEATYPE.joint3.name(), currLabel + "&" + tag, rw);
+//					jf4 = this._param_g.toFeature(network, FEATYPE.e_joint4.name(), currLabel + "&" + tag, llw);
+//					jf5 = this._param_g.toFeature(network, FEATYPE.e_joint5.name(), currLabel + "&" + tag, rrw);
 //					if(jf0 != -1){
 //						featureList.add(jf0); network.putJointFeature(parent_k, jf0, unlabeledDstNodeIdx);
 //					}
@@ -303,12 +296,12 @@ public class FCRFFeatureManager extends FeatureManager {
 					if(jf3 != -1){
 						featureList.add(jf3); network.putJointFeature(parent_k, jf3, unlabeledDstNodeIdx);
 					}
-					if(jf4 != -1){
-						featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
-					}
-					if(jf5 != -1){
-						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
-					}
+//					if(jf4 != -1){
+//						featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
+//					}
+//					if(jf5 != -1){
+//						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
+//					}
 				}
 			}
 			
@@ -325,11 +318,11 @@ public class FCRFFeatureManager extends FeatureManager {
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 				if (unlabeledDstNodeIdx >= 0) {
 //					jf0 = this._param_g.toFeature(network, FEATYPE.t_joint.name(), chunk + "&" + currLabel, "");
-					jf1 = this._param_g.toFeature(network, FEATYPE.t_joint1.name(), chunk + "&" + currLabel, w);
-					jf2 = this._param_g.toFeature(network, FEATYPE.t_joint2.name(), chunk + "&" + currLabel, lw);
-					jf3 = this._param_g.toFeature(network, FEATYPE.t_joint3.name(), chunk + "&" + currLabel, rw);
-					jf4 = this._param_g.toFeature(network, FEATYPE.t_joint4.name(), chunk + "&" + currLabel, llw);
-					jf5 = this._param_g.toFeature(network, FEATYPE.t_joint5.name(), chunk + "&" + currLabel, rrw);
+					jf1 = this._param_g.toFeature(network, FEATYPE.joint1.name(), chunk + "&" + currLabel, w);
+					jf2 = this._param_g.toFeature(network, FEATYPE.joint2.name(), chunk + "&" + currLabel, lw);
+					jf3 = this._param_g.toFeature(network, FEATYPE.joint3.name(), chunk + "&" + currLabel, rw);
+//					jf4 = this._param_g.toFeature(network, FEATYPE.t_joint4.name(), chunk + "&" + currLabel, llw);
+//					jf5 = this._param_g.toFeature(network, FEATYPE.t_joint5.name(), chunk + "&" + currLabel, rrw);
 //					if(jf0 != -1){
 //						featureList.add(jf0); network.putJointFeature(parent_k, jf0, unlabeledDstNodeIdx);
 //					}
@@ -342,12 +335,12 @@ public class FCRFFeatureManager extends FeatureManager {
 					if(jf3 != -1){
 						featureList.add(jf3); network.putJointFeature(parent_k, jf3, unlabeledDstNodeIdx);
 					}
-					if(jf4 != -1){
-						featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
-					}
-					if(jf5 != -1){
-						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
-					}
+//					if(jf4 != -1){
+//						featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
+//					}
+//					if(jf5 != -1){
+//						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
+//					}
 				}
 			}
 			
