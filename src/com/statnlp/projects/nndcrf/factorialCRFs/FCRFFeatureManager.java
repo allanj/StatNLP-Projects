@@ -52,7 +52,9 @@ public class FCRFFeatureManager extends FeatureManager {
 		joint1,
 		joint2,
 		joint3,
-		neural
+		joint4,
+		joint5,
+		neural_1
 		};
 	
 		
@@ -169,19 +171,17 @@ public class FCRFFeatureManager extends FeatureManager {
 		
 		if(NetworkConfig.USE_NEURAL_FEATURES){
 			if(windowSize == 5)
-				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), currEn, llw.toLowerCase()+IN_SEP+
+				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, llw.toLowerCase()+IN_SEP+
 																						lw.toLowerCase()+IN_SEP+
 																						currWord.toLowerCase()+IN_SEP+
 																						rw.toLowerCase()+IN_SEP+
-																						rrw.toLowerCase()+OUT_SEP+
-																						llcaps+IN_SEP+lcaps+IN_SEP+currCaps+IN_SEP+rcaps+IN_SEP+rrcaps));
+																						rrw.toLowerCase()));
 			else if(windowSize == 3)
-				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), currEn, lw.toLowerCase()+IN_SEP+
+				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, lw.toLowerCase()+IN_SEP+
 						currWord.toLowerCase()+IN_SEP+
-						rw.toLowerCase()+OUT_SEP+
-						lcaps+IN_SEP+currCaps+IN_SEP+rcaps));
+						rw.toLowerCase()));
 			else if(windowSize == 1)
-				featureList.add(this._param_g.toFeature(network, FEATYPE.neural.name(), currEn, currWord.toLowerCase() + OUT_SEP + currCaps));
+				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, currWord.toLowerCase()));
 			else throw new RuntimeException("Unknown window size: "+windowSize);
 		}
 	}
@@ -229,17 +229,15 @@ public class FCRFFeatureManager extends FeatureManager {
 		
 		if(NetworkConfig.USE_NEURAL_FEATURES){
 			if(windowSize==1)
-				featureList.add(this._param_g.toFeature(network,FEATYPE.neural.name(), currTag,  w.toLowerCase()+OUT_SEP+caps));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currTag,  w.toLowerCase()));
 			else if(windowSize==3)
-				featureList.add(this._param_g.toFeature(network,FEATYPE.neural.name(), currTag,  lw.toLowerCase()+IN_SEP+w.toLowerCase()
-																							+IN_SEP+rw.toLowerCase()+OUT_SEP+
-																							lcaps+IN_SEP+caps+IN_SEP+rcaps));
+				featureList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currTag,  lw.toLowerCase()+IN_SEP+w.toLowerCase()
+																							+IN_SEP+rw.toLowerCase()));
 			else if(windowSize==5)
-				featureList.add(this._param_g.toFeature(network,FEATYPE.neural.name(), currTag,  llw.toLowerCase()+IN_SEP+
+				featureList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currTag,  llw.toLowerCase()+IN_SEP+
 																							lw.toLowerCase()+IN_SEP+w.toLowerCase()
 																							+IN_SEP+rw.toLowerCase()+IN_SEP+
-																							rrw.toLowerCase()+OUT_SEP+
-																							llcaps+IN_SEP+lcaps+IN_SEP+caps+IN_SEP+rcaps+IN_SEP+rrcaps));
+																							rrw.toLowerCase()));
 			else throw new RuntimeException("Unknown window size: "+windowSize);
 		}
 	}
@@ -282,8 +280,8 @@ public class FCRFFeatureManager extends FeatureManager {
 					jf1 = this._param_g.toFeature(network, FEATYPE.joint1.name(), currLabel + "&" + tag, w);
 					jf2 = this._param_g.toFeature(network, FEATYPE.joint2.name(), currLabel + "&" + tag, lw);
 					jf3 = this._param_g.toFeature(network, FEATYPE.joint3.name(), currLabel + "&" + tag, rw);
-//					jf4 = this._param_g.toFeature(network, FEATYPE.e_joint4.name(), currLabel + "&" + tag, llw);
-//					jf5 = this._param_g.toFeature(network, FEATYPE.e_joint5.name(), currLabel + "&" + tag, rrw);
+//					jf4 = this._param_g.toFeature(network, FEATYPE.joint4.name(), currLabel + "&" + tag, llw);
+//					jf5 = this._param_g.toFeature(network, FEATYPE.joint5.name(), currLabel + "&" + tag, rrw);
 //					if(jf0 != -1){
 //						featureList.add(jf0); network.putJointFeature(parent_k, jf0, unlabeledDstNodeIdx);
 //					}
@@ -302,6 +300,20 @@ public class FCRFFeatureManager extends FeatureManager {
 //					if(jf5 != -1){
 //						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
 //					}
+					
+					if(NetworkConfig.USE_NEURAL_FEATURES){
+						if(windowSize==1)
+							featureList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currLabel + "&" + tag,  w.toLowerCase()));
+						else if(windowSize==3)
+							featureList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currLabel + "&" + tag,  lw.toLowerCase()+IN_SEP+w.toLowerCase()
+																										+IN_SEP+rw.toLowerCase()));
+						else if(windowSize==5)
+							featureList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currLabel + "&" + tag,  llw.toLowerCase()+IN_SEP+
+																										lw.toLowerCase()+IN_SEP+w.toLowerCase()
+																										+IN_SEP+rw.toLowerCase()+IN_SEP+
+																										rrw.toLowerCase()));
+						else throw new RuntimeException("Unknown window size: "+windowSize);
+					}
 				}
 			}
 			
@@ -321,8 +333,8 @@ public class FCRFFeatureManager extends FeatureManager {
 					jf1 = this._param_g.toFeature(network, FEATYPE.joint1.name(), chunk + "&" + currLabel, w);
 					jf2 = this._param_g.toFeature(network, FEATYPE.joint2.name(), chunk + "&" + currLabel, lw);
 					jf3 = this._param_g.toFeature(network, FEATYPE.joint3.name(), chunk + "&" + currLabel, rw);
-//					jf4 = this._param_g.toFeature(network, FEATYPE.t_joint4.name(), chunk + "&" + currLabel, llw);
-//					jf5 = this._param_g.toFeature(network, FEATYPE.t_joint5.name(), chunk + "&" + currLabel, rrw);
+//					jf4 = this._param_g.toFeature(network, FEATYPE.joint4.name(), chunk + "&" + currLabel, llw);
+//					jf5 = this._param_g.toFeature(network, FEATYPE.joint5.name(), chunk + "&" + currLabel, rrw);
 //					if(jf0 != -1){
 //						featureList.add(jf0); network.putJointFeature(parent_k, jf0, unlabeledDstNodeIdx);
 //					}
@@ -341,6 +353,19 @@ public class FCRFFeatureManager extends FeatureManager {
 //					if(jf5 != -1){
 //						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
 //					}
+					if(NetworkConfig.USE_NEURAL_FEATURES){
+						if(windowSize==1)
+							featureList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), chunk + "&" + currLabel,  w.toLowerCase()));
+						else if(windowSize==3)
+							featureList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), chunk + "&" + currLabel,  lw.toLowerCase()+IN_SEP+w.toLowerCase()
+																										+IN_SEP+rw.toLowerCase()));
+						else if(windowSize==5)
+							featureList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), chunk + "&" + currLabel,  llw.toLowerCase()+IN_SEP+
+																										lw.toLowerCase()+IN_SEP+w.toLowerCase()
+																										+IN_SEP+rw.toLowerCase()+IN_SEP+
+																										rrw.toLowerCase()));
+						else throw new RuntimeException("Unknown window size: "+windowSize);
+					}
 				}
 			}
 			

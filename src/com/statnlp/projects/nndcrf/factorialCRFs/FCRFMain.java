@@ -39,7 +39,7 @@ public class FCRFMain {
 	public static boolean npchunking = true;
 	/** Cascaded CRF option. **/
 	public static boolean cascade = false;
-	public static int windowSize = 5;
+	public static int windowSize = 1;
 	public static String modelFile = "data/conll2000/model";
 	/** The option to save model **/
 	public static boolean saveModel = false;
