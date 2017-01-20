@@ -202,7 +202,7 @@ public class NNCRFGlobalNetworkParam extends NNCRFInterface {
 								fieldMap.put(elements[j], fieldIdx);
 								inputDimList.set(i, inputDimList.get(i)+1);
 								if (NeuralConfig.EMBEDDING.get(i).equals("glove")
-								|| NeuralConfig.EMBEDDING.get(i).equals("polyglot")) {
+								|| NeuralConfig.EMBEDDING.get(i).equals("polyglot") || NeuralConfig.EMBEDDING.get(i).equals("bansal") ) {
 									wordList.add(elements[j]);
 								}
 							}
