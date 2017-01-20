@@ -296,15 +296,14 @@ public class DependencyFeatureManager extends FeatureManager {
 				String rw = sent.get(rightIndex).getName().toLowerCase();
 				String lt = sent.get(leftIndex).getTag();
 				String rt = sent.get(rightIndex).getTag();
-				this._param_g.toFeature(network, FeaType.neural_1.name(), "head", headWord.toLowerCase());
-				this._param_g.toFeature(network, FeaType.neural_1.name(), "modifier", modifierWord.toLowerCase());
+				this._param_g.toFeature(network, FeaType.neural_1.name(), att, lw.toLowerCase() + insep + rw.toLowerCase());
+				//this._param_g.toFeature(network, FeaType.neural_1.name(), "modifier", modifierWord.toLowerCase());
 			} 
 			if (NetworkConfig.READ_DEP_WEIGHTS) {
 				if (NetworkConfig.USE_NEURAL_FEATURES) {
 					String lw = sent.get(leftIndex).getName().toLowerCase();
 					String rw = sent.get(rightIndex).getName().toLowerCase();
-					neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), "head", headWord.toLowerCase()));
-					neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), "modifier", modifierWord.toLowerCase()));
+					neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, lw.toLowerCase() + insep + rw.toLowerCase()));
 				}
 			}
 			
@@ -315,8 +314,7 @@ public class DependencyFeatureManager extends FeatureManager {
 				String rw = sent.get(rightIndex).getName().toLowerCase();
 				String rlw = rightIndex - 1 >= 1 ? sent.get(rightIndex - 1).getName().toLowerCase() : "unk";
 				String rrw = rightIndex + 1 < sent.length() ? sent.get(rightIndex + 1).getName().toLowerCase(): "unk";
-				neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), "head", headWord.toLowerCase()));
-				neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), "modifier", modifierWord.toLowerCase()));
+				neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, lw.toLowerCase() + insep + rw.toLowerCase()));
 				//neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, llw + insep + lw + insep + lrw + insep + rlw + insep + rw + insep + rrw));
 			}
 			
