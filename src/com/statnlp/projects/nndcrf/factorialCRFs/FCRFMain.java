@@ -65,19 +65,19 @@ public class FCRFMain {
 		List<FCRFInstance> testInstances = null;
 		/***********DEBUG*****************/
 		trainFile = "data/conll2000/train.txt";
-//		trainNumber = 1000;
+//		trainNumber = 2;
 		testFile = "data/conll2000/test.txt";;
-//		testNumber = 1000;
+//		testNumber = 2;
 //		numIteration = 1000;   
 //		testFile = trainFile;
-//		NetworkConfig.MAX_MF_UPDATES = 50;
+//		NetworkConfig.MAX_MF_UPDATES = 6;
 //		useJointFeatures = true;
 //		task = TASK.JOINT;
 		IOBESencoding = true;
-		saveModel = true;
-		modelFile = "data/conll2000/model";
-		useExistingModel = false;
-		npchunking = false;
+//		saveModel = false;
+		//modelFile = "data/conll2000/model";
+//		useExistingModel = false;
+		npchunking = true;
 		FCRFConfig.l2val = 0.01;
 		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
 		NetworkConfig.RANDOM_INIT_FEATURE_SEED = randomSeed;
@@ -132,13 +132,9 @@ public class FCRFMain {
 		NetworkConfig.INFERENCE = task == TASK.JOINT ? InferenceType.MEAN_FIELD : InferenceType.FORWARD_BACKWARD;
 		
 		/***Neural network Configuration**/
-		NetworkConfig.USE_NEURAL_FEATURES = false; 
+//		NetworkConfig.USE_NEURAL_FEATURES = false; 
 		if(NetworkConfig.USE_NEURAL_FEATURES)
 			NeuralConfigReader.readConfig(neural_config);
-		NetworkConfig.OPTIMIZE_NEURAL = false;  //false: optimize in neural network
-		NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
-		NetworkConfig.REGULARIZE_NEURAL_FEATURES = false; //true means regularize in the crf part
-		NeuralConfig.NUM_NEURAL_NETS = 2;
 		/****/
 		
 		GlobalNetworkParam param_g = null; 
@@ -267,6 +263,14 @@ public class FCRFMain {
 									}
 									i = i + 1;
 								break;
+					case "-neural": if(args[i+1].equals("true")){ 
+						NetworkConfig.USE_NEURAL_FEATURES = true;
+						NetworkConfig.OPTIMIZE_NEURAL = true;  //false: optimize in neural network
+						NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
+						NetworkConfig.REGULARIZE_NEURAL_FEATURES = true; //true means regularize in the crf part
+						NeuralConfig.NUM_NEURAL_NETS = 1;
+					}
+					break;
 					default: System.err.println("Invalid arguments :"+args[i]+", please check usage."); System.exit(0);
 				}
 			}

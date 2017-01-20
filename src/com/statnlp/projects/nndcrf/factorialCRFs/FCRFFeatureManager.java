@@ -22,6 +22,7 @@ public class FCRFFeatureManager extends FeatureManager {
 	private boolean useJointFeatures;
 	private String OUT_SEP = NeuralConfig.OUT_SEP; 
 	private String IN_SEP = NeuralConfig.IN_SEP;
+	private String UNK = "unk";
 	
 	private int windowSize;
 	private boolean cascade;
@@ -48,18 +49,12 @@ public class FCRFFeatureManager extends FeatureManager {
 		tag_cap_ll, 
 		tag_cap_r, 
 		tag_cap_rr, 
-		e_joint1,
-		t_joint1,
-		e_joint2,
-		t_joint2,
-		e_joint3,
-		t_joint3,
-		e_joint4,
-		t_joint4,
-		e_joint5,
-		t_joint5,
-		neural_1,
-		neural_2
+		joint1,
+		joint2,
+		joint3,
+		joint4,
+		joint5,
+		neural_1
 		};
 	
 		
@@ -137,13 +132,13 @@ public class FCRFFeatureManager extends FeatureManager {
 	}
 	
 	private void addChunkFeatures(ArrayList<Integer> featureList,Network network, Sentence sent, int pos, int eId){
-		String lw = pos>0? sent.get(pos-1).getName():"<PAD>";
+		String lw = pos>0? sent.get(pos-1).getName():UNK;
 		String lcaps = capsF(lw);
-		String llw = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getName();
+		String llw = pos==0? UNK: pos==1? "unk":sent.get(pos-2).getName();
 		String llcaps = capsF(llw);
-		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"<PAD>";
+		String rw = pos<sent.length()-1? sent.get(pos+1).getName():UNK;
 		String rcaps = capsF(rw);
-		String rrw = pos==sent.length()-1? "<PAD>": pos==sent.length()-2? "<PAD>":sent.get(pos+2).getName();
+		String rrw = pos==sent.length()-1? UNK: pos==sent.length()-2? UNK:sent.get(pos+2).getName();
 		String rrcaps = capsF(rrw);
 		String currWord = sent.get(pos).getName();
 		String currEn = Chunk.get(eId).getForm();
@@ -154,12 +149,12 @@ public class FCRFFeatureManager extends FeatureManager {
 		featureList.add(this._param_g.toFeature(network,FEATYPE.chunk_leftWord2.name(), 	currEn,	llw));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.chunk_rightWord1.name(), 	currEn,	rw));
 		featureList.add(this._param_g.toFeature(network,FEATYPE.chunk_rightWord2.name(), 	currEn,	rrw));
-		
-		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap.name(), 		currEn,  currCaps));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_l.name(), 	currEn,  lcaps));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_ll.name(), 	currEn,  llcaps));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_r.name(), 	currEn,  rcaps));
-		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_rr.name(),	currEn,  rrcaps));
+//		
+//		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap.name(), 		currEn,  currCaps));
+//		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_l.name(), 	currEn,  lcaps));
+//		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_ll.name(), 	currEn,  llcaps));
+//		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_r.name(), 	currEn,  rcaps));
+//		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_rr.name(),	currEn,  rrcaps));
 		
 		if(task == TASK.CHUNKING && cascade){
 //			String llt = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getTag();
@@ -174,24 +169,21 @@ public class FCRFFeatureManager extends FeatureManager {
 //			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_rightWord2.name(), currEn,  rrt));
 		}
 		
-		if(NetworkConfig.USE_NEURAL_FEATURES){
-			if(windowSize == 5)
-				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, llw.toLowerCase()+IN_SEP+
-																						lw.toLowerCase()+IN_SEP+
-																						currWord.toLowerCase()+IN_SEP+
-																						rw.toLowerCase()+IN_SEP+
-																						rrw.toLowerCase()+OUT_SEP+
-																						llcaps+IN_SEP+lcaps+IN_SEP+currCaps+IN_SEP+rcaps+IN_SEP+rrcaps));
-			else if(windowSize == 3)
-				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, lw.toLowerCase()+IN_SEP+
-						currWord.toLowerCase()+IN_SEP+
-						rw.toLowerCase()+OUT_SEP+
-						lcaps+IN_SEP+currCaps+IN_SEP+rcaps));
-			else if(windowSize == 1)
-				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, currWord.toLowerCase()+OUT_SEP+currCaps));
-			
-			else throw new RuntimeException("Unknown window size: "+windowSize);
-		}
+//		if(NetworkConfig.USE_NEURAL_FEATURES){
+//			if(windowSize == 5)
+//				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, llw.toLowerCase()+IN_SEP+
+//																						lw.toLowerCase()+IN_SEP+
+//																						currWord.toLowerCase()+IN_SEP+
+//																						rw.toLowerCase()+IN_SEP+
+//																						rrw.toLowerCase()));
+//			else if(windowSize == 3)
+//				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, lw.toLowerCase()+IN_SEP+
+//						currWord.toLowerCase()+IN_SEP+
+//						rw.toLowerCase()));
+//			else if(windowSize == 1)
+//				featureList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, currWord.toLowerCase()));
+//			else throw new RuntimeException("Unknown window size: "+windowSize);
+//		}
 	}
 
 	private void addPOSFeatures(ArrayList<Integer> featureList, Network network, Sentence sent, int pos, int tId){
@@ -235,21 +227,19 @@ public class FCRFFeatureManager extends FeatureManager {
 		}
 		
 		
-		if(NetworkConfig.USE_NEURAL_FEATURES){
-			if(windowSize==1)
-				featureList.add(this._param_g.toFeature(network,FEATYPE.neural_2.name(), currTag,  w.toLowerCase()+OUT_SEP+caps));
-			else if(windowSize==3)
-				featureList.add(this._param_g.toFeature(network,FEATYPE.neural_2.name(), currTag,  lw.toLowerCase()+IN_SEP+w.toLowerCase()
-																							+IN_SEP+rw.toLowerCase()+OUT_SEP+
-																							lcaps+IN_SEP+caps+IN_SEP+rcaps));
-			else if(windowSize==5)
-				featureList.add(this._param_g.toFeature(network,FEATYPE.neural_2.name(), currTag,  llw.toLowerCase()+IN_SEP+
-																							lw.toLowerCase()+IN_SEP+w.toLowerCase()
-																							+IN_SEP+rw.toLowerCase()+IN_SEP+
-																							rrw.toLowerCase()+OUT_SEP+
-																							llcaps+IN_SEP+lcaps+IN_SEP+caps+IN_SEP+rcaps+IN_SEP+rrcaps));
-			else throw new RuntimeException("Unknown window size: "+windowSize);
-		}
+//		if(NetworkConfig.USE_NEURAL_FEATURES){
+//			if(windowSize==1)
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currTag,  w.toLowerCase()));
+//			else if(windowSize==3)
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currTag,  lw.toLowerCase()+IN_SEP+w.toLowerCase()
+//																							+IN_SEP+rw.toLowerCase()));
+//			else if(windowSize==5)
+//				featureList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currTag,  llw.toLowerCase()+IN_SEP+
+//																							lw.toLowerCase()+IN_SEP+w.toLowerCase()
+//																							+IN_SEP+rw.toLowerCase()+IN_SEP+
+//																							rrw.toLowerCase()));
+//			else throw new RuntimeException("Unknown window size: "+windowSize);
+//		}
 	}
 	
 	/**
@@ -287,11 +277,11 @@ public class FCRFFeatureManager extends FeatureManager {
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 				if (unlabeledDstNodeIdx >= 0) {
 //					jf0 = this._param_g.toFeature(network, FEATYPE.e_joint.name(), currLabel + "&" + tag, "");
-					jf1 = this._param_g.toFeature(network, FEATYPE.e_joint1.name(), currLabel + "&" + tag, w);
-					jf2 = this._param_g.toFeature(network, FEATYPE.e_joint2.name(), currLabel + "&" + tag, lw);
-					jf3 = this._param_g.toFeature(network, FEATYPE.e_joint3.name(), currLabel + "&" + tag, rw);
-					jf4 = this._param_g.toFeature(network, FEATYPE.e_joint4.name(), currLabel + "&" + tag, llw);
-					jf5 = this._param_g.toFeature(network, FEATYPE.e_joint5.name(), currLabel + "&" + tag, rrw);
+					jf1 = this._param_g.toFeature(network, FEATYPE.joint1.name(), currLabel + "&" + tag, w);
+					jf2 = this._param_g.toFeature(network, FEATYPE.joint2.name(), currLabel + "&" + tag, lw);
+					jf3 = this._param_g.toFeature(network, FEATYPE.joint3.name(), currLabel + "&" + tag, rw);
+//					jf4 = this._param_g.toFeature(network, FEATYPE.joint4.name(), currLabel + "&" + tag, llw);
+//					jf5 = this._param_g.toFeature(network, FEATYPE.joint5.name(), currLabel + "&" + tag, rrw);
 //					if(jf0 != -1){
 //						featureList.add(jf0); network.putJointFeature(parent_k, jf0, unlabeledDstNodeIdx);
 //					}
@@ -304,11 +294,30 @@ public class FCRFFeatureManager extends FeatureManager {
 					if(jf3 != -1){
 						featureList.add(jf3); network.putJointFeature(parent_k, jf3, unlabeledDstNodeIdx);
 					}
-					if(jf4 != -1){
-						featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
-					}
-					if(jf5 != -1){
-						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
+//					if(jf4 != -1){
+//						featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
+//					}
+//					if(jf5 != -1){
+//						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
+//					}
+					
+					if(NetworkConfig.USE_NEURAL_FEATURES){
+						int njf = -1;
+						if(windowSize==1) 
+							njf = this._param_g.toFeature(network,FEATYPE.neural_1.name(), currLabel + "&" + tag,  w.toLowerCase());
+						else if(windowSize==3)
+							njf =  this._param_g.toFeature(network,FEATYPE.neural_1.name(), currLabel + "&" + tag,  lw.toLowerCase()+IN_SEP+w.toLowerCase()
+																										+IN_SEP+rw.toLowerCase());
+						else if(windowSize==5)
+							njf = this._param_g.toFeature(network,FEATYPE.neural_1.name(), currLabel + "&" + tag,  llw.toLowerCase()+IN_SEP+
+																										lw.toLowerCase()+IN_SEP+w.toLowerCase()
+																										+IN_SEP+rw.toLowerCase()+IN_SEP+
+																										rrw.toLowerCase());
+						else throw new RuntimeException("Unknown window size: "+windowSize);
+						if (njf != -1) {
+							featureList.add(njf);
+							network.putJointFeature(parent_k, njf, unlabeledDstNodeIdx);
+						}
 					}
 				}
 			}
@@ -326,11 +335,11 @@ public class FCRFFeatureManager extends FeatureManager {
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 				if (unlabeledDstNodeIdx >= 0) {
 //					jf0 = this._param_g.toFeature(network, FEATYPE.t_joint.name(), chunk + "&" + currLabel, "");
-					jf1 = this._param_g.toFeature(network, FEATYPE.t_joint1.name(), chunk + "&" + currLabel, w);
-					jf2 = this._param_g.toFeature(network, FEATYPE.t_joint2.name(), chunk + "&" + currLabel, lw);
-					jf3 = this._param_g.toFeature(network, FEATYPE.t_joint3.name(), chunk + "&" + currLabel, rw);
-					jf4 = this._param_g.toFeature(network, FEATYPE.t_joint4.name(), chunk + "&" + currLabel, llw);
-					jf5 = this._param_g.toFeature(network, FEATYPE.t_joint5.name(), chunk + "&" + currLabel, rrw);
+					jf1 = this._param_g.toFeature(network, FEATYPE.joint1.name(), chunk + "&" + currLabel, w);
+					jf2 = this._param_g.toFeature(network, FEATYPE.joint2.name(), chunk + "&" + currLabel, lw);
+					jf3 = this._param_g.toFeature(network, FEATYPE.joint3.name(), chunk + "&" + currLabel, rw);
+//					jf4 = this._param_g.toFeature(network, FEATYPE.joint4.name(), chunk + "&" + currLabel, llw);
+//					jf5 = this._param_g.toFeature(network, FEATYPE.joint5.name(), chunk + "&" + currLabel, rrw);
 //					if(jf0 != -1){
 //						featureList.add(jf0); network.putJointFeature(parent_k, jf0, unlabeledDstNodeIdx);
 //					}
@@ -343,11 +352,29 @@ public class FCRFFeatureManager extends FeatureManager {
 					if(jf3 != -1){
 						featureList.add(jf3); network.putJointFeature(parent_k, jf3, unlabeledDstNodeIdx);
 					}
-					if(jf4 != -1){
-						featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
-					}
-					if(jf5 != -1){
-						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
+//					if(jf4 != -1){
+//						featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
+//					}
+//					if(jf5 != -1){
+//						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
+//					}
+					if(NetworkConfig.USE_NEURAL_FEATURES){
+						int njf = -1;
+						if(windowSize==1) 
+							njf = this._param_g.toFeature(network,FEATYPE.neural_1.name(), chunk + "&" + currLabel,  w.toLowerCase());
+						else if(windowSize==3)
+							njf =  this._param_g.toFeature(network,FEATYPE.neural_1.name(), chunk + "&" + currLabel,  lw.toLowerCase()+IN_SEP+w.toLowerCase()
+																										+IN_SEP+rw.toLowerCase());
+						else if(windowSize==5)
+							njf = this._param_g.toFeature(network,FEATYPE.neural_1.name(), chunk + "&" + currLabel,  llw.toLowerCase()+IN_SEP+
+																										lw.toLowerCase()+IN_SEP+w.toLowerCase()
+																										+IN_SEP+rw.toLowerCase()+IN_SEP+
+																										rrw.toLowerCase());
+						else throw new RuntimeException("Unknown window size: "+windowSize);
+						if (njf != -1) {
+							featureList.add(njf);
+							network.putJointFeature(parent_k, njf, unlabeledDstNodeIdx);
+						}
 					}
 				}
 			}
