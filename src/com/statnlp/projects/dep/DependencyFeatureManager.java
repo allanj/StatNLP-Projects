@@ -296,25 +296,49 @@ public class DependencyFeatureManager extends FeatureManager {
 				String rw = sent.get(rightIndex).getName().toLowerCase();
 				String lt = sent.get(leftIndex).getTag();
 				String rt = sent.get(rightIndex).getTag();
-				this._param_g.toFeature(network, FeaType.neural_1.name(), att, lw.toLowerCase() + insep + rw.toLowerCase());
-				//this._param_g.toFeature(network, FeaType.neural_1.name(), "modifier", modifierWord.toLowerCase());
+				this._param_g.toFeature(network, FeaType.neural_1.name(), att, lw + insep + rw);
+//				this._param_g.toFeature(network, FeaType.neural_1.name(), "head", headWord);
+//				this._param_g.toFeature(network, FeaType.neural_1.name(), "modifier", modifierWord);
 			} 
 			if (NetworkConfig.READ_DEP_WEIGHTS) {
 				if (NetworkConfig.USE_NEURAL_FEATURES) {
 					String lw = sent.get(leftIndex).getName().toLowerCase();
 					String rw = sent.get(rightIndex).getName().toLowerCase();
-					neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, lw.toLowerCase() + insep + rw.toLowerCase()));
+					neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, lw + insep + rw));
+//					neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), "head", headWord));
+//					neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), "modifier", modifierWord));
 				}
 			}
 			
 			if (NetworkConfig.USE_NEURAL_FEATURES && !NetworkConfig.READ_DEP_WEIGHTS && !NetworkConfig.SAVE_DEP_WEIGHTS) {
 				String lw = sent.get(leftIndex).getName().toLowerCase();
 				String llw = leftIndex - 1 >= 1 ? sent.get(leftIndex-1).getName().toLowerCase() : "unk";
+				String lllw = leftIndex - 2 >= 1 ? sent.get(leftIndex-2).getName().toLowerCase() : "unk";
 				String lrw = leftIndex + 1 < sent.length() ? sent.get(leftIndex+1).getName().toLowerCase() : "unk";
+				String lrrw = leftIndex + 2 < sent.length() ? sent.get(leftIndex+2).getName().toLowerCase() : "unk";
+				String lt = sent.get(leftIndex).getTag();
+				String llt = leftIndex - 1 >= 1 ? sent.get(leftIndex-1).getTag() : "unk";
+				String lllt = leftIndex - 2 >= 1 ? sent.get(leftIndex-2).getTag(): "unk";
+				String lrt = leftIndex + 1 < sent.length() ? sent.get(leftIndex+1).getTag(): "unk";
+				String lrrt = leftIndex + 2 < sent.length() ? sent.get(leftIndex+2).getTag(): "unk";
+				
 				String rw = sent.get(rightIndex).getName().toLowerCase();
 				String rlw = rightIndex - 1 >= 1 ? sent.get(rightIndex - 1).getName().toLowerCase() : "unk";
+				String rllw = rightIndex - 2 >= 1 ? sent.get(rightIndex - 2).getName().toLowerCase() : "unk";
 				String rrw = rightIndex + 1 < sent.length() ? sent.get(rightIndex + 1).getName().toLowerCase(): "unk";
-				neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, lw.toLowerCase() + insep + rw.toLowerCase()));
+				String rrrw = rightIndex + 2 < sent.length() ? sent.get(rightIndex + 2).getName().toLowerCase(): "unk";
+				
+				String rt = sent.get(rightIndex).getTag();
+				String rlt = rightIndex - 1 >= 1 ? sent.get(rightIndex - 1).getTag() : "unk";
+				String rllt = rightIndex - 2 >= 1 ? sent.get(rightIndex - 2).getTag() : "unk";
+				String rrt = rightIndex + 1 < sent.length() ? sent.get(rightIndex + 1).getTag() : "unk";
+				String rrrt = rightIndex + 2 < sent.length() ? sent.get(rightIndex + 2).getTag() : "unk";
+				neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, lllw + insep + llw + insep + lw + insep + lrw + insep + lrrw + outsep + 
+																								lllt + insep + llt + insep + lt + insep + lrt + insep + lrrt + outsep + 
+																								rllw + insep + rlw + insep + rw + insep + rrw + insep + rrrw + outsep + 
+																								rllt + insep + rlt + insep + rt + insep + rrt + insep + rrrt + outsep + dist));
+//				neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), "head", headWord));
+//				neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), "modifier", modifierWord));
 				//neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, llw + insep + lw + insep + lrw + insep + rlw + insep + rw + insep + rrw));
 			}
 			
