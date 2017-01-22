@@ -15,4 +15,13 @@ public class ExactConfig {
 	public static boolean windows = false;
 	
 	public static String EXACT_SEP = "\t";
+	
+	public static void concatExactLabel() {
+		for (String chunk: ChunkLabel.CHUNKS.keySet()) {
+			for (String pos : TagLabel.TAGS.keySet()) {
+				String concat = chunk + "\t" + pos;
+				ExactLabel.get(concat);
+			}
+		}
+	}
 }

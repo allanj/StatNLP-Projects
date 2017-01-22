@@ -92,6 +92,7 @@ public class ExactMain {
 		
 		ChunkLabel.lock();
 		TagLabel.lock();
+		ExactConfig.concatExactLabel();
 		
 		
 		System.err.println("chunk size:"+ChunkLabel.CHUNKS_INDEX.toString());
@@ -222,7 +223,7 @@ public class ExactMain {
 								break;
 					case "-neural": if(args[i+1].equals("true")){ 
 						NetworkConfig.USE_NEURAL_FEATURES = true;
-						NetworkConfig.OPTIMIZE_NEURAL = true;  //false: optimize in neural network
+						//NetworkConfig.OPTIMIZE_NEURAL = true;  //false: optimize in neural network
 						NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
 						NetworkConfig.REGULARIZE_NEURAL_FEATURES = true; //true means regularize in the crf part
 						NeuralConfig.NUM_NEURAL_NETS = 1;

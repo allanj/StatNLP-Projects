@@ -22,11 +22,13 @@ public class ExactEval {
 		PrintWriter pw = RAWF.writer(nerOut);
 		for(int index=0;index<testInsts.length;index++){
 			ExactInstance eInst = (ExactInstance)testInsts[index];
-			ArrayList<String> predEntities = eInst.getChunkPredictons();
-			ArrayList<String> trueEntities = eInst.getOutput();
+			ArrayList<String> prediction = eInst.getPrediction();
+			ArrayList<String> gold = eInst.getOutput();
 			Sentence sent = eInst.getInput();
 			for(int i=0;i<sent.length();i++){
-				pw.write(sent.get(i).getName()+" "+sent.get(i).getTag()+" "+trueEntities.get(i)+" "+predEntities.get(i)+"\n");
+				String[] predVals = prediction.get(i).split(ExactConfig.EXACT_SEP);
+				String[] goldVals = gold.get(i).split(ExactConfig.EXACT_SEP);
+				pw.write(sent.get(i).getName()+" "+sent.get(i).getTag()+" "+goldVals[0]+" "+predVals[0]+"\n");
 			}
 			pw.write("\n");
 		}
@@ -64,10 +66,13 @@ public class ExactEval {
 		int total = 0;
 		for(int index=0;index<testInsts.length;index++){
 			ExactInstance eInst = (ExactInstance)testInsts[index];
-			ArrayList<String> tPred = eInst.getTagPredictons();
+			ArrayList<String> prediction = eInst.getPrediction();
+			ArrayList<String> gold = eInst.getPrediction();
 			Sentence sent = eInst.getInput();
 			for(int i=0;i<sent.length();i++){
-				if(sent.get(i).getTag().equals(tPred.get(i)))
+				String[] predVals = prediction.get(i).split(ExactConfig.EXACT_SEP);
+				String[] goldVals = gold.get(i).split(ExactConfig.EXACT_SEP);
+				if(goldVals[1].equals(predVals[1]))
 					corr++;
 				total++;
 			}
