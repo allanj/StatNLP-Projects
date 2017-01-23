@@ -94,8 +94,7 @@ public class FCRFFeatureManager extends FeatureManager {
 		ArrayList<Integer> t_neuralList = new ArrayList<Integer>();
 		
 		
-		FeatureArray orgFa = new FeatureArray(FeatureBox.getFeatureBox(new int[]{}, this.getParams_L()[threadId]));
-		fa = orgFa;
+		
 		ArrayList<ArrayList<Integer>> bigList = new ArrayList<ArrayList<Integer>>();
 		if (nodeArr[1] == NODE_TYPES.ENODE.ordinal()){
 			if(pos==inst.size() || eId==(Chunk.CHUNKS.size()+Tag.TAGS.size())) return FeatureArray.EMPTY;
@@ -125,6 +124,8 @@ public class FCRFFeatureManager extends FeatureManager {
 			if (useJointFeatures) bigList.add(jointFeatureList);
 		}
 		
+		FeatureArray orgFa = new FeatureArray(FeatureBox.getFeatureBox(new int[]{}, this.getParams_L()[threadId]));
+		fa = orgFa;
 		for (int i = 0; i < bigList.size(); i++) {
 			boolean setAlwaysChange = false;
 			if (useJointFeatures && i == bigList.size() - 1) setAlwaysChange = true;
@@ -132,7 +133,7 @@ public class FCRFFeatureManager extends FeatureManager {
 			fa = curr;
 		}
 		
-		return fa;
+		return orgFa;
 	}
 	
 	private FeatureArray addNext(FeatureArray fa, ArrayList<Integer> featureList, int threadId, boolean setAlwaysChange)  {
@@ -296,8 +297,8 @@ public class FCRFFeatureManager extends FeatureManager {
 					jf1 = this._param_g.toFeature(network, FEATYPE.joint1.name(), currLabel + "&" + tag, w);
 					jf2 = this._param_g.toFeature(network, FEATYPE.joint2.name(), currLabel + "&" + tag, lw);
 					jf3 = this._param_g.toFeature(network, FEATYPE.joint3.name(), currLabel + "&" + tag, rw);
-//					jf4 = this._param_g.toFeature(network, FEATYPE.joint4.name(), currLabel + "&" + tag, llw);
-//					jf5 = this._param_g.toFeature(network, FEATYPE.joint5.name(), currLabel + "&" + tag, rrw);
+					jf4 = this._param_g.toFeature(network, FEATYPE.joint4.name(), currLabel + "&" + tag, llw);
+					jf5 = this._param_g.toFeature(network, FEATYPE.joint5.name(), currLabel + "&" + tag, rrw);
 //					if(jf0 != -1){
 //						featureList.add(jf0); network.putJointFeature(parent_k, jf0, unlabeledDstNodeIdx);
 //					}
@@ -310,12 +311,12 @@ public class FCRFFeatureManager extends FeatureManager {
 					if(jf3 != -1){
 						featureList.add(jf3); network.putJointFeature(parent_k, jf3, unlabeledDstNodeIdx);
 					}
-//					if(jf4 != -1){
-//						featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
-//					}
-//					if(jf5 != -1){
-//						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
-//					}
+					if(jf4 != -1){
+						featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
+					}
+					if(jf5 != -1){
+						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
+					}
 					
 					if(NetworkConfig.USE_NEURAL_FEATURES){
 						int njf = -1;
@@ -354,8 +355,8 @@ public class FCRFFeatureManager extends FeatureManager {
 					jf1 = this._param_g.toFeature(network, FEATYPE.joint1.name(), chunk + "&" + currLabel, w);
 					jf2 = this._param_g.toFeature(network, FEATYPE.joint2.name(), chunk + "&" + currLabel, lw);
 					jf3 = this._param_g.toFeature(network, FEATYPE.joint3.name(), chunk + "&" + currLabel, rw);
-//					jf4 = this._param_g.toFeature(network, FEATYPE.joint4.name(), chunk + "&" + currLabel, llw);
-//					jf5 = this._param_g.toFeature(network, FEATYPE.joint5.name(), chunk + "&" + currLabel, rrw);
+					jf4 = this._param_g.toFeature(network, FEATYPE.joint4.name(), chunk + "&" + currLabel, llw);
+					jf5 = this._param_g.toFeature(network, FEATYPE.joint5.name(), chunk + "&" + currLabel, rrw);
 //					if(jf0 != -1){
 //						featureList.add(jf0); network.putJointFeature(parent_k, jf0, unlabeledDstNodeIdx);
 //					}
@@ -368,12 +369,12 @@ public class FCRFFeatureManager extends FeatureManager {
 					if(jf3 != -1){
 						featureList.add(jf3); network.putJointFeature(parent_k, jf3, unlabeledDstNodeIdx);
 					}
-//					if(jf4 != -1){
-//						featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
-//					}
-//					if(jf5 != -1){
-//						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
-//					}
+					if(jf4 != -1){
+						featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
+					}
+					if(jf5 != -1){
+						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
+					}
 					if(NetworkConfig.USE_NEURAL_FEATURES){
 						int njf = -1;
 						if(windowSize==1) 
