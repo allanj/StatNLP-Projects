@@ -118,10 +118,6 @@ public class FCRFFeatureManager extends FeatureManager {
 		int[] jointFeaturesArr = new int[joint.size()];
 		for (int i = 0; i < joint.size(); i++)
 			jointFeaturesArr[i] = joint.get(i);
-//		FeatureArray jointFa = new FeatureArray(jointFeaturesArr);
-//		jointFa.setAlwaysChange();
-//		
-//		fa = new FeatureArray(features, jointFa);
 		
 		fa = new FeatureArray(FeatureBox.getFeatureBox(features, this.getParams_L()[network.getThreadId()]));
 		FeatureArray jointFa =  new FeatureArray(FeatureBox.getFeatureBox(jointFeaturesArr, this.getParams_L()[network.getThreadId()]));
@@ -132,11 +128,11 @@ public class FCRFFeatureManager extends FeatureManager {
 	}
 	
 	private void addChunkFeatures(ArrayList<Integer> featureList,Network network, Sentence sent, int pos, int eId){
-		String lw = pos>0? sent.get(pos-1).getName():UNK;
+		String lw = pos > 0? sent.get(pos-1).getName(): "STR";
 		String lcaps = capsF(lw);
-		String llw = pos==0? UNK: pos==1? "unk":sent.get(pos-2).getName();
+		String llw = pos == 0? "STR1": pos==1? "STR" : sent.get(pos-2).getName();
 		String llcaps = capsF(llw);
-		String rw = pos<sent.length()-1? sent.get(pos+1).getName():UNK;
+		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"END";
 		String rcaps = capsF(rw);
 		String rrw = pos==sent.length()-1? UNK: pos==sent.length()-2? UNK:sent.get(pos+2).getName();
 		String rrcaps = capsF(rrw);
@@ -144,29 +140,21 @@ public class FCRFFeatureManager extends FeatureManager {
 		String currEn = Chunk.get(eId).getForm();
 		String currCaps = capsF(currWord);
 		
-		featureList.add(this._param_g.toFeature(network,FEATYPE.chunk_currWord.name(), 		currEn,	currWord));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.chunk_leftWord1.name(), 	currEn,	lw));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.chunk_leftWord2.name(), 	currEn,	llw));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.chunk_rightWord1.name(), 	currEn,	rw));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.chunk_rightWord2.name(), 	currEn,	rrw));
-//		
-//		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap.name(), 		currEn,  currCaps));
-//		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_l.name(), 	currEn,  lcaps));
-//		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_ll.name(), 	currEn,  llcaps));
-//		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_r.name(), 	currEn,  rcaps));
-//		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_rr.name(),	currEn,  rrcaps));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.chunk_currWord.name(), 		currEn,	currWord.toLowerCase()));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.chunk_leftWord1.name(), 	currEn,	lw.toLowerCase()));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.chunk_leftWord2.name(), 	currEn,	llw.toLowerCase()));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.chunk_rightWord1.name(), 	currEn,	rw.toLowerCase()));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.chunk_rightWord2.name(), 	currEn,	rrw.toLowerCase()));
+		
+		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap.name(), 		currEn,  currCaps));
+		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_l.name(), 	currEn,  lcaps));
+		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_ll.name(), 	currEn,  llcaps));
+		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_r.name(), 	currEn,  rcaps));
+		featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_rr.name(),	currEn,  rrcaps));
 		
 		if(task == TASK.CHUNKING && cascade){
-//			String llt = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getTag();
-//			String lt = pos>0? sent.get(pos-1).getTag():"<PAD>";
-//			String rt = pos<sent.length()-1? sent.get(pos+1).getTag():"<PAD>";
-//			String rrt = pos==sent.length()-1? "<PAD>": pos==sent.length()-2? "<PAD>":sent.get(pos+2).getTag();
 			String currTag = sent.get(pos).getTag();
 			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_currWord.name(), 	currEn,  currTag));
-//			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_leftWord1.name(),  currEn,  lt));
-//			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_leftWord2.name(),  currEn,  llt));
-//			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_rightWord1.name(), currEn,  rt));
-//			featureList.add(this._param_g.toFeature(network, FEATYPE.tag_rightWord2.name(), currEn,  rrt));
 		}
 		
 //		if(NetworkConfig.USE_NEURAL_FEATURES){
@@ -201,11 +189,11 @@ public class FCRFFeatureManager extends FeatureManager {
 		String rrcaps = capsF(rrw);
 		
 		
-		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_currWord.name(), 	currTag,	w));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_leftWord1.name(), 	currTag,	lw));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_leftWord2.name(), 	currTag,	llw));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord1.name(), 	currTag,	rw));
-		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord2.name(), 	currTag,	rrw));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_currWord.name(), 	currTag,	w.toLowerCase()));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_leftWord1.name(), 	currTag,	lw.toLowerCase()));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_leftWord2.name(), 	currTag,	llw.toLowerCase()));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord1.name(), 	currTag,	rw.toLowerCase()));
+		featureList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord2.name(), 	currTag,	rrw.toLowerCase()));
 		
 		featureList.add(this._param_g.toFeature(network, FEATYPE.tag_cap.name(), 	currTag,  caps));
 		featureList.add(this._param_g.toFeature(network, FEATYPE.tag_cap_l.name(), 	currTag,  lcaps));
@@ -214,16 +202,8 @@ public class FCRFFeatureManager extends FeatureManager {
 		featureList.add(this._param_g.toFeature(network, FEATYPE.tag_cap_rr.name(),	currTag,  rrcaps));
 		
 		if(task == TASK.TAGGING && cascade){
-//			String lchunk = pos>0? sent.get(pos-1).getEntity():"<PAD>";
-//			String llchunk = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getEntity();
-//			String rchunk = pos<sent.length()-1? sent.get(pos+1).getEntity():"<PAD>";
-//			String rrchunk = pos==sent.length()? "<PAD>":pos==sent.length()-1? "<PAD>": pos==sent.length()-2? "<PAD>":sent.get(pos+2).getEntity();
-			String chunk = pos==sent.length()? "<PAD>":sent.get(pos).getEntity();
+			String chunk = pos == sent.length()? "<PAD>":sent.get(pos).getEntity();
 			featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_currWord.name(),	currTag,  chunk));
-//			featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_leftWord1.name(),   currTag,  lchunk));
-//			featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_leftWord2.name(), 	currTag,  llchunk));
-//			featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_rightWord1.name(),  currTag,  rchunk));
-//			featureList.add(this._param_g.toFeature(network, FEATYPE.chunk_rightWord2.name(), 	currTag,  rrchunk));
 		}
 		
 		
