@@ -224,9 +224,9 @@ public class DependencyMain {
 					case "-windowSize": windowSize = Integer.valueOf(args[i+1]); break;
 					case "-neural": if(args[i+1].equals("true")){ 
 										NetworkConfig.USE_NEURAL_FEATURES = true; 
-										NetworkConfig.OPTIMIZE_NEURAL = false; //optimize the neural features in CRF
+										NetworkConfig.OPTIMIZE_NEURAL = true; //optimize the neural features in CRF
 										NetworkConfig.IS_INDEXED_NEURAL_FEATURES = false; //only used when using the senna embedding.
-										NetworkConfig.REGULARIZE_NEURAL_FEATURES = false; // Regularized the neural features in /ad or not
+										NetworkConfig.REGULARIZE_NEURAL_FEATURES = true; // Regularized the neural features in /ad or not
 									} break; 
 					case "-basicf": basicFeatures = args[i+1].equals("true") ? true : false; break;
 					case "-entityf": entityFeature = args[i+1].equals("true") ? true : false; break;

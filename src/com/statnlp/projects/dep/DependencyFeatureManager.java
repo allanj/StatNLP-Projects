@@ -333,10 +333,11 @@ public class DependencyFeatureManager extends FeatureManager {
 				String rllt = rightIndex - 2 >= 1 ? sent.get(rightIndex - 2).getTag() : "unk";
 				String rrt = rightIndex + 1 < sent.length() ? sent.get(rightIndex + 1).getTag() : "unk";
 				String rrrt = rightIndex + 2 < sent.length() ? sent.get(rightIndex + 2).getTag() : "unk";
-				neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, lllw + insep + llw + insep + lw + insep + lrw + insep + lrrw + outsep + 
-																								lllt + insep + llt + insep + lt + insep + lrt + insep + lrrt + outsep + 
-																								rllw + insep + rlw + insep + rw + insep + rrw + insep + rrrw + outsep + 
-																								rllt + insep + rlt + insep + rt + insep + rrt + insep + rrrt + outsep + dist));
+				neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, lw + insep + rw));
+//				neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, lllw + insep + llw + insep + lw + insep + lrw + insep + lrrw + outsep + 
+//																								lllt + insep + llt + insep + lt + insep + lrt + insep + lrrt + outsep + 
+//																								rllw + insep + rlw + insep + rw + insep + rrw + insep + rrrw + outsep + 
+//																								rllt + insep + rlt + insep + rt + insep + rrt + insep + rrrt + outsep + dist));
 //				neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), "head", headWord));
 //				neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), "modifier", modifierWord));
 				//neuralList.add(this._param_g.toFeature(network, FeaType.neural_1.name(), att, llw + insep + lw + insep + lrw + insep + rlw + insep + rw + insep + rrw));
