@@ -39,7 +39,17 @@ public class ExactFeatureManager extends FeatureManager {
 		tag_cap_ll, 
 		tag_cap_r, 
 		tag_cap_rr, 
-		tag_transition
+		tag_transition, 
+		joint_currWord,
+		joint_leftWord1,
+		joint_leftWord2,
+		joint_rightWord1,
+		joint_rightWord2,
+		joint_cap, 
+		joint_cap_l, 
+		joint_cap_ll, 
+		joint_cap_r, 
+		joint_cap_rr
 		};
 	
 		
@@ -226,7 +236,7 @@ public class ExactFeatureManager extends FeatureManager {
 		featureList.add(this._param_g.toFeature(network, FEATYPE.joint_cap_r.name(), 	label,  rcaps));
 		featureList.add(this._param_g.toFeature(network, FEATYPE.joint_cap_rr.name(),	label,  rrcaps));
 		
-		featureList.add(this._param_g.toFeature(network, FEATYPE.joint_transition.name(),	currEn,  childEn));
+		//featureList.add(this._param_g.toFeature(network, FEATYPE.joint_transition.name(),	currEn,  childEn));
 		
 //			String llt = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getTag();
 //			String lt = pos>0? sent.get(pos-1).getTag():"<PAD>";

@@ -42,7 +42,7 @@ public class ExactMain {
 	
 	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException{
 		
-		trainNumber = 80;
+		trainNumber = 2;
 		testNumber = 2;
 		numThreads = 5;
 		numIteration = 200;
@@ -93,6 +93,7 @@ public class ExactMain {
 		ChunkLabel.lock();
 		TagLabel.lock();
 		ExactConfig.concatExactLabel();
+		ExactLabel.lock();
 		
 		
 		System.err.println("chunk size:"+ChunkLabel.CHUNKS_INDEX.toString());
@@ -122,7 +123,7 @@ public class ExactMain {
 		}
 		
 		FeatureManager fa = null;
-		fa = new ExactFeatureManager(param_g, windowSize, IOBESencoding);
+		fa = new ExactFeatureManager(param_g, windowSize);
 //		fa = new GRMMFeatureManager(param_g, useJointFeatures);
 		ExactNetworkCompiler compiler = new ExactNetworkCompiler(IOBESencoding);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);

@@ -67,7 +67,7 @@ public class ExactEval {
 		for(int index=0;index<testInsts.length;index++){
 			ExactInstance eInst = (ExactInstance)testInsts[index];
 			ArrayList<String> prediction = eInst.getPrediction();
-			ArrayList<String> gold = eInst.getPrediction();
+			ArrayList<String> gold = eInst.getOutput();
 			Sentence sent = eInst.getInput();
 			for(int i=0;i<sent.length();i++){
 				String[] predVals = prediction.get(i).split(ExactConfig.EXACT_SEP);
@@ -98,6 +98,7 @@ public class ExactEval {
 				String pos = vals[1];
 				pw.write(sent.get(i).getName()+" "+pos+" "+chunk+"\n");
 			}
+			pw.println();
 		}
 		pw.close();
 		System.out.printf("[Joint Accuracy]: %.2f%%\n", corr*1.0/total*100);

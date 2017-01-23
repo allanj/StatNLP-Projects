@@ -27,7 +27,7 @@ public class ExactNetworkCompiler extends NetworkCompiler{
 	public ExactNetworkCompiler(boolean IOBESencoding, int maxSize){
 		this._size = maxSize;
 		this.IOBESencoding = IOBESencoding;
-		NetworkIDMapper.setCapacity(new int[]{1000, 10, 500});
+		NetworkIDMapper.setCapacity(new int[]{1000, 500, 10});
 		this.compileUnlabeledInstancesGeneric();
 	}
 	
@@ -121,7 +121,7 @@ public class ExactNetworkCompiler extends NetworkCompiler{
 			long[] currentNodes = new long[ExactLabel.Labels.size()];
 			for(int l = 0 ; l < ExactLabel.Labels.size(); l++){
 				long node = toNode(i, l);
-				String exactLabel = ExactLabel.Labels.get(l).getForm();
+				String exactLabel = ExactLabel.Labels_Index.get(l).getForm();
 				String[] vals = exactLabel.split(ExactConfig.EXACT_SEP);
 				String currChunk = vals[0];
 				for(long child: children){

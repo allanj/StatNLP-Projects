@@ -47,7 +47,7 @@ public class ExactReader {
 			ChunkLabel.get(chunk);
 			TagLabel.get(pos);
 			words.add(new WordToken(word, pos, -1, chunk));
-			es.add(chunk);
+			es.add(chunk + ExactConfig.EXACT_SEP + pos);
 		}
 		br.close();
 		List<ExactInstance> myInsts = insts;
@@ -73,28 +73,35 @@ public class ExactReader {
 	}
 	
 	
-	private static void encodeIOBES(ArrayList<String> chunks){
-		for(int i=0;i<chunks.size();i++){
-			String curr = chunks.get(i);
+	private static void encodeIOBES(ArrayList<String> output){
+		for(int i=0;i<output.size();i++){
+			String[] vals = output.get(i).split(ExactConfig.EXACT_SEP);
+			String curr = vals[0];
 			if(curr.startsWith("B")){
-				if((i+1)<chunks.size()){
-					if(!chunks.get(i+1).startsWith("I")){
-						chunks.set(i, "S"+curr.substring(1));
-						ChunkLabel.get(chunks.get(i));
+				if((i+1)<output.size()){
+					String[] nextVals = output.get(i+1).split(ExactConfig.EXACT_SEP);
+					if(!nextVals[0].startsWith("I")){
+						String rep = "S"+curr.substring(1);
+						output.set(i, rep+ExactConfig.EXACT_SEP+vals[1]);
+						ChunkLabel.get(rep);
 					} //else remains the same
 				}else{
-					chunks.set(i, "S"+curr.substring(1));
-					ChunkLabel.get(chunks.get(i));
+					String rep = "S"+curr.substring(1);
+					output.set(i, rep+ExactConfig.EXACT_SEP+vals[1]);
+					ChunkLabel.get(rep);
 				}
 			}else if(curr.startsWith("I")){
-				if((i+1)<chunks.size()){
-					if(!chunks.get(i+1).startsWith("I")){
-						chunks.set(i, "E"+curr.substring(1));
-						ChunkLabel.get(chunks.get(i));
+				if((i+1)<output.size()){
+					String[] nextVals = output.get(i+1).split(ExactConfig.EXACT_SEP);
+					if(!nextVals[0].startsWith("I")){
+						String rep = "E"+curr.substring(1);
+						output.set(i, rep+ExactConfig.EXACT_SEP+vals[1]);
+						ChunkLabel.get(rep);
 					}
 				}else{
-					chunks.set(i, "E"+curr.substring(1));
-					ChunkLabel.get(chunks.get(i));
+					String rep = "E"+curr.substring(1);
+					output.set(i, rep+ExactConfig.EXACT_SEP+vals[1]);
+					ChunkLabel.get(rep);
 				}
 			}
 		}
