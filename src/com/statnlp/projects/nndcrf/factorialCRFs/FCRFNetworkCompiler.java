@@ -31,7 +31,7 @@ public class FCRFNetworkCompiler extends NetworkCompiler{
 		this.task = task;
 		this._size = maxSize;
 		this.IOBESencoding = IOBESencoding;
-		NetworkIDMapper.setCapacity(new int[]{1000, 10, 500});
+		NetworkIDMapper.setCapacity(new int[]{1000, 500, 10});
 		this.compileUnlabeledInstancesGeneric();
 	}
 	
@@ -45,7 +45,7 @@ public class FCRFNetworkCompiler extends NetworkCompiler{
 	}
 	
 	public long toNode_leaf(){
-		int[] arr = new int[]{0, NODE_TYPES.LEAF.ordinal(), Chunk.CHUNKS.size()+Tag.TAGS.size()};
+		int[] arr = new int[]{0, Chunk.CHUNKS.size()+Tag.TAGS.size(), NODE_TYPES.LEAF.ordinal()};
 		return NetworkIDMapper.toHybridNodeID(arr);
 	}
 	
@@ -56,12 +56,12 @@ public class FCRFNetworkCompiler extends NetworkCompiler{
 	 * @return
 	 */
 	public long toNode_t(int pos, int tag_id){
-		int[] arr = new int[]{pos+1, NODE_TYPES.TNODE.ordinal(), tag_id};
+		int[] arr = new int[]{pos+1, tag_id, NODE_TYPES.TNODE.ordinal()};
 		return NetworkIDMapper.toHybridNodeID(arr);
 	}
 	
 	public long toNode_e(int pos, int chunk_id){
-		int[] arr = new int[]{pos+1, NODE_TYPES.ENODE.ordinal(), chunk_id};
+		int[] arr = new int[]{pos+1, chunk_id, NODE_TYPES.ENODE.ordinal()};
 		return NetworkIDMapper.toHybridNodeID(arr);
 	}
 	
@@ -71,7 +71,7 @@ public class FCRFNetworkCompiler extends NetworkCompiler{
 	 * @return
 	 */
 	public long toNode_root(int size){
-		int[] arr = new int[]{size+1,NODE_TYPES.ROOT.ordinal(),Chunk.CHUNKS.size()+Tag.TAGS.size()};
+		int[] arr = new int[]{size+1, Chunk.CHUNKS.size()+Tag.TAGS.size(), NODE_TYPES.ROOT.ordinal()};
 		return NetworkIDMapper.toHybridNodeID(arr);
 	}
 	
@@ -154,7 +154,7 @@ public class FCRFNetworkCompiler extends NetworkCompiler{
 					for(long child: children){
 						if(child==-1) continue;
 						int[] childArr = NetworkIDMapper.toHybridNodeArray(child);
-						String childChunk = i==0? "O":Chunk.CHUNKS_INDEX.get(childArr[2]).getForm(); //i=0; child is the leaf
+						String childChunk = i==0? "O":Chunk.CHUNKS_INDEX.get(childArr[1]).getForm(); //i=0; child is the leaf
 						if(childChunk.startsWith("I")){
 							if(currChunk.startsWith("I") && !childChunk.substring(1).equals(currChunk.substring(1))) continue;
 							if(currChunk.startsWith("E") && !childChunk.substring(1).equals(currChunk.substring(1))) continue;
@@ -187,7 +187,7 @@ public class FCRFNetworkCompiler extends NetworkCompiler{
 				for(long child:currentNodes){
 					if(child==-1) continue;
 					int[] childArr = NetworkIDMapper.toHybridNodeArray(child);
-					String childChunk = i==0? "O":Chunk.CHUNKS_INDEX.get(childArr[2]).getForm(); //i=0; child is the leaf
+					String childChunk = i==0? "O":Chunk.CHUNKS_INDEX.get(childArr[1]).getForm(); //i=0; child is the leaf
 					if (IOBESencoding && childChunk.startsWith("B")) continue;
 					if (IOBESencoding && childChunk.startsWith("I")) continue;
 					lcrfNetwork.addEdge(root, new long[]{child});
@@ -256,7 +256,7 @@ public class FCRFNetworkCompiler extends NetworkCompiler{
 			long child = lcrfNetwork.getNode(child_k);
 			rootIdx = child_k;
 			int[] childArr = NetworkIDMapper.toHybridNodeArray(child);
-			int eId = childArr[2];
+			int eId = childArr[1];
 			String resChunk = Chunk.CHUNKS_INDEX.get(eId).getForm();
 			//assume it's the IOBES encoding.
 			if(resChunk.startsWith("S")) resChunk = "B"+resChunk.substring(1);
@@ -281,7 +281,7 @@ public class FCRFNetworkCompiler extends NetworkCompiler{
 			long child = lcrfNetwork.getNode(child_k);
 			rootIdx = child_k;
 			int[] childArr = NetworkIDMapper.toHybridNodeArray(child);
-			int tId = childArr[2];
+			int tId = childArr[1];
 			posPrediction.add(0, Tag.TAGS_INDEX.get(tId).getForm());
 		}
 		result.setTagPredictons(posPrediction);

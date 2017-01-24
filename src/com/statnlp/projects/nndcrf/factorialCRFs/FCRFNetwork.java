@@ -63,8 +63,8 @@ public class FCRFNetwork extends TableLookupNetwork{
 			// enable the chunking structure
 			for (int i = 0; i < this.countNodes(); i++) {
 				int[] node_k = this.getNodeArray(i);
-				if (node_k[1] == NODE_TYPES.ENODE.ordinal() || node_k[1] == NODE_TYPES.LEAF.ordinal()
-						|| node_k[1] == NODE_TYPES.ROOT.ordinal())
+				if (node_k[2] == NODE_TYPES.ENODE.ordinal() || node_k[2] == NODE_TYPES.LEAF.ordinal()
+						|| node_k[2] == NODE_TYPES.ROOT.ordinal())
 					recover(i);
 				else remove(i);
 			}
@@ -72,8 +72,8 @@ public class FCRFNetwork extends TableLookupNetwork{
 			// enable POS tagging structure
 			for (int i = 0; i < this.countNodes(); i++) {
 				int[] node_k = this.getNodeArray(i);
-				if (node_k[1] == NODE_TYPES.TNODE.ordinal() || node_k[1] == NODE_TYPES.LEAF.ordinal()
-						|| node_k[1] == NODE_TYPES.ROOT.ordinal())
+				if (node_k[2] == NODE_TYPES.TNODE.ordinal() || node_k[2] == NODE_TYPES.LEAF.ordinal()
+						|| node_k[2] == NODE_TYPES.ROOT.ordinal())
 					recover(i);
 				else remove(i);
 			}

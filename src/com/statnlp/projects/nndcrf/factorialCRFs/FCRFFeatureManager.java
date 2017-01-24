@@ -2,6 +2,7 @@ package com.statnlp.projects.nndcrf.factorialCRFs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import com.statnlp.commons.types.Sentence;
 import com.statnlp.hybridnetworks.FeatureArray;
@@ -22,6 +23,8 @@ public class FCRFFeatureManager extends FeatureManager {
 	private boolean useJointFeatures;
 	//private String OUT_SEP = NeuralConfig.OUT_SEP; 
 	private String IN_SEP = NeuralConfig.IN_SEP;
+	
+	private static HashSet<String> others = new HashSet<>(Arrays.asList("#STR#", "#END#", "#STR1#", "#END1#", "#str#", "#end#", "#str1#", "#end1#"));
 	
 	private int windowSize;
 	private boolean cascade;
@@ -71,15 +74,14 @@ public class FCRFFeatureManager extends FeatureManager {
 	@Override
 	protected FeatureArray extract_helper(Network network, int parent_k, int[] children_k) {
 		FCRFInstance inst = ((FCRFInstance)network.getInstance());
-		//int instanceId = inst.getInstanceId();
 		Sentence sent = inst.getInput();
 		long node = network.getNode(parent_k);
 		int[] nodeArr = NetworkIDMapper.toHybridNodeArray(node);
 		FeatureArray fa = null;
 		ArrayList<Integer> jointFeatureList = new ArrayList<>();
 		int threadId = network.getThreadId();
-		int pos = nodeArr[0]-1;
-		int eId = nodeArr[2];
+		int pos = nodeArr[0] - 1;
+		int eId = nodeArr[1];
 		if(pos<0 || pos > inst.size())
 			return FeatureArray.EMPTY;
 		ArrayList<Integer> c_wordList = new ArrayList<Integer>();
@@ -96,9 +98,9 @@ public class FCRFFeatureManager extends FeatureManager {
 		
 		
 		ArrayList<ArrayList<Integer>> bigList = new ArrayList<ArrayList<Integer>>();
-		if (nodeArr[1] == NODE_TYPES.ENODE.ordinal()){
+		if (nodeArr[2] == NODE_TYPES.ENODE.ordinal()){
 			if(pos==inst.size() || eId==(Chunk.CHUNKS.size()+Tag.TAGS.size())) return FeatureArray.EMPTY;
-			int childLabelId = network.getNodeArray(children_k[0])[2];
+			int childLabelId = network.getNodeArray(children_k[0])[1];
 			addChunkFeatures(network, sent, pos, eId, childLabelId, c_wordList, c_capList, c_transitionList, c_cascadeList, c_neuralList);
 			if(useJointFeatures)
 				addJointFeatures(jointFeatureList, network, sent, pos, eId, parent_k, children_k, false);
@@ -109,11 +111,9 @@ public class FCRFFeatureManager extends FeatureManager {
 			if (NetworkConfig.USE_NEURAL_FEATURES) bigList.add(c_neuralList); 
 			if (useJointFeatures) bigList.add(jointFeatureList);
 																
-		} else if (nodeArr[1] == NODE_TYPES.TNODE.ordinal() ){//|| nodeArr[1] == NODE_TYPES.ROOT.ordinal()){
+		} else if (nodeArr[2] == NODE_TYPES.TNODE.ordinal() ){//|| nodeArr[1] == NODE_TYPES.ROOT.ordinal()){
 			if(pos==inst.size() || eId==(Chunk.CHUNKS.size()+Tag.TAGS.size())) return FeatureArray.EMPTY;
-//			if (pos!=inst.size() && eId==(Chunk.CHUNKS.size()+Tag.TAGS.size() )) return FeatureArray.EMPTY;
-//			if (pos==inst.size() && eId!=(Chunk.CHUNKS.size()+Tag.TAGS.size() )) return FeatureArray.EMPTY;
-			int childLabelId = network.getNodeArray(children_k[0])[2];
+			int childLabelId = network.getNodeArray(children_k[0])[1];
 			addPOSFeatures(network, sent, pos, eId, childLabelId, t_wordList, t_capList, t_transitionList, t_cascadeList, t_neuralList);
 			if(useJointFeatures)
 				addJointFeatures(jointFeatureList, network, sent, pos, eId, parent_k, children_k, true);
@@ -157,13 +157,13 @@ public class FCRFFeatureManager extends FeatureManager {
 	private void addChunkFeatures(Network network, Sentence sent, int pos, int eId, int childLabelId,
 			ArrayList<Integer> wordList, ArrayList<Integer> capList, ArrayList<Integer> transitionList, ArrayList<Integer> cascadeList,
 			ArrayList<Integer> neuralList){
-		String lw = pos > 0? sent.get(pos-1).getName(): "STR";
+		String lw = pos > 0? sent.get(pos-1).getName(): "#STR#";
 		String lcaps = capsF(lw);
-		String llw = pos == 0? "STR1": pos==1? "STR" : sent.get(pos-2).getName();
+		String llw = pos == 0? "#STR1#": pos==1? "#STR#" : sent.get(pos-2).getName();
 		String llcaps = capsF(llw);
-		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"END";
+		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"#END#";
 		String rcaps = capsF(rw);
-		String rrw = pos == sent.length()-1? "END1": pos==sent.length()-2? "END":sent.get(pos+2).getName();
+		String rrw = pos == sent.length()-1? "#END1#": pos==sent.length()-2? "#END#":sent.get(pos+2).getName();
 		String rrcaps = capsF(rrw);
 		String currWord = sent.get(pos).getName();
 		String currEn = Chunk.get(eId).getForm();
@@ -210,11 +210,11 @@ public class FCRFFeatureManager extends FeatureManager {
 			ArrayList<Integer> wordList, ArrayList<Integer> capList, ArrayList<Integer> transitionList, ArrayList<Integer> cascadeList,
 			ArrayList<Integer> neuralList){
 		String currTag = Tag.get(tId).getForm();
-		String prevTag = childLabelId == Chunk.CHUNKS.size()+Tag.TAGS.size()? "STR" : Tag.get(childLabelId).getForm();
-		String lw = pos > 0? sent.get(pos-1).getName():"STR";
-		String llw = pos==0? "STR1": pos==1? "STR":sent.get(pos-2).getName();
-		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"END";
-		String rrw = pos==sent.length()-1? "END1": pos==sent.length()-2? "END":sent.get(pos+2).getName();
+		String prevTag = childLabelId == Chunk.CHUNKS.size()+Tag.TAGS.size()? "#STR#" : Tag.get(childLabelId).getForm();
+		String lw = pos > 0? sent.get(pos-1).getName():"#STR#";
+		String llw = pos==0? "#STR1#": pos==1? "#STR#":sent.get(pos-2).getName();
+		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"#END#";
+		String rrw = pos==sent.length()-1? "#END1#": pos==sent.length()-2? "#END#":sent.get(pos+2).getName();
 		String w = sent.get(pos).getName();
 		
 		String caps = capsF(w);
@@ -227,8 +227,8 @@ public class FCRFFeatureManager extends FeatureManager {
 		wordList.add(this._param_g.toFeature(network,FEATYPE.tag_currWord.name(), 	currTag,	w.toLowerCase()));
 		wordList.add(this._param_g.toFeature(network,FEATYPE.tag_leftWord1.name(), 	currTag,	lw.toLowerCase()));
 		wordList.add(this._param_g.toFeature(network,FEATYPE.tag_leftWord2.name(), 	currTag,	llw.toLowerCase()));
-		wordList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord1.name(), 	currTag,	rw.toLowerCase()));
-		wordList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord2.name(), 	currTag,	rrw.toLowerCase()));
+		wordList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord1.name(), currTag,	rw.toLowerCase()));
+		wordList.add(this._param_g.toFeature(network,FEATYPE.tag_rightWord2.name(), currTag,	rrw.toLowerCase()));
 		
 		capList.add(this._param_g.toFeature(network, FEATYPE.tag_cap.name(), 	currTag,  caps));
 		capList.add(this._param_g.toFeature(network, FEATYPE.tag_cap_l.name(), 	currTag,  lcaps));
@@ -271,53 +271,53 @@ public class FCRFFeatureManager extends FeatureManager {
 	 * @param paTchildE: false means the current structure is NE structure.
 	 */
 	private void addJointFeatures(ArrayList<Integer> featureList, Network network, Sentence sent, int pos, int paId, int parent_k, int[] children_k, boolean paTchildE){
-		//TFNetwork tfnetwork = (TFNetwork)network;
 		if(children_k.length!=1)
 			throw new RuntimeException("The joint features should only have one children also");
 		String currLabel = paTchildE? Tag.get(paId).getForm():Chunk.get(paId).getForm();
 		int jf1, jf2, jf3, jf4, jf5;  
 		int[] arr = null;
 		int nodeType = -1;
-		String lw = pos>0? sent.get(pos-1).getName():"<PAD>";
-		String llw = pos==0? "<PAD>": pos==1? "<PAD>":sent.get(pos-2).getName();
-		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"<PAD>";
-		String w = pos==sent.length()? "<PAD>":sent.get(pos).getName();
-		String rrw = pos==sent.length()-1? "<PAD>": pos==sent.length()-2? "<PAD>":sent.get(pos+2).getName();
+		String lw = pos > 0? sent.get(pos-1).getName():"#STR#";
+		String llw = pos == 0? "#STR1#": pos==1? "#STR#":sent.get(pos-2).getName();
+		String rw = pos < sent.length()-1? sent.get(pos+1).getName():"#END#";
+		String rrw = pos==sent.length()-1? "#END1#": pos==sent.length()-2? "#END#":sent.get(pos+2).getName();
+		String w = sent.get(pos).getName();
 		if(!paTchildE){
 			//current it's NE structure, need to refer to Tag node.
 			nodeType = NODE_TYPES.TNODE.ordinal();
 			for (int t = 0; t < Tag.TAGS_INDEX.size(); t++) {
 				String tag = Tag.get(t).getForm();
-				arr = new int[] { pos + 1, nodeType, t };
+				arr = new int[] { pos + 1, t, nodeType};
 				long unlabeledDstNode = NetworkIDMapper.toHybridNodeID(arr);
 				FCRFNetwork unlabeledNetwork = (FCRFNetwork) network.getUnlabeledNetwork();
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 				if (unlabeledDstNodeIdx >= 0) {
-//					jf0 = this._param_g.toFeature(network, FEATYPE.e_joint.name(), currLabel + "&" + tag, "");
-					jf1 = this._param_g.toFeature(network, FEATYPE.joint1.name(), currLabel + "&" + tag, w);
-					jf2 = this._param_g.toFeature(network, FEATYPE.joint2.name(), currLabel + "&" + tag, lw);
-					jf3 = this._param_g.toFeature(network, FEATYPE.joint3.name(), currLabel + "&" + tag, rw);
-					jf4 = this._param_g.toFeature(network, FEATYPE.joint4.name(), currLabel + "&" + tag, llw);
-					jf5 = this._param_g.toFeature(network, FEATYPE.joint5.name(), currLabel + "&" + tag, rrw);
-//					if(jf0 != -1){
-//						featureList.add(jf0); network.putJointFeature(parent_k, jf0, unlabeledDstNodeIdx);
-//					}
-					if(jf1 != -1){
-						featureList.add(jf1); network.putJointFeature(parent_k, jf1, unlabeledDstNodeIdx);
+					if(windowSize >= 1) {
+						jf1 = this._param_g.toFeature(network, FEATYPE.joint1.name(), currLabel + "&" + tag, w);
+						if(jf1 != -1){
+							featureList.add(jf1); network.putJointFeature(parent_k, jf1, unlabeledDstNodeIdx);
+						}
+					} 
+					if (windowSize >=3) {
+						jf2 = this._param_g.toFeature(network, FEATYPE.joint2.name(), currLabel + "&" + tag, lw);
+						jf3 = this._param_g.toFeature(network, FEATYPE.joint3.name(), currLabel + "&" + tag, rw);
+						if(jf2 != -1){
+							featureList.add(jf2); network.putJointFeature(parent_k, jf2, unlabeledDstNodeIdx);
+						}
+						if(jf3 != -1){
+							featureList.add(jf3); network.putJointFeature(parent_k, jf3, unlabeledDstNodeIdx);
+						}
 					}
-					if(jf2 != -1){
-						featureList.add(jf2); network.putJointFeature(parent_k, jf2, unlabeledDstNodeIdx);
-					}
-					if(jf3 != -1){
-						featureList.add(jf3); network.putJointFeature(parent_k, jf3, unlabeledDstNodeIdx);
-					}
-					if(jf4 != -1){
-						featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
-					}
-					if(jf5 != -1){
-						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
-					}
-					
+					if (windowSize >= 5) {
+						jf4 = this._param_g.toFeature(network, FEATYPE.joint4.name(), currLabel + "&" + tag, llw);
+						jf5 = this._param_g.toFeature(network, FEATYPE.joint5.name(), currLabel + "&" + tag, rrw);
+						if(jf4 != -1){
+							featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
+						}
+						if(jf5 != -1){
+							featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
+						}
+					} 
 					if(NetworkConfig.USE_NEURAL_FEATURES){
 						int njf = -1;
 						if(windowSize==1) 
@@ -342,38 +342,40 @@ public class FCRFFeatureManager extends FeatureManager {
 		}else{
 			//current it's POS structure, need to refer to chunk node
 			nodeType = NODE_TYPES.ENODE.ordinal();
-			for(int e=0; e<Chunk.CHUNKS_INDEX.size(); e++){
+			for (int e = 0; e < Chunk.CHUNKS_INDEX.size(); e++) {
 				String chunk = Chunk.get(e).getForm();
 				if (this.iobes && pos == sent.length()-1 && (chunk.startsWith("B") || chunk.startsWith("I")) ) 
 					continue;
-				arr = new int[]{pos+1, nodeType, e};
+				arr = new int[]{pos+1, e, nodeType};
 				long unlabeledDstNode = NetworkIDMapper.toHybridNodeID(arr);
 				FCRFNetwork unlabeledNetwork = (FCRFNetwork)network.getUnlabeledNetwork();
 				int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 				if (unlabeledDstNodeIdx >= 0) {
-//					jf0 = this._param_g.toFeature(network, FEATYPE.t_joint.name(), chunk + "&" + currLabel, "");
-					jf1 = this._param_g.toFeature(network, FEATYPE.joint1.name(), chunk + "&" + currLabel, w);
-					jf2 = this._param_g.toFeature(network, FEATYPE.joint2.name(), chunk + "&" + currLabel, lw);
-					jf3 = this._param_g.toFeature(network, FEATYPE.joint3.name(), chunk + "&" + currLabel, rw);
-					jf4 = this._param_g.toFeature(network, FEATYPE.joint4.name(), chunk + "&" + currLabel, llw);
-					jf5 = this._param_g.toFeature(network, FEATYPE.joint5.name(), chunk + "&" + currLabel, rrw);
-//					if(jf0 != -1){
-//						featureList.add(jf0); network.putJointFeature(parent_k, jf0, unlabeledDstNodeIdx);
-//					}
-					if(jf1 != -1){
-						featureList.add(jf1); network.putJointFeature(parent_k, jf1, unlabeledDstNodeIdx);
+					if(windowSize >= 1) {
+						jf1 = this._param_g.toFeature(network, FEATYPE.joint1.name(), chunk + "&" + currLabel, w);
+						if(jf1 != -1){
+							featureList.add(jf1); network.putJointFeature(parent_k, jf1, unlabeledDstNodeIdx);
+						}
 					}
-					if(jf2 != -1){
-						featureList.add(jf2); network.putJointFeature(parent_k, jf2, unlabeledDstNodeIdx);
-					}
-					if(jf3 != -1){
-						featureList.add(jf3); network.putJointFeature(parent_k, jf3, unlabeledDstNodeIdx);
-					}
-					if(jf4 != -1){
-						featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
-					}
-					if(jf5 != -1){
-						featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
+					if (windowSize >= 3) {
+						jf2 = this._param_g.toFeature(network, FEATYPE.joint2.name(), chunk + "&" + currLabel, lw);
+						jf3 = this._param_g.toFeature(network, FEATYPE.joint3.name(), chunk + "&" + currLabel, rw);
+						if(jf2 != -1){
+							featureList.add(jf2); network.putJointFeature(parent_k, jf2, unlabeledDstNodeIdx);
+						}
+						if(jf3 != -1){
+							featureList.add(jf3); network.putJointFeature(parent_k, jf3, unlabeledDstNodeIdx);
+						}
+					} 
+					if (windowSize >= 5) {
+						jf4 = this._param_g.toFeature(network, FEATYPE.joint4.name(), chunk + "&" + currLabel, llw);
+						jf5 = this._param_g.toFeature(network, FEATYPE.joint5.name(), chunk + "&" + currLabel, rrw);
+						if(jf4 != -1){
+							featureList.add(jf4); network.putJointFeature(parent_k, jf4, unlabeledDstNodeIdx);
+						}
+						if(jf5 != -1){
+							featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
+						}
 					}
 					if(NetworkConfig.USE_NEURAL_FEATURES){
 						int njf = -1;
@@ -404,7 +406,7 @@ public class FCRFFeatureManager extends FeatureManager {
 	
 	private String capsF(String word){
 		String cap = null;
-		if(word.equals("<PAD>")||word.startsWith("STR")||word.startsWith("END")) return "others";
+		if(others.contains(word)) return "others";
 		if(word.equals(word.toLowerCase())) cap = "all_lowercases";
 		else if(word.equals(word.toUpperCase())) cap = "all_uppercases";
 		else if(word.matches("[A-Z][a-z0-9]*")) cap = "first_upper";
