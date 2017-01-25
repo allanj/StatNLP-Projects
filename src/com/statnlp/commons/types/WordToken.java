@@ -68,7 +68,9 @@ public class WordToken extends InputToken{
 		return this.entity;
 	}
 	
-	
+	public void setTag(String tag) {
+		 this.tag = tag;
+	}
 	
 	public String getDepLabel() {
 		return depLabel;
