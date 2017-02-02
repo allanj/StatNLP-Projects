@@ -19,7 +19,6 @@ public class ExactFeatureManager extends FeatureManager {
 	private static final long serialVersionUID = 376931974939202432L;
 
 	private String IN_SEP = NeuralConfig.IN_SEP;
-	
 	private static HashSet<String> others = new HashSet<>(Arrays.asList("#STR#", "#END#", "#STR1#", "#END1#", "#str#", "#end#", "#str1#", "#end1#"));
 	
 	private int windowSize;
@@ -98,20 +97,19 @@ public class ExactFeatureManager extends FeatureManager {
 		ArrayList<Integer> t_neuralList = new ArrayList<Integer>();
 		
 		ArrayList<Integer> j_wordList = new ArrayList<Integer>();
-		ArrayList<Integer> j_capList = new ArrayList<Integer>();
 		ArrayList<Integer> j_neuralList = new ArrayList<Integer>();
 		ArrayList<ArrayList<Integer>> bigList = new ArrayList<ArrayList<Integer>>();
 		
 		addChunkFeatures(network, sent, pos, vals[0], childVals[0], c_wordList, c_capList, c_transitionList, c_neuralList);
 		addPOSFeatures(network, sent, pos, vals[1], childVals[1], t_wordList, t_capList, t_transitionList, t_neuralList);
-		addJointFeatures(network, sent, pos, label, childLabel, j_wordList, j_capList, j_neuralList);
+		addJointFeatures(network, sent, pos, label, childLabel, j_wordList, j_neuralList);
 		
 		bigList.add(c_wordList); bigList.add(c_capList);
 		bigList.add(c_transitionList); bigList.add(c_neuralList);
 		bigList.add(t_wordList); bigList.add(t_capList);
 		bigList.add(t_transitionList); bigList.add(t_neuralList);
 		
-		bigList.add(j_wordList); bigList.add(j_capList);
+		bigList.add(j_wordList);
 		bigList.add(j_neuralList); 
 		
 		FeatureArray orgFa = new FeatureArray(FeatureBox.getFeatureBox(new int[]{}, this.getParams_L()[threadId]));
@@ -141,6 +139,7 @@ public class ExactFeatureManager extends FeatureManager {
 	
 	private void addChunkFeatures(Network network, Sentence sent, int pos, String currEn, String prevEn,
 			ArrayList<Integer> wordList, ArrayList<Integer> capList, ArrayList<Integer> transitionList, ArrayList<Integer> neuralList){
+		
 		String lw = pos > 0? sent.get(pos-1).getName(): "#STR#";
 		String lcaps = capsF(lw);
 		String llw = pos == 0? "#STR1#": pos==1? "#STR#" : sent.get(pos-2).getName();
@@ -152,11 +151,11 @@ public class ExactFeatureManager extends FeatureManager {
 		String currWord = sent.get(pos).getName();
 		String currCaps = capsF(currWord);
 		
-		wordList.add(this._param_g.toFeature(network, FEATYPE.chunk_currWord.name(), 	currEn,	currWord.toLowerCase()));
-		wordList.add(this._param_g.toFeature(network, FEATYPE.chunk_leftWord1.name(), 	currEn,	lw.toLowerCase()));
-		wordList.add(this._param_g.toFeature(network, FEATYPE.chunk_leftWord2.name(), 	currEn,	llw.toLowerCase()));
-		wordList.add(this._param_g.toFeature(network, FEATYPE.chunk_rightWord1.name(), 	currEn,	rw.toLowerCase()));
-		wordList.add(this._param_g.toFeature(network, FEATYPE.chunk_rightWord2.name(), 	currEn,	rrw.toLowerCase()));
+		wordList.add(this._param_g.toFeature(network,FEATYPE.chunk_currWord.name(), 	currEn,	currWord.toLowerCase()));
+		wordList.add(this._param_g.toFeature(network,FEATYPE.chunk_leftWord1.name(), 	currEn,	lw.toLowerCase()));
+		wordList.add(this._param_g.toFeature(network,FEATYPE.chunk_leftWord2.name(), 	currEn,	llw.toLowerCase()));
+		wordList.add(this._param_g.toFeature(network,FEATYPE.chunk_rightWord1.name(), 	currEn,	rw.toLowerCase()));
+		wordList.add(this._param_g.toFeature(network,FEATYPE.chunk_rightWord2.name(), 	currEn,	rrw.toLowerCase()));
 		
 		capList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap.name(), 		currEn,  currCaps));
 		capList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_l.name(), 	currEn,  lcaps));
@@ -165,22 +164,21 @@ public class ExactFeatureManager extends FeatureManager {
 		capList.add(this._param_g.toFeature(network, FEATYPE.chunk_cap_rr.name(),	currEn,  rrcaps));
 		
 		transitionList.add(this._param_g.toFeature(network, FEATYPE.chunk_transition.name(),	currEn,  prevEn));
-		
-//		if(NetworkConfig.USE_NEURAL_FEATURES){
-//			if(windowSize == 5)
-//				neuralList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, llw.toLowerCase()+IN_SEP+
-//																						lw.toLowerCase()+IN_SEP+
-//																						currWord.toLowerCase()+IN_SEP+
-//																						rw.toLowerCase()+IN_SEP+
-//																						rrw.toLowerCase()));
-//			else if(windowSize == 3)
-//				neuralList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, lw.toLowerCase()+IN_SEP+
-//						currWord.toLowerCase()+IN_SEP+
-//						rw.toLowerCase()));
-//			else if(windowSize == 1)
-//				neuralList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, currWord.toLowerCase()));
-//			else throw new RuntimeException("Unknown window size: "+windowSize);
-//		}
+		if(NetworkConfig.USE_NEURAL_FEATURES){
+			if(windowSize == 5)
+				neuralList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, llw.toLowerCase()+IN_SEP+
+																						lw.toLowerCase()+IN_SEP+
+																						currWord.toLowerCase()+IN_SEP+
+																						rw.toLowerCase()+IN_SEP+
+																						rrw.toLowerCase()));
+			else if(windowSize == 3)
+				neuralList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, lw.toLowerCase()+IN_SEP+
+						currWord.toLowerCase()+IN_SEP+
+						rw.toLowerCase()));
+			else if(windowSize == 1)
+				neuralList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, currWord.toLowerCase()));
+			else throw new RuntimeException("Unknown window size: "+windowSize);
+		}
 	}
 
 	private void addPOSFeatures(Network network, Sentence sent, int pos, String currTag, String prevTag,
@@ -211,62 +209,57 @@ public class ExactFeatureManager extends FeatureManager {
 		capList.add(this._param_g.toFeature(network, FEATYPE.tag_cap_rr.name(),	currTag,  rrcaps));
 		
 		transitionList.add(this._param_g.toFeature(network, FEATYPE.tag_transition.name(),	currTag,  prevTag));
-		
-//		if(NetworkConfig.USE_NEURAL_FEATURES){
-//			if(windowSize==1)
-//				neuralList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currTag,  w.toLowerCase()));
-//			else if(windowSize==3)
-//				neuralList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currTag,  lw.toLowerCase()+IN_SEP+w.toLowerCase()
-//																							+IN_SEP+rw.toLowerCase()));
-//			else if(windowSize==5)
-//				neuralList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currTag,  llw.toLowerCase()+IN_SEP+
-//																							lw.toLowerCase()+IN_SEP+w.toLowerCase()
-//																							+IN_SEP+rw.toLowerCase()+IN_SEP+
-//																							rrw.toLowerCase()));
-//			else throw new RuntimeException("Unknown window size: "+windowSize);
-//		}
+		if(NetworkConfig.USE_NEURAL_FEATURES){
+			if(windowSize==1)
+				neuralList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currTag,  w.toLowerCase()));
+			else if(windowSize==3)
+				neuralList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currTag,  lw.toLowerCase()+IN_SEP+w.toLowerCase()
+																							+IN_SEP+rw.toLowerCase()));
+			else if(windowSize==5)
+				neuralList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currTag,  llw.toLowerCase()+IN_SEP+
+																							lw.toLowerCase()+IN_SEP+w.toLowerCase()
+																							+IN_SEP+rw.toLowerCase()+IN_SEP+
+																							rrw.toLowerCase()));
+			else throw new RuntimeException("Unknown window size: "+windowSize);
+		}
 	}
 	
 	private void addJointFeatures(Network network, Sentence sent, int pos, String label, String prevLabel,
-			ArrayList<Integer> wordList, ArrayList<Integer> capList, ArrayList<Integer> neuralList){
+			ArrayList<Integer> wordList, ArrayList<Integer> neuralList){
 		String lw = pos > 0? sent.get(pos-1).getName(): "#STR#";
-		String lcaps = capsF(lw);
 		String llw = pos == 0? "#STR1#": pos==1? "#STR#" : sent.get(pos-2).getName();
-		String llcaps = capsF(llw);
 		String rw = pos<sent.length()-1? sent.get(pos+1).getName():"#END#";
-		String rcaps = capsF(rw);
 		String rrw = pos == sent.length()-1? "#END1#": pos==sent.length()-2? "#END#":sent.get(pos+2).getName();
-		String rrcaps = capsF(rrw);
 		String currWord = sent.get(pos).getName();
-		String currCaps = capsF(currWord);
 		
-		wordList.add(this._param_g.toFeature(network,FEATYPE.joint_currWord.name(), 	label,	currWord.toLowerCase()));
-		wordList.add(this._param_g.toFeature(network,FEATYPE.joint_leftWord1.name(), 	label,	lw.toLowerCase()));
-		wordList.add(this._param_g.toFeature(network,FEATYPE.joint_leftWord2.name(), 	label,	llw.toLowerCase()));
-		wordList.add(this._param_g.toFeature(network,FEATYPE.joint_rightWord1.name(), 	label,	rw.toLowerCase()));
-		wordList.add(this._param_g.toFeature(network,FEATYPE.joint_rightWord2.name(), 	label,	rrw.toLowerCase()));
-		
-		capList.add(this._param_g.toFeature(network, FEATYPE.joint_cap.name(), 		label,  currCaps.toLowerCase()));
-		capList.add(this._param_g.toFeature(network, FEATYPE.joint_cap_l.name(), 	label,  lcaps.toLowerCase()));
-		capList.add(this._param_g.toFeature(network, FEATYPE.joint_cap_ll.name(), 	label,  llcaps.toLowerCase()));
-		capList.add(this._param_g.toFeature(network, FEATYPE.joint_cap_r.name(), 	label,  rcaps.toLowerCase()));
-		capList.add(this._param_g.toFeature(network, FEATYPE.joint_cap_rr.name(),	label,  rrcaps.toLowerCase()));
-		
+		if(windowSize >= 1) {
+			wordList.add(this._param_g.toFeature(network,FEATYPE.joint_currWord.name(), label,	currWord));
+		}
+		if (windowSize >= 3) {
+			wordList.add(this._param_g.toFeature(network,FEATYPE.joint_leftWord1.name(), 	label,	lw));
+			wordList.add(this._param_g.toFeature(network,FEATYPE.joint_rightWord1.name(), 	label,	rw));
+		}
+		if (windowSize >= 5) {
+			wordList.add(this._param_g.toFeature(network,FEATYPE.joint_leftWord2.name(), 	label,	llw));
+			wordList.add(this._param_g.toFeature(network,FEATYPE.joint_rightWord2.name(), 	label,	rrw));
+		}
 		
 		if(NetworkConfig.USE_NEURAL_FEATURES){
-			if(windowSize == 5)
-				neuralList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), label, llw.toLowerCase()+IN_SEP+
-																						lw.toLowerCase()+IN_SEP+
-																						currWord.toLowerCase()+IN_SEP+
-																						rw.toLowerCase()+IN_SEP+
-																						rrw.toLowerCase()));
-			else if(windowSize == 3)
-				neuralList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), label, lw.toLowerCase()+IN_SEP+
-						currWord.toLowerCase()+IN_SEP+
-						rw.toLowerCase()));
-			else if(windowSize == 1)
-				neuralList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), label, currWord.toLowerCase()));
+			int njf = -1;
+			if(windowSize==1) 
+				njf = this._param_g.toFeature(network,FEATYPE.neural_1.name(), label,  currWord.toLowerCase());
+			else if(windowSize==3)
+				njf =  this._param_g.toFeature(network,FEATYPE.neural_1.name(), label,  lw.toLowerCase()+IN_SEP+currWord.toLowerCase()
+																							+IN_SEP+rw.toLowerCase());
+			else if(windowSize==5)
+				njf = this._param_g.toFeature(network,FEATYPE.neural_1.name(), label,  llw.toLowerCase()+IN_SEP+
+																							lw.toLowerCase()+IN_SEP+currWord.toLowerCase()
+																							+IN_SEP+rw.toLowerCase()+IN_SEP+
+																							rrw.toLowerCase());
 			else throw new RuntimeException("Unknown window size: "+windowSize);
+			if (njf != -1) {
+				neuralList.add(njf);
+			}
 		}
 	}
 	
