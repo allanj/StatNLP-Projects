@@ -47,6 +47,9 @@ public class FCRFMain {
 	/** The option to use existing model **/
 	public static boolean useExistingModel = false;
 	public static int randomSeed = 1234;
+	public static boolean removeChunkNeural = false;
+	public static boolean removePOSNeural = false;
+	public static boolean removeJointNeural = false;
 	
 	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException{
 		
@@ -147,7 +150,8 @@ public class FCRFMain {
 		}
 		
 		FeatureManager fa = null;
-		fa = new FCRFFeatureManager(param_g, useJointFeatures, cascade, task, windowSize, IOBESencoding);
+		fa = new FCRFFeatureManager(param_g, useJointFeatures, cascade, task, windowSize, IOBESencoding,
+									removeChunkNeural, removePOSNeural, removeJointNeural);
 //		fa = new GRMMFeatureManager(param_g, useJointFeatures);
 		FCRFNetworkCompiler compiler = new FCRFNetworkCompiler(task, IOBESencoding);
 		NetworkModel model = DiscriminativeNetworkModel.create(fa, compiler);
@@ -271,6 +275,9 @@ public class FCRFMain {
 						NeuralConfig.NUM_NEURAL_NETS = 1;
 					}
 					break;
+					case "-rmchunk" : removeChunkNeural = args[i+1].equals("true")? true:false; break;
+					case "-rmpos" : removePOSNeural = args[i+1].equals("true")? true:false; break;
+					case "-rmjoint" : removeJointNeural = args[i+1].equals("true")? true:false; break;
 					default: System.err.println("Invalid arguments :"+args[i]+", please check usage."); System.exit(0);
 				}
 			}

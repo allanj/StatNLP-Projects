@@ -30,6 +30,9 @@ public class FCRFFeatureManager extends FeatureManager {
 	private boolean cascade;
 	private TASK task;
 	private boolean iobes;
+	private boolean removeChunkNeural = false;
+	private boolean removePOSNeural = false;
+	private boolean removeJointNeural = false;
 	public enum FEATYPE {
 		chunk_currWord,
 		chunk_leftWord1,
@@ -62,13 +65,17 @@ public class FCRFFeatureManager extends FeatureManager {
 		};
 	
 		
-	public FCRFFeatureManager(GlobalNetworkParam param_g, boolean useJointFeatures, boolean cascade, TASK task, int windowSize, boolean iobes) {
+	public FCRFFeatureManager(GlobalNetworkParam param_g, boolean useJointFeatures, boolean cascade, TASK task, int windowSize, boolean iobes,
+			boolean removeChunkNeural, boolean removePOSNeural, boolean removeJointNeural) {
 		super(param_g);
 		this.useJointFeatures = useJointFeatures; 
 		this.cascade = cascade;
 		this.task = task;
 		this.windowSize = windowSize;
 		this.iobes = iobes;
+		this.removeChunkNeural = removeChunkNeural;
+		this.removePOSNeural = removePOSNeural;
+		this.removeJointNeural = removeJointNeural;
 	}
 
 	@Override
@@ -189,7 +196,7 @@ public class FCRFFeatureManager extends FeatureManager {
 			cascadeList.add(this._param_g.toFeature(network, FEATYPE.tag_currWord.name(), 	currEn,  currTag));
 		}
 		
-		if(NetworkConfig.USE_NEURAL_FEATURES){
+		if(NetworkConfig.USE_NEURAL_FEATURES && !removeChunkNeural){
 			if(windowSize == 5)
 				neuralList.add(this._param_g.toFeature(network, FEATYPE.neural_1.name(), currEn, llw.toLowerCase()+IN_SEP+
 																						lw.toLowerCase()+IN_SEP+
@@ -244,7 +251,7 @@ public class FCRFFeatureManager extends FeatureManager {
 		}
 		
 		
-		if(NetworkConfig.USE_NEURAL_FEATURES){
+		if(NetworkConfig.USE_NEURAL_FEATURES && !removePOSNeural){
 			if(windowSize==1)
 				neuralList.add(this._param_g.toFeature(network,FEATYPE.neural_1.name(), currTag,  w.toLowerCase()));
 			else if(windowSize==3)
@@ -318,7 +325,7 @@ public class FCRFFeatureManager extends FeatureManager {
 							featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
 						}
 					} 
-					if(NetworkConfig.USE_NEURAL_FEATURES){
+					if(NetworkConfig.USE_NEURAL_FEATURES && !removeJointNeural){
 						int njf = -1;
 						if(windowSize==1) 
 							njf = this._param_g.toFeature(network,FEATYPE.neural_1.name(), currLabel + "&" + tag,  w.toLowerCase());
@@ -377,7 +384,7 @@ public class FCRFFeatureManager extends FeatureManager {
 							featureList.add(jf5); network.putJointFeature(parent_k, jf5, unlabeledDstNodeIdx);
 						}
 					}
-					if(NetworkConfig.USE_NEURAL_FEATURES){
+					if(NetworkConfig.USE_NEURAL_FEATURES && !removeJointNeural){
 						int njf = -1;
 						if(windowSize==1) 
 							njf = this._param_g.toFeature(network,FEATYPE.neural_1.name(), chunk + "&" + currLabel,  w.toLowerCase());
