@@ -41,6 +41,14 @@ public class Span implements Comparable<Span>, Serializable{
 		this.label = label;
 	}
 	
+	public Span(int start, int end) {
+		if(start>end)
+			throw new RuntimeException("Start cannot be larger than end");
+		this.start = start;
+		this.end = end;
+		this.label = null;
+	}
+	
 	public int length() {
 		return this.end - this.start + 1;
 	}
@@ -74,7 +82,10 @@ public class Span implements Comparable<Span>, Serializable{
 		if(start > o.start) return 1;
 		if(end < o.start) return -1;
 		if(end > o.end) return 1;
-		return label.compareTo(o.label);
+		if (label == null)
+			return 0;
+		else
+			return label.compareTo(o.label);
 	}
 	
 	public String toString(){

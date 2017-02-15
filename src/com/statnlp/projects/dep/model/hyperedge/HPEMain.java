@@ -64,7 +64,7 @@ public class HPEMain {
 		System.err.println("[Info] joint Res: "+jointRes);
 		HPEInstance[] trainingInsts = HPEReader.readCoNLLXData(trainingPath, true, trainNumber, true);;
 		HPEInstance[] testingInsts = HPEReader.readCoNLLXData(decodePath, false, testNumber, false);
-		Label.get(DPConfig.EMPTY);
+		//Label.get(DPConfig.EMPTY);
 		System.err.println("The label set: " + Label.Label_Index.toString());
 		
 		//debug
