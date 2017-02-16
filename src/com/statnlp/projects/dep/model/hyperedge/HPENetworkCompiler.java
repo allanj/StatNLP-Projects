@@ -80,9 +80,11 @@ public class HPENetworkCompiler extends NetworkCompiler {
 			outputMap.put(span, span);
 		Map<Span, Span> labelFreeOutputMap = new HashMap<>();
 		for(Span span: output){
-			Span span_dup = new Span(span.start, span.end, Label.get(DPConfig.EMPTY), span.headSpan);
-			if (span_dup.headSpan != null)
-				 span_dup.headSpan.label = Label.get(DPConfig.EMPTY);
+			Span span_dup = new Span(span.start, span.end, Label.get(DPConfig.EMPTY));
+			if (span.headSpan != null) {
+				Span headSpan = new Span(span.headSpan.start, span.headSpan.end, Label.get(DPConfig.EMPTY));
+				span_dup.headSpan = headSpan;
+			}
 			labelFreeOutputMap.put(span_dup, span_dup);
 		}
 		
@@ -110,7 +112,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 		for(int rightIndex = 1; rightIndex <= sent.length()-1; rightIndex++){
 			//eIndex: 1,2,3,4,5,..n
 			for (int spanLen = 1; spanLen <= maxEntityLen && (rightIndex - spanLen + 1) > 0; spanLen++) {
-				Span span = new Span(rightIndex - spanLen + 1, rightIndex, null);
+				Span span = new Span(rightIndex - spanLen + 1, rightIndex, Label.get(DPConfig.EMPTY));
 				if (labelFreeOutputMap.containsKey(span)) {
 					long wordRightNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, rightDir, spanLen); 
 					long wordLeftNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, leftDir, spanLen);
@@ -240,6 +242,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 				long phraseNode = this.toNodePhrase(leftPos, rightPos);
 				for (int l = 0; l < Label.Labels.size(); l++) {
 					if (l == Label.get(OEntity).id && leftPos != rightPos) continue;
+					if (l == Label.get(DPConfig.EMPTY).id) continue;
 					network.addNode(phraseNode);
 					long entityNode = this.toNodeEntity(leftPos, rightPos, l);
 					network.addNode(entityNode);
@@ -375,25 +378,23 @@ public class HPENetworkCompiler extends NetworkCompiler {
 	
 	private List<Span> toOutput(HPENetwork network, HPEInstance inst) {
 		Map<Span, Span> predictionMap = new HashMap<>();
+		Map<Span, Span> newPredictionMap = new HashMap<>();
 		long root = this.toNode_root(inst.size());
 		int rootIdx = Arrays.binarySearch(network.getAllNodes(), root);
-		findBest(network, inst, rootIdx, predictionMap);
+		findBest(network, inst, rootIdx, predictionMap, newPredictionMap);
 		List<Span> prediction = new ArrayList<>();
-		System.err.println(predictionMap.toString());
-		for (Span span : predictionMap.keySet()) {
-			prediction.add(span);
-			System.err.println(predictionMap.containsKey(span));
-			Span valSpan = predictionMap.get(span);
-			System.err.println(valSpan.toString());
+		for (Span span : newPredictionMap.keySet()) {
+			Span valSpan = newPredictionMap.get(span);
 			prediction.add(valSpan);
 		}
-		System.err.println(predictionMap.toString());
+		System.err.println(newPredictionMap.toString());
 		System.err.println(prediction.toString());
 		Collections.sort(prediction);
 		return prediction;
 	}
 	
-	private void findBest(HPENetwork network, HPEInstance inst, int parent_k, Map<Span, Span> predictionMap) {
+	private void findBest(HPENetwork network, HPEInstance inst, int parent_k, Map<Span, Span> predictionMap
+			, Map<Span, Span> newpredictionMap) {
 		int[] children_k = network.getMaxPath(parent_k);
 		for (int child_k: children_k) {
 			long node = network.getNode(child_k);
@@ -409,9 +410,11 @@ public class HPENetworkCompiler extends NetworkCompiler {
 			if (comp == COMP.incomp.ordinal() && nodeType == NodeType.normal.ordinal()) {
 				Span span;
 				if (direction == leftDir) {
-					span = new Span(leftIndex, leftIndex + leftSpanLen - 1, null, new Span(rightIndex - rightSpanLen + 1, rightIndex));
+					span = new Span(leftIndex, leftIndex + leftSpanLen - 1, Label.get(DPConfig.EMPTY), 
+							new Span(rightIndex - rightSpanLen + 1, rightIndex));
 				} else {
-					span = new Span(rightIndex - rightSpanLen + 1, rightIndex, null, new Span(leftIndex, leftIndex + leftSpanLen - 1, null));
+					span = new Span(rightIndex - rightSpanLen + 1, rightIndex, Label.get(DPConfig.EMPTY), 
+							new Span(leftIndex, leftIndex + leftSpanLen - 1));
 				}
 				predictionMap.put(span, span);
 			}
@@ -419,8 +422,9 @@ public class HPENetworkCompiler extends NetworkCompiler {
 				Span span = new Span(leftIndex, rightIndex);
 				Span valSpan = predictionMap.get(span);
 				valSpan.label = Label.get(labelId);
+				newpredictionMap.put(valSpan, valSpan);
 			}
-			findBest(network, inst, child_k, predictionMap);
+			findBest(network, inst, child_k, predictionMap, newpredictionMap);
  		}
 	}
 	

@@ -27,14 +27,14 @@ public class HPEEval {
 			HPEInstance eInst = (HPEInstance)testInsts[index];
 			List<Span> prediction = eInst.getPrediction();
 			Sentence sent = eInst.getInput();
-			int[] headSpanIdxs = new int[prediction.size()];
+			int[] headIdxs = new int[sent.length()];
 			String[] predictionE = new String[sent.length()];
 			for (int i = 0; i < prediction.size(); i++) {
 				Span span = prediction.get(i); 
 				Span headSpan = span.headSpan;
 				int headSpanIdx = prediction.indexOf(headSpan);
 				for (int p = span.start; p <= span.end; p++) {
-					headSpanIdxs[p] = headSpanIdx;
+					headIdxs[p] = headSpanIdx;
 					if (!span.label.form.equals("O")) {
 						if (p == span.start) {
 							predictionE[p] = "B-" + span.label.form;
@@ -48,7 +48,7 @@ public class HPEEval {
 				
 			}
 			for(int i = 1; i < sent.length(); i++){
-				pw.write(i + "\t" + sent.get(i).getName()+"\t"+sent.get(i).getTag()+"\t"+predictionE[i]+"\t"+headSpanIdxs[i]+"\n");
+				pw.write(i + "\t" + sent.get(i).getName()+"\t"+sent.get(i).getTag()+"\t"+predictionE[i]+"\t"+headIdxs[i]+"\n");
 			}
 			pw.write("\n");
 		}

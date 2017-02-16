@@ -62,11 +62,7 @@ public class Span implements Comparable<Span>, Serializable{
 			Span s = (Span)o;
 			if(start != s.start) return false;
 			if(end != s.end) return false;
-			//if(headIndex != s.headIndex) return false;
-			if (label == null)
-				return true;
-			else
-				return label.equals(s.label);
+			return label.equals(s.label);
 		}
 		return false;
 	}
@@ -76,7 +72,7 @@ public class Span implements Comparable<Span>, Serializable{
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + end;
-		result = prime * result + ((label == null) ? 0 : label.hashCode());
+		result = prime * result + label.hashCode();
 		result = prime * result + start;
 		return result;
 	}
@@ -87,9 +83,7 @@ public class Span implements Comparable<Span>, Serializable{
 		if(start > o.start) return 1;
 		if(end < o.start) return -1;
 		if(end > o.end) return 1;
-		if (label != o.label)
-			return label.compareTo(o.label);
-		else return 0;
+		return label.compareTo(o.label);
 	}
 	
 	public String toString(){
