@@ -413,6 +413,7 @@ public class MFLFeatureManager extends FeatureManager {
 		for (int headIdx = 0; headIdx <= sent.length() - 1; headIdx++) {
 			if (headIdx == idx) continue;
 			int direction = headIdx < idx ? DIR.right.ordinal() : DIR.left.ordinal();
+			String dir = headIdx < idx ? DIR.right.name() : DIR.left.name();
 			int right = headIdx < idx ? idx : headIdx;
 			int left = headIdx < idx ? headIdx : idx;
 			String headWord = sent.get(headIdx).getName();
@@ -421,10 +422,10 @@ public class MFLFeatureManager extends FeatureManager {
 			long unlabeledDstNode = NetworkIDMapper.toHybridNodeID(dstNodeArr);
 			int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 			if (unlabeledDstNodeIdx >= 0) {
-				jf1 = this._param_g.toFeature(network, FeaType.joint1.name(), label, headWord);
-				jf2 = this._param_g.toFeature(network, FeaType.joint2.name(), label, headWord + " & " + currWord);
-				jf3 = this._param_g.toFeature(network, FeaType.joint3.name(), label, headTag);
-				jf4 = this._param_g.toFeature(network, FeaType.joint4.name(), label, headTag + " & " + currTag);
+				jf1 = this._param_g.toFeature(network, FeaType.joint1.name(), label + "&" + dir, currWord);
+				jf2 = this._param_g.toFeature(network, FeaType.joint2.name(), label + "&" + dir, headWord + " & " + currWord);
+				jf3 = this._param_g.toFeature(network, FeaType.joint3.name(), label + "&" + dir, currTag);
+				jf4 = this._param_g.toFeature(network, FeaType.joint4.name(), label + "&" + dir, headTag + " & " + currTag);
 				if(jf1 != -1){
 					joint1List.add(jf1); network.putJointFeature(node_k, jf1, unlabeledDstNodeIdx);
 				}
@@ -455,6 +456,7 @@ public class MFLFeatureManager extends FeatureManager {
 	private void addJointFeaturesForDep(FeatureArray curr, Network network, Sentence sent, int threadId, int node_k, int[] nodeArr, int leftIndex, int rightIndex, int direction) {
 		int headIndex = direction == DIR.right.ordinal()? leftIndex: rightIndex;
 		int modifierIndex = direction == DIR.right.ordinal()? rightIndex : leftIndex;
+		String dir = direction == DIR.right.ordinal() ? DIR.right.name() : DIR.left.name();
 		String headWord = sent.get(headIndex).getName();
 		String headTag = sent.get(headIndex).getTag();
 		String modifierWord = sent.get(modifierIndex).getName();
@@ -472,10 +474,10 @@ public class MFLFeatureManager extends FeatureManager {
 			long unlabeledDstNode = NetworkIDMapper.toHybridNodeID(dstNodeArr);
 			int unlabeledDstNodeIdx = Arrays.binarySearch(unlabeledNetwork.getAllNodes(), unlabeledDstNode);
 			if (unlabeledDstNodeIdx >= 0) {
-				jf1 = this._param_g.toFeature(network, FeaType.joint1.name(), spanLabel, headWord);
-				jf2 = this._param_g.toFeature(network, FeaType.joint2.name(), spanLabel, headWord + " & " + modifierWord);
-				jf3 = this._param_g.toFeature(network, FeaType.joint3.name(), spanLabel, headTag);
-				jf4 = this._param_g.toFeature(network, FeaType.joint4.name(), spanLabel, headTag + " & " + modifierTag);
+				jf1 = this._param_g.toFeature(network, FeaType.joint1.name(), spanLabel + "&" + dir, modifierWord);
+				jf2 = this._param_g.toFeature(network, FeaType.joint2.name(), spanLabel + "&" + dir, headWord + " & " + modifierWord);
+				jf3 = this._param_g.toFeature(network, FeaType.joint3.name(), spanLabel + "&" + dir, modifierTag);
+				jf4 = this._param_g.toFeature(network, FeaType.joint4.name(), spanLabel + "&" + dir, headTag + " & " + modifierTag);
 				if(jf1 != -1){
 					joint1List.add(jf1); network.putJointFeature(node_k, jf1, unlabeledDstNodeIdx);
 				}
