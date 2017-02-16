@@ -14,6 +14,7 @@ import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
 import com.statnlp.hybridnetworks.NetworkException;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
+import com.statnlp.projects.dep.utils.DPConfig;
 import com.statnlp.projects.dep.utils.DPConfig.COMP;
 import com.statnlp.projects.dep.utils.DPConfig.DIR;
 
@@ -79,9 +80,9 @@ public class HPENetworkCompiler extends NetworkCompiler {
 			outputMap.put(span, span);
 		Map<Span, Span> labelFreeOutputMap = new HashMap<>();
 		for(Span span: output){
-			Span span_dup = new Span(span.start, span.end, null, span.headSpan);
+			Span span_dup = new Span(span.start, span.end, Label.get(DPConfig.EMPTY), span.headSpan);
 			if (span_dup.headSpan != null)
-				 span_dup.headSpan.label = null;
+				 span_dup.headSpan.label = Label.get(DPConfig.EMPTY);
 			labelFreeOutputMap.put(span_dup, span_dup);
 		}
 		
@@ -91,6 +92,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 				long phraseNode = this.toNodePhrase(leftPos, rightPos);
 				for (int l = 0; l < Label.Labels.size(); l++) {
 					if (l == Label.get(OEntity).id && leftPos != rightPos) continue;
+					if (l == Label.get(DPConfig.EMPTY).id) continue;
 					Span span = new Span(leftPos, rightPos, Label.get(l));
 					if (outputMap.containsKey(span)) {
 						network.addNode(phraseNode);
@@ -377,10 +379,16 @@ public class HPENetworkCompiler extends NetworkCompiler {
 		int rootIdx = Arrays.binarySearch(network.getAllNodes(), root);
 		findBest(network, inst, rootIdx, predictionMap);
 		List<Span> prediction = new ArrayList<>();
+		System.err.println(predictionMap.toString());
 		for (Span span : predictionMap.keySet()) {
+			prediction.add(span);
+			System.err.println(predictionMap.containsKey(span));
 			Span valSpan = predictionMap.get(span);
+			System.err.println(valSpan.toString());
 			prediction.add(valSpan);
 		}
+		System.err.println(predictionMap.toString());
+		System.err.println(prediction.toString());
 		Collections.sort(prediction);
 		return prediction;
 	}

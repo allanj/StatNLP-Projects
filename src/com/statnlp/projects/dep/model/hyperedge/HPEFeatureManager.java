@@ -105,13 +105,13 @@ public class HPEFeatureManager extends FeatureManager {
 		String rw = end<sent.length()-1? sent.get(end+1).getName():"END";
 		String rt = end<sent.length()-1? sent.get(end+1).getTag():"END";
 		String rs = end<sent.length()-1? shape(rw):"END_SHAPE";
-		featureList.add(this._param_g.toFeature(network, FeaType.seg_prev_word.name(), 		currEn,	lw));
-		featureList.add(this._param_g.toFeature(network, FeaType.seg_prev_word_shape.name(), currEn, ls));
-		featureList.add(this._param_g.toFeature(network, FeaType.seg_prev_tag.name(), 		currEn, lt));
-		featureList.add(this._param_g.toFeature(network, FeaType.seg_next_word.name(), 		currEn, rw));
-		featureList.add(this._param_g.toFeature(network, FeaType.seg_next_word_shape.name(), currEn, rs));
-		featureList.add(this._param_g.toFeature(network, FeaType.seg_next_tag.name(), 	currEn, rt));
-		
+//		featureList.add(this._param_g.toFeature(network, FeaType.seg_prev_word.name(), 		currEn,	lw));
+//		featureList.add(this._param_g.toFeature(network, FeaType.seg_prev_word_shape.name(), currEn, ls));
+//		featureList.add(this._param_g.toFeature(network, FeaType.seg_prev_tag.name(), 		currEn, lt));
+//		featureList.add(this._param_g.toFeature(network, FeaType.seg_next_word.name(), 		currEn, rw));
+//		featureList.add(this._param_g.toFeature(network, FeaType.seg_next_word_shape.name(), currEn, rs));
+//		featureList.add(this._param_g.toFeature(network, FeaType.seg_next_tag.name(), 	currEn, rt));
+//		
 		StringBuilder segPhrase = new StringBuilder(sent.get(start).getName());
 		StringBuilder segPhraseShape = new StringBuilder(shape(sent.get(start).getName()));
 		for(int pos=start+1;pos<=end; pos++){
@@ -120,37 +120,37 @@ public class HPEFeatureManager extends FeatureManager {
 			segPhraseShape.append(" " + shape(w));
 		}
 		featureList.add(this._param_g.toFeature(network, FeaType.segment.name(), currEn,	segPhrase.toString()));
-		
-		int lenOfSeg = end-start+1;
-		featureList.add(this._param_g.toFeature(network, FeaType.seg_len.name(), currEn, lenOfSeg+""));
-		
-		/** Start and end features. **/
-		String startWord = sent.get(start).getName();
-		String startTag = sent.get(start).getTag();
-		featureList.add(this._param_g.toFeature(network, FeaType.start_word.name(),	currEn,	startWord));
-		featureList.add(this._param_g.toFeature(network, FeaType.start_tag.name(),	currEn,	startTag));
-		String endW = sent.get(end).getName();
-		String endT = sent.get(end).getTag();
-		featureList.add(this._param_g.toFeature(network, FeaType.end_word.name(),		currEn,	endW));
-		featureList.add(this._param_g.toFeature(network, FeaType.end_tag.name(),		currEn,	endT));
-		
-		int insideSegLen = lenOfSeg; //Math.min(twoDirInsideLen, lenOfSeg);
-		for (int i = 0; i < insideSegLen; i++) {
-			featureList.add(this._param_g.toFeature(network, FeaType.word.name()+":"+i,		currEn, sent.get(start+i).getName()));
-			featureList.add(this._param_g.toFeature(network, FeaType.tag.name()+":"+i,		currEn, sent.get(start+i).getTag()));
-			featureList.add(this._param_g.toFeature(network, FeaType.shape.name()+":"+i,	currEn, shape(sent.get(start+i).getName())));
-
-			featureList.add(this._param_g.toFeature(network, FeaType.word.name()+":-"+i,	currEn,	sent.get(start+lenOfSeg-i-1).getName()));
-			featureList.add(this._param_g.toFeature(network, FeaType.tag.name()+":-"+i,		currEn,	sent.get(start+lenOfSeg-i-1).getTag()));
-			featureList.add(this._param_g.toFeature(network, FeaType.shape.name()+":-"+i,	currEn,	shape(sent.get(start+lenOfSeg-i-1).getName())));
-		}
-		/** needs to be modified maybe ***/
-		for(int i=0; i<prefixSuffixLen; i++){
-			String prefix = segPhrase.substring(0, Math.min(segPhrase.length(), i+1));
-			String suffix = segPhrase.substring(Math.max(segPhrase.length()-i-1, 0));
-			featureList.add(this._param_g.toFeature(network, FeaType.seg_pref.name()+"-"+i,	currEn,	prefix));
-			featureList.add(this._param_g.toFeature(network, FeaType.seg_suff.name()+"-"+i,	currEn,	suffix));
-		}		
+//		
+//		int lenOfSeg = end-start+1;
+//		featureList.add(this._param_g.toFeature(network, FeaType.seg_len.name(), currEn, lenOfSeg+""));
+//		
+//		/** Start and end features. **/
+//		String startWord = sent.get(start).getName();
+//		String startTag = sent.get(start).getTag();
+//		featureList.add(this._param_g.toFeature(network, FeaType.start_word.name(),	currEn,	startWord));
+//		featureList.add(this._param_g.toFeature(network, FeaType.start_tag.name(),	currEn,	startTag));
+//		String endW = sent.get(end).getName();
+//		String endT = sent.get(end).getTag();
+//		featureList.add(this._param_g.toFeature(network, FeaType.end_word.name(),		currEn,	endW));
+//		featureList.add(this._param_g.toFeature(network, FeaType.end_tag.name(),		currEn,	endT));
+//		
+//		int insideSegLen = lenOfSeg; //Math.min(twoDirInsideLen, lenOfSeg);
+//		for (int i = 0; i < insideSegLen; i++) {
+//			featureList.add(this._param_g.toFeature(network, FeaType.word.name()+":"+i,		currEn, sent.get(start+i).getName()));
+//			featureList.add(this._param_g.toFeature(network, FeaType.tag.name()+":"+i,		currEn, sent.get(start+i).getTag()));
+//			featureList.add(this._param_g.toFeature(network, FeaType.shape.name()+":"+i,	currEn, shape(sent.get(start+i).getName())));
+//
+//			featureList.add(this._param_g.toFeature(network, FeaType.word.name()+":-"+i,	currEn,	sent.get(start+lenOfSeg-i-1).getName()));
+//			featureList.add(this._param_g.toFeature(network, FeaType.tag.name()+":-"+i,		currEn,	sent.get(start+lenOfSeg-i-1).getTag()));
+//			featureList.add(this._param_g.toFeature(network, FeaType.shape.name()+":-"+i,	currEn,	shape(sent.get(start+lenOfSeg-i-1).getName())));
+//		}
+//		/** needs to be modified maybe ***/
+//		for(int i=0; i<prefixSuffixLen; i++){
+//			String prefix = segPhrase.substring(0, Math.min(segPhrase.length(), i+1));
+//			String suffix = segPhrase.substring(Math.max(segPhrase.length()-i-1, 0));
+//			featureList.add(this._param_g.toFeature(network, FeaType.seg_pref.name()+"-"+i,	currEn,	prefix));
+//			featureList.add(this._param_g.toFeature(network, FeaType.seg_suff.name()+"-"+i,	currEn,	suffix));
+//		}		
 	}
 
 	private void addDepFeatures(ArrayList<Integer> featureList, Network network, int[] parentArr, Sentence sent){
@@ -245,11 +245,11 @@ public class HPEFeatureManager extends FeatureManager {
 			
 			/**Unigram feature without dist info**/
 			featureList.add(this._param_g.toFeature(network,FeaType.unigram.name(), "headword", headWord));
-			featureList.add(this._param_g.toFeature(network,FeaType.unigram.name(), "headtag", headTag));
+//			featureList.add(this._param_g.toFeature(network,FeaType.unigram.name(), "headtag", headTag));
 			featureList.add(this._param_g.toFeature(network,FeaType.unigram.name(), "modifierword", modifierWord));
-			featureList.add(this._param_g.toFeature(network,FeaType.unigram.name(), "modifiertag", modifierTag));
-			featureList.add(this._param_g.toFeature(network,FeaType.unigram.name(), "headwordtag", headWord+","+headTag));
-			featureList.add(this._param_g.toFeature(network,FeaType.unigram.name(), "modifierwordtag", modifierWord+","+modifierTag));
+//			featureList.add(this._param_g.toFeature(network,FeaType.unigram.name(), "modifiertag", modifierTag));
+//			featureList.add(this._param_g.toFeature(network,FeaType.unigram.name(), "headwordtag", headWord+","+headTag));
+//			featureList.add(this._param_g.toFeature(network,FeaType.unigram.name(), "modifierwordtag", modifierWord+","+modifierTag));
 			
 //			/**Unigram feature with dist info**/
 //			featureList.add(this._param_g.toFeature(network,FEATYPE.unigram.name(), "headword-dist", headWord+attDist));
