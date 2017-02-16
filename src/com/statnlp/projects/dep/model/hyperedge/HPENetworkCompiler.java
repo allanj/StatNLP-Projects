@@ -26,7 +26,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 	private final int maxSentLen = 57;
 	private final int maxEntityLen = 7;
 	private int[][][] _children;
-	private enum NodeType {entity, phrase, incomp_dup, normal};
+	public enum NodeType {entity, phrase, incomp_dup, normal};
 	
 	private static boolean DEBUG = true;
 	
@@ -46,50 +46,12 @@ public class HPENetworkCompiler extends NetworkCompiler {
 		NetworkIDMapper.setCapacity(capacity);
 	}
 	
-	//Node composition
-	//rightIndex, (rightIndex-leftIndex), complete (0--incomplete,1), direction(0--left,1--right), leftSpanLen, leftType, rightSpanLen, rightType, node Type
-	//sentLen include index 0. 
-	public long toNode_root(int sentLen){
-		int endIndex = sentLen -1;
-		return NetworkIDMapper.toHybridNodeID(new int[]{endIndex, endIndex - 0, COMP.comp.ordinal(), DIR.right.ordinal(), 1, 0, maxEntityIdx, NodeType.normal.ordinal()});
-	}
-	
-	public long toNodeIncomp(int leftIndex, int rightIndex, int direction, int leftSpanLen, int rightSpanlen){
-		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex, rightIndex-leftIndex, COMP.incomp.ordinal(), direction, leftSpanLen, rightSpanlen, maxEntityIdx, NodeType.normal.ordinal()});
-	}
-	
-	public long toNodeComp(int leftIndex, int rightIndex, int direction, int typeSpanLen){
-		int leftSpanLen = direction == DIR.right.ordinal()? typeSpanLen:0;
-		int rightSpanlen = direction == DIR.right.ordinal()? 0:typeSpanLen;
-		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex, rightIndex-leftIndex, COMP.comp.ordinal(), direction, leftSpanLen, rightSpanlen, maxEntityIdx, NodeType.normal.ordinal()});
-	}
-	
-	public long toNodeIncompSub(long incompNode) {
-		int[] incompArr = NetworkIDMapper.toHybridNodeArray(incompNode);
-		incompArr[incompArr.length - 1] = NodeType.incomp_dup.ordinal();
-		return NetworkIDMapper.toHybridNodeID(incompArr);
-	}
-	
-	public long toNodePhrase(int phraseLeft, int phraseRight) {
-		return NetworkIDMapper.toHybridNodeID(new int[]{phraseRight, phraseRight - phraseLeft, 0, 0, 0, 0, maxEntityIdx, NodeType.phrase.ordinal()});
-	}
-	
-	public long toNodeEntity(int phraseLeft, int phraseRight, String entity) {
-		return NetworkIDMapper.toHybridNodeID(new int[]{phraseRight, phraseRight - phraseLeft, 0, 0, 0, 0, Label.get(entity).id, NodeType.entity.ordinal()});
-	}
-	
-	public long toNodeEntity(int phraseLeft, int phraseRight, int entityId) {
-		return NetworkIDMapper.toHybridNodeID(new int[]{phraseRight, phraseRight - phraseLeft, 0, 0, 0, 0, entityId, NodeType.entity.ordinal()});
-	}
-	
 	@Override
 	public Network compile(int networkId, Instance inst, LocalNetworkParam param) {
 		HPEInstance di = (HPEInstance)inst;
 		if(di.isLabeled()){
-			//System.err.println("[Info] Compiling Labeled Network...");
 			return this.compileLabledInstance(networkId, di, param);
 		}else{
-			//System.err.println("[Info] Compiling Unlabeled Network...");
 			return this.compileUnLabledInstance(networkId, di, param);
 		}
 	}
@@ -101,6 +63,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 		this.compileLabeled(network, sent, output);
 		if(DEBUG){
 			HPENetwork unlabeled = compileUnLabledInstance(networkId, inst, param);
+			System.err.println("unlabel instance contain? " + unlabeled.contains(network));
 			if(!unlabeled.contains(network)){
 				System.err.println(sent.toString());
 				throw new NetworkException("Labeled network is not contained in the unlabeled version");
@@ -114,11 +77,11 @@ public class HPENetworkCompiler extends NetworkCompiler {
 		Map<Span, Span> outputMap = new HashMap<>();
 		for(Span span: output) 
 			outputMap.put(span, span);
-		
 		Map<Span, Span> labelFreeOutputMap = new HashMap<>();
 		for(Span span: output){
-			Span span_dup = new Span(span.start, span.end, null);
-			span_dup.headSpan.label = null;
+			Span span_dup = new Span(span.start, span.end, null, span.headSpan);
+			if (span_dup.headSpan != null)
+				 span_dup.headSpan.label = null;
 			labelFreeOutputMap.put(span_dup, span_dup);
 		}
 		
@@ -134,6 +97,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 						long entityNode = this.toNodeEntity(leftPos, rightPos, l);
 						network.addNode(entityNode);
 						network.addEdge(phraseNode, new long[]{entityNode});
+						break;
 					}
 				}
 			}
@@ -177,7 +141,9 @@ public class HPENetworkCompiler extends NetworkCompiler {
 											inOutput = true;
 										}
 									} else {
-										if (labelFreeOutputMap.containsKey(rightSpan) && labelFreeOutputMap.get(rightSpan).headSpan.equals(leftSpan) ) {
+										if (labelFreeOutputMap.containsKey(rightSpan) && 
+												labelFreeOutputMap.get(rightSpan).headSpan.
+												equals(leftSpan) ) {
 											inOutput = true;
 										}
 									}
@@ -449,7 +415,43 @@ public class HPENetworkCompiler extends NetworkCompiler {
 			findBest(network, inst, child_k, predictionMap);
  		}
 	}
-	 
+	
+	
+	//Node composition
+	//rightIndex, (rightIndex-leftIndex), complete (0--incomplete,1), direction(0--left,1--right), leftSpanLen, leftType, rightSpanLen, rightType, node Type
+	//sentLen include index 0. 
+	public long toNode_root(int sentLen){
+		int endIndex = sentLen -1;
+		return NetworkIDMapper.toHybridNodeID(new int[]{endIndex, endIndex - 0, COMP.comp.ordinal(), DIR.right.ordinal(), 1, 0, maxEntityIdx, NodeType.normal.ordinal()});
+	}
+	
+	public long toNodeIncomp(int leftIndex, int rightIndex, int direction, int leftSpanLen, int rightSpanlen){
+		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex, rightIndex-leftIndex, COMP.incomp.ordinal(), direction, leftSpanLen, rightSpanlen, maxEntityIdx, NodeType.normal.ordinal()});
+	}
+	
+	public long toNodeComp(int leftIndex, int rightIndex, int direction, int typeSpanLen){
+		int leftSpanLen = direction == DIR.right.ordinal()? typeSpanLen:0;
+		int rightSpanlen = direction == DIR.right.ordinal()? 0:typeSpanLen;
+		return NetworkIDMapper.toHybridNodeID(new int[]{rightIndex, rightIndex-leftIndex, COMP.comp.ordinal(), direction, leftSpanLen, rightSpanlen, maxEntityIdx, NodeType.normal.ordinal()});
+	}
+	
+	public long toNodeIncompSub(long incompNode) {
+		int[] incompArr = NetworkIDMapper.toHybridNodeArray(incompNode);
+		incompArr[incompArr.length - 1] = NodeType.incomp_dup.ordinal();
+		return NetworkIDMapper.toHybridNodeID(incompArr);
+	}
+	
+	public long toNodePhrase(int phraseLeft, int phraseRight) {
+		return NetworkIDMapper.toHybridNodeID(new int[]{phraseRight, phraseRight - phraseLeft, 0, 0, 0, 0, maxEntityIdx, NodeType.phrase.ordinal()});
+	}
+	
+	public long toNodeEntity(int phraseLeft, int phraseRight, String entity) {
+		return NetworkIDMapper.toHybridNodeID(new int[]{phraseRight, phraseRight - phraseLeft, 0, 0, 0, 0, Label.get(entity).id, NodeType.entity.ordinal()});
+	}
+	
+	public long toNodeEntity(int phraseLeft, int phraseRight, int entityId) {
+		return NetworkIDMapper.toHybridNodeID(new int[]{phraseRight, phraseRight - phraseLeft, 0, 0, 0, 0, entityId, NodeType.entity.ordinal()});
+	}
 
 
 }

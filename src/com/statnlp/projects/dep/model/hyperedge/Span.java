@@ -61,7 +61,10 @@ public class Span implements Comparable<Span>, Serializable{
 			if(start != s.start) return false;
 			if(end != s.end) return false;
 			//if(headIndex != s.headIndex) return false;
-			return label.equals(s.label);
+			if (label == null)
+				return true;
+			else
+				return label.equals(s.label);
 		}
 		return false;
 	}

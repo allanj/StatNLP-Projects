@@ -44,10 +44,10 @@ public class HPEMain {
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
-		trainingPath = "data/allanprocess/voa/train.conllx";
-		testingPath = "data/allanprocess/voa/test.conllx";
-		trainNumber = 10;
-		testNumber = 10;
+		trainingPath = "data/allanprocess/debug.conllx";
+		testingPath = "data/allanprocess/debug.conllx";
+		trainNumber = 1;
+		testNumber = 1;
 //		numIteration = 20;
 //		numThreads = 8;
 		testingPath = trainingPath;
@@ -93,9 +93,9 @@ public class HPEMain {
 		/****************Evaluation Part**************/
 		System.err.println("*****Evaluation*****");
 		Instance[] predInsts = model.decode(testingInsts);
-//		HPEEval.evalDP(predInsts, dpRes);
 		HPEEval.evalNER(predInsts, nerEval);
-//		HPEEval.writeJointResult(predInsts, jointRes, modelType);
+		HPEEval.evalCombined(predInsts);
+		HPEEval.writeJointResult(predInsts, jointRes);
 	}
 	
 	public static void processArgs(String[] args){

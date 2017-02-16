@@ -9,14 +9,34 @@ import com.statnlp.hybridnetworks.FeatureManager;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
+import com.statnlp.projects.dep.model.hyperedge.HPENetworkCompiler.NodeType;
 import com.statnlp.projects.dep.utils.DPConfig;
+import com.statnlp.projects.dep.utils.Extractor;
+import com.statnlp.projects.dep.utils.DPConfig.COMP;
 import com.statnlp.projects.dep.utils.DPConfig.DIR;
 
 public class HPEFeatureManager extends FeatureManager {
 
 	private static final long serialVersionUID = 7274939836196010680L;
 
-	private enum FEATYPE {unigram, bigram,contextual, inbetween,entity, entity_tag,prefix,joint};
+	private final int prefixSuffixLen = 3;
+	private enum FeaType {unigram, bigram,contextual, inbetween,seg_prev_word,
+		seg_prev_word_shape,
+		seg_prev_tag,
+		seg_next_word,
+		seg_next_word_shape,
+		seg_next_tag,
+		segment,
+		seg_len,
+		start_word,
+		start_tag,
+		end_word,
+		end_tag,
+		word,
+		tag,
+		shape,
+		seg_pref,
+		seg_suff, entity_tag,prefix,joint};
 	
 	
 	public static String O_TYPE = DPConfig.O_TYPE;
@@ -38,34 +58,15 @@ public class HPEFeatureManager extends FeatureManager {
 		long parent = network.getNode(parent_k);
 		
 		int[] parentArr = NetworkIDMapper.toHybridNodeArray(parent);
-		
-		int leftIndex = parentArr[0] - parentArr[1];
-		int rightIndex = parentArr[0];
-		int direction = parentArr[3];
-		int completeness = parentArr[2];
-		String att = direction==1? "RA":"LA";
-		//used for joi
-		int headIndex = direction==1? leftIndex:rightIndex;
-		int modifierIndex = direction==1? rightIndex:leftIndex;
-		String headWord = sent.get(headIndex).getName();
-		String headTag = sent.get(headIndex).getTag();
-		String modifierWord = sent.get(modifierIndex).getName();
-		String modifierTag = sent.get(modifierIndex).getTag();
-		String leftTag = sent.get(leftIndex).getTag();
-		String rightTag = sent.get(rightIndex).getTag();
-		String distBool = "0";
-		int dist = Math.abs(rightIndex-leftIndex);
-		if(dist > 1)  distBool = "1";
-		if(dist > 2)  distBool = "2";
-		if(dist > 3)  distBool = "3";
-		if(dist > 4)  distBool = "4";
-		if(dist > 5)  distBool = "5";
-		if(dist > 10) distBool = "10";
-		String attDist = "&"+att+"&"+distBool;
+		int comp = parentArr[2];
+		int nodeType = parentArr[7];
 			
 		/**Add the entity features still only at the incomplete span as well.**/
-		addEntityFeatures(featureList,network,parentArr,sent);
-		addDepFeatures(featureList,network,parentArr,sent);
+		if (comp == COMP.incomp.ordinal() && nodeType == NodeType.normal.ordinal())
+			addDepFeatures(featureList,network,parentArr,sent);
+		if (nodeType == NodeType.entity.ordinal())
+			addEntityFeatures(featureList,network,parentArr,sent);
+		
 	
 		ArrayList<Integer> finalList = new ArrayList<Integer>();
 		for(int i=0;i<featureList.size();i++){
@@ -93,24 +94,63 @@ public class HPEFeatureManager extends FeatureManager {
 	 * @param sent
 	 */
 	private void addEntityFeatures(ArrayList<Integer> featureList, Network network, int[] parentArr, Sentence sent) {
-		int leftIndex = parentArr[0] - parentArr[1];
-		int rightIndex = parentArr[0];
-		int completeness = parentArr[2];
-		int direction = parentArr[3];
-		int leftSpanLen = parentArr[4];
-		int ltId = parentArr[5];
-		int rightSpanLen = parentArr[6];
-		int rtId = parentArr[7];
-		if(completeness==0){
-			int leftBound = direction == DIR.left.ordinal()? leftIndex : rightIndex - rightSpanLen + 1;
-			int rightBound = direction == DIR.left.ordinal()? leftIndex + leftSpanLen -1 : rightIndex;
-			int labelId = direction == DIR.left.ordinal()? ltId : rtId;
-			for (int i = leftBound; i <= rightBound; i++) {
-				featureList.add(this._param_g.toFeature(network,  FEATYPE.entity.name(), labelId + "", sent.get(i).getName() ));
-				featureList.add(this._param_g.toFeature(network,  FEATYPE.entity_tag.name(), labelId + "", sent.get(i).getTag() ));
-			}
-		}
+		int start = parentArr[0] - parentArr[1];
+		int end = parentArr[0];
+		int labelId = parentArr[6];
+		String currEn = Label.get(labelId).getForm();
 		
+		String lw = start>0? sent.get(start-1).getName():"STR";
+		String ls = start>0? shape(lw):"STR_SHAPE";
+		String lt = start>0? sent.get(start-1).getTag():"STR";
+		String rw = end<sent.length()-1? sent.get(end+1).getName():"END";
+		String rt = end<sent.length()-1? sent.get(end+1).getTag():"END";
+		String rs = end<sent.length()-1? shape(rw):"END_SHAPE";
+		featureList.add(this._param_g.toFeature(network, FeaType.seg_prev_word.name(), 		currEn,	lw));
+		featureList.add(this._param_g.toFeature(network, FeaType.seg_prev_word_shape.name(), currEn, ls));
+		featureList.add(this._param_g.toFeature(network, FeaType.seg_prev_tag.name(), 		currEn, lt));
+		featureList.add(this._param_g.toFeature(network, FeaType.seg_next_word.name(), 		currEn, rw));
+		featureList.add(this._param_g.toFeature(network, FeaType.seg_next_word_shape.name(), currEn, rs));
+		featureList.add(this._param_g.toFeature(network, FeaType.seg_next_tag.name(), 	currEn, rt));
+		
+		StringBuilder segPhrase = new StringBuilder(sent.get(start).getName());
+		StringBuilder segPhraseShape = new StringBuilder(shape(sent.get(start).getName()));
+		for(int pos=start+1;pos<=end; pos++){
+			String w = sent.get(pos).getName();
+			segPhrase.append(" "+w);
+			segPhraseShape.append(" " + shape(w));
+		}
+		featureList.add(this._param_g.toFeature(network, FeaType.segment.name(), currEn,	segPhrase.toString()));
+		
+		int lenOfSeg = end-start+1;
+		featureList.add(this._param_g.toFeature(network, FeaType.seg_len.name(), currEn, lenOfSeg+""));
+		
+		/** Start and end features. **/
+		String startWord = sent.get(start).getName();
+		String startTag = sent.get(start).getTag();
+		featureList.add(this._param_g.toFeature(network, FeaType.start_word.name(),	currEn,	startWord));
+		featureList.add(this._param_g.toFeature(network, FeaType.start_tag.name(),	currEn,	startTag));
+		String endW = sent.get(end).getName();
+		String endT = sent.get(end).getTag();
+		featureList.add(this._param_g.toFeature(network, FeaType.end_word.name(),		currEn,	endW));
+		featureList.add(this._param_g.toFeature(network, FeaType.end_tag.name(),		currEn,	endT));
+		
+		int insideSegLen = lenOfSeg; //Math.min(twoDirInsideLen, lenOfSeg);
+		for (int i = 0; i < insideSegLen; i++) {
+			featureList.add(this._param_g.toFeature(network, FeaType.word.name()+":"+i,		currEn, sent.get(start+i).getName()));
+			featureList.add(this._param_g.toFeature(network, FeaType.tag.name()+":"+i,		currEn, sent.get(start+i).getTag()));
+			featureList.add(this._param_g.toFeature(network, FeaType.shape.name()+":"+i,	currEn, shape(sent.get(start+i).getName())));
+
+			featureList.add(this._param_g.toFeature(network, FeaType.word.name()+":-"+i,	currEn,	sent.get(start+lenOfSeg-i-1).getName()));
+			featureList.add(this._param_g.toFeature(network, FeaType.tag.name()+":-"+i,		currEn,	sent.get(start+lenOfSeg-i-1).getTag()));
+			featureList.add(this._param_g.toFeature(network, FeaType.shape.name()+":-"+i,	currEn,	shape(sent.get(start+lenOfSeg-i-1).getName())));
+		}
+		/** needs to be modified maybe ***/
+		for(int i=0; i<prefixSuffixLen; i++){
+			String prefix = segPhrase.substring(0, Math.min(segPhrase.length(), i+1));
+			String suffix = segPhrase.substring(Math.max(segPhrase.length()-i-1, 0));
+			featureList.add(this._param_g.toFeature(network, FeaType.seg_pref.name()+"-"+i,	currEn,	prefix));
+			featureList.add(this._param_g.toFeature(network, FeaType.seg_suff.name()+"-"+i,	currEn,	suffix));
+		}		
 	}
 
 	private void addDepFeatures(ArrayList<Integer> featureList, Network network, int[] parentArr, Sentence sent){
@@ -120,25 +160,23 @@ public class HPEFeatureManager extends FeatureManager {
 		int completeness = parentArr[2];
 		int direction = parentArr[3];
 		int leftSpanLen = parentArr[4];
-		int ltId = parentArr[5];
-		int rightSpanLen = parentArr[6];
-		int rtId = parentArr[7];
+		int rightSpanLen = parentArr[5];
 		
-		String leftTag = sent.get(leftIndex).getTag();
-		String rightTag = sent.get(rightIndex).getTag();
-		String leftA = leftTag.substring(0, 1);
-		String rightA = rightTag.substring(0, 1);
+//		String leftTag = sent.get(leftIndex).getTag();
+//		String rightTag = sent.get(rightIndex).getTag();
+//		String leftA = leftTag.substring(0, 1);
+//		String rightA = rightTag.substring(0, 1);
 		
-		int dist = Math.abs(rightIndex-leftIndex);
-		String att = direction==1? "RA":"LA";
-		String distBool = "0";
-		if(dist > 1)  distBool = "1";
-		if(dist > 2)  distBool = "2";
-		if(dist > 3)  distBool = "3";
-		if(dist > 4)  distBool = "4";
-		if(dist > 5)  distBool = "5";
-		if(dist > 10) distBool = "10";
-		String attDist = "&"+att+"&"+distBool;
+//		int dist = Math.abs(rightIndex-leftIndex);
+//		String att = direction==1? "RA":"LA";
+//		String distBool = "0";
+//		if(dist > 1)  distBool = "1";
+//		if(dist > 2)  distBool = "2";
+//		if(dist > 3)  distBool = "3";
+//		if(dist > 4)  distBool = "4";
+//		if(dist > 5)  distBool = "5";
+//		if(dist > 10) distBool = "10";
+//		String attDist = "&"+att+"&"+distBool;
 		//maybe we can concatenate the whole span.
 		int headIndex = direction == DIR.right.ordinal()? leftIndex : rightIndex - rightSpanLen + 1;
 		int modifierIndex = direction == DIR.right.ordinal()? rightIndex - rightSpanLen + 1 : leftIndex;
@@ -152,22 +190,26 @@ public class HPEFeatureManager extends FeatureManager {
 			/**Simple concatenation**/
 			if (direction == DIR.right.ordinal()) {
 				for (int i = leftIndex + 1; i <= leftIndex + leftSpanLen - 1; i++) {
-					headWord += " & " + sent.get(i).getName();
-					headTag += " & " + sent.get(i).getTag();
+					headWord += " " + sent.get(i).getName();
+					//headTag += " " + sent.get(i).getTag();
 				}
 				for (int i = rightIndex - rightSpanLen + 2; i <= rightIndex; i++) {
-					modifierWord += " & " + sent.get(i).getName();
-					modifierTag += " & " + sent.get(i).getTag();
+					modifierWord += " " + sent.get(i).getName();
+					//modifierTag += " " + sent.get(i).getTag();
 				}
+				if (leftSpanLen > 1) headTag = "PROPN";
+				if (rightSpanLen > 1) modifierTag = "PROPN";
 			} else {
 				for (int i = leftIndex + 1; i <= leftIndex + leftSpanLen - 1; i++) {
 					modifierWord += " & " + sent.get(i).getName();
-					modifierTag += " & " + sent.get(i).getTag();
+					//modifierTag += " & " + sent.get(i).getTag();
 				}
 				for (int i = rightIndex - rightSpanLen + 2; i <= rightIndex; i++) {
 					headWord += " & " + sent.get(i).getName();
-					headTag += " & " + sent.get(i).getTag();
+					//headTag += " & " + sent.get(i).getTag();
 				}
+				if (leftSpanLen > 1) modifierTag = "PROPN";
+				if (rightSpanLen > 1) headTag = "PROPN";
 			}
 			
 //			if(headWord.length()>5 || modifierWord.length()>5){
@@ -202,12 +244,12 @@ public class HPEFeatureManager extends FeatureManager {
 //			}
 			
 			/**Unigram feature without dist info**/
-			featureList.add(this._param_g.toFeature(network,FEATYPE.unigram.name(), "headword", headWord));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.unigram.name(), "headtag", headTag));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.unigram.name(), "modifierword", modifierWord));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.unigram.name(), "modifiertag", modifierTag));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.unigram.name(), "headwordtag", headWord+","+headTag));
-			featureList.add(this._param_g.toFeature(network,FEATYPE.unigram.name(), "modifierwordtag", modifierWord+","+modifierTag));
+			featureList.add(this._param_g.toFeature(network,FeaType.unigram.name(), "headword", headWord));
+			featureList.add(this._param_g.toFeature(network,FeaType.unigram.name(), "headtag", headTag));
+			featureList.add(this._param_g.toFeature(network,FeaType.unigram.name(), "modifierword", modifierWord));
+			featureList.add(this._param_g.toFeature(network,FeaType.unigram.name(), "modifiertag", modifierTag));
+			featureList.add(this._param_g.toFeature(network,FeaType.unigram.name(), "headwordtag", headWord+","+headTag));
+			featureList.add(this._param_g.toFeature(network,FeaType.unigram.name(), "modifierwordtag", modifierWord+","+modifierTag));
 			
 //			/**Unigram feature with dist info**/
 //			featureList.add(this._param_g.toFeature(network,FEATYPE.unigram.name(), "headword-dist", headWord+attDist));
@@ -321,4 +363,7 @@ public class HPEFeatureManager extends FeatureManager {
 		}
 	}
 
+	private String shape(String word){
+		return Extractor.wordShapeOf(word);
+	}
 }
