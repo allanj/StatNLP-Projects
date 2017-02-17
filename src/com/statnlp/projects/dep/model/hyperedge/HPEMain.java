@@ -3,13 +3,13 @@ package com.statnlp.projects.dep.model.hyperedge;
 import java.io.IOException;
 import java.util.HashSet;
 
-import com.statnlp.commons.ml.opt.GradientDescentOptimizerFactory;
 import com.statnlp.commons.ml.opt.OptimizerFactory;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
 import com.statnlp.hybridnetworks.NetworkConfig;
 import com.statnlp.hybridnetworks.NetworkModel;
+import com.statnlp.projects.dep.model.hyperedge.stat.Analyzer;
 import com.statnlp.projects.dep.utils.DPConfig;
 import com.statnlp.projects.dep.utils.DPConfig.MODEL;
 
@@ -46,13 +46,13 @@ public class HPEMain {
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
-		trainingPath = "data/allanprocess/voa/train.conllx";
-		testingPath = "data/allanprocess/voa/test.conllx";
-		trainNumber = 20;
-		testNumber = 20;
+		trainingPath = "data/ConnectedData/abc/train.conllx";
+		testingPath = "data/ConnectedData/abc/test.conllx";
+		trainNumber = -1;
+		testNumber = -1;
 //		numIteration = 20;
 //		numThreads = 8;
-		testingPath = trainingPath;
+//		testingPath = trainingPath;
 //		DPConfig.readWeight = true;
 //		DPConfig.writeWeight = false;
 		/************/
@@ -66,18 +66,17 @@ public class HPEMain {
 		System.err.println("[Info] joint Res: "+jointRes);
 		HPEInstance[] trainingInsts = HPEReader.readCoNLLXData(trainingPath, true, trainNumber, true);;
 		HPEInstance[] testingInsts = HPEReader.readCoNLLXData(decodePath, false, testNumber, false);
-		Label.get(DPConfig.EMPTY);
 		System.err.println("The label set: " + Label.Label_Index.toString());
 		
 		//debug
 		Label.lock();
 		
 		//debug:
-//		System.err.println("checking training");
-//		Analyzer.checkMultiwordsHead(trainingInsts);
-//		System.err.println("checking testing");
-//		Analyzer.checkMultiwordsHead(testingInsts);
-//		System.exit(0);
+		System.err.println("checking training");
+		Analyzer.checkMultiwordsHead(trainingInsts);
+		System.err.println("checking testing");
+		Analyzer.checkMultiwordsHead(testingInsts);
+		System.exit(0);
 		
 		
 		NetworkConfig.TRAIN_MODE_IS_GENERATIVE = false;
@@ -88,10 +87,11 @@ public class HPEMain {
 		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
 		
 		
-		NetworkConfig.USE_BATCH_TRAINING = true;
-		NetworkConfig.BATCH_SIZE = 1;
+//		NetworkConfig.USE_BATCH_TRAINING = true;
+//		NetworkConfig.BATCH_SIZE = 1;
 		
-		GradientDescentOptimizerFactory optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaM();
+		OptimizerFactory optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaM();
+		optimizer = OptimizerFactory.getLBFGSFactory();
 		HPEFeatureManager hpfm = new HPEFeatureManager(new GlobalNetworkParam(optimizer));
 		HPENetworkCompiler dnc = new HPENetworkCompiler();
 		NetworkModel model = DiscriminativeNetworkModel.create(hpfm, dnc);

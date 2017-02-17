@@ -14,7 +14,6 @@ import com.statnlp.hybridnetworks.Network;
 import com.statnlp.hybridnetworks.NetworkCompiler;
 import com.statnlp.hybridnetworks.NetworkException;
 import com.statnlp.hybridnetworks.NetworkIDMapper;
-import com.statnlp.projects.dep.utils.DPConfig;
 import com.statnlp.projects.dep.utils.DPConfig.COMP;
 import com.statnlp.projects.dep.utils.DPConfig.DIR;
 
@@ -24,7 +23,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 	private static final long serialVersionUID = -5080640847287255079L;
 
 	private long[] _nodes;
-	private final int maxSentLen = 57;
+	private final int maxSentLen = 100;
 	private final int maxEntityLen = 7;
 	private int[][][] _children;
 	public enum NodeType {entity, phrase, incomp_dup, normal};
@@ -80,9 +79,9 @@ public class HPENetworkCompiler extends NetworkCompiler {
 			outputMap.put(span, span);
 		Map<Span, Span> labelFreeOutputMap = new HashMap<>();
 		for(Span span: output){
-			Span span_dup = new Span(span.start, span.end, Label.get(DPConfig.EMPTY));
+			Span span_dup = new Span(span.start, span.end);
 			if (span.headSpan != null) {
-				Span headSpan = new Span(span.headSpan.start, span.headSpan.end, Label.get(DPConfig.EMPTY));
+				Span headSpan = new Span(span.headSpan.start, span.headSpan.end);
 				span_dup.headSpan = headSpan;
 			}
 			labelFreeOutputMap.put(span_dup, span_dup);
@@ -94,7 +93,6 @@ public class HPENetworkCompiler extends NetworkCompiler {
 				long phraseNode = this.toNodePhrase(leftPos, rightPos);
 				for (int l = 0; l < Label.Labels.size(); l++) {
 					if (l == Label.get(OEntity).id && leftPos != rightPos) continue;
-					if (l == Label.get(DPConfig.EMPTY).id) continue;
 					Span span = new Span(leftPos, rightPos, Label.get(l));
 					if (outputMap.containsKey(span)) {
 						network.addNode(phraseNode);
@@ -112,7 +110,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 		for(int rightIndex = 1; rightIndex <= sent.length()-1; rightIndex++){
 			//eIndex: 1,2,3,4,5,..n
 			for (int spanLen = 1; spanLen <= maxEntityLen && (rightIndex - spanLen + 1) > 0; spanLen++) {
-				Span span = new Span(rightIndex - spanLen + 1, rightIndex, Label.get(DPConfig.EMPTY));
+				Span span = new Span(rightIndex - spanLen + 1, rightIndex);
 				if (labelFreeOutputMap.containsKey(span)) {
 					long wordRightNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, rightDir, spanLen); 
 					long wordLeftNodeE = this.toNodeComp(rightIndex - spanLen + 1, rightIndex, leftDir, spanLen);
@@ -242,7 +240,6 @@ public class HPENetworkCompiler extends NetworkCompiler {
 				long phraseNode = this.toNodePhrase(leftPos, rightPos);
 				for (int l = 0; l < Label.Labels.size(); l++) {
 					if (l == Label.get(OEntity).id && leftPos != rightPos) continue;
-					if (l == Label.get(DPConfig.EMPTY).id) continue;
 					network.addNode(phraseNode);
 					long entityNode = this.toNodeEntity(leftPos, rightPos, l);
 					network.addNode(entityNode);
@@ -408,10 +405,10 @@ public class HPENetworkCompiler extends NetworkCompiler {
 			if (comp == COMP.incomp.ordinal() && nodeType == NodeType.normal.ordinal()) {
 				Span span;
 				if (direction == leftDir) {
-					span = new Span(leftIndex, leftIndex + leftSpanLen - 1, Label.get(DPConfig.EMPTY), 
+					span = new Span(leftIndex, leftIndex + leftSpanLen - 1, null, 
 							new Span(rightIndex - rightSpanLen + 1, rightIndex));
 				} else {
-					span = new Span(rightIndex - rightSpanLen + 1, rightIndex, Label.get(DPConfig.EMPTY), 
+					span = new Span(rightIndex - rightSpanLen + 1, rightIndex, null, 
 							new Span(leftIndex, leftIndex + leftSpanLen - 1));
 				}
 				predictionMap.put(span, span);

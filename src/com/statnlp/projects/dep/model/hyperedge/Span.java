@@ -1,7 +1,6 @@
 package com.statnlp.projects.dep.model.hyperedge;
 
-import java.io.Serializable;import com.statnlp.projects.dep.utils.DPConfig;
-
+import java.io.Serializable;
 
 /**
  * Span like semi-CRFs.
@@ -46,7 +45,6 @@ public class Span implements Comparable<Span>, Serializable{
 			throw new RuntimeException("Start cannot be larger than end");
 		this.start = start;
 		this.end = end;
-		this.label = Label.get(DPConfig.EMPTY);
 	}
 	
 	public int length() {
