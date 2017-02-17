@@ -64,7 +64,7 @@ public class HPENetworkCompiler extends NetworkCompiler {
 		this.compileLabeled(network, sent, output);
 		if(DEBUG){
 			HPENetwork unlabeled = compileUnLabledInstance(networkId, inst, param);
-			System.err.println("unlabel instance contain? " + unlabeled.contains(network));
+			//System.err.println("unlabel instance contain? " + unlabeled.contains(network));
 			if(!unlabeled.contains(network)){
 				System.err.println(sent.toString());
 				throw new NetworkException("Labeled network is not contained in the unlabeled version");
@@ -387,8 +387,6 @@ public class HPENetworkCompiler extends NetworkCompiler {
 			Span valSpan = newPredictionMap.get(span);
 			prediction.add(valSpan);
 		}
-		System.err.println(newPredictionMap.toString());
-		System.err.println(prediction.toString());
 		Collections.sort(prediction);
 		return prediction;
 	}

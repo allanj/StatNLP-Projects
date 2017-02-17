@@ -3,6 +3,8 @@ package com.statnlp.projects.dep.model.hyperedge;
 import java.io.IOException;
 import java.util.HashSet;
 
+import com.statnlp.commons.ml.opt.GradientDescentOptimizerFactory;
+import com.statnlp.commons.ml.opt.OptimizerFactory;
 import com.statnlp.commons.types.Instance;
 import com.statnlp.hybridnetworks.DiscriminativeNetworkModel;
 import com.statnlp.hybridnetworks.GlobalNetworkParam;
@@ -44,10 +46,10 @@ public class HPEMain {
 		
 		System.err.println("[Info] Current Model:"+modelType);
 		/******Debug********/
-		trainingPath = "data/allanprocess/debug.conllx";
-		testingPath = "data/allanprocess/debug.conllx";
-		trainNumber = 1;
-		testNumber = 1;
+		trainingPath = "data/allanprocess/voa/train.conllx";
+		testingPath = "data/allanprocess/voa/test.conllx";
+		trainNumber = 20;
+		testNumber = 20;
 //		numIteration = 20;
 //		numThreads = 8;
 		testingPath = trainingPath;
@@ -85,7 +87,12 @@ public class HPEMain {
 		NetworkConfig.PARALLEL_FEATURE_EXTRACTION = true;
 		NetworkConfig.AVOID_DUPLICATE_FEATURES = true;
 		
-		HPEFeatureManager hpfm = new HPEFeatureManager(new GlobalNetworkParam());
+		
+		NetworkConfig.USE_BATCH_TRAINING = true;
+		NetworkConfig.BATCH_SIZE = 1;
+		
+		GradientDescentOptimizerFactory optimizer = OptimizerFactory.getGradientDescentFactoryUsingAdaM();
+		HPEFeatureManager hpfm = new HPEFeatureManager(new GlobalNetworkParam(optimizer));
 		HPENetworkCompiler dnc = new HPENetworkCompiler();
 		NetworkModel model = DiscriminativeNetworkModel.create(hpfm, dnc);
 		model.train(trainingInsts, numIteration); 
